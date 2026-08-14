@@ -20,6 +20,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 15 — Alternador de Idioma PT/EN & Internacionalização — CONCLUÍDA
+- Data: 2026-08-14 19:18 (UTC+1)
+- Commit: 2f85e4f
+- Resumo: Criado o módulo gui/i18n.py com dicionário bilingue simétrico PT/EN e persistência de preferência de idioma em data/app_settings.json. Adicionado seletor de idioma segmentado [🇵🇹 PT | 🇬🇧 EN] na barra lateral de gui/app.py com reconstrução dinâmica da UI ao alternar idioma. Criado o módulo core/i18n_helpers.py com funções de localização para notas, acordes, escalas e intervalos (solfejo em PT e notação científica em EN). Suite tests/test_i18n.py criada com 92/92 testes a passar com 100% de sucesso.
+- Ficheiros principais alterados: gui/i18n.py, core/i18n_helpers.py, gui/app.py, data/app_settings.json, tests/test_i18n.py, README.md
+
 ## Fase 14 — Síntese Sonora Realista & Timbres Distintos (Piano vs Viola) — CONCLUÍDA
 - Data: 2026-08-14 19:16 (UTC+1)
 - Commit: 83cb67f
