@@ -6,6 +6,7 @@ import customtkinter as ctk
 from core.user_manager import UserManager
 from audio.player import get_audio_player
 from gui import theme
+from gui.i18n import t, get_language, set_language
 from gui.components.user_modal import UserManagementModal
 from gui.screens.main_menu import MainMenuScreen
 from gui.screens.theory_screen import TheoryScreen
@@ -97,42 +98,37 @@ class ChordMasterApp(ctk.CTk):
         self._update_profile_card()
 
         # Navigation Buttons
-        nav_items = [
-            ("main_menu", "🏠 Menu Principal"),
-            ("theory", "📖 Teoria Musical (8 Cap)"),
-            ("practice_song", "🎶 Tocar Repertório"),
-            ("practice_scales", "🎼 Prática de Escalas"),
-            ("lamire", "🎙️ Lamiré & Afinador"),
-            ("practice_instrument", "🎯 Prática c/ Microfone"),
-            ("practice_ear", "🎧 Treino Auditivo"),
-            ("practice_staff", "🎼 Leitura de Pauta"),
-            ("stats", "📊 Estatísticas & Alunos"),
-        ]
+        self._build_nav_buttons()
 
-        for i, (key, label) in enumerate(nav_items, start=2):
-            btn = ctk.CTkButton(
-                self.sidebar_frame,
-                text=label,
-                font=theme.get_font(theme.FONT_BODY_BOLD),
-                anchor="w",
-                height=40,
-                corner_radius=theme.RADIUS_MD,
-                fg_color="transparent",
-                text_color=theme.COLOR_TEXT_MUTED,
-                hover_color=theme.COLOR_SURFACE_HOVER,
-                command=lambda k=key: self.navigate_to(k),
-            )
-            btn.grid(row=i, column=0, padx=14, pady=2, sticky="ew")
-            self.nav_buttons[key] = btn
-
-        # Reset Progress & Theme Controls at bottom
+        # Reset Progress, Theme & Language Controls at bottom
         bottom_frame = ctk.CTkFrame(self.sidebar_frame, fg_color="transparent")
         bottom_frame.grid(row=11, column=0, padx=14, pady=(10, 16), sticky="ew")
 
-        # Reset Progress Button
-        reset_btn = ctk.CTkButton(
+        # Language Selector
+        self.lang_lbl = ctk.CTkLabel(
             bottom_frame,
-            text="↺ Reiniciar Progresso",
+            text=t("language_label", "Idioma / Language:"),
+            font=theme.get_font(theme.FONT_SMALL_BOLD),
+            text_color=theme.COLOR_TEXT_MUTED,
+        )
+        self.lang_lbl.pack(anchor="w", pady=(0, 2))
+
+        self.lang_option = ctk.CTkSegmentedButton(
+            bottom_frame,
+            values=["🇵🇹 PT", "🇬🇧 EN"],
+            command=self._change_language,
+            height=30,
+            font=theme.get_font(theme.FONT_SMALL_BOLD),
+            selected_color=theme.COLOR_PRIMARY,
+            selected_hover_color=theme.COLOR_PRIMARY_HOVER,
+        )
+        self.lang_option.set("🇵🇹 PT" if get_language() == "pt" else "🇬🇧 EN")
+        self.lang_option.pack(fill="x", pady=(0, 8))
+
+        # Reset Progress Button
+        self.reset_btn = ctk.CTkButton(
+            bottom_frame,
+            text=t("reset_progress", "↺ Reiniciar Progresso"),
             font=theme.get_font(theme.FONT_SMALL_BOLD),
             fg_color="transparent",
             text_color=theme.COLOR_ACCENT_CRIMSON,
@@ -141,14 +137,15 @@ class ChordMasterApp(ctk.CTk):
             corner_radius=theme.RADIUS_SM,
             command=self.confirm_reset_user_progress,
         )
-        reset_btn.pack(fill="x", pady=(0, 10))
+        self.reset_btn.pack(fill="x", pady=(0, 8))
 
-        ctk.CTkLabel(
+        self.theme_lbl = ctk.CTkLabel(
             bottom_frame,
-            text="Tema Visual:",
+            text=t("theme_label", "Tema Visual:"),
             font=theme.get_font(theme.FONT_SMALL_BOLD),
             text_color=theme.COLOR_TEXT_MUTED,
-        ).pack(anchor="w", pady=(0, 4))
+        )
+        self.theme_lbl.pack(anchor="w", pady=(0, 4))
 
         self.theme_option = ctk.CTkOptionMenu(
             bottom_frame,
@@ -218,6 +215,55 @@ class ChordMasterApp(ctk.CTk):
             command=self._open_user_modal,
         )
         switch_btn.pack(fill="x", padx=12, pady=(6, 10))
+
+    def _build_nav_buttons(self):
+        nav_items = [
+            ("main_menu", t("nav_main_menu", "🏠 Menu Principal")),
+            ("theory", t("nav_theory", "📖 Teoria Musical (8 Cap)")),
+            ("practice_song", t("nav_practice_song", "🎶 Tocar Repertório")),
+            ("practice_scales", t("nav_practice_scales", "🎼 Prática de Escalas")),
+            ("lamire", t("nav_lamire", "🎙️ Lamiré & Afinador")),
+            ("practice_instrument", t("nav_practice_instrument", "🎯 Prática c/ Microfone")),
+            ("practice_ear", t("nav_practice_ear", "🎧 Treino Auditivo")),
+            ("practice_staff", t("nav_practice_staff", "🎼 Leitura de Pauta")),
+            ("stats", t("nav_stats", "📊 Estatísticas & Alunos")),
+        ]
+
+        for i, (key, label) in enumerate(nav_items, start=2):
+            if key in self.nav_buttons:
+                self.nav_buttons[key].configure(text=label)
+            else:
+                btn = ctk.CTkButton(
+                    self.sidebar_frame,
+                    text=label,
+                    font=theme.get_font(theme.FONT_BODY_BOLD),
+                    anchor="w",
+                    height=40,
+                    corner_radius=theme.RADIUS_MD,
+                    fg_color="transparent",
+                    text_color=theme.COLOR_TEXT_MUTED,
+                    hover_color=theme.COLOR_SURFACE_HOVER,
+                    command=lambda k=key: self.navigate_to(k),
+                )
+                btn.grid(row=i, column=0, padx=14, pady=2, sticky="ew")
+                self.nav_buttons[key] = btn
+
+    def _change_language(self, val: str):
+        lang = "pt" if "PT" in val else "en"
+        set_language(lang)
+        self._refresh_ui_language()
+
+    def _refresh_ui_language(self):
+        # Update sidebar labels and buttons
+        self._build_nav_buttons()
+        self.lang_lbl.configure(text=t("language_label", "Idioma / Language:"))
+        self.theme_lbl.configure(text=t("theme_label", "Tema Visual:"))
+        self.reset_btn.configure(text=t("reset_progress", "↺ Reiniciar Progresso"))
+        self._update_profile_card()
+
+        # Re-navigate to refresh current screen content in new language
+        if self.current_screen_name:
+            self.navigate_to(self.current_screen_name)
 
     def _open_user_modal(self):
         modal = UserManagementModal(

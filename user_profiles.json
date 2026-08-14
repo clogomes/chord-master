@@ -90,10 +90,12 @@
       "username": "Carlini",
       "avatar": "🎸",
       "created_at": 1786724265.081036,
-      "xp": 999,
+      "xp": 1702,
       "unlocked_achievements": [
         "first_step",
-        "theory_scholar"
+        "theory_scholar",
+        "sight_reader",
+        "streak_fire"
       ],
       "completed_lessons": [
         "chap1_fundamentals",
@@ -110,10 +112,10 @@
           "best_streak": 1
         },
         "leitura_pauta": {
-          "total_attempts": 6,
-          "correct_count": 6,
-          "current_streak": 6,
-          "best_streak": 6
+          "total_attempts": 15,
+          "correct_count": 15,
+          "current_streak": 15,
+          "best_streak": 15
         },
         "teoria": {
           "total_attempts": 0,
@@ -197,6 +199,87 @@
           "prompt": "Identifica a nota desenhada na pauta na **Clave de Sol**:",
           "user_answer": "Si (B)",
           "correct_answer": "Si (B)"
+        },
+        {
+          "timestamp": 1786731414.920612,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Sol**:",
+          "user_answer": "Mi (E)",
+          "correct_answer": "Mi (E)"
+        },
+        {
+          "timestamp": 1786731424.2597702,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Sol**:",
+          "user_answer": "Fá (F)",
+          "correct_answer": "Fá (F)"
+        },
+        {
+          "timestamp": 1786731430.456002,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Sol**:",
+          "user_answer": "Sol (G)",
+          "correct_answer": "Sol (G)"
+        },
+        {
+          "timestamp": 1786731438.7710001,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Sol**:",
+          "user_answer": "Dó (C)",
+          "correct_answer": "Dó (C)"
+        },
+        {
+          "timestamp": 1786731445.708833,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Sol**:",
+          "user_answer": "Si (B)",
+          "correct_answer": "Si (B)"
+        },
+        {
+          "timestamp": 1786731452.371294,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Sol**:",
+          "user_answer": "Ré (D)",
+          "correct_answer": "Ré (D)"
+        },
+        {
+          "timestamp": 1786731455.849576,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Sol**:",
+          "user_answer": "Sol (G)",
+          "correct_answer": "Sol (G)"
+        },
+        {
+          "timestamp": 1786731477.194109,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Fá**:",
+          "user_answer": "Mi (E)",
+          "correct_answer": "Mi (E)"
+        },
+        {
+          "timestamp": 1786731487.827404,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Fá**:",
+          "user_answer": "Mi (E)",
+          "correct_answer": "Mi (E)"
         }
       ]
     }
