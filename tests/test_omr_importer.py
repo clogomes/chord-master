@@ -154,21 +154,30 @@ class TestDetectNoteheads(unittest.TestCase):
 
 class TestMapPixelToNote(unittest.TestCase):
     def _treble_staff(self):
-        """Returns synthetic staff lines at spacing=12, 2nd line (index 1) at y=62."""
+        """
+        Returns synthetic staff lines sorted top→bottom (y ascending):
+          index 0 → y=50  (1st line from top = 5th from bottom)
+          index 1 → y=62
+          index 2 → y=74
+          index 3 → y=86  ← 2nd line from BOTTOM (ref for G4 treble / B2 bass)
+          index 4 → y=98  (bottom line)
+        spacing = 12 px
+        """
         return [(50, 1.0), (62, 1.0), (74, 1.0), (86, 1.0), (98, 1.0)]
 
     def test_treble_reference_line_maps_to_g4(self):
         staff = self._treble_staff()
-        # y=62 is the 2nd line from bottom (index 1) → G4 in treble clef
-        note = map_pixel_to_note(62, staff, clef="treble")
-        self.assertEqual(note.letter, "G")
+        # y=86 is the 2nd line from the BOTTOM (index 3) → G4 in treble clef
+        note = map_pixel_to_note(86, staff, clef="treble")
+        self.assertEqual(note.letter, "G",
+                         f"Expected G4 at ref line y=86, got {note}")
         self.assertEqual(note.octave, 4)
 
     def test_higher_pixel_gives_higher_note(self):
         staff = self._treble_staff()
         # higher on screen (smaller y) = higher pitch
-        note_low = map_pixel_to_note(80, staff, clef="treble")
-        note_high = map_pixel_to_note(40, staff, clef="treble")
+        note_low = map_pixel_to_note(98, staff, clef="treble")   # bottom line
+        note_high = map_pixel_to_note(44, staff, clef="treble")  # above top line
         self.assertGreater(note_high.midi, note_low.midi,
                            f"Expected {note_high} > {note_low}")
 
@@ -179,9 +188,63 @@ class TestMapPixelToNote(unittest.TestCase):
 
     def test_bass_clef_reference_maps_to_b2(self):
         staff = self._treble_staff()
-        note = map_pixel_to_note(62, staff, clef="bass")
-        self.assertEqual(note.letter, "B")
+        # Same staff geometry; y=86 is 2nd from bottom → B2 in bass clef
+        note = map_pixel_to_note(86, staff, clef="bass")
+        self.assertEqual(note.letter, "B",
+                         f"Expected B2 at ref line y=86 (bass clef), got {note}")
         self.assertEqual(note.octave, 2)
+
+    def test_one_step_above_reference_is_next_diatonic(self):
+        """One half-step (spacing/2) above G4 reference should give A4."""
+        staff = self._treble_staff()
+        spacing = 12
+        half_step = spacing / 2  # = 6 px
+        ref_y = 86
+        # One diatonic step above G4 is A4; above = smaller y
+        note = map_pixel_to_note(ref_y - round(half_step), staff, clef="treble")
+        self.assertEqual(note.letter, "A",
+                         f"One step above G4 ref should be A4, got {note}")
+
+    def test_integration_detect_then_map_treble(self):
+        """
+        End-to-end: draw 5 real staff lines with numpy, run detect_staff_lines,
+        then confirm that a 'note' drawn at the 2nd-line-from-bottom position
+        maps to G4 (treble). This is the regression test the Claude review asked for.
+        """
+        spacing = 14
+        line_ys = [40, 54, 68, 82, 96]  # top→bottom, spacing=14
+        # ref = 2nd from bottom = line_ys[-2] = 82
+        ref_y = line_ys[-2]  # 82
+
+        binary = np.zeros((200, 600), dtype=np.uint8)
+        for y in line_ys:
+            binary[y, :] = 1  # full-width lines
+
+        detected = detect_staff_lines(binary)
+        self.assertEqual(len(detected), 5, f"Expected 5 staff lines, got {len(detected)}")
+
+        note = map_pixel_to_note(ref_y, detected, clef="treble")
+        self.assertEqual(note.letter, "G",
+                         f"Integration: expected G at ref line y={ref_y}, got {note}")
+        self.assertEqual(note.octave, 4,
+                         f"Integration: expected octave 4, got {note.octave}")
+
+    def test_integration_detect_then_map_bass(self):
+        """Same integration test for bass clef: 2nd line from bottom → B2."""
+        spacing = 14
+        line_ys = [40, 54, 68, 82, 96]
+        ref_y = line_ys[-2]  # 82
+
+        binary = np.zeros((200, 600), dtype=np.uint8)
+        for y in line_ys:
+            binary[y, :] = 1
+
+        detected = detect_staff_lines(binary)
+        note = map_pixel_to_note(ref_y, detected, clef="bass")
+        self.assertEqual(note.letter, "B",
+                         f"Integration bass: expected B at y={ref_y}, got {note}")
+        self.assertEqual(note.octave, 2,
+                         f"Integration bass: expected octave 2, got {note.octave}")
 
 
 class TestImportScoreAsSong(unittest.TestCase):

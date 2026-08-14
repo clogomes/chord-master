@@ -221,8 +221,12 @@ def map_pixel_to_note(
     spacing = _line_spacing(staff_lines)
     half_step = spacing / 2.0
 
-    # 2nd line from bottom in a 5-line staff = index [1] (0-based)
-    ref_idx = min(1, len(staff_lines) - 1)
+    # staff_lines is sorted top→bottom (ascending y).
+    # The 2nd line from the BOTTOM is at index len-2 (index 3 in a 5-line staff).
+    # This is the reference line for both clefs:
+    #   Treble: 2nd line from bottom = G4  (diatonic_step 32)
+    #   Bass:   2nd line from bottom = B2  (diatonic_step 20)
+    ref_idx = max(0, len(staff_lines) - 2)
     ref_y = staff_lines[ref_idx][0]
 
     ref_pitch_str, ref_diatonic = _CLEF_REF.get(clef, _CLEF_REF["treble"])
