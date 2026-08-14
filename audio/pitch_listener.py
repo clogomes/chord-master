@@ -1,6 +1,7 @@
 """Microphone audio capture and real-time autocorrelation pitch detection engine."""
 import math
 import threading
+import time
 from typing import Callable, Optional, Tuple
 import numpy as np
 from core.notes import Note, midi_to_note
@@ -109,12 +110,14 @@ def detect_pitch_from_samples(
 class PitchListener:
     """
     Manages live microphone audio stream capture in a background daemon thread,
-    periodically triggering pitch detection callbacks.
+    periodically triggering pitch detection callbacks with intelligent rate-limiting.
     """
 
-    def __init__(self, sample_rate: int = 44100, block_size: int = 2048):
+    def __init__(self, sample_rate: int = 44100, block_size: int = 2048, max_fps: float = 16.0):
         self.sample_rate = sample_rate
         self.block_size = block_size
+        self.min_callback_interval = 1.0 / max_fps
+        self._last_callback_time = 0.0
         self._is_listening = False
         self._stream = None
         self._callback: Optional[Callable[[Optional[Note], float, float, float], None]] = None
@@ -146,6 +149,7 @@ class PitchListener:
                 return True
 
             self._callback = callback
+            self._last_callback_time = 0.0
             try:
                 self._stream = sd.InputStream(
                     samplerate=self.sample_rate,
@@ -177,9 +181,14 @@ class PitchListener:
             self._callback = None
 
     def _audio_stream_callback(self, indata, frames, time_info, status):
-        """Internal callback invoked by sounddevice for each captured block."""
+        """Internal callback invoked by sounddevice with rate-limiting."""
         if not self._is_listening or self._callback is None:
             return
+
+        now = time.time()
+        if now - self._last_callback_time < self.min_callback_interval:
+            return
+        self._last_callback_time = now
 
         samples = indata[:, 0]
         detected_note, cents, conf, freq = detect_pitch_from_samples(
@@ -187,8 +196,9 @@ class PitchListener:
             sample_rate=self.sample_rate,
         )
 
-        if self._callback is not None:
+        cb = self._callback
+        if cb is not None and self._is_listening:
             try:
-                self._callback(detected_note, cents, conf, freq)
+                cb(detected_note, cents, conf, freq)
             except Exception:
                 pass

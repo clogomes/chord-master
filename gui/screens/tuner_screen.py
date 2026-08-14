@@ -1,5 +1,6 @@
 """Lamiré & Chromatic Tuner screen with real-time microphone pitch detection and reference tone generator."""
 import math
+import time
 import tkinter as tk
 from typing import Callable, Dict, List, Optional
 import customtkinter as ctk
@@ -36,16 +37,17 @@ class LamireScreen(ctk.CTkFrame):
         super().__init__(master, fg_color=theme.COLOR_BG, **kwargs)
         self.on_back = on_back
         self.audio_player = get_audio_player()
-        self.pitch_listener = PitchListener()
+        self.pitch_listener = PitchListener(max_fps=15.0)
 
         self.tuner_mode = "Cromático"  # "Cromático" ou "Viola (6 Cordas)"
         self.current_cents: float = 0.0
         self.current_freq: float = 0.0
         self.current_note: Optional[Note] = None
 
+        self._is_gui_busy: bool = False
+        self._last_gui_update: float = 0.0
+
         self._build_ui()
-        # Automatically start listening on enter
-        self._start_listening()
 
     def _build_ui(self):
         # 1. Top Navigation Bar
@@ -85,10 +87,10 @@ class LamireScreen(ctk.CTkFrame):
         # Live Mic Toggle Button
         self.mic_toggle_btn = ctk.CTkButton(
             nav_bar,
-            text="⏹️ Desativar Microfone",
+            text="🎙️ Ativar Microfone",
             font=theme.get_font(theme.FONT_BODY_BOLD),
-            fg_color=theme.COLOR_ACCENT_CRIMSON,
-            hover_color=theme.COLOR_ACCENT_CRIMSON_HOVER,
+            fg_color=theme.COLOR_SUCCESS,
+            hover_color=theme.COLOR_SUCCESS_HOVER,
             width=170,
             height=38,
             corner_radius=theme.RADIUS_MD,
@@ -146,7 +148,7 @@ class LamireScreen(ctk.CTkFrame):
 
         self.note_name_lbl = ctk.CTkLabel(
             note_center_frame,
-            text="Toca uma nota perto do microfone...",
+            text="Clica em «Ativar Microfone» e toca uma nota...",
             font=theme.get_font(theme.FONT_SECTION),
             text_color=theme.COLOR_TEXT_MUTED,
         )
@@ -173,7 +175,7 @@ class LamireScreen(ctk.CTkFrame):
 
         self.status_hint_lbl = ctk.CTkLabel(
             self.tuner_card,
-            text="A aguardar sinal de áudio...",
+            text="Microfone em pausa. Clica no botão acima para iniciar a deteção.",
             font=theme.get_font(theme.FONT_SUBTITLE),
             text_color=theme.COLOR_TEXT_MUTED,
         )
@@ -338,6 +340,7 @@ class LamireScreen(ctk.CTkFrame):
                 fg_color=theme.COLOR_ACCENT_CRIMSON,
                 hover_color=theme.COLOR_ACCENT_CRIMSON_HOVER,
             )
+            self.status_hint_lbl.configure(text="🎙️ A ouvir... Toca uma nota no teu instrumento.", text_color="#38BDF8")
         else:
             self.status_hint_lbl.configure(text="⚠️ Erro: Microfone não disponível", text_color=theme.COLOR_ACCENT_CRIMSON)
 
@@ -351,13 +354,28 @@ class LamireScreen(ctk.CTkFrame):
         self.note_letter_lbl.configure(text="--", text_color=theme.COLOR_TEXT_MUTED)
         self.note_name_lbl.configure(text="Microfone em pausa", text_color=theme.COLOR_TEXT_MUTED)
         self.freq_lbl.configure(text="0.0 Hz  |  0 cents")
-        self.status_hint_lbl.configure(text="Microfone desligado", text_color=theme.COLOR_TEXT_MUTED)
+        self.status_hint_lbl.configure(text="Microfone desligado. Clica em «Ativar Microfone» para retomar.", text_color=theme.COLOR_TEXT_MUTED)
         self.tuner_card.configure(border_color=theme.COLOR_BORDER)
         self._draw_gauge(0.0, is_active=False)
 
     def _on_live_audio(self, note: Optional[Note], cents: float, conf: float, freq: float):
-        if self.winfo_exists():
-            self.after(0, lambda: self._update_gui(note, cents, conf, freq))
+        now = time.time()
+        if now - self._last_gui_update < 0.075:
+            return
+        if self._is_gui_busy or not self.winfo_exists():
+            return
+        self._last_gui_update = now
+        self._is_gui_busy = True
+        try:
+            self.after(0, lambda: self._safe_update_gui(note, cents, conf, freq))
+        except Exception:
+            self._is_gui_busy = False
+
+    def _safe_update_gui(self, note: Optional[Note], cents: float, conf: float, freq: float):
+        try:
+            self._update_gui(note, cents, conf, freq)
+        finally:
+            self._is_gui_busy = False
 
     def _update_gui(self, note: Optional[Note], cents: float, conf: float, freq: float):
         if not self.winfo_exists():

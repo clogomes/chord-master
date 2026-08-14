@@ -13,6 +13,7 @@ from gui.components.piano_keyboard import PianoKeyboard
 from gui.components.staff_canvas import StaffCanvas
 from gui.components.guitar_fretboard import GuitarFretboard
 from gui.components.score_card import ScoreCard
+from gui import theme
 
 
 class PracticeInstrumentScreen(ctk.CTkFrame):
@@ -28,14 +29,14 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         on_back: Callable[[], None],
         **kwargs,
     ):
-        super().__init__(master, fg_color=("#F8FAFC", "#0F172A"), **kwargs)
+        super().__init__(master, fg_color=theme.COLOR_BG, **kwargs)
         self.user_manager = user_manager
         self.on_back = on_back
         self.audio_player = get_audio_player()
-        self.pitch_listener = PitchListener()
+        self.pitch_listener = PitchListener(max_fps=15.0)
 
         self.instrument_type: str = "Piano"  # "Piano" ou "Viola"
-        self.exercise_type: str = "Escalas"  # "Escalas", "Acordes", "Repertório"
+        self.exercise_type: str = "Escalas"
 
         self.exercise_notes: List[Note] = []
         self.current_note_idx: int = 0
@@ -46,6 +47,10 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self._sustain_threshold_sec: float = 0.30  # 300 ms required sustain
         self._is_advancing: bool = False
         self.exercise_completed: bool = False
+
+        # GUI Throttling & safety guards
+        self._is_gui_busy: bool = False
+        self._last_gui_update: float = 0.0
 
         # Scoring
         self.correct_notes_count: int = 0
@@ -62,10 +67,12 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         back_btn = ctk.CTkButton(
             nav_bar,
             text="← Voltar ao Menu",
-            font=ctk.CTkFont(family="Helvetica", size=13, weight="bold"),
+            font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color="#475569",
             hover_color="#334155",
-            width=130,
+            width=140,
+            height=38,
+            corner_radius=theme.RADIUS_MD,
             command=self._handle_back,
         )
         back_btn.pack(side="left")
@@ -73,9 +80,9 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         user = self.user_manager.current_user
         title_lbl = ctk.CTkLabel(
             nav_bar,
-            text=f"🎙️ Prática com Instrumento Real ({user.avatar} {user.username})",
-            font=ctk.CTkFont(family="Helvetica", size=20, weight="bold"),
-            text_color=("#0F172A", "#F8FAFC"),
+            text=f"🎯 Prática de Instrumento Real ({user.avatar} {user.username})",
+            font=theme.get_font(theme.FONT_TITLE),
+            text_color=theme.COLOR_TEXT_PRIMARY,
         )
         title_lbl.pack(side="left", padx=14)
 
@@ -83,10 +90,12 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self.mic_btn = ctk.CTkButton(
             nav_bar,
             text="🎙️ Ativar Microfone",
-            font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"),
-            fg_color="#059669",
-            hover_color="#047857",
-            width=160,
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            fg_color=theme.COLOR_SUCCESS,
+            hover_color=theme.COLOR_SUCCESS_HOVER,
+            width=170,
+            height=38,
+            corner_radius=theme.RADIUS_MD,
             command=self._toggle_microphone,
         )
         self.mic_btn.pack(side="right")
@@ -94,40 +103,46 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         # 2. Main Scrollable Container
         self.container = ctk.CTkScrollableFrame(
             self,
-            corner_radius=12,
-            fg_color=("#F8FAFC", "#0F172A"),
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_BG,
             border_width=1,
-            border_color=("#E2E8F0", "#334155"),
+            border_color=theme.COLOR_BORDER,
         )
         self.container.pack(fill="both", expand=True, padx=18, pady=(4, 14))
 
         # 2.1 Configuration Controls Bar
         cfg_bar = ctk.CTkFrame(
             self.container,
-            corner_radius=10,
-            fg_color=("#F1F5F9", "#1E293B"),
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_SURFACE,
             border_width=1,
-            border_color=("#E2E8F0", "#334155"),
+            border_color=theme.COLOR_BORDER,
         )
         cfg_bar.pack(fill="x", padx=6, pady=(0, 10))
 
         # Instrument Selector
-        ctk.CTkLabel(cfg_bar, text="Instrumento:", font=ctk.CTkFont(family="Helvetica", size=12, weight="bold")).pack(side="left", padx=(12, 4), pady=10)
+        ctk.CTkLabel(cfg_bar, text="Instrumento:", font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(14, 4), pady=12)
         self.inst_select = ctk.CTkOptionMenu(
             cfg_bar,
             values=["🎹 Piano Acústico", "🎸 Viola / Guitarra"],
             command=self._on_instrument_changed,
+            font=theme.get_font(theme.FONT_BODY),
+            height=34,
+            corner_radius=theme.RADIUS_SM,
             width=170,
         )
         self.inst_select.set("🎹 Piano Acústico")
         self.inst_select.pack(side="left", padx=4)
 
         # Exercise Type
-        ctk.CTkLabel(cfg_bar, text="Tipo de Exercício:", font=ctk.CTkFont(family="Helvetica", size=12, weight="bold")).pack(side="left", padx=(14, 4))
+        ctk.CTkLabel(cfg_bar, text="Exercício:", font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(14, 4))
         self.exercise_type_select = ctk.CTkOptionMenu(
             cfg_bar,
             values=["Escala Maior de Dó", "Escala Menor de Lá", "Arpejo Dó Maior (C)", "Arpejo Lá Menor (Am)", "Música: Hino à Alegria", "Música: Brilha Estrelinha", "Música: Für Elise"],
             command=self._on_exercise_changed,
+            font=theme.get_font(theme.FONT_BODY),
+            height=34,
+            corner_radius=theme.RADIUS_SM,
             width=230,
         )
         self.exercise_type_select.set("Escala Maior de Dó")
@@ -137,21 +152,23 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         restart_btn = ctk.CTkButton(
             cfg_bar,
             text="↺ Reiniciar",
-            font=ctk.CTkFont(family="Helvetica", size=12),
+            font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color="#475569",
             hover_color="#334155",
             width=100,
+            height=34,
+            corner_radius=theme.RADIUS_SM,
             command=self._restart_exercise,
         )
-        restart_btn.pack(side="right", padx=12)
+        restart_btn.pack(side="right", padx=14)
 
         # 2.2 Live Tuner Gauge / Pitch Display Card
         self.tuner_card = ctk.CTkFrame(
             self.container,
-            corner_radius=12,
-            fg_color=("#F1F5F9", "#1E293B"),
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_SURFACE,
             border_width=2,
-            border_color="#334155",
+            border_color=theme.COLOR_BORDER,
         )
         self.tuner_card.pack(fill="x", padx=6, pady=(0, 10))
 
@@ -160,39 +177,39 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         tuner_grid.grid_columnconfigure((0, 1), weight=1)
 
         # Left: Target Note Box
-        target_box = ctk.CTkFrame(tuner_grid, corner_radius=10, fg_color=("#E2E8F0", "#0F172A"))
+        target_box = ctk.CTkFrame(tuner_grid, corner_radius=theme.RADIUS_MD, fg_color=theme.COLOR_SURFACE_SECONDARY)
         target_box.grid(row=0, column=0, padx=(0, 8), sticky="nsew")
 
-        ctk.CTkLabel(target_box, text="NOTA ALVO", font=ctk.CTkFont(family="Helvetica", size=11, weight="bold"), text_color=("#64748B", "#94A3B8")).pack(pady=(8, 0))
-        self.target_note_lbl = ctk.CTkLabel(target_box, text="C4 (Dó)", font=ctk.CTkFont(family="Helvetica", size=24, weight="bold"), text_color="#3B82F6")
+        ctk.CTkLabel(target_box, text="NOTA ALVO", font=theme.get_font(theme.FONT_BADGE), text_color=theme.COLOR_TEXT_MUTED).pack(pady=(8, 0))
+        self.target_note_lbl = ctk.CTkLabel(target_box, text="C4 (Dó)", font=ctk.CTkFont(family=theme.FONT_FAMILY, size=26, weight="bold"), text_color=theme.COLOR_PRIMARY)
         self.target_note_lbl.pack(pady=(0, 8))
 
         # Right: Detected Note Box
-        detected_box = ctk.CTkFrame(tuner_grid, corner_radius=10, fg_color=("#E2E8F0", "#0F172A"))
+        detected_box = ctk.CTkFrame(tuner_grid, corner_radius=theme.RADIUS_MD, fg_color=theme.COLOR_SURFACE_SECONDARY)
         detected_box.grid(row=0, column=1, padx=(8, 0), sticky="nsew")
 
-        ctk.CTkLabel(detected_box, text="MICROFONE / NOTA DETETADA", font=ctk.CTkFont(family="Helvetica", size=11, weight="bold"), text_color=("#64748B", "#94A3B8")).pack(pady=(8, 0))
-        self.detected_note_lbl = ctk.CTkLabel(detected_box, text="A aguardar áudio...", font=ctk.CTkFont(family="Helvetica", size=24, weight="bold"), text_color=("#64748B", "#94A3B8"))
+        ctk.CTkLabel(detected_box, text="MICROFONE / NOTA DETETADA", font=theme.get_font(theme.FONT_BADGE), text_color=theme.COLOR_TEXT_MUTED).pack(pady=(8, 0))
+        self.detected_note_lbl = ctk.CTkLabel(detected_box, text="Microfone desligado", font=ctk.CTkFont(family=theme.FONT_FAMILY, size=26, weight="bold"), text_color=theme.COLOR_TEXT_MUTED)
         self.detected_note_lbl.pack(pady=(0, 8))
 
         # Cents offset meter / needle
         meter_frame = ctk.CTkFrame(self.tuner_card, fg_color="transparent")
         meter_frame.pack(fill="x", padx=16, pady=(0, 10))
 
-        self.cents_bar = ctk.CTkProgressBar(meter_frame, height=10, progress_color="#10B981")
+        self.cents_bar = ctk.CTkProgressBar(meter_frame, height=10, progress_color=theme.COLOR_SUCCESS)
         self.cents_bar.set(0.5)  # 0.5 = perfectly in tune
         self.cents_bar.pack(fill="x", pady=4)
 
         self.intonation_status_lbl = ctk.CTkLabel(
             meter_frame,
-            text="Toca a nota no teu instrumento real e o microfone detetará o som automaticamente!",
-            font=ctk.CTkFont(family="Helvetica", size=13, weight="bold"),
-            text_color=("#475569", "#CBD5E1"),
+            text="Toca a nota no teu instrumento acústico após ligar o microfone!",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            text_color=theme.COLOR_TEXT_MUTED,
         )
         self.intonation_status_lbl.pack()
 
         # Progress bar
-        self.progress_bar = ctk.CTkProgressBar(self.container, height=6, progress_color="#2563EB")
+        self.progress_bar = ctk.CTkProgressBar(self.container, height=7, progress_color=theme.COLOR_PRIMARY)
         self.progress_bar.set(0.0)
         self.progress_bar.pack(fill="x", padx=6, pady=(0, 8))
 
@@ -210,26 +227,25 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
 
         # 3. Guitar View
         self.guitar_view = GuitarFretboard(vis_frame, width=650, height=155, num_frets=15)
-        # Initially hidden if in Piano mode
 
-        # macOS Microphone permission hint
+        # Guidance hint
         hint_card = ctk.CTkFrame(
             self.container,
-            corner_radius=10,
-            fg_color=("#EFF6FF", "#172554"),
+            corner_radius=theme.RADIUS_MD,
+            fg_color=theme.COLOR_PRIMARY_BG,
             border_width=1,
-            border_color=("#BFDBFE", "#1E40AF"),
+            border_color=theme.COLOR_PRIMARY_BORDER,
         )
         hint_card.pack(fill="x", padx=6, pady=(8, 10))
 
         ctk.CTkLabel(
             hint_card,
-            text="ℹ️ **Como Funciona**: Toca a nota pedida no teu instrumento acústico perto do microfone. Quando a afinação estiver afinada (±25 cents) e sustentada por 0.3s, a aplicação avança automaticamente!",
-            font=ctk.CTkFont(family="Helvetica", size=11),
-            text_color=("#1E40AF", "#DBEAFE"),
+            text="ℹ️ **Como Funciona**: Toca a nota pedida no teu instrumento acústico perto do microfone. Quando a nota estiver afinada (±25 cents) e sustentada por 0.3s, a aplicação avança automaticamente!",
+            font=theme.get_font(theme.FONT_BODY),
+            text_color=theme.COLOR_PRIMARY,
             justify="left",
             wraplength=660,
-        ).pack(padx=14, pady=10)
+        ).pack(padx=16, pady=10)
 
         # Score Card for completion
         self.score_card = ScoreCard(self.container, on_next=self._restart_exercise)
@@ -318,21 +334,21 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
             self.pitch_listener.stop_listening()
             self.mic_btn.configure(
                 text="🎙️ Ativar Microfone",
-                fg_color="#059669",
-                hover_color="#047857",
+                fg_color=theme.COLOR_SUCCESS,
+                hover_color=theme.COLOR_SUCCESS_HOVER,
             )
-            self.detected_note_lbl.configure(text="Microfone desligado", text_color=("#64748B", "#94A3B8"))
+            self.detected_note_lbl.configure(text="Microfone desligado", text_color=theme.COLOR_TEXT_MUTED)
         else:
             started = self.pitch_listener.start_listening(self._on_live_audio_block)
             if started:
                 self.mic_btn.configure(
                     text="⏹️ Desativar Microfone",
-                    fg_color="#DC2626",
-                    hover_color="#B91C1C",
+                    fg_color=theme.COLOR_ACCENT_CRIMSON,
+                    hover_color=theme.COLOR_ACCENT_CRIMSON_HOVER,
                 )
                 self.detected_note_lbl.configure(text="A ouvir...", text_color="#38BDF8")
             else:
-                self.detected_note_lbl.configure(text="Erro ao aceder ao microfone", text_color="#EF4444")
+                self.detected_note_lbl.configure(text="Erro de microfone", text_color=theme.COLOR_ACCENT_CRIMSON)
 
     def _on_live_audio_block(
         self,
@@ -341,10 +357,24 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         conf: float,
         f0: float,
     ):
-        """Threaded callback from sounddevice audio stream."""
-        # Schedule GUI updates on main Tkinter thread safely
-        if self.winfo_exists():
-            self.after(0, lambda: self._process_pitch_on_gui(detected_note, cents, conf, f0))
+        """Threaded callback from sounddevice audio stream with rate-limiting."""
+        now = time.time()
+        if now - self._last_gui_update < 0.075:
+            return
+        if self._is_gui_busy or not self.winfo_exists():
+            return
+        self._last_gui_update = now
+        self._is_gui_busy = True
+        try:
+            self.after(0, lambda: self._safe_process_pitch(detected_note, cents, conf, f0))
+        except Exception:
+            self._is_gui_busy = False
+
+    def _safe_process_pitch(self, detected_note, cents, conf, f0):
+        try:
+            self._process_pitch_on_gui(detected_note, cents, conf, f0)
+        finally:
+            self._is_gui_busy = False
 
     def _process_pitch_on_gui(
         self,
@@ -364,7 +394,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         cents_str = f"{cents:+.0f}c" if abs(cents) >= 1.0 else "0c"
         self.detected_note_lbl.configure(
             text=f"{detected_note.pitch}{detected_note.octave} ({cents_str})",
-            text_color="#10B981" if abs(cents) <= 25 else "#F59E0B",
+            text_color=theme.COLOR_SUCCESS if abs(cents) <= 25 else theme.COLOR_ACCENT_AMBER,
         )
 
         # Update progress bar position (0.0 = -50 cents, 0.5 = 0 cents, 1.0 = +50 cents)
@@ -379,9 +409,9 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
             if abs(cents) <= 25.0:
                 self.intonation_status_lbl.configure(
                     text="✓ Excelente afinação! Sustenta a nota...",
-                    text_color="#10B981",
+                    text_color=theme.COLOR_SUCCESS,
                 )
-                self.tuner_card.configure(border_color="#10B981")
+                self.tuner_card.configure(border_color=theme.COLOR_SUCCESS)
 
                 now = time.time()
                 if self._matched_start_time is None:
@@ -391,23 +421,23 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
             elif cents < -25.0:
                 self.intonation_status_lbl.configure(
                     text="▲ Toca ligeiramente mais agudo",
-                    text_color="#F59E0B",
+                    text_color=theme.COLOR_ACCENT_AMBER,
                 )
-                self.tuner_card.configure(border_color="#F59E0B")
+                self.tuner_card.configure(border_color=theme.COLOR_ACCENT_AMBER)
                 self._matched_start_time = None
             else:
                 self.intonation_status_lbl.configure(
                     text="▼ Toca ligeiramente mais grave",
-                    text_color="#F59E0B",
+                    text_color=theme.COLOR_ACCENT_AMBER,
                 )
-                self.tuner_card.configure(border_color="#F59E0B")
+                self.tuner_card.configure(border_color=theme.COLOR_ACCENT_AMBER)
                 self._matched_start_time = None
         else:
             self.intonation_status_lbl.configure(
                 text=f"Nota incorreta (detetado {detected_note.pitch}, esperado {target_note.pitch})",
-                text_color="#EF4444",
+                text_color=theme.COLOR_ACCENT_CRIMSON,
             )
-            self.tuner_card.configure(border_color="#EF4444")
+            self.tuner_card.configure(border_color=theme.COLOR_ACCENT_CRIMSON)
             self._matched_start_time = None
 
     def _advance_to_next_target_note(self):
@@ -415,7 +445,6 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self.correct_notes_count += 1
         self.total_notes_played += 1
 
-        # Small pleasant chime feedback
         self.audio_player.play_note(self.exercise_notes[self.current_note_idx], duration=0.4)
 
         if self.current_note_idx < len(self.exercise_notes) - 1:
@@ -430,9 +459,8 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self.exercise_completed = True
         self.progress_bar.set(1.0)
         self.pitch_listener.stop_listening()
-        self.mic_btn.configure(text="🎙️ Ativar Microfone", fg_color="#059669")
+        self.mic_btn.configure(text="🎙️ Ativar Microfone", fg_color=theme.COLOR_SUCCESS)
 
-        accuracy = 100.0
         stats = self.user_manager.record_attempt(
             category="pratica_instrumento",
             question_type="acoustic_pitch",
@@ -444,7 +472,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
 
         self.intonation_status_lbl.configure(
             text=f"🎉 Parabéns! Completaste «{self.exercise_title}» com o teu instrumento real!",
-            text_color="#10B981",
+            text_color=theme.COLOR_SUCCESS,
         )
 
         self.score_card.show_feedback(
@@ -463,10 +491,10 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self._matched_start_time = None
         self._is_advancing = False
         self.score_card.pack_forget()
-        self.tuner_card.configure(border_color="#334155")
+        self.tuner_card.configure(border_color=theme.COLOR_BORDER)
         self.intonation_status_lbl.configure(
-            text="Toca a nota no teu instrumento real e o microfone detetará o som automaticamente!",
-            text_color=("#475569", "#CBD5E1"),
+            text="Toca a nota no teu instrumento acústico após ligar o microfone!",
+            text_color=theme.COLOR_TEXT_MUTED,
         )
         self._highlight_target_note()
 
@@ -474,3 +502,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self.pitch_listener.stop_listening()
         self.audio_player.stop_all()
         self.on_back()
+
+    def destroy(self):
+        self.pitch_listener.stop_listening()
+        super().destroy()

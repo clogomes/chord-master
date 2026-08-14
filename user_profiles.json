@@ -1,5 +1,5 @@
 {
-  "active_user": "Utilizador 1",
+  "active_user": "Carlini",
   "users": {
     "Utilizador 1": {
       "username": "Utilizador 1",
@@ -8,16 +8,16 @@
       "completed_lessons": [],
       "categories": {
         "treino_auditivo": {
-          "total_attempts": 1,
+          "total_attempts": 0,
           "correct_count": 0,
           "current_streak": 0,
           "best_streak": 0
         },
         "leitura_pauta": {
-          "total_attempts": 2,
-          "correct_count": 1,
+          "total_attempts": 0,
+          "correct_count": 0,
           "current_streak": 0,
-          "best_streak": 1
+          "best_streak": 0
         },
         "teoria": {
           "total_attempts": 0,
@@ -26,35 +26,7 @@
           "best_streak": 0
         }
       },
-      "history": [
-        {
-          "timestamp": 1786721768.2489989,
-          "category": "leitura_pauta",
-          "question_type": "staff_note",
-          "is_correct": true,
-          "prompt": "Identifica a nota exibida na pauta (Clave de Sol):",
-          "user_answer": "G (Sol)",
-          "correct_answer": "G (Sol)"
-        },
-        {
-          "timestamp": 1786721816.9948359,
-          "category": "treino_auditivo",
-          "question_type": "ear_interval",
-          "is_correct": false,
-          "prompt": "Ouve as notas tocadas em modo ascendente e identifica o intervalo:",
-          "user_answer": "Terça Maior",
-          "correct_answer": "Quarta Justa"
-        },
-        {
-          "timestamp": 1786723744.383522,
-          "category": "leitura_pauta",
-          "question_type": "staff_note",
-          "is_correct": false,
-          "prompt": "Identifica a nota exibida na pauta (Clave de Sol):",
-          "user_answer": "E (Mi)",
-          "correct_answer": "F (Fá)"
-        }
-      ]
+      "history": []
     },
     "Beatriz": {
       "username": "Beatriz",
@@ -78,6 +50,45 @@
           "best_streak": 0
         },
         "teoria": {
+          "total_attempts": 0,
+          "correct_count": 0,
+          "current_streak": 0,
+          "best_streak": 0
+        }
+      },
+      "history": []
+    },
+    "Carlini": {
+      "username": "Carlini",
+      "avatar": "🎸",
+      "created_at": 1786724265.081036,
+      "completed_lessons": [],
+      "categories": {
+        "treino_auditivo": {
+          "total_attempts": 0,
+          "correct_count": 0,
+          "current_streak": 0,
+          "best_streak": 0
+        },
+        "leitura_pauta": {
+          "total_attempts": 0,
+          "correct_count": 0,
+          "current_streak": 0,
+          "best_streak": 0
+        },
+        "teoria": {
+          "total_attempts": 0,
+          "correct_count": 0,
+          "current_streak": 0,
+          "best_streak": 0
+        },
+        "repertorio": {
+          "total_attempts": 0,
+          "correct_count": 0,
+          "current_streak": 0,
+          "best_streak": 0
+        },
+        "pratica_instrumento": {
           "total_attempts": 0,
           "correct_count": 0,
           "current_streak": 0,
