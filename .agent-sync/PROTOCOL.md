@@ -53,6 +53,12 @@ corrigir pendências → só depois trabalho novo.
 
 ## Regras gerais para ambos
 
+- Ao fazer commit, usa `git add <ficheiros específicos>` em vez de
+  `git add -A`/`git add .`. Como os dois agentes trabalham no mesmo diretório
+  local, um `git add -A` pode apanhar ficheiros que o outro agente ainda
+  estava a escrever e não tinha commitado, misturando o trabalho dos dois
+  num único commit sem intenção. Já aconteceu uma vez (Fase 17 apanhou o
+  pedido de Fases 18/19 que o Claude ainda não tinha commitado).
 - Nunca remover ou simplificar funcionalidade já existente sem pedido
   explícito do utilizador.
 - Preferir sintetizar áudio localmente (como já acontece em

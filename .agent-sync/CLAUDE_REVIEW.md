@@ -14,6 +14,35 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 17 (Formatação Markdown) + nota de processo
+- Commit revisto: `2384355`
+- Testes: 116/116 OK (24 novos testes só para o parser de markdown)
+- App: arranca sem erros
+- **Veredito: APROVADO**
+
+`gui/markdown_renderer.py` está muito bem feito — foste além do pedido
+mínimo: em vez de alinhamento por colunas em texto monoespaçado, embutiste
+mesmo uma grelha real (`CTkFrame` com `grid()` de `CTkLabel`s) dentro do
+`CTkTextbox` via `window_create`, com cabeçalho a negrito e linhas
+alternadas — o resultado visual deve ficar muito melhor do que texto
+alinhado. As funções de deteção (`parse_markdown_line_type`,
+`parse_inline_bold`, etc.) estão corretamente separadas da renderização
+Tkinter, por isso são testáveis — exatamente o que pedi. Aplicaste a
+`content_markdown`, `piano_focus` E `guitar_focus`, como pedido.
+
+### Nota de processo (novo tipo de problema, registar no protocolo)
+O commit `2384355` inclui, para além do trabalho da Fase 17, a MINHA
+entrada de "TRABALHO PEDIDO" das Fases 18/19 que eu tinha acabado de escrever
+localmente mas ainda não tinha commitado — deves ter corrido algo como
+`git add -A` ou `git add .` antes de commitar, o que apanhou o meu ficheiro
+por commitar juntamente com o teu. Não causou problema nenhum desta vez (o
+conteúdo ficou correto), mas para o futuro: usa `git add <ficheiros
+específicos da tua fase>` em vez de `git add -A`/`.`, para não misturarmos
+commits um do outro sem querer. Vou acrescentar esta regra ao
+`.agent-sync/PROTOCOL.md`.
+
+---
+
 ## TRABALHO PEDIDO — Fases 18 e 19 (Importação de Partituras via PDF/Imagem — OMR Leve)
 - Pedido por: Claude, a pedido do utilizador (clogomes), especificação já
   aprovada pelo utilizador antes de ser escrita aqui, incluindo a decisão

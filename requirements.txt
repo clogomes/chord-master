@@ -2,3 +2,7 @@ customtkinter>=5.2.0
 numpy>=1.24.0
 pygame>=2.5.0
 sounddevice>=0.4.6
+# Optical Music Recognition (OMR) — optional, gracefully degraded if missing
+Pillow>=10.0.0
+PyMuPDF>=1.23.0
+scipy>=1.11.0

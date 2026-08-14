@@ -219,7 +219,32 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 18. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
+### 18. 🔍 FASE 18 — Motor de Reconhecimento Ótico de Partituras — OMR Leve ([`core/omr_importer.py`](file:///Users/clogomes/repo/chord-master/core/omr_importer.py))
+> **Âmbito deliberado**: funciona melhor com partituras **impressas, limpas, de melodia simples** (uma linha melódica). Polifonia, manuscritos e deteção de ritmo estão fora de âmbito — todas as notas são importadas a duração de semínima e corrigidas na Fase 19.
+
+- **Dependências opcionais** (degradação graciosa com `try/except ImportError`): `Pillow` (leitura de imagem), `PyMuPDF/fitz` (conversão PDF→imagem a 200 DPI sem binários externos), `scipy.ndimage.label` (componentes conectados).
+- **Pipeline OMR completo**:
+  1. `load_image_from_file()` — aceita `.pdf` (1ª página), `.jpg`, `.png`, `.gif` → numpy array em escala de cinzentos.
+  2. `binarize()` — limiarização simples (tinta=1, papel=0).
+  3. `detect_staff_lines()` — perfil de projeção horizontal, deteção de picos, fusão de picos próximos, devolve as 5 linhas mais fortes com posição e confiança.
+  4. `detect_noteheads()` — mascara as linhas da pauta, `scipy.ndimage.label` para blobs, filtra por área (≈ `spacing²`) e proporção (≤ 2.8:1 para descartar hastes e barras), ordena esquerda→direita.
+  5. `map_pixel_to_note()` — converte a posição vertical do blob em `Note` usando o `diatonic_step` de referência da clave escolhida pelo utilizador (Clave de Sol: G4 na 2ª linha; Clave de Fá: B2 na 2ª linha).
+  6. `import_score_as_song()` — junta tudo, devolve um `Song` com notas a 1.0 beat prontas para revisão.
+- **Testes sintéticos** em `tests/test_omr_importer.py`: imagens construídas em memória com `numpy` (linhas de pauta + blobs quadrados), sem ficheiros reais — mesmo padrão dos bytes MIDI sintéticos da Fase 8.
+
+---
+
+### 19. 🖊️ FASE 19 — Ecrã de Revisão & Correcção Manual de Partituras OMR ([`gui/screens/omr_review.py`](file:///Users/clogomes/repo/chord-master/gui/screens/omr_review.py))
+- **Integração em `practice_song.py`**: botão **«🖼️ Importar Partitura (PDF/Imagem)»** na barra lateral, ao lado do botão MIDI. Diálogo de escolha de clave antes do processamento. Mensagem clara se as dependências OMR não estiverem instaladas (nunca lança exceção não tratada).
+- **Ecrã de Revisão (`OMRReviewScreen`)**:
+  - Lista scrollável de todas as notas detetadas, cada uma com: dropdown de **altura** (todas as notas C2–B6), dropdown de **duração** (semibreve, mínima, semínima, colcheia, com ponto), botão **✕ eliminar** (falsos positivos).
+  - Botão **«+ Inserir Nota»** para adicionar notas em falta (C4, 1 tempo, por omissão).
+  - Painel direito com **pré-visualização da imagem original** (`CTkImage` + `Pillow`) para referência visual.
+- **Guardar**: ao confirmar, chama `assign_piano_fingerings` + `assign_guitar_coordinates` (mesma pipeline da Fase 8/12, sem duplicação de lógica) e grava com `save_user_song`. A música fica disponível imediatamente na biblioteca de peças para praticar.
+
+---
+
+### 20. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
 - **Deteção de Frequência Fundamental ($f_0$) via Microfone**: Algoritmo de autocorrelação no domínio do tempo acelerado por FFT, com interpolação parabólica para precisão sub-amostra e rejeição inteligente de ruído ambiente (60 Hz a 1200 Hz).
 - **Mostrador Visual com Agulha Dinâmica**: Medidor de $-50$ a $+50$ cents com faixa de tolerância verde ($\pm 10$ cents) e orientações em tempo real (*"▲ Muito Grave — Estica a corda"*, *"▼ Muito Agudo — Afrouxa a corda"*, *"✓ AFINADO (No Ponto Perfeito!)"*).
 - **Afinador de Viola (6 Cordas)**: Cartões visuais para as 6 cordas padrão ($E2, A2, D3, G3, B3, E4$) que se iluminam automaticamente ao detetar a corda tocada, com botão para ouvir o tom de cada corda.
@@ -227,13 +252,13 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 19. 🎯 Prática com Instrumento Acústico Real
+### 21. 🎯 Prática com Instrumento Acústico Real
 - Prática de escalas, arpejos e repertório utilizando o teu **piano acústico** ou **viola/guitarra física**.
 - A aplicação "escuta" através do microfone, valida a nota e o desvio em cents, exigindo uma sustentação de 300 ms afinada antes de avançar automaticamente para a nota seguinte.
 
 ---
 
-### 20. 🎧 Treino Auditivo & Leitura de Pauta
+### 22. 🎧 Treino Auditivo & Leitura de Pauta
 - **Treino Auditivo (Ear Training)**:
   - Identificação de **Intervalos Melódicos** (ascendentes/descendentes) e **Harmónicos** (duas notas em simultâneo).
   - Identificação de **Qualidade de Acordes** (Maiores, Menores, Diminutos, Aumentados, Sétimas).
@@ -246,14 +271,14 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 21. 📥 Exportação de Progresso & Certificado de Estudo
+### 23. 📥 Exportação de Progresso & Certificado de Estudo
 - Botão **«📥 Exportar Progresso»** no ecrã de Estatísticas:
   - Gera um relatório formatado em Markdown (`relatorio_progresso_<aluno>.md`) pronto a imprimir ou partilhar.
   - Inclui data de emissão, nível e título de maestria, XP total, estado das 8 lições de teoria, métricas de precisão por categoria e lista de todas as medalhas e conquistas alcançadas.
 
 ---
 
-### 22. 🎨 Design System & Interface Moderna ([`gui/theme.py`](file:///Users/clogomes/repo/chord-master/gui/theme.py))
+### 24. 🎨 Design System & Interface Moderna ([`gui/theme.py`](file:///Users/clogomes/repo/chord-master/gui/theme.py))
 - **Paleta de Cores Harmoniosa**: Base moderna em tons de ardósia escura (*Slate-950* `#0B0F19`, *Slate-900* `#111827`, *Slate-800* `#1F2937`), com destaques em *Royal Indigo* (`#4F46E5`), *Emerald* (`#10B981`), *Sky Blue* (`#0284C7`), *Amber* (`#F59E0B`) e *Crimson* (`#EF4444`).
 - **Tipografia Otimizada e Legível**: Escala com mínimo de $14\text{px}$ para textos de corpo e $28\text{--}32\text{px}$ para títulos principais, garantindo máxima legibilidade.
 - **Proteção de Threads & Rate-Limiting**: Processamento assíncrono seguro com limitação de taxa de atualização gráfica (15 FPS), evitando travamentos ou sobrecarga da GUI.
@@ -278,6 +303,7 @@ chord-master/
 │   ├── guitar.py                   # Mapeamento do Braço da Viola, Trastes e Sistema CAGED
 │   ├── songs.py                    # Biblioteca de 16 Músicas Completas de Repertório
 │   ├── midi_importer.py            # Parser SMF de Ficheiros MIDI (.mid) e Conversão para Repertório
+│   ├── omr_importer.py             # Motor OMR Leve: PDF/Imagem → Pauta → Notas (sem ML)
 │   ├── theory_content.py           # Conteúdo Pedagógico Estruturado (8 Lições de Teoria)
 │   ├── gamification.py             # Sistema de Gamificação (XP, 7 Níveis, 12 Conquistas/Medalhas)
 │   ├── exporter.py                 # Exportador de Relatórios de Progresso e Certificados em Markdown
@@ -320,9 +346,10 @@ chord-master/
 │       ├── practice_instrument.py  # Treino Acústico com Microfone para Piano e Viola Físicos
 │       ├── practice_ear.py         # Treino Auditivo & Ditado de Solfejo Cantado com Microfone
 │       ├── practice_staff.py       # Exercícios de Leitura de Pauta
+│       ├── omr_review.py           # Revisão & Correcção Manual de Notas OMR antes de Guardar
 │       └── stats_screen.py         # Painel de Estatísticas, Conquistas, Leaderboard e Exportação
 │
-└── tests/                          # 116 Testes Unitários Automatizados (100% de Sucesso)
+└── tests/                          # 131 Testes Unitários Automatizados (100% de Sucesso)
     ├── __init__.py
     ├── test_notes.py               # Testes de notas, frequências e conversões MIDI
     ├── test_intervals.py           # Testes de intervalos e transposição
@@ -336,6 +363,7 @@ chord-master/
     ├── test_synthesizer.py         # Testes de síntese Karplus-Strong, aditiva e polifónica
     ├── test_i18n.py                # Testes de simetria do dicionário de idiomas PT/EN e helpers
     ├── test_markdown_renderer.py   # Testes do parser e renderizador de markdown enriquecido
+    ├── test_omr_importer.py        # Testes sintéticos do motor OMR (imagens construídas em memória)
     ├── test_pitch.py               # Testes de deteção de pitch por autocorrelação e rejeição de ruído
     ├── test_metronome.py           # Testes de temporização do metrônomo e avaliação rítmica
     ├── test_gamification.py        # Testes de níveis de XP, cálculo de progresso e medalhas

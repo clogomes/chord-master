@@ -222,7 +222,20 @@ class PracticeSongScreen(ctk.CTkFrame):
             corner_radius=theme.RADIUS_MD,
             command=self._handle_import_midi,
         )
-        import_btn.pack(fill="x", padx=6, pady=(10, 8))
+        import_btn.pack(fill="x", padx=6, pady=(10, 4))
+
+        # OMR import button (Pillow + PyMuPDF + scipy optional)
+        self._omr_btn = ctk.CTkButton(
+            self.song_sidebar,
+            text="🖼️ Importar Partitura (PDF/Imagem)",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            fg_color=("#0284C7", "#0369A1"),
+            hover_color=("#0369A1", "#075985"),
+            height=36,
+            corner_radius=theme.RADIUS_MD,
+            command=self._handle_import_omr,
+        )
+        self._omr_btn.pack(fill="x", padx=6, pady=(0, 8))
 
         self.sidebar_title_lbl = ctk.CTkLabel(
             self.song_sidebar,
@@ -299,6 +312,104 @@ class PracticeSongScreen(ctk.CTkFrame):
             )
         except Exception as e:
             messagebox.showerror("Erro ao Importar MIDI", f"Não foi possível importar o ficheiro MIDI:\n{e}")
+
+    def _handle_import_omr(self):
+        """Open a score image or PDF, run the OMR pipeline, and navigate to the review screen."""
+        from core.omr_importer import OMR_AVAILABLE, import_score_as_song
+
+        if not OMR_AVAILABLE:
+            messagebox.showwarning(
+                "Funcionalidade Indisponível",
+                "Faltam dependências para importar partituras por imagem.\n\n"
+                "Instala-as com:\n"
+                "    pip install Pillow PyMuPDF scipy",
+            )
+            return
+
+        filepath = filedialog.askopenfilename(
+            title="Selecionar Partitura (PDF ou Imagem)",
+            filetypes=[
+                ("Partituras", "*.pdf *.jpg *.jpeg *.png *.gif"),
+                ("PDF", "*.pdf"),
+                ("Imagens", "*.jpg *.jpeg *.png *.gif"),
+                ("Todos os Ficheiros", "*.*"),
+            ],
+        )
+        if not filepath:
+            return
+
+        # Ask for clef choice via dialog
+        clef_win = ctk.CTkToplevel(self)
+        clef_win.title("Escolher Clave")
+        clef_win.geometry("320x180")
+        clef_win.resizable(False, False)
+        clef_win.grab_set()
+
+        chosen_clef = ctk.StringVar(value="treble")
+
+        ctk.CTkLabel(
+            clef_win,
+            text="Qual é a clave da partitura?",
+            font=theme.get_font(theme.FONT_SUBTITLE),
+        ).pack(pady=(20, 12))
+
+        btn_frame = ctk.CTkFrame(clef_win, fg_color="transparent")
+        btn_frame.pack()
+
+        ctk.CTkRadioButton(btn_frame, text="𝄞  Clave de Sol (Treble)",
+                           variable=chosen_clef, value="treble",
+                           font=theme.get_font(theme.FONT_BODY)).pack(side="left", padx=16)
+        ctk.CTkRadioButton(btn_frame, text="𝄢  Clave de Fá (Bass)",
+                           variable=chosen_clef, value="bass",
+                           font=theme.get_font(theme.FONT_BODY)).pack(side="left", padx=16)
+
+        def _on_confirm():
+            clef_win.destroy()
+            self._run_omr_pipeline(filepath, chosen_clef.get())
+
+        ctk.CTkButton(
+            clef_win, text="Importar", height=36,
+            fg_color=theme.COLOR_PRIMARY, hover_color=theme.COLOR_PRIMARY_HOVER,
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            command=_on_confirm,
+        ).pack(pady=16)
+
+    def _run_omr_pipeline(self, filepath: str, clef: str):
+        """Execute OMR and open the review screen."""
+        from core.omr_importer import import_score_as_song
+        from gui.screens.omr_review import OMRReviewScreen
+
+        try:
+            draft_song = import_score_as_song(filepath, clef=clef)
+        except Exception as e:
+            messagebox.showerror("Erro no OMR", f"Não foi possível reconhecer a partitura:\n{e}")
+            return
+
+        if not draft_song.notes:
+            messagebox.showwarning(
+                "Sem Notas Detetadas",
+                "O motor OMR não encontrou notas na imagem.\n\n"
+                "Dica: usa uma partitura impressa, limpa, de melodia simples (uma linha melódica).",
+            )
+            return
+
+        # Open review screen as a full-screen overlay inside the same master window
+        review = OMRReviewScreen(
+            self.master,
+            draft_song=draft_song,
+            original_filepath=filepath,
+            user_manager=self.user_manager,
+            on_save=self._on_omr_song_saved,
+            on_cancel=lambda: review.destroy(),
+        )
+        review.place(relx=0, rely=0, relwidth=1, relheight=1)
+
+    def _on_omr_song_saved(self, song):
+        """Called by the OMR review screen after the user confirms the import."""
+        if not any(s.id == song.id for s in self.user_songs):
+            self.user_songs.append(song)
+        self._populate_song_sidebar()
+        self._load_song(song)
 
     def _build_stage_ui(self):
         # Header Info Card
