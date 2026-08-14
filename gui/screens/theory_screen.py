@@ -14,6 +14,7 @@ from gui.components.piano_keyboard import PianoKeyboard
 from gui.components.staff_canvas import StaffCanvas
 from gui.components.guitar_fretboard import GuitarFretboard
 from gui.scroll_utils import bind_mousewheel
+from gui.markdown_renderer import render_markdown_to_textbox
 
 
 class TheoryScreen(ctk.CTkFrame):
@@ -275,7 +276,7 @@ class TheoryScreen(ctk.CTkFrame):
 
         content_box = ctk.CTkTextbox(
             text_card,
-            height=260,
+            height=280,
             corner_radius=8,
             fg_color=("#FFFFFF", "#0F172A"),
             text_color=("#0F172A", "#F8FAFC"),
@@ -283,8 +284,7 @@ class TheoryScreen(ctk.CTkFrame):
             wrap="word",
         )
         content_box.pack(fill="both", expand=True, padx=14, pady=14)
-        content_box.insert("0.0", chap.content_markdown.strip())
-        content_box.configure(state="disabled")
+        render_markdown_to_textbox(content_box, chap.content_markdown, base_font_size=13)
 
         # 3. Practical Instrument Guides (Piano & Viola)
         if self.display_instrument_mode in ["Piano", "Ambos"]:
@@ -297,14 +297,17 @@ class TheoryScreen(ctk.CTkFrame):
             )
             piano_card.pack(fill="x", padx=8, pady=(0, 8))
 
-            ctk.CTkLabel(
+            piano_box = ctk.CTkTextbox(
                 piano_card,
-                text=chap.piano_focus.strip(),
-                font=ctk.CTkFont(family="Helvetica", size=13),
+                height=110,
+                corner_radius=8,
+                fg_color=("#EFF6FF", "#172554"),
                 text_color=("#1E40AF", "#DBEAFE"),
-                justify="left",
-                wraplength=660,
-            ).pack(anchor="w", padx=16, pady=12)
+                font=ctk.CTkFont(family="Helvetica", size=13),
+                wrap="word",
+            )
+            piano_box.pack(fill="both", expand=True, padx=14, pady=14)
+            render_markdown_to_textbox(piano_box, chap.piano_focus, base_font_size=13)
 
         if self.display_instrument_mode in ["Viola", "Ambos"]:
             guitar_card = ctk.CTkFrame(
@@ -316,14 +319,17 @@ class TheoryScreen(ctk.CTkFrame):
             )
             guitar_card.pack(fill="x", padx=8, pady=(0, 10))
 
-            ctk.CTkLabel(
+            guitar_box = ctk.CTkTextbox(
                 guitar_card,
-                text=chap.guitar_focus.strip(),
-                font=ctk.CTkFont(family="Helvetica", size=13),
+                height=110,
+                corner_radius=8,
+                fg_color=("#FEF3C7", "#451A03"),
                 text_color=("#92400E", "#FEF3C7"),
-                justify="left",
-                wraplength=660,
-            ).pack(anchor="w", padx=16, pady=12)
+                font=ctk.CTkFont(family="Helvetica", size=13),
+                wrap="word",
+            )
+            guitar_box.pack(fill="both", expand=True, padx=14, pady=14)
+            render_markdown_to_textbox(guitar_box, chap.guitar_focus, base_font_size=13)
 
         # 4. Interactive Demonstrator Suite (Piano + Viola + Staff)
         self._build_interactive_demo_area(chap)

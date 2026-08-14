@@ -207,7 +207,19 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 17. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
+### 17. 🖋️ FASE 17 — Formatação Markdown Enriquecida no Ecrã de Teoria ([`gui/markdown_renderer.py`](file:///Users/clogomes/repo/chord-master/gui/markdown_renderer.py))
+- **Parser de Markdown Puro sem Dependências**:
+  - `parse_markdown_line_type()` classifica cada linha em `h1`, `h2`, `h3`, `separator`, `bullet`, `table_row`, `table_delimiter` ou `paragraph`.
+  - `parse_inline_bold()` transforma spans `**negrito**` numa lista de `(texto, is_bold)` para renderização granular.
+  - `parse_table_cells()` extrai e limpa as células de linhas de tabela markdown.
+- **Renderizador Visual `render_markdown_to_textbox()`**:
+  - Integrado nos três blocos de texto do `TheoryScreen`: conteúdo principal, `piano_focus` e `guitar_focus`.
+  - Cabeçalhos `###` renderizados com fonte maior em negrito; separadores `---` em caracteres de linha (`─`); bullets `•` com indent; texto `**bold**` com tag de fonte bold inline.
+  - Tabelas markdown embutidas diretamente como widgets `CTkFrame` com grelha alinhada, alternância de cor por linha e cabeçalho em destaque.
+
+---
+
+### 18. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
 - **Deteção de Frequência Fundamental ($f_0$) via Microfone**: Algoritmo de autocorrelação no domínio do tempo acelerado por FFT, com interpolação parabólica para precisão sub-amostra e rejeição inteligente de ruído ambiente (60 Hz a 1200 Hz).
 - **Mostrador Visual com Agulha Dinâmica**: Medidor de $-50$ a $+50$ cents com faixa de tolerância verde ($\pm 10$ cents) e orientações em tempo real (*"▲ Muito Grave — Estica a corda"*, *"▼ Muito Agudo — Afrouxa a corda"*, *"✓ AFINADO (No Ponto Perfeito!)"*).
 - **Afinador de Viola (6 Cordas)**: Cartões visuais para as 6 cordas padrão ($E2, A2, D3, G3, B3, E4$) que se iluminam automaticamente ao detetar a corda tocada, com botão para ouvir o tom de cada corda.
@@ -215,13 +227,13 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 17. 🎯 Prática com Instrumento Acústico Real
+### 19. 🎯 Prática com Instrumento Acústico Real
 - Prática de escalas, arpejos e repertório utilizando o teu **piano acústico** ou **viola/guitarra física**.
 - A aplicação "escuta" através do microfone, valida a nota e o desvio em cents, exigindo uma sustentação de 300 ms afinada antes de avançar automaticamente para a nota seguinte.
 
 ---
 
-### 18. 🎧 Treino Auditivo & Leitura de Pauta
+### 20. 🎧 Treino Auditivo & Leitura de Pauta
 - **Treino Auditivo (Ear Training)**:
   - Identificação de **Intervalos Melódicos** (ascendentes/descendentes) e **Harmónicos** (duas notas em simultâneo).
   - Identificação de **Qualidade de Acordes** (Maiores, Menores, Diminutos, Aumentados, Sétimas).
@@ -234,14 +246,14 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 19. 📥 Exportação de Progresso & Certificado de Estudo
+### 21. 📥 Exportação de Progresso & Certificado de Estudo
 - Botão **«📥 Exportar Progresso»** no ecrã de Estatísticas:
   - Gera um relatório formatado em Markdown (`relatorio_progresso_<aluno>.md`) pronto a imprimir ou partilhar.
   - Inclui data de emissão, nível e título de maestria, XP total, estado das 8 lições de teoria, métricas de precisão por categoria e lista de todas as medalhas e conquistas alcançadas.
 
 ---
 
-### 20. 🎨 Design System & Interface Moderna ([`gui/theme.py`](file:///Users/clogomes/repo/chord-master/gui/theme.py))
+### 22. 🎨 Design System & Interface Moderna ([`gui/theme.py`](file:///Users/clogomes/repo/chord-master/gui/theme.py))
 - **Paleta de Cores Harmoniosa**: Base moderna em tons de ardósia escura (*Slate-950* `#0B0F19`, *Slate-900* `#111827`, *Slate-800* `#1F2937`), com destaques em *Royal Indigo* (`#4F46E5`), *Emerald* (`#10B981`), *Sky Blue* (`#0284C7`), *Amber* (`#F59E0B`) e *Crimson* (`#EF4444`).
 - **Tipografia Otimizada e Legível**: Escala com mínimo de $14\text{px}$ para textos de corpo e $28\text{--}32\text{px}$ para títulos principais, garantindo máxima legibilidade.
 - **Proteção de Threads & Rate-Limiting**: Processamento assíncrono seguro com limitação de taxa de atualização gráfica (15 FPS), evitando travamentos ou sobrecarga da GUI.
@@ -289,6 +301,7 @@ chord-master/
 │   ├── app.py                      # Janela Principal, Barra Lateral com Perfil de Aluno, Router e Idioma
 │   ├── theme.py                    # Sistema Centralizado de Tokens de Design (Cores, Tipografia, Raios)
 │   ├── i18n.py                     # Dicionário de Internacionalização PT/EN e Gestão de Idioma
+│   ├── markdown_renderer.py         # Parser & Renderizador de Markdown Enriquecido para CTkTextbox
 │   ├── scroll_utils.py             # Utilitário de Scroll de Rato Recursivo Multiplataforma
 │   ├── components/                 # Componentes Visuais Reutilizáveis
 │   │   ├── __init__.py
@@ -309,7 +322,7 @@ chord-master/
 │       ├── practice_staff.py       # Exercícios de Leitura de Pauta
 │       └── stats_screen.py         # Painel de Estatísticas, Conquistas, Leaderboard e Exportação
 │
-└── tests/                          # 92 Testes Unitários Automatizados (100% de Sucesso)
+└── tests/                          # 116 Testes Unitários Automatizados (100% de Sucesso)
     ├── __init__.py
     ├── test_notes.py               # Testes de notas, frequências e conversões MIDI
     ├── test_intervals.py           # Testes de intervalos e transposição
@@ -322,6 +335,7 @@ chord-master/
     ├── test_backing_tracks.py      # Testes de síntese de bateria e motor de acompanhamento rítmico
     ├── test_synthesizer.py         # Testes de síntese Karplus-Strong, aditiva e polifónica
     ├── test_i18n.py                # Testes de simetria do dicionário de idiomas PT/EN e helpers
+    ├── test_markdown_renderer.py   # Testes do parser e renderizador de markdown enriquecido
     ├── test_pitch.py               # Testes de deteção de pitch por autocorrelação e rejeição de ruído
     ├── test_metronome.py           # Testes de temporização do metrônomo e avaliação rítmica
     ├── test_gamification.py        # Testes de níveis de XP, cálculo de progresso e medalhas

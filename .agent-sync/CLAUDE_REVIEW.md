@@ -14,6 +14,113 @@ Cada entrada tem um veredito:
 
 ---
 
+## TRABALHO PEDIDO — Fases 18 e 19 (Importação de Partituras via PDF/Imagem — OMR Leve)
+- Pedido por: Claude, a pedido do utilizador (clogomes), especificação já
+  aprovada pelo utilizador antes de ser escrita aqui, incluindo a decisão
+  consciente de âmbito (ver abaixo).
+- Estado anterior: Fases 1-16 concluídas e aprovadas (a Fase 17 pode ainda
+  estar em curso — se estiver, termina-a primeiro, depois avança para estas).
+  92+ testes atuais devem continuar a passar.
+- **Decisão de âmbito importante**: o utilizador escolheu explicitamente
+  reconhecimento ótico de partituras (OMR) LEVE, sem Machine Learning, em vez
+  de usar uma biblioteca de OMR pesada baseada em modelos treinados. Isto
+  significa: vai funcionar bem em partituras impressas, limpas, de uma única
+  linha melódica (não polifónicas, não manuscritas). A deteção de ritmo fica
+  fora de âmbito nesta fase — todas as notas detetadas ficam com duração de
+  semínima por omissão, e o utilizador corrige manualmente no ecrã de revisão
+  da Fase 19. Não tentes ser mais ambicioso do que isto — a precisão
+  imperfeita é esperada e aceite, é por isso que a Fase 19 existe.
+
+### FASE 18 — Motor de Reconhecimento Ótico de Partituras (OMR Leve)
+Cria `core/omr_importer.py`:
+
+- **Dependências novas** (segue o padrão defensivo já usado em todo o
+  projeto — `try/except ImportError` com uma flag `HAS_X`, ver
+  `audio/pitch_listener.py` como referência): `Pillow` (leitura/manipulação
+  de imagem — PIL), `PyMuPDF` (módulo `fitz`, para converter páginas PDF em
+  imagem sem precisar de binários externos do sistema como o Poppler), e
+  `scipy` (`scipy.ndimage.label` para deteção de componentes conectados —
+  isto NÃO é uma biblioteca de Machine Learning, é processamento de imagem
+  científico estabelecido, tal como o `numpy` já usado no projeto). Acrescenta
+  as três a `requirements.txt`.
+- **Carregamento**: função `load_image_from_file(filepath) -> np.ndarray`
+  (escala de cinzentos) que aceita `.pdf` (converte a 1ª página via `fitz`,
+  a uma resolução razoável tipo 200-300 DPI), `.jpg`/`.jpeg`, `.gif`, `.png`
+  (via Pillow).
+- **Binarização**: converte para preto/branco com um limiar simples (ex:
+  Otsu ou um limiar fixo razoável) — píxeis de tinta = 1, papel = 0.
+- **Deteção de pauta**: função `detect_staff_lines(binary_image) ->
+  List[Tuple[int, float]]` — soma píxeis pretos por linha horizontal (perfil
+  de projeção), encontra picos correspondentes às 5 linhas da pauta, calcula
+  o espaçamento médio entre linhas (`line_spacing`) — cada posição de linha/
+  espaço na pauta corresponde a 1 grau diatónico.
+- **Deteção de notas**: função `detect_noteheads(binary_image,
+  staff_lines) -> List[Tuple[int, int]]` (lista de coordenadas x,y do centro
+  de cada cabeça de nota) — mascara as linhas da pauta (remove as faixas
+  horizontais correspondentes), usa `scipy.ndimage.label` para encontrar
+  blobs conectados, filtra por tamanho (aproximadamente do tamanho de
+  `line_spacing`) e proporção (redondo/oval, não muito alongado — para
+  distinguir de hastes/barras de compasso), ordena por posição horizontal
+  (x) para obter a sequência temporal.
+- **Mapeamento pixel → nota**: função `map_pixel_to_note(y: int,
+  staff_lines, clef: str) -> Note` — reaproveita `Note.diatonic_step`
+  (já existe em `core/notes.py`) fazendo o caminho inverso: sabendo a
+  posição y de referência de uma linha da pauta conhecida (ex: 2ª linha de
+  baixo para cima na Clave de Sol = Sol4) e o `line_spacing`, calcula quantos
+  meios-passos diatónicos a nota está acima/abaixo dessa referência, e
+  devolve a `Note` correspondente.
+- **Escolha de clave**: NÃO tentes reconhecer o símbolo da clave na imagem
+  automaticamente — pede ao utilizador para escolher "Clave de Sol" ou
+  "Clave de Fá" antes de processar (simplificação deliberada, aprovada).
+- Função principal: `import_score_as_song(filepath, clef, title=None) ->
+  Song` — junta tudo, devolve um `Song` com todas as notas detetadas a
+  duração de semínima (1.0 beat), pronto para revisão na Fase 19 (ainda não
+  é para gravar em disco nesta fase — isso só acontece depois da revisão).
+- Testes em `tests/test_omr_importer.py`: gera uma imagem sintética simples
+  em memória (com Pillow/numpy: desenha 5 linhas horizontais + alguns
+  círculos pretos em posições conhecidas, simulando notas) e confirma que
+  `detect_staff_lines` encontra as 5 linhas nas posições certas, e que
+  `detect_noteheads` encontra o número certo de blobs nas posições x
+  esperadas. Não precisas de um ficheiro de imagem real — gera tudo em
+  memória no teste, tal como fizeste com os bytes MIDI sintéticos na Fase 8.
+
+### FASE 19 — Ecrã de Revisão & Correção Manual + Integração
+Depende da Fase 18 estar concluída.
+
+- Cria `gui/screens/omr_review.py`: depois do `import_score_as_song` correr,
+  mostra a lista de notas detetadas (pode ser numa `CTkScrollableFrame` —
+  lembra-te de chamar `bind_mousewheel` da Fase 13) com, para cada nota:
+  - A altura detetada, editável clicando numa `PianoKeyboard` pequena ou por
+    menu suspenso.
+  - A duração, editável por menu suspenso (semibreve, mínima, semínima,
+    colcheia, com opção de ponto).
+  - Botão para apagar a nota (falso positivo).
+  - Botão para inserir uma nota nova nessa posição (nota em falta).
+  Mostra também a imagem original (ou um recorte) como referência visual ao
+  lado, se for razoavelmente simples de fazer com `CTkImage`/Pillow.
+- Só quando o utilizador confirmar ("Guardar como Música"), converte a lista
+  revista em `SongNote`s de verdade: usa `assign_piano_fingerings` (de
+  `core/fingering.py`) e `assign_guitar_coordinates` (de `core/guitar.py`) —
+  ambos já existem e já são partilhados desde a Fase 12, não dupliques lógica
+  — e grava com `save_user_song` (já existe em `core/midi_importer.py`, o
+  mesmo mecanismo de persistência da Fase 8).
+- Em `gui/screens/practice_song.py`, acrescenta um botão "🖼️ Importar
+  Partitura (PDF/Imagem)" ao lado do botão "📂 Importar Música (.mid)" já
+  existente, que abre um file dialog (aceitando `.pdf`, `.jpg`, `.jpeg`,
+  `.png`, `.gif`), pede a clave, corre `import_score_as_song`, e navega para
+  `omr_review.py`.
+- Se `Pillow`/`fitz`/`scipy` não estiverem instalados, o botão deve mostrar
+  uma mensagem clara ("Funcionalidade indisponível — falta instalar
+  dependências") em vez de rebentar — segue o mesmo padrão defensivo já
+  usado no resto do projeto.
+
+No fim de cada fase, atualiza o `README.md` (e sê claro nas notas sobre a
+limitação deliberada: funciona melhor com partituras simples, impressas, de
+uma só linha melódica) e não remove nem simplifica nenhuma funcionalidade já
+existente.
+
+---
+
 ## Revisão — Fases 13, 14, 15 e 16
 - Commits revistos: `6718d62` (F13), `83cb67f` (F14), `2f85e4f` (F15), `ab5c1b6` (F16)
 - Testes: 92/92 OK
