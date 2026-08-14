@@ -3,6 +3,7 @@ from tkinter import messagebox
 from typing import Callable, Optional
 import customtkinter as ctk
 from core.user_manager import UserManager, AVATAR_CHOICES, LESSON_IDS
+from gui.scroll_utils import bind_mousewheel
 from gui import theme
 
 
@@ -72,6 +73,7 @@ class UserManagementModal(ctk.CTkToplevel):
             border_color=theme.COLOR_BORDER,
         )
         self.list_container.pack(fill="x", padx=24, pady=10)
+        bind_mousewheel(self.list_container)
 
         self._render_profile_list()
 

@@ -9,6 +9,7 @@ from core.user_manager import UserManager, LESSON_IDS, UserProfile
 from core.gamification import ACHIEVEMENT_LIBRARY, get_achievement_by_id
 from core.exporter import export_student_report_file
 from core.adaptive_engine import get_weak_areas
+from gui.scroll_utils import bind_mousewheel
 from gui import theme
 
 
@@ -96,6 +97,7 @@ class StatsScreen(ctk.CTkFrame):
             border_color=theme.COLOR_BORDER,
         )
         self.container.pack(fill="both", expand=True, padx=20, pady=(4, 16))
+        bind_mousewheel(self.container)
 
         self._render_stats_content()
 

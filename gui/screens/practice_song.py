@@ -15,6 +15,7 @@ from gui.components.piano_keyboard import PianoKeyboard
 from gui.components.staff_canvas import StaffCanvas
 from gui.components.guitar_fretboard import GuitarFretboard
 from gui.components.score_card import ScoreCard
+from gui.scroll_utils import bind_mousewheel
 from gui import theme
 
 
@@ -208,6 +209,7 @@ class PracticeSongScreen(ctk.CTkFrame):
             border_color=theme.COLOR_BORDER,
         )
         self.song_sidebar.grid(row=0, column=0, sticky="nsew", padx=(0, 12))
+        bind_mousewheel(self.song_sidebar)
 
         # Import MIDI button
         import_btn = ctk.CTkButton(
@@ -244,6 +246,7 @@ class PracticeSongScreen(ctk.CTkFrame):
             border_color=theme.COLOR_BORDER,
         )
         self.stage_scroll.grid(row=0, column=1, sticky="nsew")
+        bind_mousewheel(self.stage_scroll)
 
         self._build_stage_ui()
 
@@ -474,9 +477,9 @@ class PracticeSongScreen(ctk.CTkFrame):
         # 2. Piano Keyboard
         self.piano_view = PianoKeyboard(
             self.vis_container,
-            start_octave=3,
-            num_octaves=2,
-            key_width=42,
+            start_octave=2,
+            num_octaves=4,
+            key_width=25,
             key_height=125,
             on_key_click=self._on_user_piano_click,
         )

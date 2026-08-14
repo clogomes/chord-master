@@ -7,6 +7,7 @@ import customtkinter as ctk
 from core.notes import Note
 from audio.player import get_audio_player
 from audio.pitch_listener import PitchListener
+from gui.scroll_utils import bind_mousewheel
 from gui import theme
 
 
@@ -107,6 +108,7 @@ class LamireScreen(ctk.CTkFrame):
             border_color=theme.COLOR_BORDER,
         )
         self.scroll.pack(fill="both", expand=True, padx=20, pady=(4, 16))
+        bind_mousewheel(self.scroll)
 
         # Mode Selector
         mode_frame = ctk.CTkFrame(self.scroll, fg_color="transparent")

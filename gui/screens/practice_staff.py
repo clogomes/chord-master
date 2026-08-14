@@ -8,6 +8,7 @@ from audio.player import get_audio_player
 from gui.components.staff_canvas import StaffCanvas
 from gui.components.piano_keyboard import PianoKeyboard
 from gui.components.score_card import ScoreCard
+from gui.scroll_utils import bind_mousewheel
 
 
 class PracticeStaffScreen(ctk.CTkFrame):
@@ -105,6 +106,7 @@ class PracticeStaffScreen(ctk.CTkFrame):
         # Main scroll container
         self.main_container = ctk.CTkScrollableFrame(self, fg_color=("#F8FAFC", "#0F172A"))
         self.main_container.pack(fill="both", expand=True, padx=20, pady=(0, 10))
+        bind_mousewheel(self.main_container)
 
         # Staff display container
         self.staff_card = ctk.CTkFrame(

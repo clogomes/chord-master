@@ -90,9 +90,18 @@
       "username": "Carlini",
       "avatar": "🎸",
       "created_at": 1786724265.081036,
-      "xp": 53,
-      "unlocked_achievements": [],
-      "completed_lessons": [],
+      "xp": 903,
+      "unlocked_achievements": [
+        "first_step",
+        "theory_scholar"
+      ],
+      "completed_lessons": [
+        "chap1_fundamentals",
+        "chap2_intervals",
+        "chap3_scales_modes",
+        "chap4_chords_triads",
+        "chap5_harmonic_field_tetrads"
+      ],
       "categories": {
         "treino_auditivo": {
           "total_attempts": 1,

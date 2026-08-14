@@ -9,6 +9,7 @@ from core.notes import Note
 from audio.player import get_audio_player
 from audio.pitch_listener import PitchListener
 from gui.components.score_card import ScoreCard
+from gui.scroll_utils import bind_mousewheel
 from gui import theme
 
 
@@ -141,6 +142,7 @@ class PracticeEarScreen(ctk.CTkFrame):
             border_color=theme.COLOR_BORDER,
         )
         self.main_container.pack(fill="both", expand=True, padx=20, pady=(0, 14))
+        bind_mousewheel(self.main_container)
 
         # Audio playback & question card
         self.play_card = ctk.CTkFrame(

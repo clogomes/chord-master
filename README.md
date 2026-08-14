@@ -172,7 +172,15 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 13. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
+### 13. 🖱️ FASE 13 — Correções de UI: Scroll do Rato & Piano Alargado ([`gui/scroll_utils.py`](file:///Users/clogomes/repo/chord-master/gui/scroll_utils.py))
+- **Scroll de Rato Universal Multiplataforma**:
+  - Módulo utilitário `bind_mousewheel(scrollable_frame)` que propaga eventos de rolagem (`<MouseWheel>`, `<Button-4>`, `<Button-5>`) de forma recursiva por todos os widgets filhos, garantindo que os cartões, botões e caixas de texto não bloqueiam o scroll da página no macOS, Windows e Linux.
+- **Teclado de Piano Alargado para 4 Oitavas**:
+  - O teclado visual foi expandido de 2 para 4 oitavas completas ($C2 \dots B5$, 28 teclas brancas e 20 teclas pretas) nos ecrãs de **Teoria Musical**, **Tocar Repertório**, **Prática com Instrumento Acústico** e **Estúdio de Escalas**, permitindo a visualização e execução de peças clássicas e escalas de extensão completa sem limitações de tessitura.
+
+---
+
+### 14. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
 - **Deteção de Frequência Fundamental ($f_0$) via Microfone**: Algoritmo de autocorrelação no domínio do tempo acelerado por FFT, com interpolação parabólica para precisão sub-amostra e rejeição inteligente de ruído ambiente (60 Hz a 1200 Hz).
 - **Mostrador Visual com Agulha Dinâmica**: Medidor de $-50$ a $+50$ cents com faixa de tolerância verde ($\pm 10$ cents) e orientações em tempo real (*"▲ Muito Grave — Estica a corda"*, *"▼ Muito Agudo — Afrouxa a corda"*, *"✓ AFINADO (No Ponto Perfeito!)"*).
 - **Afinador de Viola (6 Cordas)**: Cartões visuais para as 6 cordas padrão ($E2, A2, D3, G3, B3, E4$) que se iluminam automaticamente ao detetar a corda tocada, com botão para ouvir o tom de cada corda.
@@ -180,13 +188,13 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 14. 🎯 Prática com Instrumento Acústico Real
+### 15. 🎯 Prática com Instrumento Acústico Real
 - Prática de escalas, arpejos e repertório utilizando o teu **piano acústico** ou **viola/guitarra física**.
 - A aplicação "escuta" através do microfone, valida a nota e o desvio em cents, exigindo uma sustentação de 300 ms afinada antes de avançar automaticamente para a nota seguinte.
 
 ---
 
-### 15. 🎧 Treino Auditivo & Leitura de Pauta
+### 16. 🎧 Treino Auditivo & Leitura de Pauta
 - **Treino Auditivo (Ear Training)**:
   - Identificação de **Intervalos Melódicos** (ascendentes/descendentes) e **Harmónicos** (duas notas em simultâneo).
   - Identificação de **Qualidade de Acordes** (Maiores, Menores, Diminutos, Aumentados, Sétimas).
@@ -199,14 +207,14 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 16. 📥 Exportação de Progresso & Certificado de Estudo
+### 17. 📥 Exportação de Progresso & Certificado de Estudo
 - Botão **«📥 Exportar Progresso»** no ecrã de Estatísticas:
   - Gera um relatório formatado em Markdown (`relatorio_progresso_<aluno>.md`) pronto a imprimir ou partilhar.
   - Inclui data de emissão, nível e título de maestria, XP total, estado das 8 lições de teoria, métricas de precisão por categoria e lista de todas as medalhas e conquistas alcançadas.
 
 ---
 
-### 17. 🎨 Design System & Interface Moderna ([`gui/theme.py`](file:///Users/clogomes/repo/chord-master/gui/theme.py))
+### 18. 🎨 Design System & Interface Moderna ([`gui/theme.py`](file:///Users/clogomes/repo/chord-master/gui/theme.py))
 - **Paleta de Cores Harmoniosa**: Base moderna em tons de ardósia escura (*Slate-950* `#0B0F19`, *Slate-900* `#111827`, *Slate-800* `#1F2937`), com destaques em *Royal Indigo* (`#4F46E5`), *Emerald* (`#10B981`), *Sky Blue* (`#0284C7`), *Amber* (`#F59E0B`) e *Crimson* (`#EF4444`).
 - **Tipografia Otimizada e Legível**: Escala com mínimo de $14\text{px}$ para textos de corpo e $28\text{--}32\text{px}$ para títulos principais, garantindo máxima legibilidade.
 - **Proteção de Threads & Rate-Limiting**: Processamento assíncrono seguro com limitação de taxa de atualização gráfica (15 FPS), evitando travamentos ou sobrecarga da GUI.
@@ -252,9 +260,10 @@ chord-master/
 │   ├── __init__.py
 │   ├── app.py                      # Janela Principal, Barra Lateral com Perfil de Aluno e Router
 │   ├── theme.py                    # Sistema Centralizado de Tokens de Design (Cores, Tipografia, Raios)
+│   ├── scroll_utils.py             # Utilitário de Scroll de Rato Recursivo Multiplataforma
 │   ├── components/                 # Componentes Visuais Reutilizáveis
 │   │   ├── __init__.py
-│   │   ├── piano_keyboard.py       # Teclado de Piano Interativo de 2 Oitavas com Dedilhação
+│   │   ├── piano_keyboard.py       # Teclado de Piano Interativo de 4 Oitavas com Dedilhação
 │   │   ├── guitar_fretboard.py     # Braço de Viola Interativo de 15 Trastes (CAGED)
 │   │   ├── staff_canvas.py         # Desenho Vetorial de Pauta Musical (Claves de Sol e Fá)
 │   │   ├── score_card.py           # Cartão de Feedback Imediato, Streaks e XP

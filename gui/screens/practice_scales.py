@@ -15,6 +15,7 @@ from gui.components.piano_keyboard import PianoKeyboard
 from gui.components.staff_canvas import StaffCanvas
 from gui.components.guitar_fretboard import GuitarFretboard
 from gui.components.score_card import ScoreCard
+from gui.scroll_utils import bind_mousewheel
 from gui import theme
 
 
@@ -144,6 +145,7 @@ class PracticeScalesScreen(ctk.CTkFrame):
             border_color=theme.COLOR_BORDER,
         )
         self.container.pack(fill="both", expand=True, padx=18, pady=(4, 14))
+        bind_mousewheel(self.container)
 
         # 2.1 Configuration Selector Bar
         cfg_card = ctk.CTkFrame(
@@ -333,11 +335,11 @@ class PracticeScalesScreen(ctk.CTkFrame):
         # Piano Keyboard
         self.piano_view = PianoKeyboard(
             self.vis_frame,
-            start_octave=3,
-            num_octaves=3,
-            key_width=32,
+            start_octave=2,
+            num_octaves=4,
+            key_width=25,
             key_height=125,
-            on_key_clicked=self._on_piano_key_clicked,
+            on_key_click=self._on_piano_key_clicked,
         )
         self.piano_view.pack(pady=4)
 

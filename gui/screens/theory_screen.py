@@ -13,6 +13,7 @@ from audio.player import get_audio_player
 from gui.components.piano_keyboard import PianoKeyboard
 from gui.components.staff_canvas import StaffCanvas
 from gui.components.guitar_fretboard import GuitarFretboard
+from gui.scroll_utils import bind_mousewheel
 
 
 class TheoryScreen(ctk.CTkFrame):
@@ -105,6 +106,7 @@ class TheoryScreen(ctk.CTkFrame):
             border_color=("#E2E8F0", "#334155"),
         )
         self.chapter_nav_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 10))
+        bind_mousewheel(self.chapter_nav_frame)
 
         ctk.CTkLabel(
             self.chapter_nav_frame,
@@ -124,6 +126,7 @@ class TheoryScreen(ctk.CTkFrame):
             border_color=("#E2E8F0", "#334155"),
         )
         self.content_scroll.grid(row=0, column=1, sticky="nsew")
+        bind_mousewheel(self.content_scroll)
 
     def _render_chapter_list(self):
         for btn in self.chapter_buttons:
@@ -429,7 +432,7 @@ class TheoryScreen(ctk.CTkFrame):
                 text_color=("#64748B", "#94A3B8"),
             ).pack(anchor="w", padx=16, pady=(6, 2))
 
-            self.demo_piano = PianoKeyboard(demo_card, start_octave=3, num_octaves=2, key_width=42, key_height=120)
+            self.demo_piano = PianoKeyboard(demo_card, start_octave=2, num_octaves=4, key_width=25, key_height=120)
             self.demo_piano.pack(pady=(0, 6))
         else:
             self.demo_piano = None
