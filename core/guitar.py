@@ -173,3 +173,11 @@ class GuitarFretboardModel:
                         "degree_idx": degree_idx + 1,
                     })
         return results
+
+
+def find_note_positions(note: Note, max_fret: int = 15) -> List[Tuple[int, int]]:
+    """
+    Finds all (string_idx, fret) positions matching a specific pitch or pitch-class on standard tuning.
+    """
+    model = GuitarFretboardModel(num_frets=max_fret)
+    return model.find_note_positions(note)

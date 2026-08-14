@@ -139,6 +139,17 @@ class Note:
         return NOTE_NAMES_PT.get(self.raw_name, NOTE_NAMES_PT.get(self.normalized_pitch, self.raw_name))
 
     @property
+    def pitch_with_octave(self) -> str:
+        """Returns standardized pitch with octave (e.g. 'C4', 'F#3')."""
+        return f"{self.pitch}{self.octave}"
+
+    def __str__(self) -> str:
+        return self.pitch_with_octave
+
+    def __repr__(self) -> str:
+        return f"Note('{self.pitch_with_octave}')"
+
+    @property
     def full_name(self) -> str:
         """Returns the full scientific pitch notation (e.g. 'C#4')."""
         return f"{self.raw_name}{self.octave}"

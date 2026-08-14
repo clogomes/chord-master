@@ -116,7 +116,17 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 8. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
+### 8. 📂 FASE 8 — Importador de Partituras MIDI Próprias ([`core/midi_importer.py`](file:///Users/clogomes/repo/chord-master/core/midi_importer.py))
+- **Parser Nativo de Ficheiros Standard MIDI (.mid / .midi)**:
+  - Implementado em Python puro sem dependências pesadas externas, lendo cabeçalhos `MThd`, faixas `MTrk`, delta-times com quantidades de tamanho variável (*VLQ*) e mensagens de `Note On`/`Note Off`.
+- **Cálculo Automático de Ergonomia para Piano e Viola**:
+  - Algoritmo inteligente que analisa as notas importadas e atribui automaticamente dedilhações para piano (mão direita) e posições de corda e traste no braço da viola (minimizando saltos abruptos de posição).
+- **Importação Direta & Persistência na Biblioteca (`user_songs.json`)**:
+  - Botão **«📂 Importar Música (.mid)»** no estúdio de repertório que abre a caixa de diálogo do sistema operativo, converte a música e adiciona-a instantaneamente à biblioteca pronta a tocar.
+
+---
+
+### 9. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
 - **Deteção de Frequência Fundamental ($f_0$) via Microfone**: Algoritmo de autocorrelação no domínio do tempo acelerado por FFT, com interpolação parabólica para precisão sub-amostra e rejeição inteligente de ruído ambiente (60 Hz a 1200 Hz).
 - **Mostrador Visual com Agulha Dinâmica**: Medidor de $-50$ a $+50$ cents com faixa de tolerância verde ($\pm 10$ cents) e orientações em tempo real (*"▲ Muito Grave — Estica a corda"*, *"▼ Muito Agudo — Afrouxa a corda"*, *"✓ AFINADO (No Ponto Perfeito!)"*).
 - **Afinador de Viola (6 Cordas)**: Cartões visuais para as 6 cordas padrão ($E2, A2, D3, G3, B3, E4$) que se iluminam automaticamente ao detetar a corda tocada, com botão para ouvir o tom de cada corda.
@@ -175,6 +185,7 @@ chord-master/
 │   ├── fingering.py                # Mapeamento de Dedilhações para Piano (Mão Direita e Esquerda)
 │   ├── guitar.py                   # Mapeamento de Braço de Viola (CAGED, 15 Trastes, Afinações)
 │   ├── songs.py                    # Biblioteca de 16 Músicas Completas com notas, dedilhações e tablaturas
+│   ├── midi_importer.py            # Parser e Importador de Partituras Standard MIDI (.mid/.midi)
 │   ├── gamification.py             # Sistema de Gamificação (XP, 7 Níveis, 12 Conquistas/Medalhas)
 │   ├── exporter.py                 # Exportador de Relatórios de Progresso e Certificados em Markdown
 │   ├── adaptive_engine.py          # Motor de Prática Adaptativa & Identificação de Pontos Fracos
@@ -205,14 +216,14 @@ chord-master/
 │       ├── __init__.py
 │       ├── main_menu.py            # Dashboard Inicial com Nível de XP, Progresso e Acessos Rápidos
 │       ├── theory_screen.py        # Academia de Teoria (8 Capítulos com Piano e Viola Sincronizados)
-│       ├── practice_song.py        # Estúdio de Repertório (16 Músicas Completas, Metrónomo e Suporte a MIDI)
+│       ├── practice_song.py        # Estúdio de Repertório (16 Músicas + Músicas MIDI Importadas)
 │       ├── tuner_screen.py         # Lamiré & Afinador Cromático com Agulha e Deteção por Microfone
 │       ├── practice_instrument.py  # Treino Acústico com Microfone para Piano e Viola Físicos
 │       ├── practice_ear.py         # Treino Auditivo & Ditado de Solfejo Cantado com Microfone
 │       ├── practice_staff.py       # Exercícios de Leitura de Pauta
 │       └── stats_screen.py         # Painel de Estatísticas, Conquistas, Leaderboard e Exportação
 │
-└── tests/                          # 68 Testes Unitários Automatizados (100% de Sucesso)
+└── tests/                          # 73 Testes Unitários Automatizados (100% de Sucesso)
     ├── __init__.py
     ├── test_notes.py               # Testes de notas, frequências e conversões MIDI
     ├── test_intervals.py           # Testes de intervalos e transposição
@@ -221,6 +232,7 @@ chord-master/
     ├── test_fingering.py           # Testes de regras de dedilhação no piano
     ├── test_guitar.py              # Testes de afinações, trastes e sistema CAGED
     ├── test_songs.py               # Testes de integridade das 16 peças completas de repertório
+    ├── test_midi_importer.py       # Testes do parser e importador de partituras MIDI
     ├── test_pitch.py               # Testes de deteção de pitch por autocorrelação e rejeição de ruído
     ├── test_metronome.py           # Testes de temporização do metrônomo e avaliação rítmica
     ├── test_gamification.py        # Testes de níveis de XP, cálculo de progresso e medalhas

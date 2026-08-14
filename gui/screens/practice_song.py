@@ -1,9 +1,11 @@
 """Interactive Song Performance & Play-Along Studio for Piano and Viola/Guitar with physical keyboard, metronome challenge, and USB MIDI."""
 import time
+from tkinter import filedialog, messagebox
 from typing import Callable, Dict, List, Optional
 import customtkinter as ctk
 from core.notes import Note
 from core.songs import Song, SongNote, SONG_LIBRARY, get_song_by_id
+from core.midi_importer import import_midi_as_song, save_user_song, load_user_songs
 from core.user_manager import UserManager
 from audio.player import get_audio_player
 from audio.metronome import Metronome, evaluate_rhythm_accuracy
@@ -70,7 +72,8 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.audio_player = get_audio_player()
         self.midi_manager = get_midi_manager()
 
-        self.current_song: Song = SONG_LIBRARY[0]
+        self.user_songs: List[Song] = load_user_songs()
+        self.current_song: Song = (self.user_songs[0] if self.user_songs else SONG_LIBRARY[0])
         self.current_note_idx: int = 0
         self.is_playing_demo: bool = False
         self.instrument_mode: str = "Piano"  # "Piano", "Viola", "Ambos"
@@ -88,6 +91,7 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.session_correct: int = 0
         self.session_mistakes: int = 0
         self.song_completed: bool = False
+        self.song_buttons: List[ctk.CTkButton] = []
 
         self._build_ui()
         self._bind_keyboard_events()
@@ -190,7 +194,7 @@ class PracticeSongScreen(ctk.CTkFrame):
         main_layout.grid_columnconfigure(1, weight=1)
         main_layout.grid_rowconfigure(0, weight=1)
 
-        # 2.1 Song Selection Sidebar (12 pieces)
+        # 2.1 Song Selection Sidebar
         self.song_sidebar = ctk.CTkScrollableFrame(
             main_layout,
             width=260,
@@ -201,29 +205,31 @@ class PracticeSongScreen(ctk.CTkFrame):
         )
         self.song_sidebar.grid(row=0, column=0, sticky="nsew", padx=(0, 12))
 
-        ctk.CTkLabel(
+        # Import MIDI button
+        import_btn = ctk.CTkButton(
             self.song_sidebar,
-            text=f"Biblioteca de Peças ({len(SONG_LIBRARY)})",
+            text="📂 Importar Música (.mid)",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            fg_color=theme.COLOR_PRIMARY,
+            hover_color=theme.COLOR_PRIMARY_HOVER,
+            height=36,
+            corner_radius=theme.RADIUS_MD,
+            command=self._handle_import_midi,
+        )
+        import_btn.pack(fill="x", padx=6, pady=(10, 8))
+
+        self.sidebar_title_lbl = ctk.CTkLabel(
+            self.song_sidebar,
+            text="Biblioteca de Peças",
             font=theme.get_font(theme.FONT_SECTION),
             text_color=theme.COLOR_TEXT_PRIMARY,
-        ).pack(anchor="w", padx=12, pady=(10, 8))
+        )
+        self.sidebar_title_lbl.pack(anchor="w", padx=12, pady=(4, 6))
 
-        self.song_buttons: List[ctk.CTkButton] = []
-        for s in SONG_LIBRARY:
-            btn = ctk.CTkButton(
-                self.song_sidebar,
-                text=f"{s.title}\n{s.composer} ({s.difficulty})",
-                font=theme.get_font(theme.FONT_BODY),
-                anchor="w",
-                height=52,
-                corner_radius=theme.RADIUS_MD,
-                fg_color=theme.COLOR_SURFACE_SECONDARY,
-                text_color=theme.COLOR_TEXT_PRIMARY,
-                hover_color=theme.COLOR_SURFACE_HOVER,
-                command=lambda chosen=s: self._load_song(chosen),
-            )
-            btn.pack(fill="x", padx=6, pady=3)
-            self.song_buttons.append(btn)
+        self.songs_btn_container = ctk.CTkFrame(self.song_sidebar, fg_color="transparent")
+        self.songs_btn_container.pack(fill="x")
+
+        self._populate_song_sidebar()
 
         # 2.2 Active Song Studio Stage
         self.stage_scroll = ctk.CTkScrollableFrame(
@@ -236,6 +242,56 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.stage_scroll.grid(row=0, column=1, sticky="nsew")
 
         self._build_stage_ui()
+
+    def _populate_song_sidebar(self):
+        for btn in self.song_buttons:
+            btn.destroy()
+        self.song_buttons.clear()
+
+        all_songs = SONG_LIBRARY + self.user_songs
+        self.sidebar_title_lbl.configure(text=f"Biblioteca de Peças ({len(all_songs)})")
+
+        for s in all_songs:
+            is_active = (self.current_song and self.current_song.id == s.id)
+            btn = ctk.CTkButton(
+                self.songs_btn_container,
+                text=f"{s.title}\n{s.composer} ({s.difficulty})",
+                font=theme.get_font(theme.FONT_BODY),
+                anchor="w",
+                height=52,
+                corner_radius=theme.RADIUS_MD,
+                fg_color=theme.COLOR_PRIMARY if is_active else theme.COLOR_SURFACE_SECONDARY,
+                text_color="#FFFFFF" if is_active else theme.COLOR_TEXT_PRIMARY,
+                hover_color=theme.COLOR_PRIMARY_HOVER if is_active else theme.COLOR_SURFACE_HOVER,
+                command=lambda chosen=s: self._load_song(chosen),
+            )
+            btn.pack(fill="x", padx=6, pady=3)
+            self.song_buttons.append(btn)
+
+    def _handle_import_midi(self):
+        filepath = filedialog.askopenfilename(
+            title="Selecionar Ficheiro MIDI (.mid / .midi)",
+            filetypes=[("Ficheiros MIDI", "*.mid *.midi"), ("Todos os Ficheiros", "*.*")],
+        )
+        if not filepath:
+            return
+
+        try:
+            new_song = import_midi_as_song(filepath)
+            save_user_song(new_song)
+            if not any(s.id == new_song.id for s in self.user_songs):
+                self.user_songs.append(new_song)
+            self._populate_song_sidebar()
+            self._load_song(new_song)
+            messagebox.showinfo(
+                "Partitura Importada com Sucesso",
+                f"A música «{new_song.title}» foi importada com sucesso!\n\n"
+                f"• Total de notas: {len(new_song.notes)}\n"
+                f"• Andamento detetado: {new_song.bpm} BPM\n"
+                f"• Dedilhações e posições no instrumento geradas automaticamente.",
+            )
+        except Exception as e:
+            messagebox.showerror("Erro ao Importar MIDI", f"Não foi possível importar o ficheiro MIDI:\n{e}")
 
     def _build_stage_ui(self):
         # Header Info Card
