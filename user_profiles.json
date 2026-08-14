@@ -14,9 +14,9 @@
           "best_streak": 0
         },
         "leitura_pauta": {
-          "total_attempts": 1,
+          "total_attempts": 2,
           "correct_count": 1,
-          "current_streak": 1,
+          "current_streak": 0,
           "best_streak": 1
         },
         "teoria": {
@@ -44,6 +44,15 @@
           "prompt": "Ouve as notas tocadas em modo ascendente e identifica o intervalo:",
           "user_answer": "Terça Maior",
           "correct_answer": "Quarta Justa"
+        },
+        {
+          "timestamp": 1786723744.383522,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": false,
+          "prompt": "Identifica a nota exibida na pauta (Clave de Sol):",
+          "user_answer": "E (Mi)",
+          "correct_answer": "F (Fá)"
         }
       ]
     },

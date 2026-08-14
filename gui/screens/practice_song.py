@@ -487,10 +487,16 @@ class PracticeSongScreen(ctk.CTkFrame):
 
     def _on_physical_key_press(self, event):
         """Processes key presses on the physical computer keyboard."""
-        if self.is_playing_demo or self.song_completed or not self.current_song:
+        if not self.winfo_exists() or self.is_playing_demo or self.song_completed or not self.current_song:
             return
 
-        char = event.char.lower()
+        if self.current_note_idx >= len(self.current_song.notes):
+            return
+
+        char = event.char.lower() if event.char else ""
+        if not char:
+            return
+
         expected_sn = self.current_song.notes[self.current_note_idx]
         expected_note = expected_sn.note
 
@@ -508,7 +514,7 @@ class PracticeSongScreen(ctk.CTkFrame):
                 if played_string_idx == expected_sn.guitar_string:
                     is_match = True
             else:
-                is_match = True  # If string not specified, string press passes
+                is_match = True
 
         if is_match:
             self._handle_correct_note()
@@ -516,7 +522,9 @@ class PracticeSongScreen(ctk.CTkFrame):
             self._handle_incorrect_note()
 
     def _on_user_piano_click(self, clicked_note: Note):
-        if self.is_playing_demo or self.song_completed or not self.current_song:
+        if not self.winfo_exists() or self.is_playing_demo or self.song_completed or not self.current_song:
+            return
+        if self.current_note_idx >= len(self.current_song.notes):
             return
         expected_note = self.current_song.notes[self.current_note_idx].note
         if clicked_note.normalized_pitch == expected_note.normalized_pitch:
@@ -525,7 +533,9 @@ class PracticeSongScreen(ctk.CTkFrame):
             self._handle_incorrect_note()
 
     def _on_user_guitar_click(self, clicked_note: Note):
-        if self.is_playing_demo or self.song_completed or not self.current_song:
+        if not self.winfo_exists() or self.is_playing_demo or self.song_completed or not self.current_song:
+            return
+        if self.current_note_idx >= len(self.current_song.notes):
             return
         expected_note = self.current_song.notes[self.current_note_idx].note
         if clicked_note.normalized_pitch == expected_note.normalized_pitch:
@@ -534,6 +544,8 @@ class PracticeSongScreen(ctk.CTkFrame):
             self._handle_incorrect_note()
 
     def _handle_correct_note(self):
+        if not self.current_song or self.current_note_idx >= len(self.current_song.notes):
+            return
         self.session_correct += 1
         sn = self.current_song.notes[self.current_note_idx]
         self.audio_player.play_note(sn.note, duration=0.6)
@@ -637,3 +649,8 @@ class PracticeSongScreen(ctk.CTkFrame):
         self._stop_demo_playback()
         self.audio_player.stop_all()
         self.on_back()
+
+    def destroy(self):
+        self._unbind_keyboard_events()
+        self._stop_demo_playback()
+        super().destroy()
