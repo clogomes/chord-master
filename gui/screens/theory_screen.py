@@ -8,6 +8,7 @@ from core.chords import CHORD_TYPES, Chord
 from core.guitar import GuitarChordShape, GUITAR_CHORD_LIBRARY, GuitarFretboardModel
 from core.theory_content import THEORY_CHAPTERS, TheoryChapter
 from core.user_manager import UserManager
+from core.fingering import get_chord_piano_fingering
 from audio.player import get_audio_player
 from gui.components.piano_keyboard import PianoKeyboard
 from gui.components.staff_canvas import StaffCanvas
@@ -492,6 +493,12 @@ class TheoryScreen(ctk.CTkFrame):
         if self.demo_piano:
             midi_map = {n.midi: ("#10B981" if i == 0 else "#38BDF8") for i, n in enumerate(notes)}
             self.demo_piano.highlight_by_midi(midi_map)
+            elem = self.element_select.get()
+            if "Tríade" in elem or "Acorde" in elem or "Sétima" in elem or "Maior com" in elem or "Menor com" in elem or "Justa" in elem or "Terça" in elem:
+                fingering = get_chord_piano_fingering(notes, hand="right")
+                self.demo_piano.set_fingering(fingering)
+            else:
+                self.demo_piano.set_fingering({})
 
         # 3. Update Guitar / Viola
         if self.demo_guitar:

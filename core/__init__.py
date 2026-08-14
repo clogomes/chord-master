@@ -6,6 +6,9 @@ from .chords import Chord, CHORD_TYPES, get_chord_notes
 from .quiz_engine import QuizEngine, QuizQuestion, QuestionType
 from .score_tracker import ScoreTracker
 from .user_manager import UserManager, UserProfile, LESSON_IDS, AVATAR_CHOICES
+from .fingering import get_chord_piano_fingering
+from .guitar import GuitarChordShape, GuitarFretboardModel, GUITAR_CHORD_LIBRARY
+from .songs import Song, SongNote, SONG_LIBRARY, get_song_by_id
 
 __all__ = [
     "Note",

@@ -1,4 +1,4 @@
-"""Interactive, visually responsive 2-octave piano keyboard component."""
+"""Interactive, visually responsive 2-octave piano keyboard component with fingering support."""
 import tkinter as tk
 from typing import Callable, Dict, List, Optional, Set
 import customtkinter as ctk
@@ -9,7 +9,7 @@ from audio.player import get_audio_player
 class PianoKeyboard(ctk.CTkFrame):
     """
     An interactive piano keyboard widget capable of playing audio on touch,
-    visualizing chords, scales, and receiving user input for quizzes.
+    visualizing chords, scales, fingering numbers (1-5), and receiving user input for quizzes.
     """
 
     WHITE_NOTES = ["C", "D", "E", "F", "G", "A", "B"]
@@ -46,6 +46,7 @@ class PianoKeyboard(ctk.CTkFrame):
         self.audio_player = get_audio_player()
 
         self.highlighted_midis: Dict[int, str] = {}  # midi -> color hex
+        self.fingering_map: Dict[int, int] = {}       # midi -> finger number (1-5)
 
         # Calculate canvas dimensions
         total_white_keys = self.num_octaves * 7
@@ -93,9 +94,15 @@ class PianoKeyboard(ctk.CTkFrame):
         self.highlighted_midis = dict(midi_color_map)
         self.redraw()
 
+    def set_fingering(self, fingering_map: Dict[int, int]):
+        """Sets the finger numbers (1-5) to display over highlighted keys."""
+        self.fingering_map = dict(fingering_map)
+        self.redraw()
+
     def clear_highlights(self):
-        """Clears all highlighted keys."""
+        """Clears all highlighted keys and fingering numbers."""
         self.highlighted_midis.clear()
+        self.fingering_map.clear()
         self.redraw()
 
     def _on_mouse_motion(self, event):
@@ -134,7 +141,7 @@ class PianoKeyboard(ctk.CTkFrame):
                 self.on_key_click(note)
 
     def redraw(self):
-        """Draws white and black keys with highlights, hover states, and labels."""
+        """Draws white and black keys with highlights, hover states, labels, and fingering numbers."""
         self.canvas.delete("all")
         self._key_regions.clear()
 
@@ -173,6 +180,25 @@ class PianoKeyboard(ctk.CTkFrame):
 
                 # Bottom lip highlight
                 self.canvas.create_line(x1 + 1, y2 - 3, x2 - 1, y2 - 3, fill="#CBD5E1", width=2)
+
+                # Fingering badge if defined
+                if note.midi in self.fingering_map:
+                    finger = self.fingering_map[note.midi]
+                    fc_x = x1 + self.key_width // 2
+                    fc_y = y2 - 38
+                    r = 9
+                    self.canvas.create_oval(
+                        fc_x - r, fc_y - r, fc_x + r, fc_y + r,
+                        fill="#0F172A",
+                        outline="#FFFFFF",
+                        width=1.5,
+                    )
+                    self.canvas.create_text(
+                        fc_x, fc_y,
+                        text=str(finger),
+                        fill="#FFFFFF",
+                        font=("Helvetica", 9, "bold"),
+                    )
 
                 # Note Label
                 if self.show_labels:
@@ -232,6 +258,25 @@ class PianoKeyboard(ctk.CTkFrame):
                 # Key surface highlight for 3D realism
                 self.canvas.create_line(x1 + 2, y1 + 2, x2 - 2, y1 + 2, fill="#64748B", width=1)
                 self.canvas.create_line(x1 + 2, y2 - 4, x2 - 2, y2 - 4, fill="#1E293B", width=2)
+
+                # Fingering badge on Black key if defined
+                if note.midi in self.fingering_map:
+                    finger = self.fingering_map[note.midi]
+                    fc_x = x1 + self.black_width // 2
+                    fc_y = y2 - 32
+                    r = 8
+                    self.canvas.create_oval(
+                        fc_x - r, fc_y - r, fc_x + r, fc_y + r,
+                        fill="#FFFFFF",
+                        outline="#0F172A",
+                        width=1,
+                    )
+                    self.canvas.create_text(
+                        fc_x, fc_y,
+                        text=str(finger),
+                        fill="#0F172A",
+                        font=("Helvetica", 8, "bold"),
+                    )
 
                 # Note Label on Black Key
                 if self.show_labels:
