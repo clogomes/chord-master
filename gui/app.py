@@ -1,9 +1,11 @@
 """Main CustomTkinter application window, multi-user manager, and screen router."""
 import tkinter as tk
+from tkinter import messagebox
 from typing import Dict, Optional
 import customtkinter as ctk
 from core.user_manager import UserManager
 from audio.player import get_audio_player
+from gui import theme
 from gui.components.user_modal import UserManagementModal
 from gui.screens.main_menu import MainMenuScreen
 from gui.screens.theory_screen import TheoryScreen
@@ -11,6 +13,7 @@ from gui.screens.practice_ear import PracticeEarScreen
 from gui.screens.practice_staff import PracticeStaffScreen
 from gui.screens.practice_song import PracticeSongScreen
 from gui.screens.practice_instrument import PracticeInstrumentScreen
+from gui.screens.tuner_screen import LamireScreen
 from gui.screens.stats_screen import StatsScreen
 
 # Appearance configuration
@@ -29,9 +32,9 @@ class ChordMasterApp(ctk.CTk):
 
         # Window settings & background
         self.title("ChordMaster — Teoria Musical & Prática Interativa")
-        self.geometry("1120x760")
-        self.minsize(980, 650)
-        self.configure(fg_color=("#F8FAFC", "#0F172A"))
+        self.geometry("1160x780")
+        self.minsize(1000, 680)
+        self.configure(fg_color=theme.COLOR_BG)
 
         # Core state
         self.user_manager = UserManager()
@@ -55,38 +58,39 @@ class ChordMasterApp(ctk.CTk):
         # 1. Left Sidebar
         self.sidebar_frame = ctk.CTkFrame(
             self,
-            width=240,
+            width=260,
             corner_radius=0,
-            fg_color=("#F1F5F9", "#0F172A"),
+            fg_color=theme.COLOR_SURFACE,
+            border_width=0,
         )
         self.sidebar_frame.grid(row=0, column=0, sticky="nsew")
-        self.sidebar_frame.grid_rowconfigure(8, weight=1)
+        self.sidebar_frame.grid_rowconfigure(10, weight=1)
 
         # App Logo & Branding
         logo_frame = ctk.CTkFrame(self.sidebar_frame, fg_color="transparent")
-        logo_frame.grid(row=0, column=0, padx=16, pady=(20, 10), sticky="w")
+        logo_frame.grid(row=0, column=0, padx=18, pady=(22, 12), sticky="w")
 
         ctk.CTkLabel(
             logo_frame,
             text="🎵 ChordMaster",
-            font=ctk.CTkFont(family="Helvetica", size=20, weight="bold"),
-            text_color=("#0F172A", "#F8FAFC"),
+            font=ctk.CTkFont(family=theme.FONT_FAMILY, size=22, weight="bold"),
+            text_color=theme.COLOR_TEXT_PRIMARY,
         ).pack(anchor="w")
 
         ctk.CTkLabel(
             logo_frame,
-            text="Teoria & Prática Musical",
-            font=ctk.CTkFont(family="Helvetica", size=12),
-            text_color=("#64748B", "#94A3B8"),
+            text="Estúdio & Academia Musical",
+            font=theme.get_font(theme.FONT_SMALL),
+            text_color=theme.COLOR_TEXT_MUTED,
         ).pack(anchor="w")
 
         # Active User Profile Card
         self.profile_card = ctk.CTkFrame(
             self.sidebar_frame,
-            corner_radius=10,
-            fg_color=("#E2E8F0", "#1E293B"),
+            corner_radius=theme.RADIUS_MD,
+            fg_color=theme.COLOR_SURFACE_SECONDARY,
             border_width=1,
-            border_color=("#CBD5E1", "#334155"),
+            border_color=theme.COLOR_BORDER,
         )
         self.profile_card.grid(row=1, column=0, padx=14, pady=(4, 14), sticky="ew")
         self._update_profile_card()
@@ -94,160 +98,204 @@ class ChordMasterApp(ctk.CTk):
         # Navigation Buttons
         nav_items = [
             ("main_menu", "🏠 Menu Principal"),
-            ("theory", "📖 Teoria Musical"),
+            ("theory", "📖 Teoria Musical (8 Cap)"),
             ("practice_song", "🎶 Tocar Repertório"),
-            ("practice_instrument", "🎙️ Instrumento Real"),
+            ("lamire", "🎙️ Lamiré & Afinador"),
+            ("practice_instrument", "🎯 Prática c/ Microfone"),
             ("practice_ear", "🎧 Treino Auditivo"),
             ("practice_staff", "🎼 Leitura de Pauta"),
-            ("stats", "📊 Estatísticas"),
+            ("stats", "📊 Estatísticas & Alunos"),
         ]
 
         for i, (key, label) in enumerate(nav_items, start=2):
             btn = ctk.CTkButton(
                 self.sidebar_frame,
                 text=label,
-                font=ctk.CTkFont(family="Helvetica", size=13, weight="bold"),
+                font=theme.get_font(theme.FONT_BODY_BOLD),
                 anchor="w",
-                height=38,
-                corner_radius=8,
+                height=40,
+                corner_radius=theme.RADIUS_MD,
                 fg_color="transparent",
-                text_color=("#334155", "#CBD5E1"),
-                hover_color=("#E2E8F0", "#1E293B"),
+                text_color=theme.COLOR_TEXT_MUTED,
+                hover_color=theme.COLOR_SURFACE_HOVER,
                 command=lambda k=key: self.navigate_to(k),
             )
-            btn.grid(row=i, column=0, padx=14, pady=3, sticky="ew")
+            btn.grid(row=i, column=0, padx=14, pady=2, sticky="ew")
             self.nav_buttons[key] = btn
 
-        # Theme Selector at bottom
+        # Reset Progress & Theme Controls at bottom
         bottom_frame = ctk.CTkFrame(self.sidebar_frame, fg_color="transparent")
-        bottom_frame.grid(row=9, column=0, padx=14, pady=18, sticky="ew")
+        bottom_frame.grid(row=11, column=0, padx=14, pady=(10, 16), sticky="ew")
+
+        # Reset Progress Button
+        reset_btn = ctk.CTkButton(
+            bottom_frame,
+            text="↺ Reiniciar Progresso",
+            font=theme.get_font(theme.FONT_SMALL_BOLD),
+            fg_color="transparent",
+            text_color=theme.COLOR_ACCENT_CRIMSON,
+            hover_color=theme.COLOR_CRIMSON_BG,
+            height=30,
+            corner_radius=theme.RADIUS_SM,
+            command=self.confirm_reset_user_progress,
+        )
+        reset_btn.pack(fill="x", pady=(0, 10))
 
         ctk.CTkLabel(
             bottom_frame,
             text="Tema Visual:",
-            font=ctk.CTkFont(family="Helvetica", size=11, weight="bold"),
-            text_color=("#64748B", "#94A3B8"),
+            font=theme.get_font(theme.FONT_SMALL_BOLD),
+            text_color=theme.COLOR_TEXT_MUTED,
         ).pack(anchor="w", pady=(0, 4))
 
         self.theme_option = ctk.CTkOptionMenu(
             bottom_frame,
             values=["Dark", "Light", "System"],
             command=self._change_theme,
-            height=30,
+            height=32,
+            corner_radius=theme.RADIUS_SM,
+            font=theme.get_font(theme.FONT_SMALL),
             fg_color="#334155",
             button_color="#475569",
         )
         self.theme_option.set("Dark")
         self.theme_option.pack(fill="x")
 
-        # 2. Main Content Area
-        self.content_area = ctk.CTkFrame(self, corner_radius=0, fg_color=("#F8FAFC", "#0F172A"))
+        # 2. Right Content Area
+        self.content_area = ctk.CTkFrame(
+            self,
+            corner_radius=0,
+            fg_color=theme.COLOR_BG,
+        )
         self.content_area.grid(row=0, column=1, sticky="nsew")
 
     def _update_profile_card(self):
-        for child in self.profile_card.winfo_children():
-            child.destroy()
+        for widget in self.profile_card.winfo_children():
+            widget.destroy()
 
         user = self.user_manager.current_user
 
         top_row = ctk.CTkFrame(self.profile_card, fg_color="transparent")
-        top_row.pack(fill="x", padx=10, pady=(8, 2))
+        top_row.pack(fill="x", padx=12, pady=(10, 2))
 
-        av_lbl = ctk.CTkLabel(top_row, text=user.avatar, font=ctk.CTkFont(size=20))
-        av_lbl.pack(side="left", padx=(0, 6))
+        avatar_lbl = ctk.CTkLabel(
+            top_row,
+            text=user.avatar,
+            font=ctk.CTkFont(size=24),
+        )
+        avatar_lbl.pack(side="left")
 
-        user_info = ctk.CTkFrame(top_row, fg_color="transparent")
-        user_info.pack(side="left", fill="x", expand=True)
+        name_box = ctk.CTkFrame(top_row, fg_color="transparent")
+        name_box.pack(side="left", padx=8)
 
-        ctk.CTkLabel(
-            user_info,
+        name_lbl = ctk.CTkLabel(
+            name_box,
             text=user.username,
-            font=ctk.CTkFont(family="Helvetica", size=13, weight="bold"),
-            text_color=("#0F172A", "#F8FAFC"),
-        ).pack(anchor="w")
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+        )
+        name_lbl.pack(anchor="w")
 
-        prog_text = f"Lições: {len(user.completed_lessons)}/4 ({user.lessons_progress_percent:.0f}%)"
-        ctk.CTkLabel(
-            user_info,
-            text=prog_text,
-            font=ctk.CTkFont(family="Helvetica", size=10),
-            text_color=("#64748B", "#94A3B8"),
-        ).pack(anchor="w")
+        lessons_count = len(user.completed_lessons)
+        stats_lbl = ctk.CTkLabel(
+            name_box,
+            text=f"{lessons_count}/8 lições • {user.accuracy_rate:.0f}% acertos",
+            font=theme.get_font(theme.FONT_SMALL),
+            text_color=theme.COLOR_TEXT_MUTED,
+        )
+        stats_lbl.pack(anchor="w")
 
-        # Progress bar
-        pbar = ctk.CTkProgressBar(self.profile_card, height=5, progress_color="#10B981")
-        pbar.set(user.lessons_progress_percent / 100.0)
-        pbar.pack(fill="x", padx=10, pady=(2, 6))
-
-        # Switch / manage profile button
         switch_btn = ctk.CTkButton(
             self.profile_card,
-            text="Trocar Perfil 👥",
-            font=ctk.CTkFont(family="Helvetica", size=11, weight="bold"),
-            height=24,
-            fg_color="#334155",
-            hover_color="#475569",
+            text="👥 Gerir Alunos / Perfis",
+            font=theme.get_font(theme.FONT_SMALL_BOLD),
+            height=28,
+            corner_radius=theme.RADIUS_SM,
+            fg_color=theme.COLOR_PRIMARY,
+            hover_color=theme.COLOR_PRIMARY_HOVER,
             command=self._open_user_modal,
         )
-        switch_btn.pack(fill="x", padx=10, pady=(0, 8))
+        switch_btn.pack(fill="x", padx=12, pady=(6, 10))
 
     def _open_user_modal(self):
-        UserManagementModal(self, user_manager=self.user_manager, on_user_changed=self._on_user_changed)
+        modal = UserManagementModal(
+            self,
+            user_manager=self.user_manager,
+            on_user_switched=self._on_user_switched,
+        )
+        modal.grab_set()
 
-    def _on_user_changed(self):
+    def _on_user_switched(self, username: str):
         self._update_profile_card()
         # Refresh current screen
         if self.current_screen_name:
             self.navigate_to(self.current_screen_name)
 
+    def confirm_reset_user_progress(self):
+        """Displays confirmation dialog before resetting learning progress for active user."""
+        user = self.user_manager.current_user
+        confirm = messagebox.askyesno(
+            "Reiniciar Aprendizagem",
+            f"Tens a certeza que desejas reiniciar todo o progresso do aluno «{user.username}»?\n\n"
+            "Isto irá limpar as lições concluídas, estatísticas de exercícios e histórico para recomeçar do zero.",
+        )
+        if confirm:
+            self.user_manager.reset_current_user_scores()
+            self._update_profile_card()
+            if self.current_screen_name:
+                self.navigate_to(self.current_screen_name)
+            messagebox.showinfo("Progresso Reiniciado", f"O progresso de {user.username} foi reiniciado com sucesso!")
+
     def navigate_to(self, screen_name: str):
-        """Switches the active screen view in the content area."""
-        if not self.winfo_exists():
-            return
-
+        """Switches the active view in the content area."""
         self.audio_player.stop_all()
-        self._update_profile_card()
 
-        # Update sidebar highlight
+        # Update button highlights
         for key, btn in self.nav_buttons.items():
-            if btn.winfo_exists():
-                if key == screen_name:
-                    btn.configure(
-                        fg_color="#2563EB",
-                        text_color="#FFFFFF",
-                        hover_color="#1D4ED8",
-                    )
-                else:
-                    btn.configure(
-                        fg_color="transparent",
-                        text_color=("#334155", "#CBD5E1"),
-                        hover_color=("#E2E8F0", "#1E293B"),
-                    )
+            if key == screen_name:
+                btn.configure(
+                    fg_color=theme.COLOR_PRIMARY,
+                    text_color="#FFFFFF",
+                    hover_color=theme.COLOR_PRIMARY_HOVER,
+                )
+            else:
+                btn.configure(
+                    fg_color="transparent",
+                    text_color=theme.COLOR_TEXT_MUTED,
+                    hover_color=theme.COLOR_SURFACE_HOVER,
+                )
 
         # Destroy existing screen widget
-        if self.current_screen_widget and self.current_screen_widget.winfo_exists():
+        if self.current_screen_widget is not None:
             self.current_screen_widget.destroy()
+            self.current_screen_widget = None
 
         self.current_screen_name = screen_name
 
-        # Instantiate new screen view with user_manager
+        # Create target screen
         if screen_name == "main_menu":
             self.current_screen_widget = MainMenuScreen(
                 self.content_area,
                 user_manager=self.user_manager,
                 on_navigate=self.navigate_to,
-                on_open_users=self._open_user_modal,
+                on_switch_user=self._open_user_modal,
             )
         elif screen_name == "theory":
             self.current_screen_widget = TheoryScreen(
                 self.content_area,
                 user_manager=self.user_manager,
                 on_back=lambda: self.navigate_to("main_menu"),
+                on_user_updated=self._update_profile_card,
             )
         elif screen_name == "practice_song":
             self.current_screen_widget = PracticeSongScreen(
                 self.content_area,
                 user_manager=self.user_manager,
+                on_back=lambda: self.navigate_to("main_menu"),
+            )
+        elif screen_name == "lamire":
+            self.current_screen_widget = LamireScreen(
+                self.content_area,
                 on_back=lambda: self.navigate_to("main_menu"),
             )
         elif screen_name == "practice_instrument":
@@ -273,14 +321,24 @@ class ChordMasterApp(ctk.CTk):
                 self.content_area,
                 user_manager=self.user_manager,
                 on_back=lambda: self.navigate_to("main_menu"),
+                on_user_switched=self._on_user_switched,
             )
 
-        self.current_screen_widget.pack(fill="both", expand=True)
+        if self.current_screen_widget is not None:
+            self.current_screen_widget.pack(fill="both", expand=True)
 
-    def _change_theme(self, new_theme: str):
-        ctk.set_appearance_mode(new_theme)
+    def _change_theme(self, choice: str):
+        ctk.set_appearance_mode(choice)
 
     def _on_close(self):
         self.audio_player.stop_all()
-        self.user_manager.save()
         self.destroy()
+
+
+def run_app():
+    app = ChordMasterApp()
+    app.mainloop()
+
+
+if __name__ == "__main__":
+    run_app()

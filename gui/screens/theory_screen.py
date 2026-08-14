@@ -26,11 +26,13 @@ class TheoryScreen(ctk.CTkFrame):
         master,
         user_manager: UserManager,
         on_back: Callable[[], None],
+        on_user_updated: Optional[Callable[[], None]] = None,
         **kwargs,
     ):
-        super().__init__(master, fg_color=("#F8FAFC", "#0F172A"), **kwargs)
+        super().__init__(master, fg_color=("#F8FAFC", "#0B0F19"), **kwargs)
         self.user_manager = user_manager
         self.on_back = on_back
+        self.on_user_updated = on_user_updated
         self.audio_player = get_audio_player()
 
         self.current_chapter_idx = 0
@@ -160,6 +162,11 @@ class TheoryScreen(ctk.CTkFrame):
         else:
             self.display_instrument_mode = "Ambos"
         self._load_chapter(self.current_chapter_idx)
+        if self.on_user_updated:
+            try:
+                self.on_user_updated()
+            except Exception:
+                pass
 
     def _load_chapter(self, chapter_idx: int):
         self.current_chapter_idx = chapter_idx

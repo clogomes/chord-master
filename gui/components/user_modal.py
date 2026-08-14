@@ -1,7 +1,9 @@
 """User Profile management modal dialog for creating, switching, and managing student profiles."""
+from tkinter import messagebox
 from typing import Callable, Optional
 import customtkinter as ctk
 from core.user_manager import UserManager, AVATAR_CHOICES, LESSON_IDS
+from gui import theme
 
 
 class UserManagementModal(ctk.CTkToplevel):
@@ -11,17 +13,19 @@ class UserManagementModal(ctk.CTkToplevel):
         self,
         master,
         user_manager: UserManager,
-        on_user_changed: Callable[[], None],
+        on_user_changed: Optional[Callable[[], None]] = None,
+        on_user_switched: Optional[Callable[[str], None]] = None,
         **kwargs,
     ):
         super().__init__(master, **kwargs)
         self.user_manager = user_manager
         self.on_user_changed = on_user_changed
+        self.on_user_switched = on_user_switched
 
-        self.title("Gestão de Perfis de Utilizador")
-        self.geometry("520x600")
-        self.minsize(480, 520)
-        self.configure(fg_color=("#F8FAFC", "#0F172A"))
+        self.title("Gestão de Perfis de Alunos")
+        self.geometry("560x640")
+        self.minsize(500, 560)
+        self.configure(fg_color=theme.COLOR_BG)
 
         # Make modal
         self.transient(master)
@@ -30,110 +34,122 @@ class UserManagementModal(ctk.CTkToplevel):
         self.selected_avatar = AVATAR_CHOICES[0]
         self._build_ui()
 
+    def _notify_change(self, username: Optional[str] = None):
+        active = username or self.user_manager.active_username
+        if self.on_user_switched:
+            self.on_user_switched(active)
+        if self.on_user_changed:
+            self.on_user_changed()
+
     def _build_ui(self):
         # Header
         header = ctk.CTkFrame(self, fg_color="transparent")
-        header.pack(fill="x", padx=20, pady=(20, 10))
+        header.pack(fill="x", padx=24, pady=(20, 10))
 
         ctk.CTkLabel(
             header,
-            text="👥 Perfis de Utilizador",
-            font=ctk.CTkFont(family="Helvetica", size=22, weight="bold"),
-            text_color=("#0F172A", "#F8FAFC"),
+            text="👥 Perfis de Alunos & Utilizadores",
+            font=theme.get_font(theme.FONT_TITLE),
+            text_color=theme.COLOR_TEXT_PRIMARY,
         ).pack(anchor="w")
 
         ctk.CTkLabel(
             header,
-            text="Escolhe o teu perfil ou cria um novo para guardar o teu progresso nas lições.",
-            font=ctk.CTkFont(family="Helvetica", size=12),
-            text_color=("#64748B", "#94A3B8"),
-            wraplength=460,
+            text="Escolhe o teu perfil ou cria um novo para guardar o teu progresso nas lições e exercícios.",
+            font=theme.get_font(theme.FONT_BODY),
+            text_color=theme.COLOR_TEXT_MUTED,
+            wraplength=480,
+            justify="left",
         ).pack(anchor="w", pady=(2, 0))
 
         # Main scrollable list of profiles
         self.list_container = ctk.CTkScrollableFrame(
             self,
-            height=220,
-            fg_color=("#F1F5F9", "#1E293B"),
-            corner_radius=10,
+            height=230,
+            fg_color=theme.COLOR_SURFACE,
+            corner_radius=theme.RADIUS_LG,
+            border_width=1,
+            border_color=theme.COLOR_BORDER,
         )
-        self.list_container.pack(fill="x", padx=20, pady=10)
+        self.list_container.pack(fill="x", padx=24, pady=10)
 
         self._render_profile_list()
 
         # Create New Profile Section
         create_frame = ctk.CTkFrame(
             self,
-            fg_color=("#F1F5F9", "#1E293B"),
-            corner_radius=12,
+            fg_color=theme.COLOR_SURFACE,
+            corner_radius=theme.RADIUS_LG,
             border_width=1,
-            border_color=("#E2E8F0", "#334155"),
+            border_color=theme.COLOR_BORDER,
         )
-        create_frame.pack(fill="both", expand=True, padx=20, pady=(4, 20))
+        create_frame.pack(fill="both", expand=True, padx=24, pady=(4, 20))
 
         ctk.CTkLabel(
             create_frame,
-            text="➕ Criar Novo Perfil",
-            font=ctk.CTkFont(family="Helvetica", size=14, weight="bold"),
-            text_color=("#0F172A", "#F8FAFC"),
-        ).pack(anchor="w", padx=16, pady=(12, 6))
+            text="➕ Criar Novo Aluno",
+            font=theme.get_font(theme.FONT_SECTION),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+        ).pack(anchor="w", padx=18, pady=(14, 6))
 
         # Name input row
         input_row = ctk.CTkFrame(create_frame, fg_color="transparent")
-        input_row.pack(fill="x", padx=16, pady=4)
+        input_row.pack(fill="x", padx=18, pady=4)
 
         ctk.CTkLabel(
             input_row,
             text="Nome:",
-            font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"),
-        ).pack(side="left", padx=(0, 8))
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+        ).pack(side="left", padx=(0, 10))
 
         self.name_entry = ctk.CTkEntry(
             input_row,
-            placeholder_text="Ex: Carlos, Maria, João...",
-            height=34,
-            font=ctk.CTkFont(family="Helvetica", size=13),
+            placeholder_text="Ex: Maria, Carlos, Beatriz...",
+            height=36,
+            font=theme.get_font(theme.FONT_BODY),
         )
         self.name_entry.pack(side="left", expand=True, fill="x")
 
         # Avatar picker row
-        avatar_lbl = ctk.CTkLabel(
+        ctk.CTkLabel(
             create_frame,
-            text="Escolhe o teu Avatar:",
-            font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"),
-        )
-        avatar_lbl.pack(anchor="w", padx=16, pady=(8, 4))
+            text="Escolhe o Avatar do Aluno:",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+        ).pack(anchor="w", padx=18, pady=(10, 4))
 
         avatar_row = ctk.CTkFrame(create_frame, fg_color="transparent")
-        avatar_row.pack(fill="x", padx=16, pady=(0, 10))
+        avatar_row.pack(fill="x", padx=18, pady=(0, 12))
 
         self.avatar_buttons = []
         for av in AVATAR_CHOICES:
             btn = ctk.CTkButton(
                 avatar_row,
                 text=av,
-                font=ctk.CTkFont(size=18),
-                width=34,
-                height=34,
-                corner_radius=6,
-                fg_color="#2563EB" if av == self.selected_avatar else "#334155",
-                hover_color="#1D4ED8",
+                font=ctk.CTkFont(size=20),
+                width=38,
+                height=38,
+                corner_radius=theme.RADIUS_SM,
+                fg_color=theme.COLOR_PRIMARY if av == self.selected_avatar else theme.COLOR_SURFACE_SECONDARY,
+                hover_color=theme.COLOR_PRIMARY_HOVER,
                 command=lambda a=av: self._select_avatar(a),
             )
-            btn.pack(side="left", padx=2)
+            btn.pack(side="left", padx=3)
             self.avatar_buttons.append((av, btn))
 
         # Create button
         create_btn = ctk.CTkButton(
             create_frame,
             text="Criar & Ativar Perfil",
-            font=ctk.CTkFont(family="Helvetica", size=13, weight="bold"),
-            fg_color="#059669",
-            hover_color="#047857",
-            height=36,
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            fg_color=theme.COLOR_SUCCESS,
+            hover_color=theme.COLOR_SUCCESS_HOVER,
+            corner_radius=theme.RADIUS_MD,
+            height=38,
             command=self._handle_create_user,
         )
-        create_btn.pack(fill="x", padx=16, pady=(4, 14))
+        create_btn.pack(fill="x", padx=18, pady=(4, 16))
 
     def _render_profile_list(self):
         for child in self.list_container.winfo_children():
@@ -146,34 +162,34 @@ class UserManagementModal(ctk.CTkToplevel):
             is_active = profile.username == active_name
             row = ctk.CTkFrame(
                 self.list_container,
-                corner_radius=8,
-                fg_color="#2563EB" if is_active else ("#FFFFFF", "#0F172A"),
+                corner_radius=theme.RADIUS_MD,
+                fg_color=theme.COLOR_PRIMARY if is_active else theme.COLOR_SURFACE_SECONDARY,
                 border_width=1 if is_active else 0,
-                border_color="#60A5FA",
+                border_color=theme.COLOR_PRIMARY,
             )
             row.pack(fill="x", padx=6, pady=4)
 
             # Avatar + Name
-            av_lbl = ctk.CTkLabel(row, text=profile.avatar, font=ctk.CTkFont(size=20))
-            av_lbl.pack(side="left", padx=(10, 6), pady=8)
+            av_lbl = ctk.CTkLabel(row, text=profile.avatar, font=ctk.CTkFont(size=22))
+            av_lbl.pack(side="left", padx=(12, 8), pady=8)
 
             info_box = ctk.CTkFrame(row, fg_color="transparent")
             info_box.pack(side="left", expand=True, fill="x", padx=4)
 
-            name_color = "#FFFFFF" if is_active else ("#0F172A", "#F8FAFC")
+            name_color = "#FFFFFF" if is_active else theme.COLOR_TEXT_PRIMARY
             ctk.CTkLabel(
                 info_box,
                 text=profile.username + (" (Ativo)" if is_active else ""),
-                font=ctk.CTkFont(family="Helvetica", size=13, weight="bold"),
+                font=theme.get_font(theme.FONT_BODY_BOLD),
                 text_color=name_color,
             ).pack(anchor="w")
 
-            detail_text = f"Lições: {len(profile.completed_lessons)}/4 • Precisão: {profile.accuracy_rate:.0f}% ({profile.total_attempts} ex.)"
-            sub_color = "#DBEAFE" if is_active else ("#64748B", "#94A3B8")
+            detail_text = f"Lições: {len(profile.completed_lessons)}/8 • Precisão: {profile.accuracy_rate:.0f}% ({profile.total_attempts} ex.)"
+            sub_color = "#DBEAFE" if is_active else theme.COLOR_TEXT_MUTED
             ctk.CTkLabel(
                 info_box,
                 text=detail_text,
-                font=ctk.CTkFont(family="Helvetica", size=11),
+                font=theme.get_font(theme.FONT_SMALL),
                 text_color=sub_color,
             ).pack(anchor="w")
 
@@ -182,11 +198,12 @@ class UserManagementModal(ctk.CTkToplevel):
                 select_btn = ctk.CTkButton(
                     row,
                     text="Selecionar",
-                    font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"),
-                    width=85,
-                    height=28,
-                    fg_color="#2563EB",
-                    hover_color="#1D4ED8",
+                    font=theme.get_font(theme.FONT_SMALL_BOLD),
+                    width=90,
+                    height=30,
+                    corner_radius=theme.RADIUS_SM,
+                    fg_color=theme.COLOR_PRIMARY,
+                    hover_color=theme.COLOR_PRIMARY_HOVER,
                     command=lambda u=profile.username: self._handle_switch_user(u),
                 )
                 select_btn.pack(side="right", padx=6)
@@ -196,29 +213,30 @@ class UserManagementModal(ctk.CTkToplevel):
                         row,
                         text="✕",
                         font=ctk.CTkFont(size=12, weight="bold"),
-                        width=28,
-                        height=28,
-                        fg_color="#DC2626",
-                        hover_color="#B91C1C",
+                        width=30,
+                        height=30,
+                        corner_radius=theme.RADIUS_SM,
+                        fg_color=theme.COLOR_ACCENT_CRIMSON,
+                        hover_color=theme.COLOR_ACCENT_CRIMSON_HOVER,
                         command=lambda u=profile.username: self._handle_delete_user(u),
                     )
-                    del_btn.pack(side="right", padx=(0, 4))
+                    del_btn.pack(side="right", padx=(0, 6))
             else:
                 badge = ctk.CTkLabel(
                     row,
                     text="✓ EM USO",
-                    font=ctk.CTkFont(family="Helvetica", size=11, weight="bold"),
+                    font=theme.get_font(theme.FONT_BADGE),
                     text_color="#FFFFFF",
                 )
-                badge.pack(side="right", padx=12)
+                badge.pack(side="right", padx=14)
 
     def _select_avatar(self, avatar: str):
         self.selected_avatar = avatar
         for av, btn in self.avatar_buttons:
             if av == avatar:
-                btn.configure(fg_color="#2563EB")
+                btn.configure(fg_color=theme.COLOR_PRIMARY)
             else:
-                btn.configure(fg_color="#334155")
+                btn.configure(fg_color=theme.COLOR_SURFACE_SECONDARY)
 
     def _handle_create_user(self):
         name = self.name_entry.get().strip()
@@ -228,14 +246,16 @@ class UserManagementModal(ctk.CTkToplevel):
         self.user_manager.create_user(name, avatar=self.selected_avatar)
         self.name_entry.delete(0, "end")
         self._render_profile_list()
-        self.on_user_changed()
+        self._notify_change()
 
     def _handle_switch_user(self, username: str):
         self.user_manager.switch_user(username)
         self._render_profile_list()
-        self.on_user_changed()
+        self._notify_change(username)
 
     def _handle_delete_user(self, username: str):
-        self.user_manager.delete_user(username)
-        self._render_profile_list()
-        self.on_user_changed()
+        confirm = messagebox.askyesno("Remover Perfil", f"Tens a certeza que desejas remover o perfil «{username}»?")
+        if confirm:
+            self.user_manager.delete_user(username)
+            self._render_profile_list()
+            self._notify_change()

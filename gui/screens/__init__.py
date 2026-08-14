@@ -5,6 +5,7 @@ from .practice_ear import PracticeEarScreen
 from .practice_staff import PracticeStaffScreen
 from .practice_song import PracticeSongScreen
 from .practice_instrument import PracticeInstrumentScreen
+from .tuner_screen import LamireScreen
 from .stats_screen import StatsScreen
 
 __all__ = [
@@ -14,5 +15,6 @@ __all__ = [
     "PracticeStaffScreen",
     "PracticeSongScreen",
     "PracticeInstrumentScreen",
+    "LamireScreen",
     "StatsScreen",
 ]
