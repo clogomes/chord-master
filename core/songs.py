@@ -174,7 +174,7 @@ SONG_LIBRARY: List[Song] = [
     # 5. FÜR ELISE (Beethoven - Motivo Principal)
     Song(
         id="fur_elise",
-        title="Pour Élise (Motivo Principal)",
+        title="Für Elise (Motivo Principal)",
         composer="Ludwig van Beethoven",
         difficulty="Intermédio",
         bpm=120,
