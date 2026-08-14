@@ -93,7 +93,28 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 6. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
+### 6. 🧠 FASE 6 — Motor de Prática Adaptativa & Deteção de Pontos Fracos ([`core/adaptive_engine.py`](file:///Users/clogomes/repo/chord-master/core/adaptive_engine.py))
+- **Análise Inteligente do Histórico de Exercícios**:
+  - Analisa as últimas 50 tentativas do perfil do aluno em `user.history` com decaimento exponencial de recência (os erros recentes têm maior peso).
+  - Identifica automaticamente as áreas de maior dificuldade (*pontos fracos*) entre Treino Auditivo, Leitura de Pauta, Teoria, Repertório e Instrumento.
+- **Cartão Personalizado no Dashboard Inicial**:
+  - Exibe no topo do menu principal o cartão **«🎯 Recomendado para ti hoje: [Categoria Mais Fraca]»** com explicação do motivo da recomendação e botão direto **«Praticar Agora →»**.
+- **Geração de Desafios Adaptativos**:
+  - 60% de probabilidade de direcionar exercícios para as áreas com menor taxa de acerto e 40% de exploração equilibrada.
+
+---
+
+### 7. 📈 FASE 7 — Painel de Análise de Progresso com Gráficos em Canvas ([`gui/screens/stats_screen.py`](file:///Users/clogomes/repo/chord-master/gui/screens/stats_screen.py))
+- **Gráfico de Linha de Tendência de Precisão (Últimas 4 Semanas)**:
+  - Renderizado nativamente em `tk.Canvas` com interpolação suave, eixos graduados de $0\%$ a $100\%$, linhas de grelha subtis e pontos com halo que destacam a percentagem de cada semana.
+- **Gráfico de Barras Horizontais de Comparação entre Categorias**:
+  - Comparação lado a lado do aproveitamento em Treino Auditivo, Leitura de Pauta, Teoria Musical e Repertório, facilitando a identificação imediata de onde o aluno precisa focar o estudo.
+- **Calendário de Atividade Estilo GitHub (~90 Dias)**:
+  - Grelha de consistência de 14 semanas ($14 \times 7$ dias) com escala de intensidade em esmeralda (*Dark Slate* a *Vibrant Emerald* `#34D399`), marcadores de meses e dias da semana, e contador de dias ativos.
+
+---
+
+### 8. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
 - **Deteção de Frequência Fundamental ($f_0$) via Microfone**: Algoritmo de autocorrelação no domínio do tempo acelerado por FFT, com interpolação parabólica para precisão sub-amostra e rejeição inteligente de ruído ambiente (60 Hz a 1200 Hz).
 - **Mostrador Visual com Agulha Dinâmica**: Medidor de $-50$ a $+50$ cents com faixa de tolerância verde ($\pm 10$ cents) e orientações em tempo real (*"▲ Muito Grave — Estica a corda"*, *"▼ Muito Agudo — Afrouxa a corda"*, *"✓ AFINADO (No Ponto Perfeito!)"*).
 - **Afinador de Viola (6 Cordas)**: Cartões visuais para as 6 cordas padrão ($E2, A2, D3, G3, B3, E4$) que se iluminam automaticamente ao detetar a corda tocada, com botão para ouvir o tom de cada corda.
@@ -101,13 +122,13 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 7. 🎯 Prática com Instrumento Acústico Real
+### 9. 🎯 Prática com Instrumento Acústico Real
 - Prática de escalas, arpejos e repertório utilizando o teu **piano acústico** ou **viola/guitarra física**.
 - A aplicação "escuta" através do microfone, valida a nota e o desvio em cents, exigindo uma sustentação de 300 ms afinada antes de avançar automaticamente para a nota seguinte.
 
 ---
 
-### 8. 🎧 Treino Auditivo & Leitura de Pauta
+### 10. 🎧 Treino Auditivo & Leitura de Pauta
 - **Treino Auditivo (Ear Training)**:
   - Identificação de **Intervalos Melódicos** (ascendentes/descendentes) e **Harmónicos** (duas notas em simultâneo).
   - Identificação de **Qualidade de Acordes** (Maiores, Menores, Diminutos, Aumentados, Sétimas).
@@ -120,14 +141,14 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 9. 📥 Exportação de Progresso & Certificado de Estudo
+### 11. 📥 Exportação de Progresso & Certificado de Estudo
 - Botão **«📥 Exportar Progresso»** no ecrã de Estatísticas:
   - Gera um relatório formatado em Markdown (`relatorio_progresso_<aluno>.md`) pronto a imprimir ou partilhar.
   - Inclui data de emissão, nível e título de maestria, XP total, estado das 8 lições de teoria, métricas de precisão por categoria e lista de todas as medalhas e conquistas alcançadas.
 
 ---
 
-### 10. 🎨 Design System & Interface Moderna ([`gui/theme.py`](file:///Users/clogomes/repo/chord-master/gui/theme.py))
+### 12. 🎨 Design System & Interface Moderna ([`gui/theme.py`](file:///Users/clogomes/repo/chord-master/gui/theme.py))
 - **Paleta de Cores Harmoniosa**: Base moderna em tons de ardósia escura (*Slate-950* `#0B0F19`, *Slate-900* `#111827`, *Slate-800* `#1F2937`), com destaques em *Royal Indigo* (`#4F46E5`), *Emerald* (`#10B981`), *Sky Blue* (`#0284C7`), *Amber* (`#F59E0B`) e *Crimson* (`#EF4444`).
 - **Tipografia Otimizada e Legível**: Escala com mínimo de $14\text{px}$ para textos de corpo e $28\text{--}32\text{px}$ para títulos principais, garantindo máxima legibilidade.
 - **Proteção de Threads & Rate-Limiting**: Processamento assíncrono seguro com limitação de taxa de atualização gráfica (15 FPS), evitando travamentos ou sobrecarga da GUI.
@@ -151,9 +172,10 @@ chord-master/
 │   ├── chords.py                   # Formação de Tríades, Tétrades e Inversões de Acordes
 │   ├── fingering.py                # Mapeamento de Dedilhações para Piano (Mão Direita e Esquerda)
 │   ├── guitar.py                   # Mapeamento de Braço de Viola (CAGED, 15 Trastes, Afinações)
-│   ├── songs.py                    # Biblioteca de 12 Músicas Completas com notas, dedilhações e tablaturas
+│   ├── songs.py                    # Biblioteca de 16 Músicas Completas com notas, dedilhações e tablaturas
 │   ├── gamification.py             # Sistema de Gamificação (XP, 7 Níveis, 12 Conquistas/Medalhas)
 │   ├── exporter.py                 # Exportador de Relatórios de Progresso e Certificados em Markdown
+│   ├── adaptive_engine.py          # Motor de Prática Adaptativa & Identificação de Pontos Fracos
 │   ├── quiz_engine.py              # Motor de Geração de Questões (Intervalos, Acordes, Pauta, Solfejo Cantado)
 │   ├── score_tracker.py            # Gestor de Pontuações e Métricas
 │   └── user_manager.py             # Gestor Multi-Utilizador, Persistência e Progressão
@@ -181,14 +203,14 @@ chord-master/
 │       ├── __init__.py
 │       ├── main_menu.py            # Dashboard Inicial com Nível de XP, Progresso e Acessos Rápidos
 │       ├── theory_screen.py        # Academia de Teoria (8 Capítulos com Piano e Viola Sincronizados)
-│       ├── practice_song.py        # Estúdio de Repertório (12 Músicas Completas, Metrónomo e Suporte a MIDI)
+│       ├── practice_song.py        # Estúdio de Repertório (16 Músicas Completas, Metrónomo e Suporte a MIDI)
 │       ├── tuner_screen.py         # Lamiré & Afinador Cromático com Agulha e Deteção por Microfone
 │       ├── practice_instrument.py  # Treino Acústico com Microfone para Piano e Viola Físicos
 │       ├── practice_ear.py         # Treino Auditivo & Ditado de Solfejo Cantado com Microfone
 │       ├── practice_staff.py       # Exercícios de Leitura de Pauta
 │       └── stats_screen.py         # Painel de Estatísticas, Conquistas, Leaderboard e Exportação
 │
-└── tests/                          # 64 Testes Unitários Automatizados (100% de Sucesso)
+└── tests/                          # 68 Testes Unitários Automatizados (100% de Sucesso)
     ├── __init__.py
     ├── test_notes.py               # Testes de notas, frequências e conversões MIDI
     ├── test_intervals.py           # Testes de intervalos e transposição
@@ -196,11 +218,12 @@ chord-master/
     ├── test_chords.py              # Testes de acordes, tríades e inversões
     ├── test_fingering.py           # Testes de regras de dedilhação no piano
     ├── test_guitar.py              # Testes de afinações, trastes e sistema CAGED
-    ├── test_songs.py               # Testes de integridade das 12 peças completas de repertório
+    ├── test_songs.py               # Testes de integridade das 16 peças completas de repertório
     ├── test_pitch.py               # Testes de deteção de pitch por autocorrelação e rejeição de ruído
     ├── test_metronome.py           # Testes de temporização do metrônomo e avaliação rítmica
     ├── test_gamification.py        # Testes de níveis de XP, cálculo de progresso e medalhas
     ├── test_exporter.py            # Testes de exportação de relatórios Markdown
+    ├── test_adaptive.py            # Testes do motor adaptativo e decaimento de recência
     ├── test_theme.py               # Testes de tokens de cores e tipografia
     ├── test_quiz.py                # Testes do motor de perguntas, solfejo cantado e streaks
     └── test_users.py               # Testes de perfis multi-utilizador e persistência

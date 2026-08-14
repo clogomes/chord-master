@@ -1,16 +1,19 @@
-"""Statistics, progress tracking, user comparison leaderboard, gamification achievements, and export screen."""
+"""Statistics, visual progress charts, activity calendar, leaderboard, and report exporter."""
 import datetime
+import time
+import tkinter as tk
 from tkinter import messagebox
-from typing import Callable, Optional
+from typing import Callable, Dict, List, Optional, Tuple
 import customtkinter as ctk
-from core.user_manager import UserManager, LESSON_IDS
+from core.user_manager import UserManager, LESSON_IDS, UserProfile
 from core.gamification import ACHIEVEMENT_LIBRARY, get_achievement_by_id
 from core.exporter import export_student_report_file
+from core.adaptive_engine import get_weak_areas
 from gui import theme
 
 
 class StatsScreen(ctk.CTkFrame):
-    """Visual dashboard displaying performance metrics, streaks, XP level, achievements, and export options."""
+    """Visual dashboard with Canvas-rendered trend charts, category comparisons, activity heatmaps, and achievements."""
 
     def __init__(
         self,
@@ -49,7 +52,7 @@ class StatsScreen(ctk.CTkFrame):
 
         title_lbl = ctk.CTkLabel(
             nav_bar,
-            text=f"📊 Estatísticas & Conquistas — {user.avatar} {user.username}",
+            text=f"📊 Estatísticas & Análise de Progresso — {user.avatar} {user.username}",
             font=theme.get_font(theme.FONT_TITLE),
             text_color=theme.COLOR_TEXT_PRIMARY,
         )
@@ -156,7 +159,7 @@ class StatsScreen(ctk.CTkFrame):
 
         ctk.CTkLabel(
             header_row,
-            text=f"Desempenho de {user.avatar} {user.username}",
+            text=f"Resumo Geral de Desempenho",
             font=theme.get_font(theme.FONT_SECTION),
             text_color=theme.COLOR_TEXT_PRIMARY,
         ).pack(side="left")
@@ -177,7 +180,105 @@ class StatsScreen(ctk.CTkFrame):
         self._create_stat_box(stats_row, "Precisão Global", f"{user.accuracy_rate:.1f}%", theme.COLOR_PRIMARY)
         self._create_stat_box(stats_row, "Melhor Sequência", f"🔥 {user.best_streak}", theme.COLOR_ACCENT_AMBER)
 
-        # 3. Badges & Achievements Showcase (12 Achievements)
+        # 3. Visual Charts Row (Accuracy Trend + Category Comparison Bars)
+        charts_row = ctk.CTkFrame(self.container, fg_color="transparent")
+        charts_row.pack(fill="x", pady=(0, 14))
+        charts_row.grid_columnconfigure((0, 1), weight=1, uniform="charts")
+
+        # Chart 1: Accuracy Trend (Last 4 Weeks)
+        trend_card = ctk.CTkFrame(
+            charts_row,
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_SURFACE,
+            border_width=1,
+            border_color=theme.COLOR_BORDER,
+        )
+        trend_card.grid(row=0, column=0, sticky="nsew", padx=(0, 6))
+
+        ctk.CTkLabel(
+            trend_card,
+            text="📈 Tendência de Precisão (Últimas 4 Semanas)",
+            font=theme.get_font(theme.FONT_SECTION),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+        ).pack(anchor="w", padx=16, pady=(12, 6))
+
+        trend_canvas = tk.Canvas(
+            trend_card,
+            height=210,
+            bg="#111827",
+            highlightthickness=0,
+        )
+        trend_canvas.pack(fill="x", padx=14, pady=(0, 12))
+        self._draw_accuracy_trend(trend_canvas, user)
+
+        # Chart 2: Category Comparison Bars
+        cat_card = ctk.CTkFrame(
+            charts_row,
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_SURFACE,
+            border_width=1,
+            border_color=theme.COLOR_BORDER,
+        )
+        cat_card.grid(row=0, column=1, sticky="nsew", padx=(6, 0))
+
+        ctk.CTkLabel(
+            cat_card,
+            text="📊 Desempenho por Categoria (%)",
+            font=theme.get_font(theme.FONT_SECTION),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+        ).pack(anchor="w", padx=16, pady=(12, 6))
+
+        cat_canvas = tk.Canvas(
+            cat_card,
+            height=210,
+            bg="#111827",
+            highlightthickness=0,
+        )
+        cat_canvas.pack(fill="x", padx=14, pady=(0, 12))
+        self._draw_category_bars(cat_canvas, user)
+
+        # 4. Activity Heatmap Calendar (GitHub Style ~90 Days)
+        calendar_card = ctk.CTkFrame(
+            self.container,
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_SURFACE,
+            border_width=1,
+            border_color=theme.COLOR_BORDER,
+        )
+        calendar_card.pack(fill="x", pady=(0, 14))
+
+        cal_top = ctk.CTkFrame(calendar_card, fg_color="transparent")
+        cal_top.pack(fill="x", padx=16, pady=(12, 4))
+
+        ctk.CTkLabel(
+            cal_top,
+            text="📅 Calendário de Consistência & Atividade (Últimos 90 Dias)",
+            font=theme.get_font(theme.FONT_SECTION),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+        ).pack(side="left")
+
+        # Active days count
+        active_days_count = len(set(
+            datetime.date.fromtimestamp(rec.timestamp)
+            for rec in user.history
+        ))
+        ctk.CTkLabel(
+            cal_top,
+            text=f"Total de Dias Ativos: {active_days_count} dias",
+            font=theme.get_font(theme.FONT_BADGE),
+            text_color=theme.COLOR_SUCCESS,
+        ).pack(side="right")
+
+        cal_canvas = tk.Canvas(
+            calendar_card,
+            height=140,
+            bg="#111827",
+            highlightthickness=0,
+        )
+        cal_canvas.pack(fill="x", padx=14, pady=(0, 12))
+        self._draw_activity_calendar(cal_canvas, user)
+
+        # 5. Badges & Achievements Showcase (12 Achievements)
         ach_card = ctk.CTkFrame(
             self.container,
             corner_radius=theme.RADIUS_LG,
@@ -241,7 +342,7 @@ class StatsScreen(ctk.CTkFrame):
                 justify="left",
             ).pack(anchor="w", padx=10, pady=(0, 8))
 
-        # 4. Completed Lessons Status Cards (8 Chapters)
+        # 6. Completed Lessons Status Cards (8 Chapters)
         lessons_card = ctk.CTkFrame(
             self.container,
             corner_radius=theme.RADIUS_LG,
@@ -284,7 +385,7 @@ class StatsScreen(ctk.CTkFrame):
                 text_color=theme.COLOR_SUCCESS if is_done else theme.COLOR_TEXT_MUTED,
             ).pack(padx=8, pady=10)
 
-        # 5. Student Leaderboard Card
+        # 7. Student Leaderboard Card
         lead_card = ctk.CTkFrame(
             self.container,
             corner_radius=theme.RADIUS_LG,
@@ -336,6 +437,194 @@ class StatsScreen(ctk.CTkFrame):
                 font=theme.get_font(theme.FONT_BODY),
                 text_color="#DBEAFE" if is_active else theme.COLOR_TEXT_MUTED,
             ).pack(side="right", padx=14)
+
+    def _draw_accuracy_trend(self, canvas: tk.Canvas, user: UserProfile):
+        """Draws a 4-week accuracy trend line chart with percentage axes and highlighted data points."""
+        canvas.delete("all")
+        w = canvas.winfo_width() or 440
+        h = 210
+
+        # Calculate accuracy for each of the last 4 weeks
+        now = time.time()
+        week_seconds = 7 * 86400
+        weeks_data = []  # list of (label, accuracy_pct, count)
+
+        for i in range(3, -1, -1):
+            start_t = now - (i + 1) * week_seconds
+            end_t = now - i * week_seconds
+            lbl = "Sem -3" if i == 3 else ("Sem -2" if i == 2 else ("Sem Passada" if i == 1 else "Esta Semana"))
+
+            recs = [r for r in user.history if start_t <= r.timestamp <= end_t]
+            if recs:
+                corr = sum(1 for r in recs if r.is_correct)
+                acc = (corr / len(recs)) * 100.0
+            else:
+                acc = user.accuracy_rate if user.history else 75.0
+            weeks_data.append((lbl, acc, len(recs)))
+
+        pad_l = 45
+        pad_r = 25
+        pad_t = 25
+        pad_b = 35
+        chart_w = w - pad_l - pad_r
+        chart_h = h - pad_t - pad_b
+
+        # Draw horizontal grid lines (0%, 25%, 50%, 75%, 100%)
+        for pct in [0, 25, 50, 75, 100]:
+            y = pad_t + chart_h - (pct / 100.0) * chart_h
+            canvas.create_line(pad_l, y, w - pad_r, y, fill="#374151", dash=(2, 4))
+            canvas.create_text(pad_l - 8, y, text=f"{pct}%", fill="#9CA3AF", font=("Helvetica", 10), anchor="e")
+
+        # Coordinates for the 4 points
+        points = []
+        step_x = chart_w / 3.0
+        for idx, (lbl, acc, count) in enumerate(weeks_data):
+            x = pad_l + idx * step_x
+            y = pad_t + chart_h - (acc / 100.0) * chart_h
+            points.append((x, y, acc, lbl, count))
+
+        # Draw connecting line
+        line_coords = []
+        for p in points:
+            line_coords.extend([p[0], p[1]])
+        if len(line_coords) >= 4:
+            canvas.create_line(line_coords, fill="#4F46E5", width=3, smooth=True)
+
+        # Draw point dots and values
+        for x, y, acc, lbl, count in points:
+            # Outer halo
+            canvas.create_oval(x - 6, y - 6, x + 6, y + 6, fill="#111827", outline="#4F46E5", width=2)
+            # Inner dot
+            canvas.create_oval(x - 3, y - 3, x + 3, y + 3, fill="#10B981")
+            # Percentage label
+            canvas.create_text(x, y - 14, text=f"{acc:.0f}%", fill="#FFFFFF", font=("Helvetica", 11, "bold"))
+            # Week label on bottom axis
+            canvas.create_text(x, h - 14, text=lbl, fill="#9CA3AF", font=("Helvetica", 10))
+
+    def _draw_category_bars(self, canvas: tk.Canvas, user: UserProfile):
+        """Draws horizontal percentage comparison bars for the 4 main study categories."""
+        canvas.delete("all")
+        w = canvas.winfo_width() or 440
+        h = 210
+
+        categories = [
+            ("Treino Auditivo", "treino_auditivo", "#4F46E5"),
+            ("Leitura de Pauta", "leitura_pauta", "#0284C7"),
+            ("Teoria Musical", "teoria", "#F59E0B"),
+            ("Repertório & Músicas", "repertorio", "#8B5CF6"),
+        ]
+
+        pad_l = 135
+        pad_r = 65
+        pad_t = 16
+        bar_h = 22
+        spacing = 46
+
+        for idx, (title, cat_key, col) in enumerate(categories):
+            y = pad_t + idx * spacing
+
+            # Calculate accuracy for this category
+            cat_recs = [r for r in user.history if r.category == cat_key]
+            if cat_recs:
+                corr = sum(1 for r in cat_recs if r.is_correct)
+                acc = (corr / len(cat_recs)) * 100.0
+                sub_info = f"{corr}/{len(cat_recs)}"
+            else:
+                acc = 0.0
+                sub_info = "0/0"
+
+            # Label on left
+            canvas.create_text(pad_l - 12, y + bar_h // 2, text=title, fill="#F9FAFB", font=("Helvetica", 11, "bold"), anchor="e")
+
+            # Background bar track
+            track_w = w - pad_l - pad_r
+            canvas.create_rectangle(pad_l, y, pad_l + track_w, y + bar_h, fill="#1F2937", outline="")
+
+            # Filled progress bar
+            fill_w = max(4.0, (acc / 100.0) * track_w) if acc > 0 else 0
+            if fill_w > 0:
+                canvas.create_rectangle(pad_l, y, pad_l + fill_w, y + bar_h, fill=col, outline="")
+
+            # Percentage text on right
+            canvas.create_text(pad_l + track_w + 10, y + bar_h // 2, text=f"{acc:.0f}%", fill=col if acc > 0 else "#6B7280", font=("Helvetica", 11, "bold"), anchor="w")
+
+    def _draw_activity_calendar(self, canvas: tk.Canvas, user: UserProfile):
+        """Draws a 90-day activity heatmap grid (GitHub contribution graph style)."""
+        canvas.delete("all")
+        w = canvas.winfo_width() or 900
+        h = 140
+
+        # Group history by date
+        history_by_date: Dict[datetime.date, int] = {}
+        for rec in user.history:
+            d = datetime.date.fromtimestamp(rec.timestamp)
+            history_by_date[d] = history_by_date.get(d, 0) + 1
+
+        today = datetime.date.today()
+        # 13 weeks of 7 days = 91 days
+        start_date = today - datetime.timedelta(days=90)
+        # Adjust start_date to Monday
+        start_monday = start_date - datetime.timedelta(days=start_date.weekday())
+
+        box_size = 14
+        gap = 4
+        pad_l = 40
+        pad_t = 28
+
+        # Day initials on the left
+        day_initials = ["S", "T", "Q", "Q", "S", "S", "D"]
+        for d_idx, init in enumerate(day_initials):
+            y = pad_t + d_idx * (box_size + gap) + box_size // 2
+            canvas.create_text(pad_l - 12, y, text=init, fill="#6B7280", font=("Helvetica", 9), anchor="e")
+
+        curr = start_monday
+        week_idx = 0
+        last_month = None
+
+        while curr <= today or week_idx < 14:
+            x = pad_l + week_idx * (box_size + gap)
+
+            # Month label above first week of that month
+            if curr.month != last_month and curr <= today:
+                months_pt = ["", "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
+                canvas.create_text(x, pad_t - 14, text=months_pt[curr.month], fill="#9CA3AF", font=("Helvetica", 10, "bold"), anchor="w")
+                last_month = curr.month
+
+            for day_of_week in range(7):
+                day_date = curr + datetime.timedelta(days=day_of_week)
+                y = pad_t + day_of_week * (box_size + gap)
+
+                if day_date > today or day_date < start_date:
+                    col = "#111827"  # future or out of bounds
+                else:
+                    cnt = history_by_date.get(day_date, 0)
+                    if cnt == 0:
+                        col = "#1F2937"
+                    elif cnt <= 2:
+                        col = "#065F46"
+                    elif cnt <= 5:
+                        col = "#059669"
+                    elif cnt <= 9:
+                        col = "#10B981"
+                    else:
+                        col = "#34D399"
+
+                canvas.create_rectangle(x, y, x + box_size, y + box_size, fill=col, outline="")
+
+            curr += datetime.timedelta(days=7)
+            week_idx += 1
+            if week_idx >= 14:
+                break
+
+        # Legend at bottom right
+        leg_x = pad_l + 14 * (box_size + gap) + 20
+        leg_y = h - 22
+        canvas.create_text(leg_x, leg_y, text="Menos", fill="#6B7280", font=("Helvetica", 9), anchor="w")
+        legend_colors = ["#1F2937", "#065F46", "#059669", "#10B981", "#34D399"]
+        for idx, col in enumerate(legend_colors):
+            bx = leg_x + 42 + idx * (box_size + 3)
+            canvas.create_rectangle(bx, leg_y - 7, bx + box_size, leg_y + 7, fill=col, outline="")
+        canvas.create_text(leg_x + 42 + len(legend_colors) * (box_size + 3) + 8, leg_y, text="Mais", fill="#6B7280", font=("Helvetica", 9), anchor="w")
 
     def _create_stat_box(self, parent, label: str, value: str, accent_color: str):
         box = ctk.CTkFrame(

@@ -3,6 +3,7 @@ from tkinter import messagebox
 from typing import Callable, Optional
 import customtkinter as ctk
 from core.user_manager import UserManager, LESSON_IDS
+from core.adaptive_engine import get_recommendation
 from gui import theme
 
 
@@ -143,6 +144,52 @@ class MainMenuScreen(ctk.CTkFrame):
         self._create_metric_item(self.metrics_frame, "Exercícios", f"{user.total_attempts}", 2)
         self._create_metric_item(self.metrics_frame, "Precisão", f"{user.accuracy_rate:.1f}%", 3)
         self._create_metric_item(self.metrics_frame, "Sequência", f"🔥 {user.best_streak}", 4)
+
+        # Adaptive Practice Recommendation Card
+        rec = get_recommendation(user)
+        rec_card = ctk.CTkFrame(
+            self,
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_SURFACE,
+            border_width=1,
+            border_color=theme.COLOR_PRIMARY,
+        )
+        rec_card.pack(fill="x", padx=24, pady=(0, 10))
+
+        rec_inner = ctk.CTkFrame(rec_card, fg_color="transparent")
+        rec_inner.pack(fill="x", padx=18, pady=12)
+
+        rec_left = ctk.CTkFrame(rec_inner, fg_color="transparent")
+        rec_left.pack(side="left", fill="x", expand=True)
+
+        ctk.CTkLabel(
+            rec_left,
+            text=f"🎯 {rec['title']}",
+            font=theme.get_font(theme.FONT_SECTION),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+        ).pack(anchor="w")
+
+        ctk.CTkLabel(
+            rec_left,
+            text=f"{rec['reason']} • {rec['tip']}",
+            font=theme.get_font(theme.FONT_SMALL),
+            text_color=theme.COLOR_TEXT_MUTED,
+            wraplength=640,
+            justify="left",
+        ).pack(anchor="w", pady=(2, 0))
+
+        rec_btn = ctk.CTkButton(
+            rec_inner,
+            text="Praticar Agora →",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            fg_color=theme.COLOR_PRIMARY,
+            hover_color=theme.COLOR_PRIMARY_HOVER,
+            height=36,
+            width=140,
+            corner_radius=theme.RADIUS_MD,
+            command=lambda r=rec['route']: self.on_navigate(r),
+        )
+        rec_btn.pack(side="right", padx=(12, 0))
 
         # Navigation Grid (2 Columns x 3 Rows)
         cards_container = ctk.CTkFrame(self, fg_color="transparent")
