@@ -317,15 +317,15 @@ class BackingTrackPlayer:
 
     def _run_loop(self):
         step_idx = 0
-        while not self._stop_event.is_set():
-            step_start = time.perf_counter()
+        next_step_time = time.perf_counter()
 
+        while not self._stop_event.is_set():
             with self._lock:
                 pattern = self.current_pattern
                 bpm = self.bpm
 
             if not pattern or not pattern.grid:
-                time.sleep(0.05)
+                self._stop_event.wait(timeout=0.05)
                 continue
 
             # Calculate step duration based on time signature and steps per bar
@@ -349,10 +349,13 @@ class BackingTrackPlayer:
 
             step_idx = (step_idx + 1) % len(pattern.grid)
 
-            # High precision wait for next step
-            elapsed = time.perf_counter() - step_start
-            remain = step_dur - elapsed
-            if remain > 0.002:
-                time.sleep(remain - 0.001)
-            while (time.perf_counter() - step_start) < step_dur:
-                pass
+            # Drift-free monotonic scheduling without CPU spin-wait
+            next_step_time += step_dur
+            now = time.perf_counter()
+            sleep_time = next_step_time - now
+
+            if sleep_time > 0:
+                self._stop_event.wait(timeout=sleep_time)
+            else:
+                # If behind schedule, resync anchor to current timestamp
+                next_step_time = now
