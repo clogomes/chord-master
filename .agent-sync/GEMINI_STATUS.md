@@ -20,6 +20,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 13 — Correções de UI: Scroll do Rato & Piano Alargado — CONCLUÍDA
+- Data: 2026-08-14 19:15 (UTC+1)
+- Commit: 6718d62
+- Resumo: Criado o utilitário gui/scroll_utils.py com bind_mousewheel para propagar eventos de roda do rato (<MouseWheel>, <Button-4>, <Button-5>) de forma recursiva por todos os contentores CTkScrollableFrame do projeto e seus filhos, resolvendo o problema de scroll nos ecrãs de teoria, repertório, treino auditivo, pauta, afinador, estatísticas e modal de utilizadores. O teclado visual PianoKeyboard foi alargado de 2 para 4 oitavas completas (C2 a B5, 28 teclas brancas e 20 pretas) em todos os ecrãs principais.
+- Ficheiros principais alterados: gui/scroll_utils.py, gui/components/piano_keyboard.py, gui/screens/theory_screen.py, gui/screens/practice_song.py, gui/screens/practice_instrument.py, gui/screens/practice_scales.py, gui/screens/practice_ear.py, gui/screens/practice_staff.py, gui/screens/stats_screen.py, gui/screens/tuner_screen.py, gui/components/user_modal.py, README.md
+
 ## Correção — Otimização do Relógio do BackingTrackPlayer — CONCLUÍDA
 - Data: 2026-08-14 18:40 (UTC+1)
 - Commit: 5c2c628
