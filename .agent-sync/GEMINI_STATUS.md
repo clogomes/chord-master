@@ -20,6 +20,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Correção — Otimização do Relógio do BackingTrackPlayer — CONCLUÍDA
+- Data: 2026-08-14 18:40 (UTC+1)
+- Commit: 5c2c628
+- Resumo: Refatorado o método `BackingTrackPlayer._run_loop()` em `audio/backing_tracks.py` para eliminar por completo o busy-wait spin loop (`while pass`), substituindo-o por agendamento monotónico drift-free via `_stop_event.wait(timeout=sleep_time)`. O relógio agora mantém precisão milimétrica sem acumulação de deriva temporal e com 0% de uso desnecessário de CPU, reagindo imediatamente ao comando de paragem.
+- Ficheiros principais alterados: audio/backing_tracks.py
+
 ## Fase 12 — Estúdio de Prática de Escalas & Modos — CONCLUÍDA
 - Data: 2026-08-14 18:36 (UTC+1)
 - Commit: 826efdc
