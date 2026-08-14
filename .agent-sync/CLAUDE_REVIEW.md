@@ -14,6 +14,155 @@ Cada entrada tem um veredito:
 
 ---
 
+## TRABALHO PEDIDO — Fases 13 a 17 (Feedback direto do utilizador a usar a app)
+- Pedido por: Claude, a pedido do utilizador (clogomes), que testou a app
+  diretamente e reportou 6 problemas/pedidos concretos. Especificação já
+  aprovada pelo utilizador antes de ser escrita aqui.
+- Estado anterior: Fases 1-12 concluídas e aprovadas. 82+ testes atuais devem
+  continuar a passar.
+- Implementa por ordem, uma fase de cada vez. Corre
+  `python3 -m unittest discover tests` no fim de cada fase, e atualiza o
+  README.md no fim de CADA fase. **Lembrete do protocolo**: reporta em
+  `GEMINI_STATUS.md` no fim de CADA fase individual, não só no fim das 5 —
+  já reparei duas vezes que isto não aconteceu.
+
+### FASE 13 — Correções de UI: Scroll do Rato + Piano Alargado
+Confirmei no código que não existe NENHUM binding de `MouseWheel` em
+`gui/` — a app depende inteiramente do comportamento interno do
+`CTkScrollableFrame`, que não está a funcionar para o utilizador.
+
+- Cria `gui/scroll_utils.py` com uma função `bind_mousewheel(scrollable_frame:
+  ctk.CTkScrollableFrame)` que associa `<MouseWheel>` (Windows/macOS, usa
+  `event.delta`), `<Button-4>` e `<Button-5>` (Linux) tanto ao frame como,
+  recursivamente, a todos os seus widgets descendentes (widgets CTk filhos
+  costumam "engolir" o evento antes de chegar à canvas interna do scroll).
+  Usa `scrollable_frame._parent_canvas.yview_scroll(...)` para fazer o scroll
+  real.
+- Aplica esta função a TODOS os `CTkScrollableFrame` existentes no projeto
+  (procura por `CTkScrollableFrame(` em `gui/screens/*.py`): a lista de
+  capítulos e a área de conteúdo em `theory_screen.py`, a barra lateral de
+  músicas em `practice_song.py`, e quaisquer outros que encontrares.
+- Aumenta o teclado de piano de 2 para 4 oitavas (`num_octaves=2` →
+  `num_octaves=4`) em `theory_screen.py` (demo_piano), `practice_song.py` e
+  `practice_instrument.py`. Em `practice_staff.py` o teclado alterna entre
+  2 oitavas conforme a clave (Sol/Fá) — podes manter esse comportamento como
+  está, ou alargar também se achares que melhora a UX, ao teu critério.
+  Confirma que a largura da canvas e do contentor pai continuam a caber bem
+  no layout (pode ser preciso ajustar `key_width` ou permitir scroll
+  horizontal).
+
+### FASE 14 — Síntese Sonora Mais Realista + Timbres Distintos (Piano vs Viola)
+Confirmei no código que `guitar_fretboard.py` e `piano_keyboard.py` chamam
+ambos exatamente `AudioPlayer.play_note()`, que usa sempre
+`Synthesizer.generate_single_frequency()` — não existe timbre diferente
+entre piano e viola, é literalmente o mesmo som sintetizado.
+
+- Em `audio/synthesizer.py`, acrescenta `Synthesizer.generate_plucked_string
+  (frequency, duration, volume) -> bytes`, implementando síntese
+  Karplus-Strong (algoritmo clássico de modelação física de corda dedilhada):
+  inicializa um buffer de ruído do tamanho `sample_rate / frequency`, e
+  aplica repetidamente uma média entre amostras adjacentes com um fator de
+  decaimento, realimentando uma linha de atraso — produz um som de corda
+  dedilhada muito mais realista do que síntese aditiva pura. É simples de
+  implementar em numpy.
+- Em `audio/player.py`, acrescenta um parâmetro `instrument: str = "piano"`
+  a `AudioPlayer.play_note()`. Quando `instrument == "guitar"`, usa
+  `generate_plucked_string` em vez de `generate_single_frequency`. A chave de
+  cache (`cache_key`) deve incluir o instrumento, para não misturar sons de
+  piano e viola na mesma nota.
+- Atualiza `gui/components/guitar_fretboard.py` (`_on_canvas_click`) para
+  chamar `self.audio_player.play_note(note, duration=0.8, instrument="guitar")`.
+  Os restantes pontos de chamada (piano) mantêm o comportamento por omissão.
+- Opcional (não obrigatório): afinar `generate_single_frequency` para o piano
+  soar menos "sintético" — sustain/decaimento mais longos, leve
+  inarmonicidade nos harmónicos superiores (característica real de cordas de
+  piano). Só se for simples de fazer sem grande risco.
+- Testes: cria `tests/test_synthesizer.py` (ainda não existe nenhum) a
+  confirmar que `generate_plucked_string` devolve bytes de áudio válidos e
+  não vazios sem lançar exceções, para várias frequências.
+
+### FASE 15 — Alternador de Idioma PT/EN
+Boas notícias: os dados já suportam bilingue — `Interval`, `ScaleDefinition`
+e `ChordDefinition` já têm `name_pt` E `name_en`, e `Note` já tem `.name_pt`
+(solfejo) e `.pitch` (notação anglo-saxónica). O que falta é a camada de
+alternância e tradução da interface.
+
+- Cria `gui/i18n.py`:
+  - `UI_STRINGS: Dict[str, Dict[str, str]]` com traduções PT/EN dos textos
+    fixos da interface (botões, títulos de ecrã, labels da barra lateral)
+    atualmente escritos diretamente em português no código.
+  - Estado de idioma global simples: `set_language(lang)`, `get_language()`,
+    `t(key)` (helper de tradução), persistido em disco (pode reaproveitar o
+    `UserManager`/`user_profiles.json` ou um ficheiro de definições próprio)
+    para se manter entre sessões.
+- Acrescenta um seletor de idioma na barra lateral em `gui/app.py`, perto do
+  seletor de tema já existente (ex: "🌐 PT" / "🌐 EN"). Ao mudar, atualiza
+  a UI (provavelmente precisas de re-navegar para o ecrã atual para os
+  textos serem reconstruídos, já que o CTk não é reativo automaticamente).
+- Cria um pequeno helper (ex: `core/i18n_helpers.py`) com funções como
+  `localized_note_name(note)`, `localized_chord_name(chord_def)`,
+  `localized_scale_name(scale_def)`, `localized_interval_name(interval)` que
+  devolvem o campo certo (`_pt` ou `_en`, `.name_pt` ou `.pitch`) consoante o
+  idioma atual. Substitui os usos diretos de `.name_pt` nos ecrãs por estes
+  helpers.
+- **Fora de âmbito nesta fase, deliberadamente**: o texto longo dos 8
+  capítulos em `core/theory_content.py` (`content_markdown`, `summary`,
+  `piano_focus`, `guitar_focus`, `subtitle`, `title`) fica em português
+  mesmo com o idioma em EN — traduzir ~500 linhas de conteúdo educativo é
+  trabalho de conteúdo, não só de código, e fica para uma fase futura
+  dedicada se o utilizador quiser. Não é preciso resolver isso agora, só não
+  partir nada (o capítulo continua a mostrar-se normalmente, só que em PT).
+- Testes: `tests/test_i18n.py` a confirmar que os dicionários PT e EN têm
+  exatamente as mesmas chaves (nenhuma tradução em falta), e que os helpers
+  de localização mudam corretamente consoante o idioma.
+
+### FASE 16 — Mais Dicas Práticas de Técnica (Piano & Viola)
+- Expande os campos `piano_focus` e `guitar_focus` nos 8 capítulos de
+  `THEORY_CHAPTERS` (`core/theory_content.py`), acrescentando 2-3 dicas
+  concretas e acionáveis a mais em cada um, no mesmo tom/formato já usado
+  (emoji 🎹/🎸, bullets). Garante que ficam cobertos, nalgum capítulo que
+  fizer sentido: erros comuns de postura, como estruturar uma rotina de
+  prática (liga bem com a rampa de tempo já construída na Fase 9 —
+  praticar devagar primeiro), exercícios de independência dos dedos, e
+  problemas técnicos comuns (cordas a abafar na viola, ombros tensos no
+  piano, etc.).
+- Não precisa de estrutura de dados nova — é só expansão de conteúdo dentro
+  dos campos já existentes.
+
+### FASE 17 — Corrigir Formatação Markdown no Ecrã de Teoria
+Confirmei o bug: em `theory_screen.py`, `content_box.insert("0.0",
+chap.content_markdown.strip())` insere o markdown em bruto numa caixa de
+texto simples, sem processar `**negrito**`, `•`, `---` ou tabelas `| |` —
+por isso aparecem os símbolos literais em vez de formatação.
+
+- Cria `gui/markdown_renderer.py` com uma função
+  `render_markdown_to_textbox(textbox: ctk.CTkTextbox, markdown_text: str)`
+  que:
+  - Deteta `**negrito**` e aplica uma tag de fonte a negrito
+    (`textbox.tag_config` + `tag_add`).
+  - Renderiza linhas que começam com `•` ou `-` como bullets indentados.
+  - Renderiza `---` como um separador visual (linha de caracteres `─`, ou
+    uma tag com margem/borda).
+  - Deteta tabelas markdown (linha de cabeçalho `| ... |` seguida de
+    `| :--- | :--- |`) e renderiza-as como uma grelha alinhada de verdade —
+    podes usar `textbox.window_create(index, window=frame)` para embutir um
+    `CTkFrame` com `grid()` de `CTkLabel`s (melhor resultado visual), ou
+    alinhamento por colunas com fonte monoespaçada como alternativa mais
+    simples. O resultado final tem de parecer mesmo uma tabela, não texto
+    com barras verticais.
+  - Trata cabeçalhos (`### texto`) com uma tag de fonte maior/negrita.
+- Aplica isto a `content_markdown`, `piano_focus` e `guitar_focus` em
+  `theory_screen.py`, em todos os sítios onde são inseridos em bruto
+  atualmente.
+- Extrai a lógica de deteção linha-a-linha (negrito, bullet, linha de
+  tabela) para funções puras sem dependência de Tkinter, para serem
+  testáveis. Testa em `tests/test_markdown_renderer.py`.
+
+No fim de cada fase, atualiza o `README.md` e não remove nem simplifica
+nenhuma funcionalidade já existente.
+
+---
+
 ## Revisão — Fases 10, 11 e 12 (Acompanhamento Rítmico, Mais Escalas, Estúdio de Escalas)
 - Commits revistos: `c6436bc` (F10), `b5ed5df` (F11), `826efdc`+`059bc90` (F12)
 - Testes: 82/82 OK
