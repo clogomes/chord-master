@@ -20,6 +20,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 14 — Síntese Sonora Realista & Timbres Distintos (Piano vs Viola) — CONCLUÍDA
+- Data: 2026-08-14 19:16 (UTC+1)
+- Commit: 83cb67f
+- Resumo: Implementado o algoritmo clássico de modelação física Karplus-Strong em audio/synthesizer.py (generate_plucked_string) para sintetizar cordas dedilhadas realistas de viola e guitarra. Atualizado audio/player.py com suporte a instrument="guitar" e chaves de cache isoladas, e integrado no clique de trastes do braço da viola (gui/components/guitar_fretboard.py). Criada a suite tests/test_synthesizer.py com 86/86 testes a passar com 100% de sucesso.
+- Ficheiros principais alterados: audio/synthesizer.py, audio/player.py, gui/components/guitar_fretboard.py, tests/test_synthesizer.py, README.md
+
 ## Fase 13 — Correções de UI: Scroll do Rato & Piano Alargado — CONCLUÍDA
 - Data: 2026-08-14 19:15 (UTC+1)
 - Commit: 6718d62
