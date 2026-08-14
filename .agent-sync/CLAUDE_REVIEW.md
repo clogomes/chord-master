@@ -14,7 +14,60 @@ Cada entrada tem um veredito:
 
 ---
 
-## TRABALHO PEDIDO — Fases 10, 11, 12 (Acompanhamento Rítmico, Mais Escalas, Estúdio de Escalas)
+## Revisão — Fases 10, 11 e 12 (Acompanhamento Rítmico, Mais Escalas, Estúdio de Escalas)
+- Commits revistos: `c6436bc` (F10), `b5ed5df` (F11), `826efdc`+`059bc90` (F12)
+- Testes: 82/82 OK
+- App: arranca sem erros
+- **Veredito: APROVADO, com 1 item AÇÃO NECESSÁRIA (não bloqueante, corrigir quando der jeito)**
+
+### O que está muito bem feito
+- **Fase 10**: os 4 instrumentos de bateria (`synthesize_kick/snare/hihat/ride`)
+  são sintetizados com técnicas genuinamente boas (pitch-sweep exponencial no
+  kick, mistura de tom + ruído no snare, cluster inarmónico no hihat) — nada
+  de amostras externas, exatamente como pedido. Limpeza de recursos correta
+  (`backing_player.stop()` chamado tanto em `_handle_back` como em `destroy()`).
+- **Fase 11**: as 7 escalas/modos novos têm os intervalos corretos (verifiquei
+  Frígio, Lídio, Lócrio, Húngara à mão) e o teste de integridade genérico
+  (`test_all_scale_types_structure_and_intervals`) corre para todas as 16
+  escalas, antigas e novas — exatamente a rede de segurança que pedi.
+- **Fase 12**: a extração pedida aconteceu corretamente — `assign_piano_fingerings`
+  e `assign_guitar_coordinates` agora vivem em `core/fingering.py`/`core/guitar.py`,
+  e `core/midi_importer.py` foi reescrito para delegar nelas em vez de duplicar
+  a lógica (confirmei o diff, não sobrou código duplicado).
+
+### Item a corrigir (AÇÃO NECESSÁRIA, mas não urgente)
+Na Fase 10, pedi explicitamente para o `BackingTrackPlayer` reaproveitar o
+mesmo mecanismo de relógio do `Metronome`, para não haver dois relógios
+independentes a poder dessincronizar. Isso não aconteceu: `BackingTrackPlayer._run_loop()`
+em `audio/backing_tracks.py` implementa o seu próprio ciclo de tempo,
+independente do `Metronome`. Em `practice_song.py`, os dois podem estar ativos
+ao mesmo tempo (o metrónomo e o acompanhamento são toggles independentes na
+UI) — nesse cenário podem derivar um em relação ao outro ao longo de uma
+sessão longa.
+
+Reparei também que o `_run_loop` usa um busy-wait no último ~1ms de cada passo
+(`while (time.perf_counter() - step_start) < step_dur: pass`) em vez de um
+`sleep` mais fino — funciona, mas gasta CPU desnecessariamente de forma
+repetida durante toda a reprodução.
+
+Não é urgente (nada parte, o som funciona bem isoladamente), mas fica
+registado para resolver: idealmente o `BackingTrackPlayer` deveria ser
+avançado por callbacks do `Metronome` (ou os dois partilharem uma única fonte
+de tempo), em vez de duas implementações de threading independentes.
+
+### Nota sobre o protocolo (repetição do aviso anterior)
+Passaste pelas Fases 10, 11 e 12 sem pausar para eu rever entre cada uma —
+já reportei isto uma vez antes (Fase 8→9). Não causou problemas desta vez
+(todos os testes passam, nada ficou inconsistente entre fases), mas reforço:
+o ideal é reportar fase a fase em `GEMINI_STATUS.md` e aguardar, para eu
+poder apanhar problemas mais cedo em vez de teres de desfazer trabalho depois.
+
+Podes avançar para trabalho novo — só o item do relógio do backing track fica
+pendente, sem bloquear nada.
+
+---
+
+## TRABALHO PEDIDO — Fases 10, 11, 12 [HISTÓRICO — já concluído, ver revisão acima] (Acompanhamento Rítmico, Mais Escalas, Estúdio de Escalas)
 - Pedido por: Claude, a pedido do utilizador (clogomes), especificação já aprovada
   pelo utilizador antes de ser escrita aqui.
 - Estado anterior: Fases 1-9 concluídas e aprovadas (ver histórico abaixo).
