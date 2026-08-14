@@ -20,6 +20,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fases 18 e 19 — OMR: Motor de Reconhecimento Ótico de Partituras + Ecrã de Revisão — CONCLUÍDAS
+- Data: 2026-08-14 19:38 (UTC+1)
+- Commit: 991cd58
+- Resumo: Fase 18 — criado core/omr_importer.py com pipeline OMR leve puro (sem ML): load_image_from_file() aceita PDF/JPG/PNG/GIF, binarize() com limiar simples, detect_staff_lines() por projeção horizontal + fusão de picos, detect_noteheads() com scipy.ndimage.label + filtragem por área/proporção, map_pixel_to_note() inverso do diatonic_step, import_score_as_song() pipeline completo. Fase 19 — criado gui/screens/omr_review.py com lista scrollável editável (altura + duração + eliminar), inserção de notas, preview da imagem original (CTkImage/Pillow), e guardar com assign_piano_fingerings + assign_guitar_coordinates + save_user_song. Botão «🖼️ Importar Partitura (PDF/Imagem)» adicionado à sidebar do practice_song.py com diálogo de clave e fallback gracioso se deps em falta. 131/131 testes a passar. Pillow, PyMuPDF e scipy adicionados a requirements.txt.
+- Ficheiros principais alterados: core/omr_importer.py, gui/screens/omr_review.py, gui/screens/practice_song.py, tests/test_omr_importer.py, requirements.txt, README.md
+
 ## Fase 17 — Formatação Markdown Enriquecida no Ecrã de Teoria — CONCLUÍDA
 - Data: 2026-08-14 19:25 (UTC+1)
 - Commit: 2384355
