@@ -9,6 +9,7 @@ from core.midi_importer import import_midi_as_song, save_user_song, load_user_so
 from core.user_manager import UserManager
 from audio.player import get_audio_player
 from audio.metronome import Metronome, evaluate_rhythm_accuracy
+from audio.backing_tracks import BackingTrackPlayer, BACKING_TRACK_LIBRARY
 from audio.midi_manager import get_midi_manager
 from gui.components.piano_keyboard import PianoKeyboard
 from gui.components.staff_canvas import StaffCanvas
@@ -79,11 +80,12 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.instrument_mode: str = "Piano"  # "Piano", "Viola", "Ambos"
         self._demo_timer_id: Optional[str] = None
 
-        # Rhythm & Metronome Challenge Mode
+        # Rhythm, Metronome & Backing Tracks
         self.is_challenge_mode: bool = False
         self.tempo_ramp_var = ctk.BooleanVar(value=False)
         self.current_ramp_bpm: int = max(40, int(self.current_song.bpm * 0.70))
         self.metronome = Metronome(bpm=self.current_song.bpm, on_beat=self._on_metronome_beat)
+        self.backing_player = BackingTrackPlayer(bpm=self.current_song.bpm, volume=0.65)
         self.current_combo: int = 0
         self.max_combo: int = 0
         self.rhythm_score: int = 0
@@ -374,16 +376,31 @@ class PracticeSongScreen(ctk.CTkFrame):
         # Metronome Toggle Button
         self.metronome_btn = ctk.CTkButton(
             ctrl_bar,
-            text="⏱️ Metrónomo: Desligado",
+            text="⏱️ Metrónomo",
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color=theme.COLOR_SURFACE_SECONDARY,
             hover_color=theme.COLOR_SURFACE_HOVER,
             text_color=theme.COLOR_TEXT_PRIMARY,
             corner_radius=theme.RADIUS_MD,
             height=36,
+            width=115,
             command=self._toggle_metronome,
         )
-        self.metronome_btn.pack(side="left", padx=6)
+        self.metronome_btn.pack(side="left", padx=4)
+
+        # Backing Track Rhythm Selector
+        backing_styles = ["🥁 Sem Ritmo"] + [f"🥁 {p.name_pt}" for p in BACKING_TRACK_LIBRARY.values()]
+        self.backing_track_select = ctk.CTkOptionMenu(
+            ctrl_bar,
+            values=backing_styles,
+            command=self._on_backing_style_changed,
+            font=theme.get_font(theme.FONT_SMALL_BOLD),
+            height=36,
+            width=165,
+            corner_radius=theme.RADIUS_MD,
+        )
+        self.backing_track_select.set("🥁 Sem Ritmo")
+        self.backing_track_select.pack(side="left", padx=4)
 
         # Tempo BPM Slider
         ctk.CTkLabel(
@@ -391,14 +408,14 @@ class PracticeSongScreen(ctk.CTkFrame):
             text="BPM:",
             font=theme.get_font(theme.FONT_SMALL_BOLD),
             text_color=theme.COLOR_TEXT_MUTED,
-        ).pack(side="left", padx=(8, 2))
+        ).pack(side="left", padx=(6, 2))
 
         self.bpm_slider = ctk.CTkSlider(
             ctrl_bar,
             from_=40,
             to=180,
             number_of_steps=140,
-            width=95,
+            width=90,
             command=self._on_bpm_changed,
         )
         self.bpm_slider.set(self.current_song.bpm)
@@ -409,7 +426,7 @@ class PracticeSongScreen(ctk.CTkFrame):
             text=f"{self.current_song.bpm}",
             font=theme.get_font(theme.FONT_BODY_BOLD),
             text_color=theme.COLOR_PRIMARY,
-            width=32,
+            width=30,
         )
         self.bpm_lbl.pack(side="left", padx=2)
 
@@ -421,7 +438,7 @@ class PracticeSongScreen(ctk.CTkFrame):
             command=self._on_tempo_ramp_toggled,
             font=theme.get_font(theme.FONT_SMALL_BOLD),
         )
-        self.ramp_checkbox.pack(side="left", padx=8)
+        self.ramp_checkbox.pack(side="left", padx=6)
 
         # Progress bar
         self.progress_bar = ctk.CTkProgressBar(self.stage_scroll, height=7, progress_color=theme.COLOR_PRIMARY)
@@ -514,10 +531,21 @@ class PracticeSongScreen(ctk.CTkFrame):
                 fg_color=theme.COLOR_PRIMARY,
             )
 
+    def _on_backing_style_changed(self, choice: str):
+        if "Sem Ritmo" in choice:
+            self.backing_player.stop()
+        else:
+            bpm = int(self.bpm_slider.get())
+            for p_id, p in BACKING_TRACK_LIBRARY.items():
+                if p.name_pt in choice:
+                    self.backing_player.start(p_id, bpm=bpm)
+                    break
+
     def _on_bpm_changed(self, value):
         val = int(value)
         self.bpm_lbl.configure(text=str(val))
         self.metronome.set_bpm(val)
+        self.backing_player.set_bpm(val)
 
     def _update_legend_text(self):
         if self.instrument_mode == "Piano":
@@ -558,10 +586,12 @@ class PracticeSongScreen(ctk.CTkFrame):
             self.bpm_slider.set(self.current_ramp_bpm)
             self.bpm_lbl.configure(text=f"{self.current_ramp_bpm} (Rampa)")
             self.metronome.set_bpm(self.current_ramp_bpm)
+            self.backing_player.set_bpm(self.current_ramp_bpm)
         else:
             self.bpm_slider.set(self.current_song.bpm)
             self.bpm_lbl.configure(text=str(self.current_song.bpm))
             self.metronome.set_bpm(self.current_song.bpm)
+            self.backing_player.set_bpm(self.current_song.bpm)
 
     def _load_song(self, song: Song):
         self._stop_demo_playback()
@@ -805,6 +835,7 @@ class PracticeSongScreen(ctk.CTkFrame):
                 self.bpm_slider.set(self.current_ramp_bpm)
                 self.bpm_lbl.configure(text=f"{self.current_ramp_bpm} (Rampa)")
                 self.metronome.set_bpm(self.current_ramp_bpm)
+                self.backing_player.set_bpm(self.current_ramp_bpm)
                 ramp_msg = f"\n🏎️ Rampa de Tempo acelerou para {self.current_ramp_bpm} BPM!"
             else:
                 ramp_msg = f"\n🏆 Atingiste o andamento alvo completo ({self.current_song.bpm} BPM)!"
@@ -874,6 +905,7 @@ class PracticeSongScreen(ctk.CTkFrame):
         self._unbind_keyboard_events()
         self._stop_demo_playback()
         self.metronome.stop()
+        self.backing_player.stop()
         self.midi_manager.stop_listening()
         self.audio_player.stop_all()
         self.on_back()
@@ -882,5 +914,6 @@ class PracticeSongScreen(ctk.CTkFrame):
         self._unbind_keyboard_events()
         self._stop_demo_playback()
         self.metronome.stop()
+        self.backing_player.stop()
         self.midi_manager.stop_listening()
         super().destroy()

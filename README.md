@@ -137,7 +137,17 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 10. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
+### 10. 🥁 FASE 10 — Motor de Acompanhamento Rítmico Sintetizado ([`audio/backing_tracks.py`](file:///Users/clogomes/repo/chord-master/audio/backing_tracks.py))
+- **Síntese Algorítmica de Bateria em NumPy Puro**:
+  - `synthesize_kick()` (bombo com sweep exponencial de afinação e transiente de ataque), `synthesize_snare()` (caixa acústica com ressonância de corpo e esteira de ruído), `synthesize_hihat()` (prato de choque aberto/fechado com cluster metálico) e `synthesize_ride()` (prato de condução com anel metálico brilhante).
+- **Biblioteca de 5 Estilos Rítmicos**:
+  - *Rock Básico (4/4)*, *Balada Lenta (4/4)*, *Bossa Nova (4/4 Sincopado)*, *Blues Shuffle (4/4 Swing/12/8)* e *Valsa Clássica (3/4)*.
+- **Leitor em Loop com Precisão de Tempo (`BackingTrackPlayer`)**:
+  - Toca em loop em thread separada com alta precisão, sincronizado com o slider de BPM, e acompanha automaticamente as acelerações da Rampa de Tempo.
+
+---
+
+### 11. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
 - **Deteção de Frequência Fundamental ($f_0$) via Microfone**: Algoritmo de autocorrelação no domínio do tempo acelerado por FFT, com interpolação parabólica para precisão sub-amostra e rejeição inteligente de ruído ambiente (60 Hz a 1200 Hz).
 - **Mostrador Visual com Agulha Dinâmica**: Medidor de $-50$ a $+50$ cents com faixa de tolerância verde ($\pm 10$ cents) e orientações em tempo real (*"▲ Muito Grave — Estica a corda"*, *"▼ Muito Agudo — Afrouxa a corda"*, *"✓ AFINADO (No Ponto Perfeito!)"*).
 - **Afinador de Viola (6 Cordas)**: Cartões visuais para as 6 cordas padrão ($E2, A2, D3, G3, B3, E4$) que se iluminam automaticamente ao detetar a corda tocada, com botão para ouvir o tom de cada corda.
@@ -145,13 +155,13 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 9. 🎯 Prática com Instrumento Acústico Real
+### 12. 🎯 Prática com Instrumento Acústico Real
 - Prática de escalas, arpejos e repertório utilizando o teu **piano acústico** ou **viola/guitarra física**.
 - A aplicação "escuta" através do microfone, valida a nota e o desvio em cents, exigindo uma sustentação de 300 ms afinada antes de avançar automaticamente para a nota seguinte.
 
 ---
 
-### 10. 🎧 Treino Auditivo & Leitura de Pauta
+### 13. 🎧 Treino Auditivo & Leitura de Pauta
 - **Treino Auditivo (Ear Training)**:
   - Identificação de **Intervalos Melódicos** (ascendentes/descendentes) e **Harmónicos** (duas notas em simultâneo).
   - Identificação de **Qualidade de Acordes** (Maiores, Menores, Diminutos, Aumentados, Sétimas).
@@ -164,14 +174,14 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 11. 📥 Exportação de Progresso & Certificado de Estudo
+### 14. 📥 Exportação de Progresso & Certificado de Estudo
 - Botão **«📥 Exportar Progresso»** no ecrã de Estatísticas:
   - Gera um relatório formatado em Markdown (`relatorio_progresso_<aluno>.md`) pronto a imprimir ou partilhar.
   - Inclui data de emissão, nível e título de maestria, XP total, estado das 8 lições de teoria, métricas de precisão por categoria e lista de todas as medalhas e conquistas alcançadas.
 
 ---
 
-### 12. 🎨 Design System & Interface Moderna ([`gui/theme.py`](file:///Users/clogomes/repo/chord-master/gui/theme.py))
+### 15. 🎨 Design System & Interface Moderna ([`gui/theme.py`](file:///Users/clogomes/repo/chord-master/gui/theme.py))
 - **Paleta de Cores Harmoniosa**: Base moderna em tons de ardósia escura (*Slate-950* `#0B0F19`, *Slate-900* `#111827`, *Slate-800* `#1F2937`), com destaques em *Royal Indigo* (`#4F46E5`), *Emerald* (`#10B981`), *Sky Blue* (`#0284C7`), *Amber* (`#F59E0B`) e *Crimson* (`#EF4444`).
 - **Tipografia Otimizada e Legível**: Escala com mínimo de $14\text{px}$ para textos de corpo e $28\text{--}32\text{px}$ para títulos principais, garantindo máxima legibilidade.
 - **Proteção de Threads & Rate-Limiting**: Processamento assíncrono seguro com limitação de taxa de atualização gráfica (15 FPS), evitando travamentos ou sobrecarga da GUI.
@@ -184,19 +194,19 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 chord-master/
 ├── main.py                         # Ponto de entrada da aplicação (arranque com Tkinter moderno)
 ├── requirements.txt                # Dependências externas (customtkinter, numpy, pygame, sounddevice)
-├── README.md                       # Documentação técnica exaustiva
-├── user_profiles.json              # Perfis, progresso de lições, XP e histórico dos utilizadores
+├── README.md                       # Documentação exaustiva e arquitetura técnica
 │
-├── core/                           # Lógica Musical Pura & Regras de Negócio (Sem dependência de GUI)
+├── core/                           # Motor Teórico Musical e Lógica de Negócio
 │   ├── __init__.py
-│   ├── notes.py                    # Classes de Notas, Frequências em Hz, MIDI, Solfejo e Acidentes
-│   ├── intervals.py                # Intervalos musicais, Semitons, Mnemónicas e Transposição
-│   ├── scales.py                   # Fórmulas de Escalas Maiores, Menores, Pentatónicas e Modos Gregos
-│   ├── chords.py                   # Formação de Tríades, Tétrades e Inversões de Acordes
-│   ├── fingering.py                # Mapeamento de Dedilhações para Piano (Mão Direita e Esquerda)
-│   ├── guitar.py                   # Mapeamento de Braço de Viola (CAGED, 15 Trastes, Afinações)
-│   ├── songs.py                    # Biblioteca de 16 Músicas Completas com notas, dedilhações e tablaturas
-│   ├── midi_importer.py            # Parser e Importador de Partituras Standard MIDI (.mid/.midi)
+│   ├── notes.py                    # Classes de Notas, Frequências e Cálculos de Transposição
+│   ├── intervals.py                # Intervalos Musicais (Semitons, Nomes PT/EN, Tipos)
+│   ├── scales.py                   # Fórmulas de Escalas e Modos Gregos
+│   ├── chords.py                   # Tríades, Tétrades e Inversões de Acordes
+│   ├── fingering.py                # Motor de Dedilhação Inteligente para Piano (Mão Direita e Esquerda)
+│   ├── guitar.py                   # Mapeamento do Braço da Viola, Trastes e Sistema CAGED
+│   ├── songs.py                    # Biblioteca de 16 Músicas Completas de Repertório
+│   ├── midi_importer.py            # Parser SMF de Ficheiros MIDI (.mid) e Conversão para Repertório
+│   ├── theory_content.py           # Conteúdo Pedagógico Estruturado (8 Lições de Teoria)
 │   ├── gamification.py             # Sistema de Gamificação (XP, 7 Níveis, 12 Conquistas/Medalhas)
 │   ├── exporter.py                 # Exportador de Relatórios de Progresso e Certificados em Markdown
 │   ├── adaptive_engine.py          # Motor de Prática Adaptativa & Identificação de Pontos Fracos
@@ -207,6 +217,7 @@ chord-master/
 ├── audio/                          # Motores de Síntese Sonora, Microfone e MIDI
 │   ├── __init__.py
 │   ├── synthesizer.py              # Síntese Harmónica Aditiva com Envelope ADSR
+│   ├── backing_tracks.py           # Síntese de Bateria e Motor de Acompanhamento Rítmico
 │   ├── player.py                   # Reprodução Sonora Assíncrona Thread-Safe (Pygame Mixer)
 │   ├── pitch_listener.py           # Captura de Microfone e Deteção de Afinação por Autocorrelação FFT
 │   ├── metronome.py                # Metrónomo Acústico Thread-Safe e Avaliador de Precisão Rítmica
@@ -227,14 +238,14 @@ chord-master/
 │       ├── __init__.py
 │       ├── main_menu.py            # Dashboard Inicial com Nível de XP, Progresso e Acessos Rápidos
 │       ├── theory_screen.py        # Academia de Teoria (8 Capítulos com Piano e Viola Sincronizados)
-│       ├── practice_song.py        # Estúdio de Repertório (16 Músicas + Músicas MIDI Importadas)
+│       ├── practice_song.py        # Estúdio de Repertório (16 Músicas + Acompanhamento Rítmico + MIDI)
 │       ├── tuner_screen.py         # Lamiré & Afinador Cromático com Agulha e Deteção por Microfone
 │       ├── practice_instrument.py  # Treino Acústico com Microfone para Piano e Viola Físicos
 │       ├── practice_ear.py         # Treino Auditivo & Ditado de Solfejo Cantado com Microfone
 │       ├── practice_staff.py       # Exercícios de Leitura de Pauta
 │       └── stats_screen.py         # Painel de Estatísticas, Conquistas, Leaderboard e Exportação
 │
-└── tests/                          # 75 Testes Unitários Automatizados (100% de Sucesso)
+└── tests/                          # 78 Testes Unitários Automatizados (100% de Sucesso)
     ├── __init__.py
     ├── test_notes.py               # Testes de notas, frequências e conversões MIDI
     ├── test_intervals.py           # Testes de intervalos e transposição
@@ -244,6 +255,7 @@ chord-master/
     ├── test_guitar.py              # Testes de afinações, trastes e sistema CAGED
     ├── test_songs.py               # Testes de integridade das 16 peças completas de repertório
     ├── test_midi_importer.py       # Testes do parser e importador de partituras MIDI
+    ├── test_backing_tracks.py      # Testes de síntese de bateria e motor de acompanhamento rítmico
     ├── test_pitch.py               # Testes de deteção de pitch por autocorrelação e rejeição de ruído
     ├── test_metronome.py           # Testes de temporização do metrônomo e avaliação rítmica
     ├── test_gamification.py        # Testes de níveis de XP, cálculo de progresso e medalhas
