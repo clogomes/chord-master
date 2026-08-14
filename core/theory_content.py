@@ -1,6 +1,6 @@
 """Comprehensive, structured music theory curriculum covering beginner to advanced levels, with deep piano and guitar/viola focus."""
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from dataclasses import dataclass
+from typing import List
 
 
 @dataclass
@@ -60,12 +60,16 @@ A pauta (ou pentagrama) é composta por **5 linhas e 4 espaços**, contados de b
 • As teclas brancas correspondem às 7 notas naturais (C, D, E, F, G, A, B).
 • As teclas pretas são os acidentes (agrupadas em pares de 2 e trios de 3).
 • O **Dó Central (C4)** localiza-se à esquerda do grupo de 2 teclas pretas mais próximo do centro do teclado.
+• **Postura & Altura do Banco**: Senta-te na metade frontal do banco com as costas direitas e os dois pés assentes no chão. Os teus cotovelos devem ficar ligeiramente acima do nível das teclas brancas.
+• **Relaxamento dos Ombros**: Mantém os ombros baixos e descontraídos; a tensão nos ombros e no pescoço bloqueia a circulação e causa fadiga precoce.
 """,
         guitar_focus="""
 🎸 **Na Viola / Guitarra**:
 • A afinação padrão das 6 cordas soltas (da 6ª mais grossa para a 1ª mais fina) é: **E2 - A2 - D3 - G3 - B3 - E4** (Mi, Lá, Ré, Sol, Si, Mi).
 • Cada traste no braço avança exatamente **1 semitom**.
 • A música de guitarra é escrita na **Clave de Sol**, mas soa uma oitava abaixo do que está escrito (instrumento transpositor de 8ª).
+• **Ângulo do Instrumento**: Apoia a viola com o braço inclinado a cerca de 30º-45º para cima; nunca toques com o braço paralelo ao chão, pois força uma dobra prejudicial no pulso esquerdo.
+• **Ataque na Ponta dos Dedos**: Pressiona as cordas rigorosamente com a ponta dos dedos (a 90º da escala) para evitar que a almofada do dedo encoste e abafe as cordas soltas vizinhas.
 """,
         interactive_demo="notes",
     ),
@@ -122,6 +126,8 @@ Quando invertemos as duas notas de um intervalo (por exemplo, Dó-Sol vira Sol-D
 • Segunda Menor (1 semitom) = Tecla branca imediatamente adjacente à tecla preta (ou Mi-Fá e Si-Dó).
 • Quinta Justa (7 semitons) = Distância padrão natural da mão em posição de repouso (dedo 1 ao dedo 5).
 • Terça Maior vs Menor = 4 semitons (2 tons inteiros) vs 3 semitons (1 tom e meio).
+• **Exercício de Independência dos Dedos**: Mantém o Dó premido com o polegar (dedo 1) e toca os intervalos de 2ª, 3ª, 4ª e 5ª com os dedos 2, 3, 4 e 5 sem soltar o polegar e sem contrair o pulso.
+• **Flexibilidade do Pulso**: O pulso deve agir como um amortecedor suave (como a suspensão de um carro), subindo e descendo ligeiramente ao articular intervalos distantes.
 """,
         guitar_focus="""
 🎸 **Na Viola / Guitarra**:
@@ -129,6 +135,8 @@ Quando invertemos as duas notas de um intervalo (por exemplo, Dó-Sol vira Sol-D
 • 1 Tom (2 semitons) = 2 Trastes de distância na mesma corda.
 • Quinta Justa = 1 corda abaixo e 2 trastes à frente (ex: 3º traste na 6ª corda [Sol] → 5º traste na 5ª corda [Ré]).
 • Exceção da 2ª corda (Si): A afinação entre a 3ª corda (Sol) e a 2ª (Si) é de uma Terça Maior (4 semitons), enquanto todas as outras cordas são afinadas em Quartas Justas (5 semitons).
+• **Evitar o 'Fret Buzz' (Trastejar)**: Coloca o dedo imediatamente atrás do ferrinho do traste (a 1-2 mm), nunca no meio do espaço, para obter o som mais límpido com a menor pressão possível.
+• **Pressão Mínima**: Experimenta tocar uma nota aliviando a força até trastejar, e depois aperta apenas o milímetro suficiente para soar limpa — evita gastar o dobro da energia necessária.
 """,
         interactive_demo="intervals",
     ),
@@ -185,12 +193,16 @@ O Círculo de Quintas organiza as 12 armações de clave:
 • Dó Maior toca-se apenas nas teclas brancas.
 • Digitação clássica da Escala Maior (Mão Direita): **1-2-3-1-2-3-4-5** (o polegar passa por baixo do dedo 3 após o Mi).
 • Digitação (Mão Esquerda): **5-4-3-2-1-3-2-1** (o dedo 3 passa por cima do polegar após o Sol).
+• **Rotina de Prática com Rampa de Tempo**: Começa a praticar a escala a 60 BPM (70% do tempo final). Foca-te na igualdade sonora de cada nota e na passagem macia do polegar por baixo da mão antes de acelerar progressivamente.
+• **Passagem Oculta do Polegar**: Não levantes o cotovelo para fora ao passar o polegar; mantém o antebraço calmo e move o polegar horizontalmente por baixo da palma.
 """,
         guitar_focus="""
 🎸 **Na Viola / Guitarra**:
 • As escalas são memorizadas em **padrões geométricos (Boxes / Posições)** ao longo do braço.
 • A **Pentatónica Menor** (Posição 1) é o padrão mais famoso do mundo: 2 notas por corda começando na tónica da 6ª corda.
 • O Sistema **CAGED** divide o braço em 5 regiões sobrepostas onde todas as escalas e modos podem ser tocados sem mudar de afinação.
+• **Palhetada Alternada Estrita**: Pratica cada escala com palhetada estritamente alternada (Baixo - Cima - Baixo - Cima) para sincronizar o movimento rítmico das duas mãos com o metrónomo.
+• **Mão Esquerda Estável**: Mantém os dedos curvados e perto das cordas mesmo quando não estão a tocar — dedos que voam longe do braço perdem preciosas frações de segundo.
 """,
         interactive_demo="scales",
     ),
@@ -247,11 +259,15 @@ A nota mais grave tocada no acorde (o **Baixo**) define o estado de inversão:
 • 1ª Inversão (C/E): Dedos **1-2-5** nas teclas E - G - C.
 • 2ª Inversão (C/G): Dedos **1-3-5** nas teclas G - C - E.
 • Na mão esquerda, pode-se tocar apenas a fundamental da oitava grave (ex: Dó 2) ou uma oitava completa.
+• **Economia de Movimento (Voice Leading)**: Ao passar de C [C-E-G] para F [C-F-A], repara que a nota C é comum — mantém o dedo 1 no C e move apenas os dedos 3 e 5 para F e A (2ª inversão de Fá).
+• **Ataque Sincronizado**: Pressiona as 3 notas da tríade rigorosamente ao mesmo milissegundo para evitar que soe como um arpejo desleixado.
 """,
         guitar_focus="""
 🎸 **Na Viola / Guitarra**:
 • Os acordes de viola frequentemente dobram notas (por exemplo, a forma aberta de Dó Maior [X-3-2-0-1-0] toca: Mudo - C - E - G - C - E, contendo duas tónicas e duas terças).
 • As tríades estritas de 3 cordas (em cordas agudas: 1ª, 2ª e 3ª cordas) são a ferramenta secreta dos guitarristas de Funk, Pop e Jazz para cortar na mistura sem embolar com o baixo.
+• **Técnica do Dedo Pivot**: Na transição entre acordes (ex: Am para C), mantém o dedo indicador e médio fixos na 2ª e 4ª cordas e desloca apenas o dedo 3 para a 5ª corda.
+• **Troca Antecipada no Ar**: Ao mudar de acorde, move todos os dedos em bloco no ar já com a forma do próximo acorde, em vez de assentar um dedo de cada vez.
 """,
         interactive_demo="chords",
     ),
@@ -313,6 +329,8 @@ Ao adicionar uma quarta nota a 1 terça de distância da quinta, criamos as **T�
 • Distribuição recomendada (*Rootless Voicings*):
   - Mão Esquerda: Toca a Fundamental e a Quinta (ou só a Fundamental no baixo).
   - Mão Direita: Toca a 3ª e a 7ª (as *Guide Tones* que definem o acorde) + extensões (9ª).
+• **Equilíbrio Dinâmico (Voicing Balance)**: Aplica mais peso no dedo 5 (a nota mais aguda da tétrade) para que a melodia sobressaia com clareza sobre os acordes de acompanhamento.
+• **Dedilhação de 4 Notas**: Para tétrades em posição fundamental (ex: Cmaj7 [C-E-G-B]), usa os dedos **1-2-3-5** (o dedo 4 fica relaxado sem rigidez).
 """,
         guitar_focus="""
 🎸 **Na Viola / Guitarra**:
@@ -321,6 +339,8 @@ Ao adicionar uma quarta nota a 1 terça de distância da quinta, criamos as **T�
   - Cmaj7: [X-3-2-4-0-0] ou [X-3-5-4-5-X]
   - Dm7: [X-5-7-5-6-X]
   - G7: [3-X-3-4-3-X] ou [3-5-3-4-6-X]
+• **Abafamento Intencional de Cordas (String Muting)**: Usa a lateral do polegar esquerdo ou a ponta do dedo que faz a tónica para tocar suavemente na corda 6 ou 5 e calá-la, garantindo que cordas indesejadas nunca soam.
+• **Sincronismo Polegar + Dedos (PIMA)**: O polegar toca o baixo no tempo forte e os dedos I-M-A puxam as 3 cordas agudas em uníssono como uma pinça coordenada.
 """,
         interactive_demo="fretboard",
     ),
@@ -352,7 +372,7 @@ Qualquer acorde diatónico maior ou menor do campo harmónico pode ser antecedid
 Consiste em 'pedir emprestados' acordes da escala homónima menor para usar numa tonalidade maior:
 
 • **O Subdominante Menor (iv)**: Usar **Fm** em vez de **F** em tom de Dó Maior (progressão clássica: $I \\to IV \\to iv \\to I$, ex: $C \\to F \\to Fm \\to C$). Soa extremamente emotivo e nostálgico.
-• **$\\\\flat\\text{VI}$ e $\\\\flat\\text{VII}$**: Usar A♭ e B♭ em tom de Dó Maior (muito comum no Rock e Cinema).
+• **$\\flat\\text{VI}$ e $\\flat\\text{VII}$**: Usar A♭ e B♭ em tom de Dó Maior (muito comum no Rock e Cinema).
 
 ---
 
@@ -370,6 +390,8 @@ Todo o acorde dominante com 7ª pode ser substituído por outro dominante locali
   - D♭7: Baixo D♭ / Mão Direita [F - A♭ - B]
   - Cmaj7: Baixo C / Mão Direita [E - G - B]
 • Repara como o baixo e a voz superior descem suavemente em semitons!
+• **Pedalação Sincopada (Troca de Pedal de Sustentação)**: Ao mudar para o acorde SubV7 ou de empréstimo modal, solta e volta a carregar no pedal *imediatamente após* tocar o novo acorde para limpar as ressonâncias do acorde anterior sem cortar o som.
+• **Toque Legato com Dedos**: Pratica ligar as notas de topo da harmonia exclusivamente com a articulação dos dedos antes de adicionar o pedal.
 """,
         guitar_focus="""
 🎸 **Na Viola / Guitarra**:
@@ -378,6 +400,8 @@ Todo o acorde dominante com 7ª pode ser substituído por outro dominante locali
   - D♭7 no 4º traste [X-4-3-4-2-X]
   - Cmaj7 no 3º traste [X-3-5-4-5-X]
 • João Gilberto e Tom Jobim construíram a linguagem da Bossa Nova explorando estes movimentos cromáticos no violão/viola.
+• **Deslizar de Traste com Dedo Guia**: Mantém a pressão do dedo que faz a nota guia enquanto deslizas 1 traste para trás, mantendo a continuidade tímbrica.
+• **Substituição de Baixos com o Polegar**: Nas cordas graves 6 e 5, usa o polegar com peso natural para dar clareza aos baixos cromáticos descendentes.
 """,
         interactive_demo="circle_of_fifths",
     ),
@@ -428,10 +452,17 @@ Em ambas as mãos, os dedos são numerados do polegar ao mindinho:
    - Am: [A - C - E]
    - F: [A - C - F]
    - G: [G - B - D]
+• **Independência dos Dedos 4 e 5**: Como os dedos 4 e 5 partilham tendões comuns, pratica levantar o dedo 4 mantendo o 3 e o 5 apoiados, sem forçar nem sentir dor.
+• **Estrutura de Rotina de 20 Minutos**:
+  - 5 min: Aquecimento & Escalas a 70% BPM.
+  - 10 min: Peça / Repertório por secções pequenas de 2 a 4 compassos.
+  - 5 min: Treino auditivo e leitura de pauta à primeira vista.
 """,
         guitar_focus="""
 🎸 **Dica de Interligação**:
 • Entender as aberturas do piano ajuda o guitarrista a visualizar as notas absolutas que compõem a harmonia, permitindo criar linhas melódicas mais ricas na guitarra/viola.
+• **Crossover de Repertório**: Experimenta tocar a linha do baixo de Alberti do piano (1-5-3-5) nas 3 cordas mais graves da viola usando o polegar e indicador.
+• **Treino de Ouvido Harmónico**: Toca um acorde de piano no estúdio e tenta reproduzir o mesmo som na viola de ouvido, encontrando os trastes certos.
 """,
         interactive_demo="piano_interactive",
     ),
@@ -484,6 +515,7 @@ Qualquer um destes 5 formatos pode ser deslocado para a frente no braço usando 
 🎹 **Dica de Interligação**:
 • O teclado do piano é linear (uma única linha reta de notas graves a agudas).
 • O braço da viola é uma matriz bidimensional (as mesmas notas repetem-se em diferentes cordas e trastes com timbres distintos).
+• **Visualização Mental**: Imagina as 5 formas do CAGED como transposição cromática em blocos, equivalente a usar a função de transpose ou mudar de oitava no teclado.
 """,
         guitar_focus="""
 🎸 **Exercício Recomendado**:
@@ -492,6 +524,11 @@ Qualquer um destes 5 formatos pode ser deslocado para a frente no braço usando 
    - Pestana na 6ª corda (Forma E no 3º traste): [3-5-5-4-3-3]
    - Pestana na 5ª corda (Forma A no 10º traste): [X-10-12-12-12-10]
 2. Ouve como todas contêm as notas Sol, Si e Ré, mas com 'voicings' e brilho diferentes!
+• **Exercício da Aranha (Spider Walk 1-2-3-4)**: Toca trastes 1-2-3-4 corda a corda com dedos 1-2-3-4 sem levantar os dedos anteriores para desenvolver força, independência e precisão cirúrgica.
+• **Rotina de Prática Diária Eficaz**:
+  - 5 min: Spider Walk e alongamentos lentos.
+  - 10 min: Mudanças de pestanas e repertório com metrónomo a 70% BPM.
+  - 5 min: Prática de palhetada alternada e improvisação sobre backing track.
 """,
         interactive_demo="guitar_fretboard",
     ),

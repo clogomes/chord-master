@@ -198,7 +198,16 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 16. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
+### 16. 📚 FASE 16 — Dicas Práticas de Técnica e Ergonomia (Piano & Viola) ([`core/theory_content.py`](file:///Users/clogomes/repo/chord-master/core/theory_content.py))
+- **Expansão Pedagógica dos 8 Capítulos de Teoria**:
+  - Dicas concretas de postura e ergonomia física: altura do banco e relaxamento de ombros no piano, ângulo de 45º do braço e ataque na ponta dos dedos na viola.
+  - Exercícios de independência e força dos dedos: separação de tendões entre os dedos 4 e 5 no piano, e treino clássico *Spider Walk (1-2-3-4)* na viola.
+  - Otimização técnica: prevenção de trastejar (*fret buzz*), abafamento seletivo de cordas (*string muting*), técnica do dedo pivot para mudanças de acordes, transições em bloco e pedalação sincopada.
+  - Estrutura de rotina de estudo diário equilibrada em 20 minutos com rampa de tempo progressiva.
+
+---
+
+### 17. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
 - **Deteção de Frequência Fundamental ($f_0$) via Microfone**: Algoritmo de autocorrelação no domínio do tempo acelerado por FFT, com interpolação parabólica para precisão sub-amostra e rejeição inteligente de ruído ambiente (60 Hz a 1200 Hz).
 - **Mostrador Visual com Agulha Dinâmica**: Medidor de $-50$ a $+50$ cents com faixa de tolerância verde ($\pm 10$ cents) e orientações em tempo real (*"▲ Muito Grave — Estica a corda"*, *"▼ Muito Agudo — Afrouxa a corda"*, *"✓ AFINADO (No Ponto Perfeito!)"*).
 - **Afinador de Viola (6 Cordas)**: Cartões visuais para as 6 cordas padrão ($E2, A2, D3, G3, B3, E4$) que se iluminam automaticamente ao detetar a corda tocada, com botão para ouvir o tom de cada corda.
