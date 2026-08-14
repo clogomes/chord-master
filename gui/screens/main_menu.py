@@ -127,7 +127,7 @@ class MainMenuScreen(ctk.CTkFrame):
         )
         reset_prog_btn.pack(side="left", padx=4)
 
-        # Metrics bar
+        # Metrics bar (XP, Level, Exercises, Accuracy, Streak)
         self.metrics_frame = ctk.CTkFrame(
             self,
             corner_radius=theme.RADIUS_LG,
@@ -137,9 +137,12 @@ class MainMenuScreen(ctk.CTkFrame):
         )
         self.metrics_frame.pack(fill="x", padx=24, pady=(2, 10))
 
-        self._create_metric_item(self.metrics_frame, "Exercícios Realizados", f"{user.total_attempts}", 0)
-        self._create_metric_item(self.metrics_frame, "Taxa de Precisão", f"{user.accuracy_rate:.1f}%", 1)
-        self._create_metric_item(self.metrics_frame, "Melhor Sequência", f"🔥 {user.best_streak}", 2)
+        lvl = user.level_info
+        self._create_metric_item(self.metrics_frame, "Nível do Aluno", f"{lvl['icon']} Nível {user.level}", 0)
+        self._create_metric_item(self.metrics_frame, "Pontos de XP", f"{user.xp} XP", 1)
+        self._create_metric_item(self.metrics_frame, "Exercícios", f"{user.total_attempts}", 2)
+        self._create_metric_item(self.metrics_frame, "Precisão", f"{user.accuracy_rate:.1f}%", 3)
+        self._create_metric_item(self.metrics_frame, "Sequência", f"🔥 {user.best_streak}", 4)
 
         # Navigation Grid (2 Columns x 3 Rows)
         cards_container = ctk.CTkFrame(self, fg_color="transparent")

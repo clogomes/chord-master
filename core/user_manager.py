@@ -1,31 +1,59 @@
-"""Multi-user profile manager, progress tracking, and persistence."""
+"""Multi-user management, progress persistence, level XP, and achievement tracking."""
+from dataclasses import dataclass, field, asdict
 import json
 import os
 import time
-from dataclasses import asdict, dataclass, field
-from typing import Dict, List, Optional
-from .score_tracker import CategoryStats, ExerciseRecord
-
-AVATAR_CHOICES = ["🎵", "🎹", "🎸", "🎻", "🎧", "🎷", "🎺", "🥁", "🎼", "🌟"]
+from typing import Dict, List, Optional, Tuple
+from core.gamification import (
+    Achievement,
+    ACHIEVEMENT_LIBRARY,
+    get_level_info,
+    get_achievement_by_id,
+)
 
 LESSON_IDS = [
-    ("chap1_fundamentals", "1. Fundamentos & Notação"),
-    ("chap2_intervals", "2. Intervalos & Acústica"),
-    ("chap3_scales_modes", "3. Escalas & Modos"),
-    ("chap4_chords_triads", "4. Tríades & Inversões"),
-    ("chap5_harmonic_field_tetrads", "5. Campo Harmónico & Tétrades"),
-    ("chap6_advanced_harmony", "6. Harmonia Avançada"),
-    ("chap7_piano_guide", "7. Guia Prático de Piano"),
-    ("chap8_guitar_guide", "8. Guia Prático de Viola (CAGED)"),
+    ("chap1_fundamentals", "Cap 1: Fundamentos & Notação"),
+    ("chap2_intervals", "Cap 2: Intervalos & Física Harmónica"),
+    ("chap3_scales_modes", "Cap 3: Escalas, Modos & 5ªs"),
+    ("chap4_chords_triads", "Cap 4: Formação de Acordes & Tríades"),
+    ("chap5_harmonic_field", "Cap 5: Campo Harmónico & Tétrades"),
+    ("chap6_advanced_harmony", "Cap 6: Harmonia Avançada & Modulação"),
+    ("chap7_piano_guide", "Cap 7: Guia Prático de Piano"),
+    ("chap8_guitar_guide", "Cap 8: Guia Prático de Viola (CAGED)"),
+]
+
+AVATAR_CHOICES = [
+    "🎵", "🎹", "🎸", "🎼", "🎻", "🎺", "🎷", "🥁", "🎧", "🌟", "⚡", "🔥"
 ]
 
 
 @dataclass
+class CategoryStats:
+    total_attempts: int = 0
+    correct_count: int = 0
+    current_streak: int = 0
+    best_streak: int = 0
+
+
+@dataclass
+class ExerciseRecord:
+    timestamp: float
+    category: str
+    question_type: str
+    is_correct: bool
+    prompt: str
+    user_answer: str
+    correct_answer: str
+
+
+@dataclass
 class UserProfile:
-    """Represents a single student profile with independent stats and lesson progress."""
+    """Represents a single student profile with independent stats, XP, level, and achievements."""
     username: str
     avatar: str = "🎵"
     created_at: float = field(default_factory=time.time)
+    xp: int = 0
+    unlocked_achievements: List[str] = field(default_factory=list)
     categories: Dict[str, CategoryStats] = field(default_factory=lambda: {
         "treino_auditivo": CategoryStats(),
         "leitura_pauta": CategoryStats(),
@@ -35,6 +63,22 @@ class UserProfile:
     })
     completed_lessons: List[str] = field(default_factory=list)
     history: List[ExerciseRecord] = field(default_factory=list)
+
+    @property
+    def level_info(self) -> Dict:
+        return get_level_info(self.xp)
+
+    @property
+    def level(self) -> int:
+        return self.level_info["level"]
+
+    @property
+    def level_title(self) -> str:
+        return self.level_info["title"]
+
+    @property
+    def level_icon(self) -> str:
+        return self.level_info["icon"]
 
     @property
     def total_attempts(self) -> int:
@@ -48,7 +92,7 @@ class UserProfile:
     def accuracy_rate(self) -> float:
         if self.total_attempts == 0:
             return 0.0
-        return (self.total_correct / self.total_attempts) * 100.0
+        return (self.total_correct / float(self.total_attempts)) * 100.0
 
     @property
     def best_streak(self) -> int:
@@ -59,15 +103,18 @@ class UserProfile:
         total_lessons = len(LESSON_IDS)
         if total_lessons == 0:
             return 0.0
-        return (len(self.completed_lessons) / total_lessons) * 100.0
+        return (len(self.completed_lessons) / float(total_lessons)) * 100.0
 
 
 class UserManager:
-    """Manages multiple local user profiles with switching, progress saving, and leaderboards."""
+    """
+    Manages multi-student profiles, gamification XP, level unlocks,
+    and persistent storage in user_profiles.json.
+    """
 
     def __init__(self, filepath: Optional[str] = None):
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         if filepath is None:
-            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             self.filepath = os.path.join(base_dir, "user_profiles.json")
             self.legacy_filepath = os.path.join(base_dir, "user_scores.json")
         else:
@@ -79,14 +126,12 @@ class UserManager:
         self.load()
 
         if not self.profiles:
-            # Create default profile
             self.create_user("Utilizador 1", avatar="🎵")
             self.active_username = "Utilizador 1"
 
     @property
     def current_user(self) -> UserProfile:
         if self.active_username not in self.profiles:
-            # Pick first available or create default
             if self.profiles:
                 self.active_username = next(iter(self.profiles.keys()))
             else:
@@ -95,16 +140,13 @@ class UserManager:
         return self.profiles[self.active_username]
 
     def get_all_users(self) -> List[UserProfile]:
-        """Returns all registered user profiles sorted by creation date."""
         return list(self.profiles.values())
 
     def create_user(self, username: str, avatar: str = "🎵") -> UserProfile:
-        """Creates and activates a new user profile."""
         clean_name = username.strip()
         if not clean_name:
             clean_name = f"Utilizador {len(self.profiles) + 1}"
 
-        # If name exists, add suffix
         base_name = clean_name
         counter = 2
         while clean_name in self.profiles:
@@ -115,6 +157,8 @@ class UserManager:
             username=clean_name,
             avatar=avatar,
             created_at=time.time(),
+            xp=0,
+            unlocked_achievements=[],
         )
         self.profiles[clean_name] = profile
         self.active_username = clean_name
@@ -122,7 +166,6 @@ class UserManager:
         return profile
 
     def switch_user(self, username: str) -> bool:
-        """Switches the active user profile."""
         if username in self.profiles:
             self.active_username = username
             self.save()
@@ -130,11 +173,7 @@ class UserManager:
         return False
 
     def delete_user(self, username: str) -> bool:
-        """Deletes a user profile (cannot delete if it's the only one)."""
-        if len(self.profiles) <= 1:
-            return False
-
-        if username in self.profiles:
+        if username in self.profiles and len(self.profiles) > 1:
             del self.profiles[username]
             if self.active_username == username:
                 self.active_username = next(iter(self.profiles.keys()))
@@ -142,17 +181,65 @@ class UserManager:
             return True
         return False
 
+    def add_xp(self, amount: int) -> Tuple[int, bool]:
+        """Awards XP to current active user. Returns (new_xp, did_level_up)."""
+        user = self.current_user
+        old_level = user.level
+        user.xp += max(0, amount)
+        new_level = user.level
+        self.check_achievements()
+        self.save()
+        return user.xp, (new_level > old_level)
+
+    def check_achievements(self) -> List[Achievement]:
+        """Evaluates achievement requirements for active user and unlocks any newly earned."""
+        user = self.current_user
+        newly_unlocked = []
+
+        for ach in ACHIEVEMENT_LIBRARY:
+            if ach.id in user.unlocked_achievements:
+                continue
+
+            unlocked = False
+
+            if ach.id == "first_step" and len(user.completed_lessons) >= 1:
+                unlocked = True
+            elif ach.id == "theory_scholar" and len(user.completed_lessons) >= 4:
+                unlocked = True
+            elif ach.id == "theory_master" and len(user.completed_lessons) >= 8:
+                unlocked = True
+            elif ach.id == "first_melody" and user.categories.get("repertorio", CategoryStats()).correct_count >= 1:
+                unlocked = True
+            elif ach.id == "perfect_ear" and user.categories.get("treino_auditivo", CategoryStats()).best_streak >= 5:
+                unlocked = True
+            elif ach.id == "sight_reader" and user.categories.get("leitura_pauta", CategoryStats()).best_streak >= 10:
+                unlocked = True
+            elif ach.id == "streak_fire" and user.best_streak >= 10:
+                unlocked = True
+            elif ach.id == "diligent_student" and user.total_attempts >= 50:
+                unlocked = True
+
+            if unlocked:
+                user.unlocked_achievements.append(ach.id)
+                user.xp += ach.xp_reward
+                newly_unlocked.append(ach)
+
+        if newly_unlocked:
+            self.save()
+
+        return newly_unlocked
+
     def mark_lesson_completed(self, lesson_id: str) -> bool:
-        """Marks a theory lesson as completed for the current user."""
         user = self.current_user
         if lesson_id not in user.completed_lessons:
             user.completed_lessons.append(lesson_id)
+            user.xp += 100  # +100 XP per completed lesson
+            self.check_achievements()
             self.save()
             return True
         return False
 
     def is_lesson_completed(self, lesson_id: str) -> bool:
-        """Checks if a theory lesson is completed for the current user."""
         return lesson_id in self.current_user.completed_lessons
 
     def record_attempt(
@@ -164,7 +251,6 @@ class UserManager:
         user_answer: str = "",
         correct_answer: str = "",
     ) -> CategoryStats:
-        """Records an exercise attempt for the active user."""
         user = self.current_user
         if category not in user.categories:
             user.categories[category] = CategoryStats()
@@ -177,6 +263,9 @@ class UserManager:
             stats.current_streak += 1
             if stats.current_streak > stats.best_streak:
                 stats.best_streak = stats.current_streak
+            # Award XP for correct answer (+15 XP + streak bonus)
+            streak_bonus = min(20, stats.current_streak * 2)
+            user.xp += (15 + streak_bonus)
         else:
             stats.current_streak = 0
 
@@ -194,20 +283,22 @@ class UserManager:
         if len(user.history) > 100:
             user.history = user.history[-100:]
 
+        self.check_achievements()
         self.save()
         return stats
 
     def reset_current_user_scores(self):
-        """Resets scores and progress for the active user only."""
+        """Resets scores, XP, achievements and lesson progress for the active user."""
         user = self.current_user
         for cat in user.categories.keys():
             user.categories[cat] = CategoryStats()
         user.history.clear()
         user.completed_lessons.clear()
+        user.xp = 0
+        user.unlocked_achievements.clear()
         self.save()
 
     def save(self):
-        """Persists all profiles and the active user to JSON."""
         data = {
             "active_user": self.active_username,
             "users": {}
@@ -217,6 +308,8 @@ class UserManager:
                 "username": profile.username,
                 "avatar": profile.avatar,
                 "created_at": profile.created_at,
+                "xp": profile.xp,
+                "unlocked_achievements": profile.unlocked_achievements,
                 "completed_lessons": profile.completed_lessons,
                 "categories": {
                     k: {
@@ -237,7 +330,6 @@ class UserManager:
             print(f"[UserManager] Erro ao salvar utilizadores em {self.filepath}: {e}")
 
     def load(self):
-        """Loads profiles from JSON, with migration from legacy user_scores.json."""
         if os.path.exists(self.filepath) and os.path.getsize(self.filepath) > 0:
             try:
                 with open(self.filepath, "r", encoding="utf-8") as f:
@@ -247,7 +339,13 @@ class UserManager:
                 self.profiles.clear()
 
                 for name, udata in data.get("users", {}).items():
-                    categories = {}
+                    categories = {
+                        "treino_auditivo": CategoryStats(),
+                        "leitura_pauta": CategoryStats(),
+                        "teoria": CategoryStats(),
+                        "repertorio": CategoryStats(),
+                        "pratica_instrumento": CategoryStats(),
+                    }
                     for ck, cv in udata.get("categories", {}).items():
                         categories[ck] = CategoryStats(
                             total_attempts=cv.get("total_attempts", 0),
@@ -271,6 +369,8 @@ class UserManager:
                         username=udata.get("username", name),
                         avatar=udata.get("avatar", "🎵"),
                         created_at=udata.get("created_at", time.time()),
+                        xp=udata.get("xp", 0),
+                        unlocked_achievements=udata.get("unlocked_achievements", []),
                         categories=categories,
                         completed_lessons=udata.get("completed_lessons", []),
                         history=history,
@@ -279,42 +379,3 @@ class UserManager:
                 return
             except Exception as e:
                 print(f"[UserManager] Erro ao carregar {self.filepath}: {e}")
-
-        # Migration from legacy user_scores.json if present
-        if self.legacy_filepath and os.path.exists(self.legacy_filepath) and os.path.getsize(self.legacy_filepath) > 0:
-            try:
-                with open(self.legacy_filepath, "r", encoding="utf-8") as f:
-                    legacy_data = json.load(f)
-
-                categories = {}
-                for ck, cv in legacy_data.get("categories", {}).items():
-                    categories[ck] = CategoryStats(
-                        total_attempts=cv.get("total_attempts", 0),
-                        correct_count=cv.get("correct_count", 0),
-                        current_streak=cv.get("current_streak", 0),
-                        best_streak=cv.get("best_streak", 0),
-                    )
-                history = [
-                    ExerciseRecord(
-                        timestamp=h.get("timestamp", 0.0),
-                        category=h.get("category", "treino_auditivo"),
-                        question_type=h.get("question_type", "unknown"),
-                        is_correct=h.get("is_correct", False),
-                        prompt=h.get("prompt", ""),
-                        user_answer=h.get("user_answer", ""),
-                        correct_answer=h.get("correct_answer", ""),
-                    )
-                    for h in legacy_data.get("history", [])
-                ]
-                default_profile = UserProfile(
-                    username="Utilizador 1",
-                    avatar="🎵",
-                    categories=categories,
-                    completed_lessons=[],
-                    history=history,
-                )
-                self.profiles["Utilizador 1"] = default_profile
-                self.active_username = "Utilizador 1"
-                self.save()
-            except Exception as e:
-                print(f"[UserManager] Erro na migração legacy: {e}")

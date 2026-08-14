@@ -38,7 +38,7 @@ class TestSongs(unittest.TestCase):
                 # Piano finger must be 1-5 if specified
                 if sn.piano_finger is not None:
                     self.assertIn(sn.piano_finger, [1, 2, 3, 4, 5])
-                self.assertIn(sn.piano_hand, ["right", "left"])
+                self.assertIn(sn.piano_hand, ["right", "left", "direita", "esquerda"])
 
                 # Guitar coordinates must match note pitch if specified
                 if sn.guitar_string is not None and sn.guitar_fret is not None:
