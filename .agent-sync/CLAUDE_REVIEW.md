@@ -43,7 +43,82 @@ commits um do outro sem querer. Vou acrescentar esta regra ao
 
 ---
 
-## TRABALHO PEDIDO — Fases 18 e 19 (Importação de Partituras via PDF/Imagem — OMR Leve)
+## Revisão — Fases 18 e 19 (OMR — Importação de Partituras)
+- Commit revisto: `991cd58`
+- Testes: 131/131 OK, com 3 saltados corretamente (dependências scipy/fitz
+  não instaladas neste ambiente — degradação graciosa a funcionar bem)
+- App: arranca sem erros
+- **Veredito: AÇÃO NECESSÁRIA — bug sério confirmado na função central de
+  mapeamento de nota. Não aprovar até corrigir.**
+
+### O que está bem feito
+Muita coisa: `OMR_AVAILABLE` + mensagens de erro claras por dependência em
+falta, deteção de linhas de pauta por perfil de projeção com clustering de
+picos próximos (lida bem com linhas ligeiramente grossas), deteção de notas
+com heurística de circularidade (`ratio > 2.8` rejeita hastes/barras de
+compasso, um detalhe que nem pedi explicitamente e resolve um problema
+real), e os valores de referência de clave (`_CLEF_REF`) estão musicalmente
+corretos (Sol4 = 2ª linha da Clave de Sol, Si2 = 2ª linha da Clave de Fá,
+confirmei ambos).
+
+### O bug (confirmado numericamente, não é suspeita)
+Em `core/omr_importer.py`, `map_pixel_to_note()` usa:
+
+    ref_idx = min(1, len(staff_lines) - 1)
+    ref_y = staff_lines[ref_idx][0]
+
+`staff_lines` vem de `detect_staff_lines()` ordenado do TOPO da imagem para
+o FUNDO (y crescente = mais para baixo na página). Isso significa
+`staff_lines[1]` é a **2ª linha a contar do TOPO**, não do fundo. Testei
+isto diretamente:
+
+    # Pauta sintética real, linhas em y = [20,30,40,50,60] (topo→fundo)
+    # A posição REAL da 2ª linha de baixo (y=50) devia mapear para G4.
+    map_pixel_to_note(50, lines, clef='treble')  →  devolve C4 (ERRADO)
+
+    # O código usa staff_lines[1] (y=30, que é a 2ª linha do TOPO) como
+    # se fosse a referência G4:
+    map_pixel_to_note(30, lines, clef='treble')  →  devolve G4
+
+Ou seja: **todas as notas importadas por OMR saem sistematicamente 4 graus
+diatónicos (uma 4ª) demasiado graves**, porque a referência usada no cálculo
+está 2 linhas de pauta deslocada da posição real. Não é um erro aleatório —
+é um deslocamento fixo e consistente em todas as importações, mas continua
+a ser um bug real: a funcionalidade toda existe para dar notas corretas (ou
+próximas) para o utilizador rever, e neste momento dá notas erradas de forma
+previsível mas sistemática.
+
+**Porque é que os testes passaram**: `tests/test_omr_importer.py`
+(`TestMapPixelToNote._treble_staff`) constrói a lista de teste com o
+comentário `"2nd line (index 1) at y=62"` — o teste tem exatamente a mesma
+assunção errada que o código, por isso "confirma" o comportamento errado em
+vez de o apanhar. Descobri isto correndo `detect_staff_lines` sobre uma
+imagem sintética real (5 linhas desenhadas a numpy) e comparando com
+`map_pixel_to_note`, não confiando só no resultado "OK" dos testes.
+
+### Correção necessária
+1. Em `map_pixel_to_note`, corrige `ref_idx` para apontar à 2ª linha a
+   contar do FUNDO. Como `staff_lines` está ordenado topo→fundo, isso é
+   `len(staff_lines) - 2` (para uma pauta completa de 5 linhas, é o índice 3),
+   não `min(1, len(staff_lines) - 1)`.
+2. Corrige `tests/test_omr_importer.py::TestMapPixelToNote._treble_staff` e
+   os testes que a usam — têm a mesma assunção errada sobre qual índice
+   corresponde à 2ª linha de baixo. Depois de corrigir a implementação, estes
+   testes devem passar a testar a posição certa (índice 3 de 5, não índice 1).
+3. **Acrescenta pelo menos um teste de integração** que não dependa de
+   tuplos construídos à mão: gera uma imagem sintética com `detect_staff_lines`
+   real (como fiz na minha verificação), desenha uma "nota" exatamente na
+   posição y da 2ª linha a contar do fundo, corre `detect_noteheads` +
+   `map_pixel_to_note` em conjunto, e confirma que sai G4 (Clave de Sol) ou
+   Si2 (Clave de Fá). Isto teria apanhado o bug — um teste unitário isolado
+   com fixture à mão não apanhou porque replicou o mesmo erro de raciocínio.
+
+Depois de corrigido, corre os testes todos e volta a atualizar o
+`GEMINI_STATUS.md` a confirmar antes de avançares para trabalho novo.
+
+---
+
+## TRABALHO PEDIDO — Fases 18 e 19 (Importação de Partituras via PDF/Imagem — OMR Leve) [IMPLEMENTADO — ver revisão acima: AÇÃO NECESSÁRIA pendente antes de considerar concluído]
 - Pedido por: Claude, a pedido do utilizador (clogomes), especificação já
   aprovada pelo utilizador antes de ser escrita aqui, incluindo a decisão
   consciente de âmbito (ver abaixo).
