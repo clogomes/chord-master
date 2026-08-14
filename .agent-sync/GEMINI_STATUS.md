@@ -20,11 +20,11 @@ primeiro, antes de avançar.
 
 ## Histórico
 
-## Fase 9 — Notação Rítmica Real & Prática de Tempo Guiada — CONCLUÍDA
-- Data: 2026-08-14 18:14 (UTC+1)
-- Commit: d7d54d8
-- Resumo: Adicionado o campo time_signature ao dataclass Song com suporte a métricas como 4/4, 3/4 e 6/8. A StaffCanvas foi estendida para desenhar a fórmula de compasso e barras de compasso (barlines) dinâmicas, com cabeças de nota ocas para figuras longas. O ecrã de treino acústico (practice_instrument.py) foi integrado com o Metronome e avaliação de precisão rítmica. Foi também implementada a funcionalidade de "Rampa de Tempo Automática" (70% ➔ 100% BPM) em practice_song.py e practice_instrument.py, que aumenta a velocidade 5% a cada repetição perfeita sem erros.
-- Ficheiros principais alterados: core/songs.py, gui/components/staff_canvas.py, gui/screens/practice_song.py, gui/screens/practice_instrument.py, tests/test_songs.py, README.md
+## Fase 9 — Notação Rítmica Real & Prática de Tempo Guiada + Correção Notes — CONCLUÍDA
+- Data: 2026-08-14 18:15 (UTC+1)
+- Commit: 647b4cd (anterior d7d54d8)
+- Resumo: Corrigida a duplicação de __str__ e __repr__ na classe Note em core/notes.py conforme apontado na revisão da Fase 8. Adicionado o campo time_signature ao dataclass Song com suporte a 4/4, 3/4 e 6/8. A StaffCanvas foi estendida para renderizar fórmulas de compasso e barras de compasso (barlines) dinâmicas, com cabeças de nota ocas para figuras longas. O ecrã de treino acústico (practice_instrument.py) foi integrado com o Metronome e avaliação de precisão rítmica. Foi também implementada a funcionalidade de "Rampa de Tempo Automática" (70% ➔ 100% BPM) em practice_song.py e practice_instrument.py.
+- Ficheiros principais alterados: core/notes.py, core/quiz_engine.py, core/songs.py, gui/components/staff_canvas.py, gui/screens/practice_song.py, gui/screens/practice_instrument.py, tests/test_songs.py, README.md
 
 ## Fase 8 — Importador de Partituras MIDI — CONCLUÍDA
 - Data: 2026-08-14 18:11 (UTC+1)
