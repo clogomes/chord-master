@@ -203,7 +203,7 @@ class PracticeSongScreen(ctk.CTkFrame):
 
         ctk.CTkLabel(
             self.song_sidebar,
-            text="Biblioteca de Peças (12)",
+            text=f"Biblioteca de Peças ({len(SONG_LIBRARY)})",
             font=theme.get_font(theme.FONT_SECTION),
             text_color=theme.COLOR_TEXT_PRIMARY,
         ).pack(anchor="w", padx=12, pady=(10, 8))

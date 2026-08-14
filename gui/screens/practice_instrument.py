@@ -138,12 +138,23 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         ctk.CTkLabel(cfg_bar, text="Exercício:", font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(14, 4))
         self.exercise_type_select = ctk.CTkOptionMenu(
             cfg_bar,
-            values=["Escala Maior de Dó", "Escala Menor de Lá", "Arpejo Dó Maior (C)", "Arpejo Lá Menor (Am)", "Música: Hino à Alegria", "Música: Brilha Estrelinha", "Música: Für Elise"],
+            values=[
+                "Escala Maior de Dó",
+                "Escala Menor de Lá",
+                "Arpejo Dó Maior (C)",
+                "Arpejo Lá Menor (Am)",
+                "Música: Nothing Else Matters (Metallica)",
+                "Música: Stairway to Heaven (Led Zeppelin)",
+                "Música: Enter Sandman (Metallica)",
+                "Música: Smoke on the Water",
+                "Música: Hino à Alegria",
+                "Música: Für Elise",
+            ],
             command=self._on_exercise_changed,
             font=theme.get_font(theme.FONT_BODY),
             height=34,
             corner_radius=theme.RADIUS_SM,
-            width=230,
+            width=260,
         )
         self.exercise_type_select.set("Escala Maior de Dó")
         self.exercise_type_select.pack(side="left", padx=4)
@@ -288,6 +299,22 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
             chord = Chord(Note("A3"), "minor")
             self.exercise_notes = [chord.root, chord.notes[1], chord.notes[2], Note("A4")]
             self.exercise_title = "Arpejo de Lá Menor"
+        elif "Nothing Else Matters" in choice:
+            song = get_song_by_id("nothing_else_matters")
+            self.exercise_notes = [sn.note for sn in song.notes] if song else [Note("E2")]
+            self.exercise_title = "Nothing Else Matters (Metallica)"
+        elif "Stairway to Heaven" in choice:
+            song = get_song_by_id("stairway_to_heaven")
+            self.exercise_notes = [sn.note for sn in song.notes] if song else [Note("A3")]
+            self.exercise_title = "Stairway to Heaven (Led Zeppelin)"
+        elif "Enter Sandman" in choice:
+            song = get_song_by_id("enter_sandman")
+            self.exercise_notes = [sn.note for sn in song.notes] if song else [Note("E2")]
+            self.exercise_title = "Enter Sandman (Metallica)"
+        elif "Smoke on the Water" in choice:
+            song = get_song_by_id("smoke_on_the_water")
+            self.exercise_notes = [sn.note for sn in song.notes] if song else [Note("G3")]
+            self.exercise_title = "Smoke on the Water (Deep Purple)"
         elif "Hino à Alegria" in choice:
             song = get_song_by_id("ode_to_joy")
             self.exercise_notes = [sn.note for sn in song.notes] if song else [Note("C4")]

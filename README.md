@@ -49,9 +49,9 @@ Um curso completo de harmonia e teoria desde os conceitos fundamentais até téc
 
 ---
 
-### 4. 🎶 Estúdio de Repertório & Tocar Peças (12 Músicas Completas)
-Estúdio de execução interativa com pauta iluminada, teclas destacadas com número de dedo e posição de corda/traste, contendo as **músicas completas na íntegra** (estrofes, refrões, pontes e variações):
-- **12 Peças do Repertório Clássico e Cancioneiro Tradicional**:
+### 4. 🎶 Estúdio de Repertório & Tocar Peças (16 Músicas Completas)
+Estúdio de execução interativa com pauta iluminada, teclas destacadas com número de dedo e posição de corda/traste, contendo as **16 músicas completas na íntegra** (clássicos, cancioneiro tradicional e temas lendários de rock acústico):
+- **16 Peças do Repertório Clássico, Tradicional & Rock**:
   1. *Hino à Alegria* (Ludwig van Beethoven — 9ª Sinfonia Completa: Frase A + A' + Ponte B + Conclusão)
   2. *Brilha, Brilha Estrelinha* (W. A. Mozart / Tradicional — Forma Ternária Completa A-B-A)
   3. *Papagaio Loiro* (Folclore Português — 3 Estrofes e Refrão Tradicional Integral)
@@ -64,6 +64,10 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
   10. *Greensleeves* (Melodia Renascentista Inglesa — Verso e Refrão Tradicional Completo)
   11. *O Cravo e a Rosa* (Cantiga Tradicional Lusófona — 4 Estrofes Integrais)
   12. *Grândola, Vila Morena* (José Afonso / Zeca Afonso — Hino Completo com Estrofes e Cadência)
+  13. *Stairway to Heaven* (Led Zeppelin — Introdução Acústica Dedilhada em Lá Menor)
+  14. *Nothing Else Matters* (Metallica — Introdução Clássica em Cordas Soltas de Mi Menor)
+  15. *Enter Sandman* (Metallica — Riff Principal em Mi Menor)
+  16. *Smoke on the Water* (Deep Purple — O Riff Lendário em Sol Menor)
 - **3 Métodos Flexíveis de Execução**:
   - **Teclado do Computador**: Mapeamento QWERTY ergonómico no Piano (`A..L` para notas brancas Dó4 a Mi5; `W..P` para notas pretas) e cordas da Viola (`1..6`).
   - **Teclados MIDI USB**: Deteção automática *Plug-and-Play* de pianos digitais e sintetizadores USB físicos.
