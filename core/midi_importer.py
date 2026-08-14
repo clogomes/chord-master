@@ -5,7 +5,8 @@ import struct
 from typing import List, Optional, Tuple
 from core.notes import Note
 from core.songs import Song, SongNote, SONG_LIBRARY
-from core.guitar import find_note_positions
+from core.guitar import find_note_positions, assign_guitar_coordinates
+from core.fingering import assign_piano_fingerings
 
 
 USER_SONGS_FILE = "user_songs.json"
@@ -143,49 +144,12 @@ class MidiParser:
 
 def _assign_guitar_coordinates(notes: List[Note]) -> List[Tuple[int, int]]:
     """Assigns ergonomic guitar string and fret coordinates minimizing hand position shifts."""
-    coords = []
-    prev_str, prev_fret = 4, 1  # start around C4
-
-    for n in notes:
-        positions = find_note_positions(n, max_fret=15)
-        if not positions:
-            coords.append((4, 1))
-            continue
-
-        # Pick position closest to previous string & fret
-        best_pos = min(
-            positions,
-            key=lambda p: abs(p[0] - prev_str) * 2 + abs(p[1] - prev_fret)
-        )
-        coords.append(best_pos)
-        prev_str, prev_fret = best_pos
-
-    return coords
+    return assign_guitar_coordinates(notes)
 
 
 def _assign_piano_fingerings(notes: List[Note]) -> List[int]:
     """Assigns standard 5-finger melodic heuristics for right hand."""
-    if not notes:
-        return []
-
-    fingerings = []
-    curr_finger = 1
-    prev_midi = notes[0].midi
-
-    for i, n in enumerate(notes):
-        if i == 0:
-            fingerings.append(curr_finger)
-            continue
-
-        delta = n.midi - prev_midi
-        if delta > 0:
-            curr_finger = min(5, curr_finger + min(delta, 2))
-        elif delta < 0:
-            curr_finger = max(1, curr_finger + max(delta, -2))
-        fingerings.append(curr_finger)
-        prev_midi = n.midi
-
-    return fingerings
+    return assign_piano_fingerings(notes)
 
 
 def import_midi_as_song(

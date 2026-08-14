@@ -191,11 +191,11 @@ class MainMenuScreen(ctk.CTkFrame):
         )
         rec_btn.pack(side="right", padx=(12, 0))
 
-        # Navigation Grid (2 Columns x 3 Rows)
+        # Navigation Grid (2 Columns x 4 Rows)
         cards_container = ctk.CTkFrame(self, fg_color="transparent")
         cards_container.pack(fill="both", expand=True, padx=24, pady=(4, 16))
         cards_container.grid_columnconfigure((0, 1), weight=1, uniform="group1")
-        cards_container.grid_rowconfigure((0, 1, 2), weight=1, uniform="group1")
+        cards_container.grid_rowconfigure((0, 1, 2, 3), weight=1, uniform="group1")
 
         # Card 1: Teoria Musical
         self._create_nav_card(
@@ -217,23 +217,23 @@ class MainMenuScreen(ctk.CTkFrame):
             col=1,
             icon="🎶",
             title="Tocar Repertório",
-            subtitle="Toca melodias famosas (Beethoven, Bach, Mozart) com teclas do PC ou rato.",
+            subtitle="Toca 16 peças completas com acompanhamento de bateria, teclado do PC ou MIDI USB.",
             button_text="Tocar Músicas",
             color_accent=theme.COLOR_PRIMARY,
             target_screen="practice_song",
         )
 
-        # Card 3: Lamiré & Afinador
+        # Card 3: Estúdio de Escalas
         self._create_nav_card(
             cards_container,
             row=1,
             col=0,
-            icon="🎙️",
-            title="Lamiré & Afinador",
-            subtitle="Deteção de afinação em tempo real pelo microfone e diapasão de 440 Hz.",
-            button_text="Abrir Lamiré",
-            color_accent=theme.COLOR_SUCCESS,
-            target_screen="lamire",
+            icon="🎼",
+            title="Estúdio de Escalas",
+            subtitle="Pratica 16 escalas e modos com dedilhação no piano, trastes na viola e bateria.",
+            button_text="Praticar Escalas",
+            color_accent="#8B5CF6",
+            target_screen="practice_scales",
         )
 
         # Card 4: Instrumento Real
@@ -249,12 +249,25 @@ class MainMenuScreen(ctk.CTkFrame):
             target_screen="practice_instrument",
         )
 
-        # Card 5: Leitura de Pauta
+        # Card 5: Lamiré & Afinador
         self._create_nav_card(
             cards_container,
             row=2,
             col=0,
-            icon="🎼",
+            icon="🎙️",
+            title="Lamiré & Afinador",
+            subtitle="Deteção de afinação em tempo real pelo microfone e diapasão de 440 Hz.",
+            button_text="Abrir Lamiré",
+            color_accent=theme.COLOR_SUCCESS,
+            target_screen="lamire",
+        )
+
+        # Card 6: Leitura de Pauta
+        self._create_nav_card(
+            cards_container,
+            row=2,
+            col=1,
+            icon="📜",
             title="Leitura de Pauta",
             subtitle="Identifica notas na pauta com Clave de Sol (𝄞) e Clave de Fá (𝄢).",
             button_text="Praticar Pauta",
@@ -262,17 +275,30 @@ class MainMenuScreen(ctk.CTkFrame):
             target_screen="practice_staff",
         )
 
-        # Card 6: Treino Auditivo
+        # Card 7: Treino Auditivo
         self._create_nav_card(
             cards_container,
-            row=2,
-            col=1,
+            row=3,
+            col=0,
             icon="🎧",
             title="Treino Auditivo",
             subtitle="Reconhece intervalos melódicos, harmónicos e acordes sintetizados de ouvido.",
             button_text="Treino Auditivo",
             color_accent=theme.COLOR_ACCENT_PURPLE,
             target_screen="practice_ear",
+        )
+
+        # Card 8: Estatísticas & Alunos
+        self._create_nav_card(
+            cards_container,
+            row=3,
+            col=1,
+            icon="📊",
+            title="Estatísticas & Alunos",
+            subtitle="Gráficos de evolução, mapa de atividade, leaderboard e exportação de certificados.",
+            button_text="Ver Estatísticas",
+            color_accent="#EC4899",
+            target_screen="stats",
         )
 
     def _confirm_reset(self):

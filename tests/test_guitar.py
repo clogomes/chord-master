@@ -71,6 +71,18 @@ class TestGuitar(unittest.TestCase):
         root_positions = [p for p in positions if p["is_root"]]
         self.assertTrue(any(p["string"] == 1 and p["fret"] == 3 for p in root_positions))  # 5th string 3rd fret is C
 
+    def test_assign_guitar_coordinates(self):
+        from core.guitar import assign_guitar_coordinates
+        notes = [Note("C4"), Note("D4"), Note("E4"), Note("F4"), Note("G4")]
+        coords = assign_guitar_coordinates(notes)
+        self.assertEqual(len(coords), 5)
+        for s, f in coords:
+            self.assertTrue(0 <= s <= 5)
+            self.assertTrue(0 <= f <= 15)
+
+        # Empty test
+        self.assertEqual(assign_guitar_coordinates([]), [])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -20,6 +20,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 11 — Expansão do Catálogo de Escalas & Modos — CONCLUÍDA
+- Data: 2026-08-14 18:33 (UTC+1)
+- Commit: b5ed5df
+- Resumo: Expandido o catálogo SCALE_TYPES em core/scales.py com 7 novas escalas e modos: Frígio, Lídio, Lócrio (completando os 7 modos gregos), Tons Inteiros (Hexatónica), Cromática (12 semitons), Bebop Dominante e Menor Húngara (Cigana). Adicionado teste automatizado genérico em tests/test_scales.py que valida para todas as escalas a progressão estrita de 0 a 12 semitons e a integridade descritiva.
+- Ficheiros principais alterados: core/scales.py, tests/test_scales.py, README.md
+
 ## Fase 10 — Motor de Acompanhamento Rítmico Sintetizado — CONCLUÍDA
 - Data: 2026-08-14 18:32 (UTC+1)
 - Commit: c6436bc

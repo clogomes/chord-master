@@ -181,3 +181,32 @@ def find_note_positions(note: Note, max_fret: int = 15) -> List[Tuple[int, int]]
     """
     model = GuitarFretboardModel(num_frets=max_fret)
     return model.find_note_positions(note)
+
+
+def assign_guitar_coordinates(notes: List[Note], max_fret: int = 15) -> List[Tuple[int, int]]:
+    """
+    Calculates an ergonomic sequence of (string, fret) coordinates for a melody,
+    minimizing sudden hand shifts across the fretboard.
+    """
+    if not notes:
+        return []
+
+    coords = []
+    prev_str = 2  # Start around D string
+    prev_fret = 5
+
+    for n in notes:
+        positions = find_note_positions(n, max_fret=max_fret)
+        if not positions:
+            coords.append((4, 1))
+            continue
+
+        # Pick position closest to previous string & fret
+        best_pos = min(
+            positions,
+            key=lambda p: abs(p[0] - prev_str) * 2 + abs(p[1] - prev_fret)
+        )
+        coords.append(best_pos)
+        prev_str, prev_fret = best_pos
+
+    return coords

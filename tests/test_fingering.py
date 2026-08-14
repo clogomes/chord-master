@@ -50,6 +50,19 @@ class TestFingering(unittest.TestCase):
         self.assertEqual(fingering[52], 3)  # Middle on E3
         self.assertEqual(fingering[55], 1)  # Thumb on G3
 
+    def test_assign_piano_fingerings_melodic(self):
+        from core.fingering import assign_piano_fingerings
+        notes = [Note("C4"), Note("D4"), Note("E4"), Note("F4"), Note("G4")]
+        fingers = assign_piano_fingerings(notes)
+        self.assertEqual(len(fingers), 5)
+        self.assertEqual(fingers[0], 1)
+        # ascending scale fingers should increase up to 5
+        self.assertTrue(all(1 <= f <= 5 for f in fingers))
+        self.assertEqual(fingers[-1], 5)
+
+        # Empty list test
+        self.assertEqual(assign_piano_fingerings([]), [])
+
 
 if __name__ == "__main__":
     unittest.main()

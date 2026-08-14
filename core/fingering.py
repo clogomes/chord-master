@@ -81,3 +81,28 @@ def get_scale_piano_fingering_description(scale_name: str, hand: str = "right") 
         return "Mão Direita: 1-2-3-1-2-3-4-5 (o polegar passa por baixo do dedo 3)"
     else:
         return "Mão Esquerda: 5-4-3-2-1-3-2-1 (o dedo 3 passa por cima do polegar)"
+
+
+def assign_piano_fingerings(notes: List[Note]) -> List[int]:
+    """Assigns standard 5-finger melodic heuristics for right hand."""
+    if not notes:
+        return []
+
+    fingerings = []
+    curr_finger = 1
+    prev_midi = notes[0].midi
+
+    for i, n in enumerate(notes):
+        if i == 0:
+            fingerings.append(curr_finger)
+            continue
+
+        delta = n.midi - prev_midi
+        if delta > 0:
+            curr_finger = min(5, curr_finger + min(delta, 2))
+        elif delta < 0:
+            curr_finger = max(1, curr_finger + max(delta, -2))
+        fingerings.append(curr_finger)
+        prev_midi = n.midi
+
+    return fingerings
