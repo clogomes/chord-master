@@ -143,12 +143,6 @@ class Note:
         """Returns standardized pitch with octave (e.g. 'C4', 'F#3')."""
         return f"{self.pitch}{self.octave}"
 
-    def __str__(self) -> str:
-        return self.pitch_with_octave
-
-    def __repr__(self) -> str:
-        return f"Note('{self.pitch_with_octave}')"
-
     @property
     def full_name(self) -> str:
         """Returns the full scientific pitch notation (e.g. 'C#4')."""

@@ -302,7 +302,7 @@ class QuizEngine:
         q_type = random.choice(topics) if topic == "mixed" else topic
 
         if q_type == "scale_formula":
-            key = random.choice(["major", "natural_minor", "harmonic_minor", "pentatonic_major", "dorian"])
+            key = random.choice(list(SCALE_TYPES.keys()))
             scale_def = SCALE_TYPES[key]
             other_defs = [s for k, s in SCALE_TYPES.items() if k != key]
             random.shuffle(other_defs)

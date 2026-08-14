@@ -14,35 +14,44 @@ Cada entrada tem um veredito:
 
 ---
 
-## TRABALHO PEDIDO — Fase 8 (Importador de Partituras MIDI) e Fase 9 (Notação Rítmica & Prática de Tempo Guiada)
+## Revisão — Fase 8 (Importador de Partituras MIDI)
+- Commits revistos: `6f91329`, `8ba5316`
+- Testes: 73/73 OK (5 novos testes em `test_midi_importer.py`, incluindo bytes MIDI
+  sintéticos escritos à mão — exatamente como pedido)
+- App: arranca sem erros
+- **Veredito: AÇÃO NECESSÁRIA (1 item, pequeno, antes de avançares para a Fase 9)**
+
+O parser SMF em si está muito bem feito — trata running status, VLQ, meta-eventos
+de tempo, Note On com velocity 0 como Note Off, tudo conforme a spec real do
+formato. A integração no `practice_song.py` (botão, file dialog, persistência em
+JSON, mensagens de erro/sucesso) também está correta.
+
+### Item a corrigir
+Em `core/notes.py`, a classe `Note` ficou com **`__str__` e `__repr__` definidos
+duas vezes**: as novas versões que acrescentaste (logo a seguir a
+`pitch_with_octave`) e as versões originais que já existiam mais abaixo na classe
+(perto do fim). Em Python, a segunda definição no corpo da classe substitui
+silenciosamente a primeira — por isso as versões novas nunca são chamadas, ficam
+como código morto. Confirmei isto a correr `repr(Note("C4"))`, que ainda devolve
+o formato antigo (`Note('C4', freq=261.6Hz, midi=60)`), não o novo.
+
+Não está a partir nada neste momento (por coincidência os dois formatos de
+`__str__` produzem o mesmo texto na maioria dos casos), mas é preciso remover a
+duplicação: mantém só uma definição de `__str__` e uma de `__repr__` na classe
+`Note` (podes manter a versão mais antiga, mais informativa para debug com
+frequência/MIDI, ou a nova mais simples — a tua escolha, só não podem coexistir
+as duas).
+
+---
+
+## TRABALHO PEDIDO — Fase 9 (Notação Rítmica & Prática de Tempo Guiada)
 - Pedido por: Claude, a pedido do utilizador (clogomes)
-- Estado anterior: Fases 1-7 concluídas e aprovadas (ver histórico abaixo).
-  64+ testes atuais devem continuar a passar.
-- Regra geral: implementa uma fase de cada vez, corre
-  `python3 -m unittest discover tests` no fim de cada uma, e atualiza o
-  README.md no fim de CADA fase (não só no fim de tudo).
-
-### FASE 8 — Importador de Partituras MIDI Próprias
-O repertório atual tem peças de domínio público e algumas com direitos de autor
-ativos que o utilizador decidiu manter, ciente do risco. Para dar uma alternativa
-legal e útil que permita aprender QUALQUER música que o utilizador já possua:
-
-- Cria `core/midi_importer.py` com um parser de ficheiros `.mid` simples e leve
-  (sem dependências pesadas — o formato Standard MIDI File é bem documentado; um
-  parser mínimo em Python puro lendo os bytes diretamente chega, só precisas de
-  extrair eventos `note_on`/`note_off` de uma pista/canal escolhido).
-- Função `import_midi_as_song(filepath, title, composer, difficulty) -> Song` que
-  converte os eventos MIDI em `SongNote` (nota + duração em beats), usa
-  `core/fingering.py` para sugerir dedilhação automaticamente, e
-  `core/guitar.py` (`find_note_positions`) para sugerir a posição de corda/traste
-  mais confortável (preferindo posições que minimizem saltos grandes entre notas
-  consecutivas).
-- No ecrã de Repertório (`practice_song.py`), acrescenta um botão "Importar
-  Música (.mid)" que abre um file dialog (`tkinter.filedialog`), corre o
-  importador, e guarda a música resultante para reutilização futura (persistida
-  em disco — JSON próprio ou pasta `user_songs/`).
-- Testa com um `.mid` gerado sinteticamente em `tests/test_midi_importer.py`
-  (escreve os bytes MIDI mínimos à mão no teste, não precisas de ficheiro externo).
+- Estado anterior: Fases 1-8 concluídas. Fase 8 tem 1 item em "AÇÃO NECESSÁRIA"
+  acima (duplicação de `__str__`/`__repr__` em `core/notes.py`) — **corrige isso
+  primeiro**, faz commit, e só depois começa a Fase 9. 73+ testes atuais devem
+  continuar a passar.
+- Regra geral: corre `python3 -m unittest discover tests` no fim, e atualiza o
+  README.md no fim da fase.
 
 ### FASE 9 — Notação Rítmica Real & Prática de Tempo Guiada
 As músicas atuais têm `duration_beats` mas não têm fórmula de compasso nem
