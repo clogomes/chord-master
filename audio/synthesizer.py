@@ -132,6 +132,90 @@ class Synthesizer:
         return cls._create_wav_header(pcm_data, sample_rate, num_channels=1)
 
     @classmethod
+    def generate_plucked_string(
+        cls,
+        frequency: float,
+        duration: float = 0.8,
+        volume: float = 0.5,
+        decay_factor: float = 0.994,
+    ) -> bytes:
+        """
+        Synthesizes a realistic plucked string (acoustic guitar/viola) using the Karplus-Strong
+        physical modeling algorithm (filtered delay line with noise excitation).
+        """
+        sample_rate = cls.SAMPLE_RATE
+        total_samples = int(sample_rate * duration)
+        if frequency <= 0 or total_samples <= 0:
+            return cls._create_wav_header(b"", sample_rate)
+
+        # Buffer length corresponding to fundamental wavelength
+        n_delay = max(2, int(round(sample_rate / frequency)))
+
+        if HAS_NUMPY:
+            rng = np.random.default_rng(seed=42)
+            # Initial pluck excitation: band-limited noise burst
+            buffer = rng.uniform(-1.0, 1.0, n_delay).astype(np.float32)
+            samples = np.zeros(total_samples, dtype=np.float32)
+
+            # Karplus-Strong lowpass feedback loop
+            for i in range(total_samples):
+                idx = i % n_delay
+                next_idx = (idx + 1) % n_delay
+                val = buffer[idx]
+                samples[i] = val
+                # Averaging filter + loss damping
+                buffer[idx] = 0.5 * (val + buffer[next_idx]) * decay_factor
+
+            # Normalize peak
+            peak = float(np.max(np.abs(samples)))
+            if peak > 0:
+                samples = samples / peak
+
+            # Smooth release envelope to avoid click at end
+            samples = cls.apply_adsr(
+                samples,
+                sample_rate,
+                attack_ms=2.0,
+                decay_ms=duration * 400.0,
+                sustain_level=0.4,
+                release_ms=35.0,
+            )
+            samples = samples * volume
+            pcm_data = np.int16(np.clip(samples * 32767, -32768, 32767)).tobytes()
+        else:
+            import random
+            random.seed(42)
+            buffer = [random.uniform(-1.0, 1.0) for _ in range(n_delay)]
+            samples = [0.0] * total_samples
+
+            for i in range(total_samples):
+                idx = i % n_delay
+                next_idx = (idx + 1) % n_delay
+                val = buffer[idx]
+                samples[i] = val
+                buffer[idx] = 0.5 * (val + buffer[next_idx]) * decay_factor
+
+            max_val = max(abs(s) for s in samples) if samples else 1.0
+            if max_val > 0:
+                samples = [s / max_val for s in samples]
+
+            samples = cls.apply_adsr(
+                samples,
+                sample_rate,
+                attack_ms=2.0,
+                decay_ms=duration * 400.0,
+                sustain_level=0.4,
+                release_ms=35.0,
+            )
+            pcm_bytes = bytearray()
+            for s in samples:
+                val = int(max(-1.0, min(1.0, s * volume)) * 32767)
+                pcm_bytes.extend(val.to_bytes(2, byteorder="little", signed=True))
+            pcm_data = bytes(pcm_bytes)
+
+        return cls._create_wav_header(pcm_data, sample_rate, num_channels=1)
+
+    @classmethod
     def generate_polyphonic(
         cls,
         frequencies: List[float],

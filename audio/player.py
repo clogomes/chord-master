@@ -71,12 +71,15 @@ class AudioPlayer:
                 print(f"[AudioPlayer] Error creating sound from bytes: {e}")
         return wav_bytes
 
-    def play_note(self, note: Note, duration: float = 0.7, volume: float = 0.5):
-        """Plays a single musical note asynchronously."""
+    def play_note(self, note: Note, duration: float = 0.7, volume: float = 0.5, instrument: str = "piano"):
+        """Plays a single musical note asynchronously with instrument timbre ('piano' or 'guitar')."""
         def _play_worker():
-            cache_key = f"note_{note.midi}_{duration}_{volume}"
+            cache_key = f"note_{instrument}_{note.midi}_{duration}_{volume}"
             if cache_key not in self._sound_cache:
-                wav_bytes = Synthesizer.generate_single_frequency(note.frequency, duration, volume)
+                if instrument == "guitar":
+                    wav_bytes = Synthesizer.generate_plucked_string(note.frequency, duration, volume)
+                else:
+                    wav_bytes = Synthesizer.generate_single_frequency(note.frequency, duration, volume)
                 sound_obj = self._get_or_create_sound(wav_bytes, cache_key)
             else:
                 sound_obj = self._sound_cache[cache_key]

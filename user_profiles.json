@@ -90,7 +90,7 @@
       "username": "Carlini",
       "avatar": "🎸",
       "created_at": 1786724265.081036,
-      "xp": 903,
+      "xp": 999,
       "unlocked_achievements": [
         "first_step",
         "theory_scholar"
@@ -110,10 +110,10 @@
           "best_streak": 1
         },
         "leitura_pauta": {
-          "total_attempts": 2,
-          "correct_count": 2,
-          "current_streak": 2,
-          "best_streak": 2
+          "total_attempts": 6,
+          "correct_count": 6,
+          "current_streak": 6,
+          "best_streak": 6
         },
         "teoria": {
           "total_attempts": 0,
@@ -161,6 +161,42 @@
           "prompt": "Identifica a nota exibida na pauta (Clave de Sol):",
           "user_answer": "A (Lá)",
           "correct_answer": "A (Lá)"
+        },
+        {
+          "timestamp": 1786731383.120658,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Sol**:",
+          "user_answer": "Dó (C)",
+          "correct_answer": "Dó (C)"
+        },
+        {
+          "timestamp": 1786731390.838743,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Sol**:",
+          "user_answer": "Fá (F)",
+          "correct_answer": "Fá (F)"
+        },
+        {
+          "timestamp": 1786731400.605364,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Sol**:",
+          "user_answer": "Ré (D)",
+          "correct_answer": "Ré (D)"
+        },
+        {
+          "timestamp": 1786731407.514401,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Sol**:",
+          "user_answer": "Si (B)",
+          "correct_answer": "Si (B)"
         }
       ]
     }

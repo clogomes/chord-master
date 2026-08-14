@@ -154,7 +154,7 @@ class GuitarFretboard(ctk.CTkFrame):
             str_idx, fret = cell
             note = self.model.get_note_at(str_idx, fret)
             if self.enable_audio:
-                self.audio_player.play_note(note, duration=0.8)
+                self.audio_player.play_note(note, duration=0.8, instrument="guitar")
             if self.on_note_clicked:
                 self.on_note_clicked(note)
 
