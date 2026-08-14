@@ -20,6 +20,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 16 — Dicas Práticas de Técnica e Ergonomia (Piano & Viola) — CONCLUÍDA
+- Data: 2026-08-14 19:20 (UTC+1)
+- Commit: ab5c1b6
+- Resumo: Expandidos os campos piano_focus e guitar_focus de todos os 8 capítulos de core/theory_content.py com 2-3 dicas práticas detalhadas e acionáveis, cobrindo alinhamento postural, relaxamento muscular, exercícios de independência e força dos dedos (Hanon simplificado e Spider Walk 1-2-3-4), prevenção de ruído e trastejar (fret buzz), abafamento de cordas (string muting), dedilhações pivot, pedalação sincopada e rotinas de estudo de 20 minutos com rampa de tempo. Todos os 92 testes a passar com 100% de sucesso.
+- Ficheiros principais alterados: core/theory_content.py, README.md
+
 ## Fase 15 — Alternador de Idioma PT/EN & Internacionalização — CONCLUÍDA
 - Data: 2026-08-14 19:18 (UTC+1)
 - Commit: 2f85e4f
