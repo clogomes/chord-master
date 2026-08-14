@@ -20,6 +20,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 8 — Importador de Partituras MIDI — CONCLUÍDA
+- Data: 2026-08-14 18:11 (UTC+1)
+- Commit: 6f91329
+- Resumo: Criado o módulo core/midi_importer.py com parser SMF Format 0/1 em Python puro sem dependências externas pesadas. Implementada a extração de melodias, quantização rítmica, cálculo ergonómico automático de dedilhação de piano e posições na viola (minimizando saltos de mão), integração com botão «📂 Importar Música (.mid)» no ecrã de repertório e persistência em user_songs.json.
+- Ficheiros principais alterados: core/midi_importer.py, core/notes.py, core/guitar.py, gui/screens/practice_song.py, tests/test_midi_importer.py, README.md
+
 ## Fases 6 e 7 + Correções Adaptativo & Gráficos — CONCLUÍDA
 - Data: 2026-08-14 18:06 (UTC+1)
 - Commit: d55815b
