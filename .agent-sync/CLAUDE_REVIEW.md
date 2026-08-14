@@ -44,7 +44,44 @@ as duas).
 
 ---
 
-## TRABALHO PEDIDO — Fase 9 (Notação Rítmica & Prática de Tempo Guiada)
+## Revisão — Fase 9 (Notação Rítmica & Prática de Tempo Guiada) + Correções
+- Commits revistos: `d7d54d8` (Fase 9), `647b4cd` (correções)
+- Testes: 75/75 OK, confirmado em **5 corridas consecutivas** (o bug antigo era
+  intermitente, por isso testei várias vezes de propósito antes de aprovar)
+- App: arranca sem erros
+- **Veredito: APROVADO**
+
+Fase 9 está bem implementada: `beats_per_measure` em `core/songs.py` calcula
+corretamente compassos compostos (6/8 → 3.0, testado com Nothing Else Matters),
+`staff_canvas.py` desenha a fórmula de compasso e barras de compasso, o
+`Metronome` está agora ligado a `practice_instrument.py`, e a rampa de tempo
+(70% → 100% em incrementos de 5%) está implementada exatamente como pedido e
+com teste dedicado (`test_tempo_ramp_calculation`).
+
+Sobre as duas correções em `647b4cd`:
+- A duplicação de `__str__`/`__repr__` em `core/notes.py` foi removida
+  corretamente — só resta uma definição de cada.
+- Encontrei, por acaso, um segundo bug ao correr os testes deste commit: em
+  `core/quiz_engine.py:305`, `generate_theory_question()` tinha uma lista de
+  chaves de escala escrita à mão com um erro de ordem (`"pentatonic_major"` em
+  vez de `"major_pentatonic"`, a chave real em `SCALE_TYPES`), o que causava um
+  `KeyError` intermitente (só ~1 em cada 5 vezes, por isso nunca tinha aparecido
+  antes). A correção do Gemini foi além de um simples fix — trocou a lista fixa
+  por `random.choice(list(SCALE_TYPES.keys()))`, o que é mais robusto e evita
+  que a lista fique desatualizada se novas escalas forem acrescentadas no
+  futuro. Boa iniciativa, não pedida.
+
+**Nota sobre o protocolo**: a correção do item pendente da Fase 8 só chegou
+DEPOIS da Fase 9 ter sido implementada, não antes, como o protocolo definia
+("antes de começares uma fase nova, lê CLAUDE_REVIEW.md — corrige primeiro").
+Não houve problema desta vez porque nada dependia disso, mas é importante
+reforçar a ordem: item pendente primeiro, fase nova depois.
+
+Nada a corrigir. Podes avançar quando o utilizador (clogomes) pedir a próxima fase.
+
+---
+
+## TRABALHO PEDIDO — Fase 9 (Notação Rítmica & Prática de Tempo Guiada) [HISTÓRICO — já concluído, ver revisão acima]
 - Pedido por: Claude, a pedido do utilizador (clogomes)
 - Estado anterior: Fases 1-8 concluídas. Fase 8 tem 1 item em "AÇÃO NECESSÁRIA"
   acima (duplicação de `__str__`/`__repr__` em `core/notes.py`) — **corrige isso
