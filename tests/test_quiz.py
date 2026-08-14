@@ -33,6 +33,15 @@ class TestQuizAndScore(unittest.TestCase):
         self.assertEqual(q_bass.clef, "bass")
         self.assertIsNotNone(q_bass.staff_note)
 
+    def test_generate_solfege_sing_question(self):
+        q = QuizEngine.generate_solfege_sing_question(difficulty="beginner")
+        self.assertEqual(q.question_type, QuestionType.SOLFEGE_SING)
+        self.assertIsNotNone(q.target_note)
+        self.assertIsNotNone(q.reference_note)
+        self.assertEqual(len(q.options), 4)
+        self.assertTrue(0 <= q.correct_index < 4)
+        self.assertIn(q.correct_answer, q.options)
+
     def test_generate_theory_question(self):
         q = QuizEngine.generate_theory_question()
         self.assertEqual(len(q.options), 4)

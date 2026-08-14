@@ -1,16 +1,20 @@
-"""Interactive Ear Training practice screen for musical intervals and chord qualities."""
+"""Interactive Ear Training & Vocal Solfège Practice Screen with PitchListener real-time validation."""
+import time
 from typing import Callable, List, Optional
 import customtkinter as ctk
 from core.quiz_engine import QuizEngine, QuizQuestion, QuestionType
 from core.user_manager import UserManager
+from core.notes import Note
 from audio.player import get_audio_player
+from audio.pitch_listener import PitchListener
 from gui.components.score_card import ScoreCard
+from gui import theme
 
 
 class PracticeEarScreen(ctk.CTkFrame):
     """
-    Ear training workout room. Synthesizes intervals or chords and evaluates user guesses
-    with instant acoustic feedback, mnemonics, and streak tracking.
+    Ear training workout room & vocal solfège studio. Synthesizes intervals or chords,
+    and supports real-time microphone vocal pitch validation for solfège singing dictation.
     """
 
     def __init__(
@@ -20,14 +24,22 @@ class PracticeEarScreen(ctk.CTkFrame):
         on_back: Callable[[], None],
         **kwargs,
     ):
-        super().__init__(master, fg_color=("#F8FAFC", "#0F172A"), **kwargs)
+        super().__init__(master, fg_color=theme.COLOR_BG, **kwargs)
         self.user_manager = user_manager
         self.on_back = on_back
         self.audio_player = get_audio_player()
+        self.pitch_listener = PitchListener(max_fps=15.0)
 
         self.current_question: Optional[QuizQuestion] = None
         self.option_buttons: List[ctk.CTkButton] = []
         self.is_answered = False
+
+        # Solfège vocal singing tracking
+        self._sustain_start_time: Optional[float] = None
+        self._sustain_threshold_sec: float = 0.35
+        self._is_evaluating_singing: bool = False
+        self._is_gui_busy: bool = False
+        self._last_gui_update: float = 0.0
 
         self._build_ui()
         self.load_new_question()
@@ -35,50 +47,65 @@ class PracticeEarScreen(ctk.CTkFrame):
     def _build_ui(self):
         # Top Navigation Bar
         nav_bar = ctk.CTkFrame(self, fg_color="transparent")
-        nav_bar.pack(fill="x", padx=20, pady=(16, 8))
+        nav_bar.pack(fill="x", padx=20, pady=(16, 6))
 
         back_btn = ctk.CTkButton(
             nav_bar,
             text="← Voltar ao Menu",
-            font=ctk.CTkFont(family="Helvetica", size=13, weight="bold"),
+            font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color="#475569",
             hover_color="#334155",
-            width=130,
-            command=self.on_back,
+            width=140,
+            height=38,
+            corner_radius=theme.RADIUS_MD,
+            command=self._handle_back,
         )
         back_btn.pack(side="left")
 
+        user = self.user_manager.current_user
         title_lbl = ctk.CTkLabel(
             nav_bar,
-            text="🎧 Treino Auditivo",
-            font=ctk.CTkFont(family="Helvetica", size=24, weight="bold"),
-            text_color=("#0F172A", "#F8FAFC"),
+            text=f"🎧 Treino Auditivo & Solfejo ({user.avatar} {user.username})",
+            font=theme.get_font(theme.FONT_TITLE),
+            text_color=theme.COLOR_TEXT_PRIMARY,
         )
-        title_lbl.pack(side="left", padx=18)
+        title_lbl.pack(side="left", padx=16)
 
         # Settings & Filter Header
         settings_frame = ctk.CTkFrame(
             self,
-            corner_radius=10,
-            fg_color=("#F8FAFC", "#1E293B"),
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_SURFACE,
             border_width=1,
-            border_color=("#E2E8F0", "#334155"),
+            border_color=theme.COLOR_BORDER,
         )
-        settings_frame.pack(fill="x", padx=20, pady=(4, 12))
+        settings_frame.pack(fill="x", padx=20, pady=(4, 10))
 
-        ctk.CTkLabel(settings_frame, text="Tipo de Exercício:", font=ctk.CTkFont(family="Helvetica", size=12, weight="bold")).pack(side="left", padx=(14, 4), pady=10)
+        ctk.CTkLabel(
+            settings_frame,
+            text="Tipo de Exercício:",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+        ).pack(side="left", padx=(16, 4), pady=12)
 
         self.type_select = ctk.CTkSegmentedButton(
             settings_frame,
-            values=["Intervalos", "Acordes"],
+            values=["Intervalos", "Acordes", "🎤 Ditado de Solfejo (Cantar)"],
             command=lambda v: self.load_new_question(),
-            selected_color="#7C3AED",
-            selected_hover_color="#6D28D9",
+            selected_color=theme.COLOR_PRIMARY,
+            selected_hover_color=theme.COLOR_PRIMARY_HOVER,
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            height=36,
         )
         self.type_select.set("Intervalos")
         self.type_select.pack(side="left", padx=6, pady=10)
 
-        ctk.CTkLabel(settings_frame, text="Dificuldade:", font=ctk.CTkFont(family="Helvetica", size=12, weight="bold")).pack(side="left", padx=(16, 4), pady=10)
+        ctk.CTkLabel(
+            settings_frame,
+            text="Dificuldade:",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+        ).pack(side="left", padx=(16, 4), pady=12)
 
         self.diff_select = ctk.CTkSegmentedButton(
             settings_frame,
@@ -86,163 +113,361 @@ class PracticeEarScreen(ctk.CTkFrame):
             command=lambda v: self.load_new_question(),
             selected_color="#2563EB",
             selected_hover_color="#1D4ED8",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            height=36,
         )
         self.diff_select.set("Iniciante")
         self.diff_select.pack(side="left", padx=6, pady=10)
 
-        # Exercise Main Area
-        self.main_container = ctk.CTkScrollableFrame(self, fg_color=("#F8FAFC", "#0F172A"))
-        self.main_container.pack(fill="both", expand=True, padx=20, pady=(0, 10))
+        # Exercise Main Scrollable Container
+        self.main_container = ctk.CTkScrollableFrame(
+            self,
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_BG,
+            border_width=1,
+            border_color=theme.COLOR_BORDER,
+        )
+        self.main_container.pack(fill="both", expand=True, padx=20, pady=(0, 14))
 
-        # Audio playback controls card
+        # Audio playback & question card
         self.play_card = ctk.CTkFrame(
             self.main_container,
-            corner_radius=14,
-            fg_color=("#F8FAFC", "#1E293B"),
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_SURFACE,
             border_width=1,
-            border_color=("#E2E8F0", "#334155"),
+            border_color=theme.COLOR_BORDER,
         )
-        self.play_card.pack(fill="x", pady=(0, 12))
+        self.play_card.pack(fill="x", pady=(4, 12))
 
         self.prompt_label = ctk.CTkLabel(
             self.play_card,
             text="",
-            font=ctk.CTkFont(family="Helvetica", size=17, weight="bold"),
-            text_color=("#0F172A", "#F8FAFC"),
-            wraplength=600,
+            font=theme.get_font(theme.FONT_SECTION),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+            wraplength=640,
+            justify="center",
         )
-        self.prompt_label.pack(pady=(16, 12))
+        self.prompt_label.pack(pady=(16, 12), padx=20)
 
-        # Audio Action Buttons
-        audio_btn_box = ctk.CTkFrame(self.play_card, fg_color="transparent")
-        audio_btn_box.pack(pady=(0, 16))
+        # Audio control buttons row
+        self.btn_row = ctk.CTkFrame(self.play_card, fg_color="transparent")
+        self.btn_row.pack(pady=(0, 16))
 
         self.play_btn = ctk.CTkButton(
-            audio_btn_box,
-            text="🔊 Tocar Áudio",
-            font=ctk.CTkFont(family="Helvetica", size=14, weight="bold"),
-            fg_color="#7C3AED",
-            hover_color="#6D28D9",
+            self.btn_row,
+            text="🔊 Ouvir Áudio",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            fg_color=theme.COLOR_PRIMARY,
+            hover_color=theme.COLOR_PRIMARY_HOVER,
+            corner_radius=theme.RADIUS_MD,
             height=40,
-            width=150,
-            command=self._play_audio_normal,
+            width=160,
+            command=self.play_question_audio,
         )
-        self.play_btn.pack(side="left", padx=8)
+        self.play_btn.pack(side="left", padx=6)
 
         self.play_slow_btn = ctk.CTkButton(
-            audio_btn_box,
+            self.btn_row,
             text="🐢 Tocar Lento",
-            font=ctk.CTkFont(family="Helvetica", size=14, weight="bold"),
-            fg_color="#475569",
-            hover_color="#334155",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            fg_color=theme.COLOR_SURFACE_SECONDARY,
+            hover_color=theme.COLOR_SURFACE_HOVER,
+            text_color=theme.COLOR_TEXT_PRIMARY,
+            corner_radius=theme.RADIUS_MD,
             height=40,
             width=140,
-            command=self._play_audio_slow,
+            command=self.play_question_audio_slow,
         )
-        self.play_slow_btn.pack(side="left", padx=8)
+        self.play_slow_btn.pack(side="left", padx=6)
 
-        # Options Container (2x2 Grid)
-        self.options_grid = ctk.CTkFrame(self.main_container, fg_color="transparent")
-        self.options_grid.pack(fill="x", pady=6)
-        self.options_grid.grid_columnconfigure((0, 1), weight=1, uniform="opts")
+        # Vocal Pitch Detection Card (Visible in Solfège Singing mode)
+        self.vocal_mic_card = ctk.CTkFrame(
+            self.main_container,
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_SURFACE,
+            border_width=2,
+            border_color=theme.COLOR_BORDER,
+        )
 
-        for i in range(4):
-            btn = ctk.CTkButton(
-                self.options_grid,
-                text="",
-                font=ctk.CTkFont(family="Helvetica", size=14, weight="bold"),
-                height=48,
-                corner_radius=10,
-                fg_color=("#E2E8F0", "#334155"),
-                text_color=("#0F172A", "#F8FAFC"),
-                hover_color=("#CBD5E1", "#475569"),
-                command=lambda idx=i: self._handle_answer_selection(idx),
-            )
-            r, c = i // 2, i % 2
-            btn.grid(row=r, column=c, padx=8, pady=8, sticky="nsew")
-            self.option_buttons.append(btn)
+        vocal_top = ctk.CTkFrame(self.vocal_mic_card, fg_color="transparent")
+        vocal_top.pack(fill="x", padx=16, pady=(12, 4))
 
-        # Feedback ScoreCard
-        self.feedback_card = ScoreCard(
+        ctk.CTkLabel(
+            vocal_top,
+            text="🎙️ Deteção Vocal de Afinação em Tempo Real",
+            font=theme.get_font(theme.FONT_SECTION),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+        ).pack(side="left")
+
+        self.mic_toggle_btn = ctk.CTkButton(
+            vocal_top,
+            text="🎙️ Ativar Microfone & Cantar",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            fg_color=theme.COLOR_SUCCESS,
+            hover_color=theme.COLOR_SUCCESS_HOVER,
+            corner_radius=theme.RADIUS_MD,
+            height=34,
+            command=self._toggle_microphone,
+        )
+        self.mic_toggle_btn.pack(side="right")
+
+        # Detected vocal feedback
+        self.vocal_detected_lbl = ctk.CTkLabel(
+            self.vocal_mic_card,
+            text="Clica em «Ativar Microfone» e canta a nota pedida...",
+            font=theme.get_font(theme.FONT_TITLE, size=24),
+            text_color=theme.COLOR_TEXT_MUTED,
+        )
+        self.vocal_detected_lbl.pack(pady=(8, 2))
+
+        self.vocal_cents_bar = ctk.CTkProgressBar(self.vocal_mic_card, height=9, progress_color=theme.COLOR_SUCCESS)
+        self.vocal_cents_bar.set(0.5)
+        self.vocal_cents_bar.pack(fill="x", padx=24, pady=(4, 6))
+
+        self.vocal_hint_lbl = ctk.CTkLabel(
+            self.vocal_mic_card,
+            text="Dica: Entoa o nome da nota com voz firme e clara (ex: «Dóóó», «Miii»)",
+            font=theme.get_font(theme.FONT_BODY),
+            text_color=theme.COLOR_TEXT_MUTED,
+        )
+        self.vocal_hint_lbl.pack(pady=(0, 14))
+
+        # Options Container (2x2 Grid for multiple-choice buttons)
+        self.options_frame = ctk.CTkFrame(self.main_container, fg_color="transparent")
+        self.options_frame.pack(fill="x", pady=(0, 10))
+        self.options_frame.grid_columnconfigure((0, 1), weight=1)
+
+        # Feedback & Score Card Component
+        self.score_card = ScoreCard(
             self.main_container,
             on_next=self.load_new_question,
-            on_replay=self._play_audio_normal,
         )
-        # Initially hidden
 
     def load_new_question(self):
-        """Generates a fresh exercise based on the selected mode and difficulty."""
+        self._stop_listening()
         self.is_answered = False
-        self.feedback_card.pack_forget()
+        self._sustain_start_time = None
+        self._is_evaluating_singing = False
+        self.score_card.pack_forget()
 
-        # Map difficulty
-        diff_pt = self.diff_select.get()
-        diff_key = "beginner" if diff_pt == "Iniciante" else ("intermediate" if diff_pt == "Intermédio" else "advanced")
+        ex_type = self.type_select.get()
+        diff_map = {"Iniciante": "beginner", "Intermédio": "intermediate", "Avançado": "advanced"}
+        difficulty = diff_map.get(self.diff_select.get(), "beginner")
 
-        # Generate question
-        if self.type_select.get() == "Intervalos":
-            self.current_question = QuizEngine.generate_ear_interval_question(difficulty=diff_key)
+        if "Solfejo" in ex_type or "Cantar" in ex_type:
+            self.current_question = QuizEngine.generate_solfege_sing_question(difficulty)
+            self.vocal_mic_card.pack(fill="x", pady=(0, 12))
+            self.play_btn.configure(text="🔊 Ouvir Tom de Referência")
+            self.play_slow_btn.pack_forget()
+            self.vocal_detected_lbl.configure(text="Clica em «Ativar Microfone» e canta...", text_color=theme.COLOR_TEXT_MUTED)
+            self.vocal_cents_bar.set(0.5)
+        elif ex_type == "Acordes":
+            self.current_question = QuizEngine.generate_ear_chord_question(difficulty)
+            self.vocal_mic_card.pack_forget()
+            self.play_btn.configure(text="🔊 Ouvir Acorde")
+            self.play_slow_btn.pack(side="left", padx=6)
         else:
-            self.current_question = QuizEngine.generate_ear_chord_question(difficulty=diff_key)
+            self.current_question = QuizEngine.generate_ear_interval_question(difficulty)
+            self.vocal_mic_card.pack_forget()
+            self.play_btn.configure(text="🔊 Ouvir Intervalo")
+            self.play_slow_btn.pack(side="left", padx=6)
 
         self.prompt_label.configure(text=self.current_question.prompt_text)
+        self._render_options()
 
-        for i, opt_text in enumerate(self.current_question.options):
-            btn = self.option_buttons[i]
-            btn.configure(
+        # Automatically play prompt audio on new question
+        self.after(250, self.play_question_audio)
+
+    def _render_options(self):
+        for btn in self.option_buttons:
+            btn.destroy()
+        self.option_buttons.clear()
+
+        for idx, opt_text in enumerate(self.current_question.options):
+            r = idx // 2
+            c = idx % 2
+            btn = ctk.CTkButton(
+                self.options_frame,
                 text=opt_text,
-                fg_color=("#E2E8F0", "#334155"),
-                text_color=("#0F172A", "#F8FAFC"),
-                hover_color=("#CBD5E1", "#475569"),
-                state="normal",
+                font=theme.get_font(theme.FONT_BODY_BOLD),
+                height=48,
+                corner_radius=theme.RADIUS_MD,
+                fg_color=theme.COLOR_SURFACE_SECONDARY,
+                hover_color=theme.COLOR_SURFACE_HOVER,
+                text_color=theme.COLOR_TEXT_PRIMARY,
+                command=lambda i=idx: self.handle_answer(i),
             )
+            btn.grid(row=r, column=c, padx=6, pady=6, sticky="nsew")
+            self.option_buttons.append(btn)
 
-        # Auto-play audio when loading question
-        self.after(200, self._play_audio_normal)
-
-    def _play_audio_normal(self):
-        if not self.winfo_exists():
+    def play_question_audio(self):
+        if not self.current_question:
             return
-        if self.current_question:
-            self.audio_player.play_question(self.current_question, slow_mode=False)
+        self.audio_player.play_question(self.current_question, slow_mode=False)
 
-    def _play_audio_slow(self):
-        if not self.winfo_exists():
+    def play_question_audio_slow(self):
+        if not self.current_question:
             return
-        if self.current_question:
-            self.audio_player.play_question(self.current_question, slow_mode=True)
+        self.audio_player.play_question(self.current_question, slow_mode=True)
 
-    def _handle_answer_selection(self, selected_index: int):
-        if self.is_answered or not self.current_question:
+    def _toggle_microphone(self):
+        if self.pitch_listener.is_listening:
+            self._stop_listening()
+        else:
+            self._start_listening()
+
+    def _start_listening(self):
+        started = self.pitch_listener.start_listening(self._on_live_vocal_audio)
+        if started:
+            self.mic_toggle_btn.configure(
+                text="⏹️ Desativar Microfone",
+                fg_color=theme.COLOR_ACCENT_CRIMSON,
+                hover_color=theme.COLOR_ACCENT_CRIMSON_HOVER,
+            )
+            self.vocal_detected_lbl.configure(text="🎙️ A ouvir a tua voz... Canta a nota!", text_color="#38BDF8")
+        else:
+            self.vocal_detected_lbl.configure(text="Erro ao aceder ao microfone", text_color=theme.COLOR_ACCENT_CRIMSON)
+
+    def _stop_listening(self):
+        self.pitch_listener.stop_listening()
+        self.mic_toggle_btn.configure(
+            text="🎙️ Ativar Microfone & Cantar",
+            fg_color=theme.COLOR_SUCCESS,
+            hover_color=theme.COLOR_SUCCESS_HOVER,
+        )
+
+    def _on_live_vocal_audio(
+        self,
+        detected_note: Optional[Note],
+        cents: float,
+        conf: float,
+        freq: float,
+    ):
+        """Thread-safe callback from microphone pitch listener."""
+        now = time.time()
+        if now - self._last_gui_update < 0.075:
+            return
+        if self._is_gui_busy or not self.winfo_exists() or self.is_answered:
+            return
+        self._last_gui_update = now
+        self._is_gui_busy = True
+        try:
+            self.after(0, lambda: self._safe_process_vocal_pitch(detected_note, cents, conf, freq))
+        except Exception:
+            self._is_gui_busy = False
+
+    def _safe_process_vocal_pitch(self, detected_note, cents, conf, freq):
+        try:
+            self._process_vocal_pitch(detected_note, cents, conf, freq)
+        finally:
+            self._is_gui_busy = False
+
+    def _process_vocal_pitch(
+        self,
+        detected_note: Optional[Note],
+        cents: float,
+        conf: float,
+        freq: float,
+    ):
+        if not self.winfo_exists() or self.is_answered or not self.current_question:
             return
 
+        target_note = self.current_question.target_note
+        if not target_note:
+            return
+
+        if detected_note is None:
+            self._sustain_start_time = None
+            return
+
+        # Display detected note
+        cents_str = f"{cents:+.0f}c" if abs(cents) >= 1.0 else "0c"
+        self.vocal_detected_lbl.configure(
+            text=f"A tua voz: {detected_note.pitch}{detected_note.octave} ({detected_note.name_pt}, {cents_str})",
+            text_color=theme.COLOR_SUCCESS if abs(cents) <= 25 else theme.COLOR_ACCENT_AMBER,
+        )
+
+        norm_cents = max(-50.0, min(50.0, cents))
+        self.vocal_cents_bar.set((norm_cents + 50.0) / 100.0)
+
+        # Check if sung note matches target pitch class
+        if detected_note.normalized_pitch == target_note.normalized_pitch:
+            if abs(cents) <= 40.0:
+                self.vocal_hint_lbl.configure(
+                    text="✓ Excelente afinação vocal! Mantém a nota...",
+                    text_color=theme.COLOR_SUCCESS,
+                )
+                self.vocal_mic_card.configure(border_color=theme.COLOR_SUCCESS)
+
+                now = time.time()
+                if self._sustain_start_time is None:
+                    self._sustain_start_time = now
+                elif (now - self._sustain_start_time) >= self._sustain_threshold_sec and not self._is_evaluating_singing:
+                    self._is_evaluating_singing = True
+                    self._handle_vocal_success(detected_note)
+            else:
+                self.vocal_hint_lbl.configure(
+                    text="Ajusta a altura: quase afinado!",
+                    text_color=theme.COLOR_ACCENT_AMBER,
+                )
+                self._sustain_start_time = None
+        else:
+            self.vocal_hint_lbl.configure(
+                text=f"Detetado {detected_note.pitch} — Tenta cantar {target_note.pitch} ({target_note.name_pt})",
+                text_color=theme.COLOR_TEXT_MUTED,
+            )
+            self._sustain_start_time = None
+
+    def _handle_vocal_success(self, sung_note: Note):
+        self._stop_listening()
         self.is_answered = True
-        correct_index = self.current_question.correct_index
-        is_correct = selected_index == correct_index
+        self.audio_player.play_note(sung_note, duration=0.6)
 
-        # Update button colors
-        for i, btn in enumerate(self.option_buttons):
-            if i == correct_index:
-                btn.configure(fg_color="#059669", text_color="#FFFFFF")  # Green for correct
-            elif i == selected_index and not is_correct:
-                btn.configure(fg_color="#DC2626", text_color="#FFFFFF")  # Red for incorrect
-            btn.configure(state="disabled")
+        correct_idx = self.current_question.correct_index
+        self.handle_answer(correct_idx, from_voice=True)
 
-        # Record in user manager
+    def handle_answer(self, chosen_index: int, from_voice: bool = False):
+        if self.is_answered and not from_voice:
+            return
+
+        self._stop_listening()
+        self.is_answered = True
+        is_correct = (chosen_index == self.current_question.correct_index)
+
+        # Color the buttons
+        for idx, btn in enumerate(self.option_buttons):
+            if idx == self.current_question.correct_index:
+                btn.configure(fg_color=theme.COLOR_SUCCESS, hover_color=theme.COLOR_SUCCESS_HOVER, text_color="#FFFFFF")
+            elif idx == chosen_index and not is_correct:
+                btn.configure(fg_color=theme.COLOR_ACCENT_CRIMSON, hover_color=theme.COLOR_ACCENT_CRIMSON_HOVER, text_color="#FFFFFF")
+
+        # Record attempt in UserManager
         stats = self.user_manager.record_attempt(
-            category="treino_auditivo",
+            category=self.current_question.category,
             question_type=self.current_question.question_type.value,
             is_correct=is_correct,
             prompt=self.current_question.prompt_text,
-            user_answer=self.current_question.options[selected_index],
+            user_answer="Voz Afinada" if from_voice else self.current_question.options[chosen_index],
             correct_answer=self.current_question.correct_answer,
         )
 
-        # Show feedback card
-        self.feedback_card.show_feedback(
+        prefix = "🎤 Cantaste com afinação perfeita! " if from_voice else ""
+        explanation_full = f"{prefix}{self.current_question.explanation}"
+
+        # Show feedback score card
+        self.score_card.show_feedback(
             is_correct=is_correct,
-            explanation=self.current_question.explanation,
+            explanation=explanation_full,
             stats=stats,
             can_replay=True,
         )
-        self.feedback_card.pack(fill="x", pady=(12, 10))
+        self.score_card.pack(fill="x", pady=(10, 10))
+
+    def _handle_back(self):
+        self._stop_listening()
+        self.audio_player.stop_all()
+        self.on_back()
+
+    def destroy(self):
+        self._stop_listening()
+        super().destroy()

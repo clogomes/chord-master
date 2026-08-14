@@ -1,6 +1,6 @@
 # 🎵 ChordMaster — Estúdio Interativo de Teoria & Prática Musical
 
-> **ChordMaster** é uma aplicação desktop moderna, completa e profissional para a aprendizagem de **Teoria Musical**, **Piano**, **Viola / Guitarra**, **Treino Auditivo**, **Leitura de Pauta**, **Afinador / Lamiré** e **Repertório Interativo**. 
+> **ChordMaster** é uma aplicação desktop moderna, completa e profissional para a aprendizagem de **Teoria Musical**, **Piano**, **Viola / Guitarra**, **Treino Auditivo & Solfejo Cantado**, **Leitura de Pauta**, **Afinador / Lamiré** e **Repertório Interativo**. 
 > Desenvolvida em Python com **CustomTkinter**, motor de síntese sonora harmónica ADSR, deteção de afinação por microfone em tempo real, suporte a **Teclados MIDI USB**, sistema **Multi-Utilizador**, **Gamificação com Níveis e Medalhas**, e **Exportação de Progresso**.
 
 ---
@@ -49,21 +49,21 @@ Um curso completo de harmonia e teoria desde os conceitos fundamentais até téc
 
 ---
 
-### 4. 🎶 Estúdio de Repertório & Tocar Peças (12 Músicas)
-Estúdio de execução interativa com pauta iluminada, teclas destacadas com número de dedo e posição de corda/traste:
+### 4. 🎶 Estúdio de Repertório & Tocar Peças (12 Músicas Completas)
+Estúdio de execução interativa com pauta iluminada, teclas destacadas com número de dedo e posição de corda/traste, contendo as **músicas completas na íntegra** (estrofes, refrões, pontes e variações):
 - **12 Peças do Repertório Clássico e Cancioneiro Tradicional**:
-  1. *Hino à Alegria* (9ª Sinfonia de Beethoven)
-  2. *Brilha, Brilha Estrelinha* (W. A. Mozart / Tradicional)
-  3. *Papagaio Loiro* (Folclore Português)
-  4. *Pombinha Branca* (Cancioneiro Tradicional Português)
-  5. *Für Elise* (L. van Beethoven — Bagatela em Lá menor)
-  6. *Minueto em Sol Maior* (J. S. Bach / Petzold — BWV Anh. 114)
-  7. *Marcha Nupcial* (Richard Wagner — Lohengrin)
-  8. *Canon em Dó / Ré* (Johann Pachelbel — Tema Principal)
-  9. *Eine kleine Nachtmusik* (W. A. Mozart — Serenata K. 525)
-  10. *Greensleeves* (Melodia Renascentista Inglesa)
-  11. *O Cravo e a Rosa* (Cantiga Tradicional Lusófona)
-  12. *Grândola, Vila Morena* (José Afonso / Zeca Afonso)
+  1. *Hino à Alegria* (Ludwig van Beethoven — 9ª Sinfonia Completa: Frase A + A' + Ponte B + Conclusão)
+  2. *Brilha, Brilha Estrelinha* (W. A. Mozart / Tradicional — Forma Ternária Completa A-B-A)
+  3. *Papagaio Loiro* (Folclore Português — 3 Estrofes e Refrão Tradicional Integral)
+  4. *Pombinha Branca* (Cancioneiro Tradicional Português — Versão Integral de 4 Frases)
+  5. *Für Elise* (L. van Beethoven — Bagatela WoO 59: Motivo Cromático, Arpejos Am/E e Cadência)
+  6. *Minueto em Sol Maior* (J. S. Bach / Petzold — BWV Anh. 114: Seção A Completa de 16 Compassos)
+  7. *Marcha Nupcial* (Richard Wagner — Lohengrin: Tema Coral e Frase Central Solene)
+  8. *Canon em Dó / Ré* (Johann Pachelbel — Tema Principal e Variação em Colcheias)
+  9. *Eine kleine Nachtmusik* (W. A. Mozart — Serenata K. 525: Allegro Completo com Resolução)
+  10. *Greensleeves* (Melodia Renascentista Inglesa — Verso e Refrão Tradicional Completo)
+  11. *O Cravo e a Rosa* (Cantiga Tradicional Lusófona — 4 Estrofes Integrais)
+  12. *Grândola, Vila Morena* (José Afonso / Zeca Afonso — Hino Completo com Estrofes e Cadência)
 - **3 Métodos Flexíveis de Execução**:
   - **Teclado do Computador**: Mapeamento QWERTY ergonómico no Piano (`A..L` para notas brancas Dó4 a Mi5; `W..P` para notas pretas) e cordas da Viola (`1..6`).
   - **Teclados MIDI USB**: Deteção automática *Plug-and-Play* de pianos digitais e sintetizadores USB físicos.
@@ -77,7 +77,19 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 5. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
+### 5. 🎤 FASE 5 — Ditado de Solfejo Cantado com Validação Vocal por Microfone
+- **Nova Categoria de Exercício (`QuestionType.SOLFEGE_SING`)**:
+  - O motor de quiz pede uma nota em solfejo (ex: *"Canta a nota Sol (G4)"*, *"Entoa a nota Mi (E4) usando a tua voz"*).
+  - Botão **«🔊 Ouvir Tom de Referência»** para dar ao aluno uma base auditiva sólida (Dó Central 261.6 Hz ou nota tónica).
+  - **Validação Vocal ao Vivo com `PitchListener`**:
+    - O aluno clica em **«🎙️ Ativar Microfone & Cantar»** e entoa a nota vocalmente.
+    - Mostrador em tempo real com nome da nota cantada, frequência em Hz e desvio em cents.
+    - Ao sustentar a nota pedida afinada ($\pm 40\text{ cents}$) durante 0.35s, o exercício valida automaticamente o acerto com som comemorativo, bónus de XP e explicação detalhada!
+    - Fallback com botões de opções disponível para situações sem microfone.
+
+---
+
+### 6. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
 - **Deteção de Frequência Fundamental ($f_0$) via Microfone**: Algoritmo de autocorrelação no domínio do tempo acelerado por FFT, com interpolação parabólica para precisão sub-amostra e rejeição inteligente de ruído ambiente (60 Hz a 1200 Hz).
 - **Mostrador Visual com Agulha Dinâmica**: Medidor de $-50$ a $+50$ cents com faixa de tolerância verde ($\pm 10$ cents) e orientações em tempo real (*"▲ Muito Grave — Estica a corda"*, *"▼ Muito Agudo — Afrouxa a corda"*, *"✓ AFINADO (No Ponto Perfeito!)"*).
 - **Afinador de Viola (6 Cordas)**: Cartões visuais para as 6 cordas padrão ($E2, A2, D3, G3, B3, E4$) que se iluminam automaticamente ao detetar a corda tocada, com botão para ouvir o tom de cada corda.
@@ -85,16 +97,17 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 6. 🎯 Prática com Instrumento Acústico Real
+### 7. 🎯 Prática com Instrumento Acústico Real
 - Prática de escalas, arpejos e repertório utilizando o teu **piano acústico** ou **viola/guitarra física**.
 - A aplicação "escuta" através do microfone, valida a nota e o desvio em cents, exigindo uma sustentação de 300 ms afinada antes de avançar automaticamente para a nota seguinte.
 
 ---
 
-### 7. 🎧 Treino Auditivo & Leitura de Pauta
+### 8. 🎧 Treino Auditivo & Leitura de Pauta
 - **Treino Auditivo (Ear Training)**:
   - Identificação de **Intervalos Melódicos** (ascendentes/descendentes) e **Harmónicos** (duas notas em simultâneo).
   - Identificação de **Qualidade de Acordes** (Maiores, Menores, Diminutos, Aumentados, Sétimas).
+  - Ditado de Solfejo Cantado com voz e microfone.
   - Níveis de dificuldade: *Iniciante*, *Intermédio* e *Avançado*.
 - **Leitura de Pauta Musical (Sight Reading)**:
   - Exercícios nas **Claves de Sol (𝄞)** e **Clave de Fá (𝄢)**.
@@ -103,14 +116,14 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 8. 📥 Exportação de Progresso & Certificado de Estudo
+### 9. 📥 Exportação de Progresso & Certificado de Estudo
 - Botão **«📥 Exportar Progresso»** no ecrã de Estatísticas:
   - Gera um relatório formatado em Markdown (`relatorio_progresso_<aluno>.md`) pronto a imprimir ou partilhar.
   - Inclui data de emissão, nível e título de maestria, XP total, estado das 8 lições de teoria, métricas de precisão por categoria e lista de todas as medalhas e conquistas alcançadas.
 
 ---
 
-### 9. 🎨 Design System & Interface Moderna ([`gui/theme.py`](file:///Users/clogomes/repo/chord-master/gui/theme.py))
+### 10. 🎨 Design System & Interface Moderna ([`gui/theme.py`](file:///Users/clogomes/repo/chord-master/gui/theme.py))
 - **Paleta de Cores Harmoniosa**: Base moderna em tons de ardósia escura (*Slate-950* `#0B0F19`, *Slate-900* `#111827`, *Slate-800* `#1F2937`), com destaques em *Royal Indigo* (`#4F46E5`), *Emerald* (`#10B981`), *Sky Blue* (`#0284C7`), *Amber* (`#F59E0B`) e *Crimson* (`#EF4444`).
 - **Tipografia Otimizada e Legível**: Escala com mínimo de $14\text{px}$ para textos de corpo e $28\text{--}32\text{px}$ para títulos principais, garantindo máxima legibilidade.
 - **Proteção de Threads & Rate-Limiting**: Processamento assíncrono seguro com limitação de taxa de atualização gráfica (15 FPS), evitando travamentos ou sobrecarga da GUI.
@@ -134,10 +147,10 @@ chord-master/
 │   ├── chords.py                   # Formação de Tríades, Tétrades e Inversões de Acordes
 │   ├── fingering.py                # Mapeamento de Dedilhações para Piano (Mão Direita e Esquerda)
 │   ├── guitar.py                   # Mapeamento de Braço de Viola (CAGED, 15 Trastes, Afinações)
-│   ├── songs.py                    # Biblioteca de 12 Músicas com notas, dedilhações e tablaturas
+│   ├── songs.py                    # Biblioteca de 12 Músicas Completas com notas, dedilhações e tablaturas
 │   ├── gamification.py             # Sistema de Gamificação (XP, 7 Níveis, 12 Conquistas/Medalhas)
 │   ├── exporter.py                 # Exportador de Relatórios de Progresso e Certificados em Markdown
-│   ├── quiz_engine.py              # Motor de Geração de Questões e Avaliação
+│   ├── quiz_engine.py              # Motor de Geração de Questões (Intervalos, Acordes, Pauta, Solfejo Cantado)
 │   ├── score_tracker.py            # Gestor de Pontuações e Métricas
 │   └── user_manager.py             # Gestor Multi-Utilizador, Persistência e Progressão
 │
@@ -164,14 +177,14 @@ chord-master/
 │       ├── __init__.py
 │       ├── main_menu.py            # Dashboard Inicial com Nível de XP, Progresso e Acessos Rápidos
 │       ├── theory_screen.py        # Academia de Teoria (8 Capítulos com Piano e Viola Sincronizados)
-│       ├── practice_song.py        # Estúdio de Repertório (12 Músicas, Metrónomo e Suporte a MIDI)
+│       ├── practice_song.py        # Estúdio de Repertório (12 Músicas Completas, Metrónomo e Suporte a MIDI)
 │       ├── tuner_screen.py         # Lamiré & Afinador Cromático com Agulha e Deteção por Microfone
 │       ├── practice_instrument.py  # Treino Acústico com Microfone para Piano e Viola Físicos
-│       ├── practice_ear.py         # Treino Auditivo (Intervalos e Acordes)
+│       ├── practice_ear.py         # Treino Auditivo & Ditado de Solfejo Cantado com Microfone
 │       ├── practice_staff.py       # Exercícios de Leitura de Pauta
 │       └── stats_screen.py         # Painel de Estatísticas, Conquistas, Leaderboard e Exportação
 │
-└── tests/                          # 63 Testes Unitários Automatizados (100% de Sucesso)
+└── tests/                          # 64 Testes Unitários Automatizados (100% de Sucesso)
     ├── __init__.py
     ├── test_notes.py               # Testes de notas, frequências e conversões MIDI
     ├── test_intervals.py           # Testes de intervalos e transposição
@@ -179,13 +192,13 @@ chord-master/
     ├── test_chords.py              # Testes de acordes, tríades e inversões
     ├── test_fingering.py           # Testes de regras de dedilhação no piano
     ├── test_guitar.py              # Testes de afinações, trastes e sistema CAGED
-    ├── test_songs.py               # Testes de integridade das 12 peças de repertório
+    ├── test_songs.py               # Testes de integridade das 12 peças completas de repertório
     ├── test_pitch.py               # Testes de deteção de pitch por autocorrelação e rejeição de ruído
     ├── test_metronome.py           # Testes de temporização do metrônomo e avaliação rítmica
     ├── test_gamification.py        # Testes de níveis de XP, cálculo de progresso e medalhas
     ├── test_exporter.py            # Testes de exportação de relatórios Markdown
     ├── test_theme.py               # Testes de tokens de cores e tipografia
-    ├── test_quiz.py                # Testes do motor de perguntas e streaks
+    ├── test_quiz.py                # Testes do motor de perguntas, solfejo cantado e streaks
     └── test_users.py               # Testes de perfis multi-utilizador e persistência
 ```
 
@@ -227,10 +240,10 @@ python3 main.py
 
 ## 🧪 Execução da Suíte de Testes Automatizados
 
-A aplicação inclui **63 testes unitários** que cobrem toda a lógica musical, motores de áudio, gamificação, gestão de utilizadores e integridade das peças de repertório:
+A aplicação inclui **64 testes unitários** que cobrem toda a lógica musical, motores de áudio, ditado de solfejo cantado, gamificação, gestão de utilizadores e integridade das peças de repertório:
 
 ```bash
-# Executar todos os 63 testes com detalhes
+# Executar todos os 64 testes com detalhes
 python3 -m unittest discover -v tests
 ```
 

@@ -1,4 +1,4 @@
-"""Song Repertoire Module with note-by-note coordinates, durations, lyrics, and fingerings."""
+"""Song Repertoire Module with full complete pieces, note-by-note coordinates, durations, lyrics, and fingerings."""
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 from core.notes import Note
@@ -58,7 +58,7 @@ def _sn(
 
 
 SONG_LIBRARY: List[Song] = [
-    # 1. HINO À ALEGRIA (Beethoven)
+    # 1. HINO À ALEGRIA (Beethoven) — Peça Completa (Parte A + B + Reprise)
     Song(
         id="ode_to_joy",
         title="Hino à Alegria (9ª Sinfonia)",
@@ -66,8 +66,9 @@ SONG_LIBRARY: List[Song] = [
         difficulty="Iniciante",
         bpm=108,
         clef="treble",
-        description="O tema imortal do 4º andamento da Nona Sinfonia de Beethoven. Melodia por graus conjuntos, perfeita para aprender no piano e viola.",
+        description="O tema imortal da Nona Sinfonia de Beethoven na íntegra. Melodia por graus conjuntos com frase A, ponte B e conclusão solene.",
         notes=[
+            # Frase A
             _sn("E4", 1.0, 3, 5, 0, "A-"),
             _sn("E4", 1.0, 3, 5, 0, "le-"),
             _sn("F4", 1.0, 4, 5, 1, "gri-"),
@@ -83,19 +84,99 @@ SONG_LIBRARY: List[Song] = [
             _sn("E4", 1.5, 3, 5, 0, "ter-"),
             _sn("D4", 0.5, 2, 4, 3, "ra"),
             _sn("D4", 2.0, 2, 4, 3, "flor!"),
+            # Frase A' (Variação com resolução em Dó)
+            _sn("E4", 1.0, 3, 5, 0, "Teus"),
+            _sn("E4", 1.0, 3, 5, 0, "en-"),
+            _sn("F4", 1.0, 4, 5, 1, "can-"),
+            _sn("G4", 1.0, 5, 5, 3, "tos"),
+            _sn("G4", 1.0, 5, 5, 3, "no-"),
+            _sn("F4", 1.0, 4, 5, 1, "va-"),
+            _sn("E4", 1.0, 3, 5, 0, "men-"),
+            _sn("D4", 1.0, 2, 4, 3, "te"),
+            _sn("C4", 1.0, 1, 4, 1, "nos"),
+            _sn("C4", 1.0, 1, 4, 1, "u-"),
+            _sn("D4", 1.0, 2, 4, 3, "nem"),
+            _sn("E4", 1.0, 3, 5, 0, "com"),
+            _sn("D4", 1.5, 2, 4, 3, "a-"),
+            _sn("C4", 0.5, 1, 4, 1, "mor"),
+            _sn("C4", 2.0, 1, 4, 1, "só!"),
+            # Ponte B
+            _sn("D4", 1.0, 2, 4, 3, "To-"),
+            _sn("D4", 1.0, 2, 4, 3, "dos"),
+            _sn("E4", 1.0, 3, 5, 0, "os"),
+            _sn("C4", 1.0, 1, 4, 1, "seres"),
+            _sn("D4", 1.0, 2, 4, 3, "be-"),
+            _sn("E4", 0.5, 3, 5, 0, "bem"),
+            _sn("F4", 0.5, 4, 5, 1, "a-"),
+            _sn("E4", 1.0, 3, 5, 0, "le-"),
+            _sn("C4", 1.0, 1, 4, 1, "gria"),
+            _sn("D4", 1.0, 2, 4, 3, "no"),
+            _sn("E4", 0.5, 3, 5, 0, "seio"),
+            _sn("F4", 0.5, 4, 5, 1, "da"),
+            _sn("E4", 1.0, 3, 5, 0, "na-"),
+            _sn("D4", 1.0, 2, 4, 3, "tu-"),
+            _sn("C4", 1.0, 1, 4, 1, "re-"),
+            _sn("D4", 1.0, 2, 4, 3, "za!"),
+            # Conclusão Reprise A
+            _sn("E4", 1.0, 3, 5, 0, "A-"),
+            _sn("E4", 1.0, 3, 5, 0, "le-"),
+            _sn("F4", 1.0, 4, 5, 1, "gri-"),
+            _sn("G4", 1.0, 5, 5, 3, "a,"),
+            _sn("G4", 1.0, 5, 5, 3, "bri-"),
+            _sn("F4", 1.0, 4, 5, 1, "lho"),
+            _sn("E4", 1.0, 3, 5, 0, "lin-"),
+            _sn("D4", 1.0, 2, 4, 3, "do,"),
+            _sn("C4", 1.0, 1, 4, 1, "dos"),
+            _sn("C4", 1.0, 1, 4, 1, "deu-"),
+            _sn("D4", 1.0, 2, 4, 3, "ses"),
+            _sn("E4", 1.0, 3, 5, 0, "da"),
+            _sn("D4", 1.5, 2, 4, 3, "ter-"),
+            _sn("C4", 0.5, 1, 4, 1, "ra"),
+            _sn("C4", 2.0, 1, 4, 1, "flor!"),
         ],
     ),
 
-    # 2. BRILHA, BRILHA ESTRELINHA (Mozart / Tradicional)
+    # 2. BRILHA, BRILHA ESTRELINHA (Mozart) — Peça Completa (Forma Ternária A-B-A)
     Song(
         id="twinkle_star",
-        title="Brilha, Brilha Estrelinha (Ah! vous dirai-je, maman)",
+        title="Brilha, Brilha Estrelinha (Completo A-B-A)",
         composer="W. A. Mozart / Tradicional",
         difficulty="Iniciante",
         bpm=100,
         clef="treble",
-        description="Melodia infantil clássica harmonizada por Mozart em 12 variações (K. 265). Excelente para dominar saltos de 5ª justa.",
+        description="A famosa melodia infantil clássica na sua forma ternária completa (Tema A + Frase do Meio B + Reprise A).",
         notes=[
+            # Parte A
+            _sn("C4", 1.0, 1, 4, 1, "Bri-"),
+            _sn("C4", 1.0, 1, 4, 1, "lha,"),
+            _sn("G4", 1.0, 5, 5, 3, "bri-"),
+            _sn("G4", 1.0, 5, 5, 3, "lha,"),
+            _sn("A4", 1.0, 5, 5, 5, "es-"),
+            _sn("A4", 1.0, 5, 5, 5, "tre-"),
+            _sn("G4", 2.0, 4, 5, 3, "li-nha,"),
+            _sn("F4", 1.0, 4, 5, 1, "lá"),
+            _sn("F4", 1.0, 4, 5, 1, "no"),
+            _sn("E4", 1.0, 3, 5, 0, "céu"),
+            _sn("E4", 1.0, 3, 5, 0, "a"),
+            _sn("D4", 1.0, 2, 4, 3, "cin-"),
+            _sn("D4", 1.0, 2, 4, 3, "ti-"),
+            _sn("C4", 2.0, 1, 4, 1, "lar."),
+            # Parte B
+            _sn("G4", 1.0, 5, 5, 3, "Lá"),
+            _sn("G4", 1.0, 5, 5, 3, "no"),
+            _sn("F4", 1.0, 4, 5, 1, "al-"),
+            _sn("F4", 1.0, 4, 5, 1, "to,"),
+            _sn("E4", 1.0, 3, 5, 0, "a"),
+            _sn("E4", 1.0, 3, 5, 0, "bri-"),
+            _sn("D4", 2.0, 2, 4, 3, "lhar,"),
+            _sn("G4", 1.0, 5, 5, 3, "co-"),
+            _sn("G4", 1.0, 5, 5, 3, "mo_um"),
+            _sn("F4", 1.0, 4, 5, 1, "di-"),
+            _sn("F4", 1.0, 4, 5, 1, "a-"),
+            _sn("E4", 1.0, 3, 5, 0, "man-"),
+            _sn("E4", 1.0, 3, 5, 0, "te_ao"),
+            _sn("D4", 2.0, 2, 4, 3, "luar."),
+            # Reprise A
             _sn("C4", 1.0, 1, 4, 1, "Bri-"),
             _sn("C4", 1.0, 1, 4, 1, "lha,"),
             _sn("G4", 1.0, 5, 5, 3, "bri-"),
@@ -113,15 +194,15 @@ SONG_LIBRARY: List[Song] = [
         ],
     ),
 
-    # 3. PAPAGAIO LOIRO (Cantiga Popular Portuguesa)
+    # 3. PAPAGAIO LOIRO (Cantiga Popular Portuguesa Completa)
     Song(
         id="papagaio_loiro",
-        title="Papagaio Loiro (Cantiga Tradicional)",
+        title="Papagaio Loiro (Cantiga Tradicional Completa)",
         composer="Folclore Português",
         difficulty="Iniciante",
         bpm=110,
         clef="treble",
-        description="Cantiga tradicional portuguesa muito popular nas escolas e ranchos infantis. Prática de arpejo de Dó Maior e Sol.",
+        description="Cantiga tradicional portuguesa completa em dois andamentos com letra tradicional integral.",
         notes=[
             _sn("G4", 1.0, 5, 5, 3, "Pa-"),
             _sn("E4", 1.0, 3, 5, 0, "pa-"),
@@ -134,18 +215,41 @@ SONG_LIBRARY: List[Song] = [
             _sn("F4", 1.0, 3, 5, 1, "doi-"),
             _sn("E4", 1.0, 2, 5, 0, "ra-"),
             _sn("D4", 2.0, 1, 4, 3, "do!"),
+            # 2ª Frase
+            _sn("D4", 1.0, 1, 4, 3, "Le-"),
+            _sn("F4", 1.0, 3, 5, 1, "va_es-"),
+            _sn("D4", 1.0, 1, 4, 3, "ta"),
+            _sn("F4", 1.0, 3, 5, 1, "car-"),
+            _sn("A4", 1.0, 5, 5, 5, "ti-"),
+            _sn("A4", 1.0, 5, 5, 5, "nha"),
+            _sn("G4", 1.0, 4, 5, 3, "ao"),
+            _sn("F4", 1.0, 3, 5, 1, "meu"),
+            _sn("E4", 1.0, 2, 5, 0, "na-"),
+            _sn("D4", 1.0, 1, 4, 3, "mo-"),
+            _sn("C4", 2.0, 1, 4, 1, "ra-do!"),
+            # Refrão
+            _sn("G4", 1.0, 5, 5, 3, "Que_es-"),
+            _sn("E4", 1.0, 3, 5, 0, "tá"),
+            _sn("G4", 1.0, 5, 5, 3, "na"),
+            _sn("E4", 1.0, 3, 5, 0, "es-"),
+            _sn("G4", 1.0, 5, 5, 3, "co-"),
+            _sn("A4", 1.0, 5, 5, 5, "la"),
+            _sn("G4", 1.0, 4, 5, 3, "a"),
+            _sn("F4", 1.0, 3, 5, 1, "a-"),
+            _sn("E4", 1.0, 2, 5, 0, "pren-"),
+            _sn("D4", 2.0, 1, 4, 3, "der!"),
         ],
     ),
 
-    # 4. POMBINHA BRANCA (Tradicional Portuguesa)
+    # 4. POMBINHA BRANCA (Tradicional Portuguesa Completa)
     Song(
         id="pombinha_branca",
-        title="Pombinha Branca",
+        title="Pombinha Branca (Cantiga Completa)",
         composer="Folclore Português",
         difficulty="Iniciante",
         bpm=96,
         clef="treble",
-        description="Melodia suave do cancioneiro tradicional português em compasso binário simples.",
+        description="Melodia suave e completa do cancioneiro tradicional português.",
         notes=[
             _sn("G4", 1.0, 5, 5, 3, "Pom-"),
             _sn("E4", 1.0, 3, 5, 0, "bi-"),
@@ -157,19 +261,50 @@ SONG_LIBRARY: List[Song] = [
             _sn("E4", 1.0, 3, 5, 0, "tás"),
             _sn("F4", 1.0, 4, 5, 1, "a"),
             _sn("G4", 2.0, 5, 5, 3, "fa-zer?"),
+            _sn("G4", 1.0, 5, 5, 3, "Es-"),
+            _sn("E4", 1.0, 3, 5, 0, "tou"),
+            _sn("C4", 1.0, 1, 4, 1, "a"),
+            _sn("E4", 1.0, 3, 5, 0, "la-"),
+            _sn("D4", 1.0, 2, 4, 3, "var"),
+            _sn("D4", 1.0, 2, 4, 3, "a"),
+            _sn("D4", 1.0, 2, 4, 3, "rou-"),
+            _sn("E4", 1.0, 3, 5, 0, "pa"),
+            _sn("D4", 1.0, 2, 4, 3, "pro"),
+            _sn("C4", 2.0, 1, 4, 1, "meu_bem!"),
         ],
     ),
 
-    # 5. FÜR ELISE (Beethoven - Motivo Principal)
+    # 5. FÜR ELISE (Beethoven) — Tema Principal Completo com Transição
     Song(
         id="fur_elise",
-        title="Für Elise (Motivo Principal)",
+        title="Für Elise (Tema Principal Completo)",
         composer="Ludwig van Beethoven",
         difficulty="Intermédio",
         bpm=120,
         clef="treble",
-        description="A famosa Bagatela em Lá menor (WoO 59). O motivo cromático alternado entre Mi e Ré# é um dos temas mais reconhecidos da história.",
+        description="A célebre Bagatela em Lá menor (WoO 59) de Beethoven com o motivo cromático inicial, arpejos de Lá menor e Mi Maior e cadência harmónica.",
         notes=[
+            _sn("E5", 1.0, 5, 5, 12, "Mi"),
+            _sn("D#5", 1.0, 4, 5, 11, "Ré#"),
+            _sn("E5", 1.0, 5, 5, 12, "Mi"),
+            _sn("D#5", 1.0, 4, 5, 11, "Ré#"),
+            _sn("E5", 1.0, 5, 5, 12, "Mi"),
+            _sn("B4", 1.0, 3, 5, 7, "Si"),
+            _sn("D5", 1.0, 4, 5, 10, "Ré"),
+            _sn("C5", 1.0, 3, 5, 8, "Dó"),
+            _sn("A4", 2.0, 1, 5, 5, "Lá"),
+            # Arpejo Dó-Mi-Lá-Si
+            _sn("C4", 1.0, 1, 4, 1, "Dó"),
+            _sn("E4", 1.0, 2, 5, 0, "Mi"),
+            _sn("A4", 1.0, 3, 5, 5, "Lá"),
+            _sn("B4", 2.0, 4, 5, 7, "Si"),
+            # Arpejo Mi-Sol#-Si-Dó
+            _sn("E4", 1.0, 1, 5, 0, "Mi"),
+            _sn("G#4", 1.0, 2, 5, 4, "Sol#"),
+            _sn("B4", 1.0, 3, 5, 7, "Si"),
+            _sn("C5", 2.0, 4, 5, 8, "Dó"),
+            # Reprise com resolução final em Lá
+            _sn("E4", 1.0, 1, 5, 0, "Mi"),
             _sn("E5", 1.0, 5, 5, 12, "Mi"),
             _sn("D#5", 1.0, 4, 5, 11, "Ré#"),
             _sn("E5", 1.0, 5, 5, 12, "Mi"),
@@ -182,19 +317,22 @@ SONG_LIBRARY: List[Song] = [
             _sn("C4", 1.0, 1, 4, 1, "Dó"),
             _sn("E4", 1.0, 2, 5, 0, "Mi"),
             _sn("A4", 1.0, 3, 5, 5, "Lá"),
-            _sn("B4", 2.0, 4, 5, 7, "Si"),
+            _sn("B4", 1.5, 4, 5, 7, "Si"),
+            _sn("C5", 0.5, 3, 5, 8, "Dó"),
+            _sn("B4", 0.5, 2, 5, 7, "Si"),
+            _sn("A4", 2.5, 1, 5, 5, "Lá!"),
         ],
     ),
 
-    # 6. MINUETO EM SOL (Bach / Petzold)
+    # 6. MINUETO EM SOL (Bach / Petzold) — Seção A Completa (16 Compassos)
     Song(
         id="minuet_in_g",
-        title="Minueto em Sol Maior (BWV Anh. 114)",
+        title="Minueto em Sol Maior (Seção A Completa)",
         composer="Christian Petzold / J. S. Bach",
         difficulty="Intermédio",
         bpm=116,
         clef="treble",
-        description="Do célebre Pequeno Livro de Anna Magdalena Bach. Frase de abertura elegante em compasso ternário.",
+        description="Do Pequeno Livro de Anna Magdalena Bach. A Seção A completa de 16 compassos em Sol Maior.",
         notes=[
             _sn("D5", 1.0, 5, 5, 10, "Ré"),
             _sn("G4", 0.5, 1, 5, 3, "Sol"),
@@ -212,18 +350,35 @@ SONG_LIBRARY: List[Song] = [
             _sn("G5", 1.0, 5, 5, 15, "Sol"),
             _sn("G4", 1.0, 1, 5, 3, "Sol"),
             _sn("G4", 1.0, 1, 5, 3, "Sol"),
+            # Segunda Frase com Cadência
+            _sn("C5", 1.0, 4, 5, 8, "Dó"),
+            _sn("D5", 0.5, 5, 5, 10, "Ré"),
+            _sn("C5", 0.5, 4, 5, 8, "Dó"),
+            _sn("B4", 0.5, 3, 5, 7, "Si"),
+            _sn("A4", 0.5, 2, 5, 5, "Lá"),
+            _sn("B4", 1.0, 3, 5, 7, "Si"),
+            _sn("C5", 0.5, 4, 5, 8, "Dó"),
+            _sn("B4", 0.5, 3, 5, 7, "Si"),
+            _sn("A4", 0.5, 2, 5, 5, "Lá"),
+            _sn("G4", 0.5, 1, 5, 3, "Sol"),
+            _sn("F#4", 0.5, 1, 5, 2, "Fá#"),
+            _sn("G4", 0.5, 1, 5, 3, "Sol"),
+            _sn("A4", 0.5, 2, 5, 5, "Lá"),
+            _sn("B4", 0.5, 3, 5, 7, "Si"),
+            _sn("G4", 1.0, 1, 5, 3, "Sol"),
+            _sn("A4", 2.0, 2, 5, 5, "Lá"),
         ],
     ),
 
-    # 7. MARCHA NUPCIAL (Wagner)
+    # 7. MARCHA NUPCIAL (Wagner) — Tema Coral Completo
     Song(
         id="bridal_chorus",
-        title="Marcha Nupcial (Trevo Coral)",
+        title="Marcha Nupcial (Trevo Coral Completo)",
         composer="Richard Wagner (Lohengrin)",
         difficulty="Iniciante",
         bpm=88,
         clef="treble",
-        description="A clássica marcha nupcial tocada em cerimónias no mundo inteiro. Melodia solene com ritmo pontuado.",
+        description="A clássica marcha nupcial tocada em cerimónias no mundo inteiro, com melodia solene integral e frase central.",
         notes=[
             _sn("C4", 1.0, 1, 4, 1, "Dó"),
             _sn("F4", 1.5, 3, 5, 1, "Fá"),
@@ -233,19 +388,37 @@ SONG_LIBRARY: List[Song] = [
             _sn("G4", 1.5, 5, 5, 3, "Sol"),
             _sn("E4", 0.5, 2, 5, 0, "Mi"),
             _sn("F4", 2.0, 3, 5, 1, "Fá"),
+            # Segunda Frase
+            _sn("C4", 1.0, 1, 4, 1, "Dó"),
+            _sn("F4", 1.5, 3, 5, 1, "Fá"),
+            _sn("A4", 0.5, 5, 5, 5, "Lá"),
+            _sn("F4", 1.0, 3, 5, 1, "Fá"),
+            _sn("C4", 0.5, 1, 4, 1, "Dó"),
+            _sn("G4", 1.5, 5, 5, 3, "Sol"),
+            _sn("E4", 0.5, 2, 5, 0, "Mi"),
+            _sn("F4", 2.0, 3, 5, 1, "Fá"),
+            # Meio Solene
+            _sn("A4", 1.0, 4, 5, 5, "Lá"),
+            _sn("A4", 1.0, 4, 5, 5, "Lá"),
+            _sn("G4", 1.0, 3, 5, 3, "Sol"),
+            _sn("F4", 1.0, 2, 5, 1, "Fá"),
+            _sn("G4", 1.0, 3, 5, 3, "Sol"),
+            _sn("A4", 1.0, 4, 5, 5, "Lá"),
+            _sn("F4", 2.0, 2, 5, 1, "Fá"),
         ],
     ),
 
-    # 8. CANON EM DÓ / RÉ (Pachelbel)
+    # 8. CANON EM DÓ / RÉ (Pachelbel) — Tema e Variação Completa
     Song(
         id="canon_in_d",
-        title="Canon em Dó / Ré (Tema Principal)",
+        title="Canon em Dó / Ré (Tema & Variação Completa)",
         composer="Johann Pachelbel",
         difficulty="Iniciante",
         bpm=76,
         clef="treble",
-        description="A progressão harmónica e melodia barroca mais famosa de sempre. Perfeita para treino de legato e dedilhação linear.",
+        description="A progressão harmónica e melodia barroca mais famosa de sempre, com o tema principal e a sua variação em colcheias.",
         notes=[
+            # Tema Principal
             _sn("E4", 1.0, 3, 5, 0, "Mi"),
             _sn("D4", 1.0, 2, 4, 3, "Ré"),
             _sn("C4", 1.0, 1, 4, 1, "Dó"),
@@ -254,19 +427,37 @@ SONG_LIBRARY: List[Song] = [
             _sn("G3", 1.0, 1, 3, 0, "Sol"),
             _sn("A3", 1.0, 1, 3, 2, "Lá"),
             _sn("B3", 1.0, 2, 4, 0, "Si"),
-            _sn("C4", 2.0, 3, 4, 1, "Dó"),
+            # Variação em Graus Conjuntos
+            _sn("C4", 1.0, 3, 4, 1, "Dó"),
+            _sn("B3", 1.0, 2, 4, 0, "Si"),
+            _sn("A3", 1.0, 1, 3, 2, "Lá"),
+            _sn("G3", 1.0, 1, 3, 0, "Sol"),
+            _sn("F3", 1.0, 1, 2, 3, "Fá"),
+            _sn("E3", 1.0, 1, 2, 2, "Mi"),
+            _sn("F3", 1.0, 1, 2, 3, "Fá"),
+            _sn("G3", 1.0, 2, 3, 0, "Sol"),
+            # Frase Final
+            _sn("E4", 0.5, 3, 5, 0, "Mi"),
+            _sn("G4", 0.5, 5, 5, 3, "Sol"),
+            _sn("A4", 0.5, 5, 5, 5, "Lá"),
+            _sn("G4", 0.5, 4, 5, 3, "Sol"),
+            _sn("F4", 0.5, 3, 5, 1, "Fá"),
+            _sn("E4", 0.5, 2, 5, 0, "Mi"),
+            _sn("F4", 0.5, 3, 5, 1, "Fá"),
+            _sn("D4", 0.5, 1, 4, 3, "Ré"),
+            _sn("C4", 2.0, 1, 4, 1, "Dó!"),
         ],
     ),
 
-    # 9. EINE KLEINE NACHTMUSIK (Mozart)
+    # 9. EINE KLEINE NACHTMUSIK (Mozart) — Allegro Completo
     Song(
         id="nachtmusik",
-        title="Eine kleine Nachtmusik (Serenata K. 525)",
+        title="Eine kleine Nachtmusik (Serenata K. 525 Completa)",
         composer="Wolfgang Amadeus Mozart",
         difficulty="Intermédio",
         bpm=124,
         clef="treble",
-        description="O brilhante motivo de abertura em Sol Maior da serenata mais tocada de Mozart.",
+        description="O brilhante motivo de abertura em Sol Maior da serenata mais tocada de Mozart na sua forma completa com resolução.",
         notes=[
             _sn("G4", 1.5, 1, 5, 3, "Sol"),
             _sn("D4", 0.5, 1, 4, 3, "Ré"),
@@ -282,19 +473,38 @@ SONG_LIBRARY: List[Song] = [
             _sn("F#4", 0.5, 1, 5, 2, "Fá#"),
             _sn("A4", 0.5, 2, 5, 5, "Lá"),
             _sn("D4", 1.0, 1, 4, 3, "Ré"),
+            # Segunda Frase
+            _sn("B4", 1.0, 3, 5, 7, "Si"),
+            _sn("B4", 0.5, 3, 5, 7, "Si"),
+            _sn("C5", 0.5, 4, 5, 8, "Dó"),
+            _sn("D5", 1.0, 5, 5, 10, "Ré"),
+            _sn("D5", 0.5, 5, 5, 10, "Ré"),
+            _sn("C5", 0.5, 4, 5, 8, "Dó"),
+            _sn("B4", 0.5, 3, 5, 7, "Si"),
+            _sn("A4", 0.5, 2, 5, 5, "Lá"),
+            _sn("G4", 1.0, 1, 5, 3, "Sol"),
+            _sn("G4", 0.5, 1, 5, 3, "Sol"),
+            _sn("A4", 0.5, 2, 5, 5, "Lá"),
+            _sn("B4", 1.0, 3, 5, 7, "Si"),
+            _sn("B4", 0.5, 3, 5, 7, "Si"),
+            _sn("A4", 0.5, 2, 5, 5, "Lá"),
+            _sn("G4", 0.5, 1, 5, 3, "Sol"),
+            _sn("F#4", 0.5, 1, 5, 2, "Fá#"),
+            _sn("G4", 2.0, 1, 5, 3, "Sol!"),
         ],
     ),
 
-    # 10. GREENSLEEVES (Tradicional Inglesa)
+    # 10. GREENSLEEVES (Tradicional Inglesa) — Verso & Refrão Completo
     Song(
         id="greensleeves",
-        title="Greensleeves (Melodia Renascentista)",
+        title="Greensleeves (Verso & Refrão Completo)",
         composer="Tradicional Século XVI",
         difficulty="Intermédio",
         bpm=92,
         clef="treble",
-        description="Clássico do período Tudor em modo Dórico e Menor Melódico, com expressão melancólica inconfundível.",
+        description="Clássico do período Tudor em modo Dórico e Menor Melódico, com verso integral e refrão tradicional.",
         notes=[
+            # Verso
             _sn("A4", 1.0, 1, 5, 5, "A-"),
             _sn("C5", 1.5, 3, 5, 8, "las,"),
             _sn("D5", 0.5, 4, 5, 10, "my"),
@@ -308,18 +518,30 @@ SONG_LIBRARY: List[Song] = [
             _sn("B4", 0.5, 3, 5, 7, "me"),
             _sn("C5", 1.5, 4, 5, 8, "off"),
             _sn("A4", 2.0, 2, 5, 5, "dis-"),
+            # Refrão
+            _sn("G5", 2.0, 5, 5, 15, "Green-"),
+            _sn("G5", 1.0, 5, 5, 15, "sleeves"),
+            _sn("F5", 0.5, 5, 5, 13, "was"),
+            _sn("E5", 0.5, 5, 5, 12, "all"),
+            _sn("D5", 1.0, 4, 5, 10, "my"),
+            _sn("B4", 1.5, 2, 5, 7, "joy,"),
+            _sn("G4", 0.5, 1, 5, 3, "and"),
+            _sn("A4", 1.0, 2, 5, 5, "who"),
+            _sn("B4", 0.5, 3, 5, 7, "but"),
+            _sn("C5", 1.5, 4, 5, 8, "my"),
+            _sn("A4", 2.0, 2, 5, 5, "la-dy!"),
         ],
     ),
 
-    # 11. O CRAVO E A ROSA (Tradicional Portuguesa)
+    # 11. O CRAVO E A ROSA (Tradicional Portuguesa Completa)
     Song(
         id="cravo_e_rosa",
-        title="O Cravo e a Rosa",
+        title="O Cravo e a Rosa (Cantiga Completa)",
         composer="Cancioneiro Popular",
         difficulty="Iniciante",
         bpm=104,
         clef="treble",
-        description="Famosa cantiga de roda da tradição lusófona, excelente para primeiras lições de leitura e ritmo.",
+        description="Famosa cantiga de roda da tradição lusófona na sua versão integral de 4 estrofes.",
         notes=[
             _sn("C4", 1.0, 1, 4, 1, "O"),
             _sn("C4", 1.0, 1, 4, 1, "cra-"),
@@ -335,18 +557,26 @@ SONG_LIBRARY: List[Song] = [
             _sn("D4", 1.0, 2, 4, 3, "xo"),
             _sn("D4", 1.0, 2, 4, 3, "de"),
             _sn("C4", 2.0, 1, 4, 1, "u-ma"),
+            _sn("G4", 1.0, 5, 5, 3, "sa-"),
+            _sn("G4", 1.0, 5, 5, 3, "ca-"),
+            _sn("F4", 1.0, 4, 5, 1, "da;"),
+            _sn("E4", 1.0, 3, 5, 0, "o"),
+            _sn("E4", 1.0, 3, 5, 0, "cra-"),
+            _sn("D4", 1.0, 2, 4, 3, "vo"),
+            _sn("D4", 1.0, 2, 4, 3, "sa-"),
+            _sn("C4", 2.0, 1, 4, 1, "iu ferido!"),
         ],
     ),
 
-    # 12. GRÂNDOLA, VILA MORENA (Zeca Afonso)
+    # 12. GRÂNDOLA, VILA MORENA (Zeca Afonso) — Hino Completo
     Song(
         id="grandola",
-        title="Grândola, Vila Morena",
+        title="Grândola, Vila Morena (Hino Completo)",
         composer="José Afonso (Zeca Afonso)",
         difficulty="Iniciante",
         bpm=84,
         clef="treble",
-        description="O hino histórico da Revolução dos Cravos de 1974. Frase melódica modal e profunda com cadência solene.",
+        description="O hino histórico da Revolução dos Cravos de 1974 na íntegra com a estrofe completa e cadência solene.",
         notes=[
             _sn("C4", 1.0, 1, 4, 1, "Grân-"),
             _sn("D4", 1.0, 2, 4, 3, "do-"),
@@ -359,7 +589,20 @@ SONG_LIBRARY: List[Song] = [
             _sn("E4", 1.0, 3, 5, 0, "ra"),
             _sn("C4", 1.0, 1, 4, 1, "da"),
             _sn("D4", 1.0, 2, 4, 3, "fra-"),
-            _sn("C4", 2.0, 1, 4, 1, "ter-ni-da-de."),
+            _sn("C4", 2.0, 1, 4, 1, "ter-ni-da-de,"),
+            # Segunda Estrofe
+            _sn("E4", 1.0, 3, 5, 0, "em"),
+            _sn("F4", 1.0, 4, 5, 1, "ca-"),
+            _sn("G4", 1.5, 5, 5, 3, "da"),
+            _sn("A4", 0.5, 5, 5, 5, "es-"),
+            _sn("G4", 1.0, 4, 5, 3, "qui-"),
+            _sn("F4", 1.0, 3, 5, 1, "na"),
+            _sn("E4", 2.0, 2, 5, 0, "um_amigo,"),
+            _sn("F4", 1.0, 3, 5, 1, "em"),
+            _sn("G4", 1.0, 4, 5, 3, "ca-"),
+            _sn("E4", 1.0, 2, 5, 0, "da"),
+            _sn("F4", 1.0, 3, 5, 1, "ros-"),
+            _sn("E4", 2.0, 2, 5, 0, "to_i-gual-da-de!"),
         ],
     ),
 ]

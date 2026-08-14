@@ -1,4 +1,4 @@
-"""Quiz engine for music theory and ear training practice exercises."""
+"""Quiz engine for music theory, ear training, sight reading, and solfege singing exercises."""
 import random
 from dataclasses import dataclass, field
 from enum import Enum
@@ -16,6 +16,7 @@ class QuestionType(Enum):
     THEORY_INTERVAL = "theory_interval"
     THEORY_SCALE = "theory_scale"
     THEORY_CHORD = "theory_chord"
+    SOLFEGE_SING = "solfege_sing"
 
 
 @dataclass
@@ -31,6 +32,8 @@ class QuizQuestion:
     play_mode: str = "melodic_asc"  # "melodic_asc", "melodic_desc", "harmonic", "chord"
     staff_note: Optional[Note] = None
     clef: str = "treble"  # "treble" or "bass"
+    target_note: Optional[Note] = None
+    reference_note: Optional[Note] = None
 
     @property
     def correct_answer(self) -> str:
@@ -38,7 +41,7 @@ class QuizQuestion:
 
 
 class QuizEngine:
-    """Generates and validates interactive music theory and ear training exercises."""
+    """Generates and validates interactive music theory, ear training, and solfege exercises."""
 
     @staticmethod
     def generate_ear_interval_question(difficulty: str = "beginner") -> QuizQuestion:
@@ -58,38 +61,40 @@ class QuizEngine:
             allowed_semitones = list(range(1, 13))
             play_modes = ["melodic_asc", "melodic_desc", "harmonic"]
 
-        target_semitones = random.choice(allowed_semitones)
-        target_interval = INTERVALS[target_semitones]
+        target_st = random.choice(allowed_semitones)
+        target_interval = INTERVALS[target_st]
 
-        # Choose a comfortable root note between C3 and G4
-        root_midi = random.randint(55, 67)
+        # Pick a random base root note (between C3 and G4)
+        root_midi = random.randint(48, 67)
         root_note = Note.from_midi(root_midi)
 
         play_mode = random.choice(play_modes)
         if play_mode == "melodic_desc":
-            top_note = root_note.transpose(target_semitones)
-            notes_to_play = [top_note, root_note]
+            second_note = root_note
+            first_note = root_note.transpose(target_st)
+            notes_to_play = [first_note, second_note]
         else:
-            top_note = root_note.transpose(target_semitones)
-            notes_to_play = [root_note, top_note]
+            second_note = root_note.transpose(target_st)
+            notes_to_play = [root_note, second_note]
 
-        # Generate distractors
-        other_semitones = [st for st in allowed_semitones if st != target_semitones]
-        random.shuffle(other_semitones)
-        distractors = [INTERVALS[st].name_pt for st in other_semitones[:3]]
+        # Generate 4 unique options
+        other_intervals = [i for i in INTERVALS.values() if i.semitones != target_st and i.semitones in allowed_semitones]
+        if len(other_intervals) < 3:
+            other_intervals = [i for i in INTERVALS.values() if i.semitones != target_st]
+        random.shuffle(other_intervals)
 
-        options = distractors + [target_interval.name_pt]
+        distractors = [f"{i.name_pt} ({i.short_code})" for i in other_intervals[:3]]
+        correct_label = f"{target_interval.name_pt} ({target_interval.short_code})"
+        options = distractors + [correct_label]
         random.shuffle(options)
-        correct_index = options.index(target_interval.name_pt)
+        correct_index = options.index(correct_label)
 
-        mode_pt = "ascendente" if play_mode == "melodic_asc" else ("descendente" if play_mode == "melodic_desc" else "harmónico (em simultâneo)")
-        prompt = f"Ouve as notas tocadas em modo {mode_pt} e identifica o intervalo:"
-
+        direction_str = "descendente" if play_mode == "melodic_desc" else ("harmónico (simultâneo)" if play_mode == "harmonic" else "ascendente")
+        prompt = f"Ouve o intervalo musical {direction_str} e identifica a sua classificação:"
         explanation = (
-            f"Correto! O intervalo é **{target_interval.name_pt}** ({target_interval.short_code}), "
+            f"Correto! O intervalo tocado é uma **{target_interval.name_pt}** ({target_interval.short_code}), "
             f"correspondendo a **{target_interval.semitones} semitons**.\n"
-            f"💡 Mnemónica: *{target_interval.mnemonic}*.\n"
-            f"Notas tocadas: {root_note.pitch} ({root_note.name_pt}) → {top_note.pitch} ({top_note.name_pt})."
+            f"💡 Mnemónica: Lembra-te do início da canção «{target_interval.mnemonic}»."
         )
 
         return QuizQuestion(
@@ -105,41 +110,43 @@ class QuizEngine:
 
     @staticmethod
     def generate_ear_chord_question(difficulty: str = "beginner") -> QuizQuestion:
-        """Generates an ear training chord quality exercise."""
+        """
+        Generates an ear training chord quality exercise.
+        - beginner: Maior, Menor
+        - intermediate: Maior, Menor, Diminuto, Aumentado
+        - advanced: Maior, Menor, Diminuto, Aumentado, Sétima Dominante (7), Sétima Maior (maj7)
+        """
         if difficulty == "beginner":
-            chord_keys = ["major", "minor"]
+            allowed_chords = ["major", "minor"]
         elif difficulty == "intermediate":
-            chord_keys = ["major", "minor", "diminished", "augmented"]
+            allowed_chords = ["major", "minor", "diminished", "augmented"]
         else:
-            chord_keys = ["major", "minor", "diminished", "augmented", "dom7", "maj7", "min7"]
+            allowed_chords = ["major", "minor", "diminished", "augmented", "dom7", "maj7"]
 
-        target_key = random.choice(chord_keys)
-        target_def = CHORD_TYPES[target_key]
+        target_type_key = random.choice(allowed_chords)
+        target_chord_def = CHORD_TYPES[target_type_key]
 
-        root_midi = random.randint(53, 65)  # F3 to F4
+        # Root between C3 and F4
+        root_midi = random.randint(48, 65)
         root_note = Note.from_midi(root_midi)
-        chord = Chord(root_note, target_key)
+        chord_obj = Chord(root_note, target_type_key)
 
-        other_keys = [k for k in chord_keys if k != target_key]
-        if len(other_keys) < 3:
-            # Add from full pool if pool is small
-            all_other = [k for k in CHORD_TYPES.keys() if k != target_key and k not in other_keys]
-            other_keys += all_other
-
+        # Distractor options from all available chord types to ensure 4 options
+        other_keys = [k for k in CHORD_TYPES.keys() if k != target_type_key]
         random.shuffle(other_keys)
-        distractors = [CHORD_TYPES[k].name_pt for k in other_keys[:3]]
+        distractor_keys = other_keys[:3]
+        distractors = [CHORD_TYPES[k].name_pt for k in distractor_keys]
 
-        options = distractors + [target_def.name_pt]
+        correct_label = target_chord_def.name_pt
+        options = distractors + [correct_label]
         random.shuffle(options)
-        correct_index = options.index(target_def.name_pt)
+        correct_index = options.index(correct_label)
 
-        prompt = "Ouve o acorde tocado e identifica a sua qualidade/tipo:"
-        notes_str = ", ".join(f"{n.pitch} ({n.name_pt})" for n in chord.notes)
-
+        prompt = "Ouve o acorde tocado e identifica a sua qualidade harmónica:"
         explanation = (
-            f"Correto! O acorde tocado é **{target_def.name_pt}** ({target_def.symbol or 'Maior'}).\n"
-            f"Fórmula: {target_def.formula_degrees} ({target_def.formula_intervals}).\n"
-            f"Notas: {notes_str}."
+            f"Correto! O acorde tocado é um acorde **{target_chord_def.name_pt}** "
+            f"({target_chord_def.symbol or 'M'}).\n"
+            f"Fórmula: {target_chord_def.formula_intervals} ({target_chord_def.description})."
         )
 
         return QuizQuestion(
@@ -149,56 +156,70 @@ class QuizEngine:
             options=options,
             correct_index=correct_index,
             explanation=explanation,
-            notes_to_play=chord.notes,
+            notes_to_play=chord_obj.notes,
             play_mode="chord",
         )
 
     @staticmethod
-    def generate_staff_reading_question(clef: str = "treble", include_accidentals: bool = False) -> QuizQuestion:
-        """
-        Generates a note identification exercise on the musical staff.
-        - treble: C4 to G5 (diatonic or accidental)
-        - bass: E2 to C4 (diatonic or accidental)
-        """
-        diatonic_pitches = ["C", "D", "E", "F", "G", "A", "B"]
-        accidental_pitches = ["C#", "D#", "F#", "G#", "A#"] if include_accidentals else []
-        all_pitches = diatonic_pitches + accidental_pitches
+    def generate_staff_reading_question(
+        clef: str = "treble",
+        include_accidentals: bool = False,
+        difficulty: str = "beginner",
+    ) -> QuizQuestion:
+        diff = "advanced" if include_accidentals else difficulty
+        return QuizEngine.generate_staff_question(clef=clef, difficulty=diff)
 
+    @staticmethod
+    def generate_staff_question(
+        clef: str = "treble",
+        difficulty: str = "beginner",
+    ) -> QuizQuestion:
+        """
+        Generates a sheet music reading exercise.
+        - beginner: Natural diatonic notes within the 5 main staff lines
+        - intermediate: Includes ledger lines (linhas suplementares)
+        - advanced: Includes accidentals (sustenidos e bemóis)
+        """
         if clef == "treble":
-            octaves = [4, 5]
-            # Valid comfortable treble range: C4 to A5
-            valid_notes = [Note(p, oct) for oct in octaves for p in all_pitches if 60 <= Note(p, oct).midi <= 81]
-        else:
-            octaves = [2, 3]
-            # Valid comfortable bass range: E2 to C4
-            valid_notes = [Note(p, oct) for oct in octaves for p in all_pitches if 40 <= Note(p, oct).midi <= 60]
+            if difficulty == "beginner":
+                # E4 to F5 (Within staff lines)
+                midi_range = [64, 65, 67, 69, 71, 72, 74, 76, 77]
+            elif difficulty == "intermediate":
+                # C4 to A5 (with ledger lines)
+                midi_range = [60, 62, 64, 65, 67, 69, 71, 72, 74, 76, 77, 79, 81]
+            else:
+                # With chromatic accidentals
+                midi_range = list(range(60, 82))
+        else:  # Bass clef
+            if difficulty == "beginner":
+                # G2 to A3 (Within staff lines)
+                midi_range = [43, 45, 47, 48, 50, 52, 53, 55, 57]
+            elif difficulty == "intermediate":
+                # E2 to C4
+                midi_range = [40, 41, 43, 45, 47, 48, 50, 52, 53, 55, 57, 59, 60]
+            else:
+                midi_range = list(range(40, 61))
 
-        target_note = random.choice(valid_notes)
+        target_midi = random.choice(midi_range)
+        target_note = Note.from_midi(target_midi)
 
-        # Distractor options from diatonic / relevant pitches
-        distractor_pitches = [p for p in diatonic_pitches if p != target_note.letter]
-        random.shuffle(distractor_pitches)
+        # Distractor options
+        all_possible_pitches = list(NOTE_NAMES)
+        distractors_pitches = [p for p in all_possible_pitches if p != target_note.pitch]
+        random.shuffle(distractors_pitches)
 
-        if include_accidentals and target_note.accidental:
-            correct_label = f"{target_note.pitch} ({target_note.name_pt})"
-            distractor_labels = [
-                f"{p}{target_note.accidental} ({NOTE_NAMES_PT.get(p + target_note.accidental, p)})"
-                for p in distractor_pitches[:3]
-            ]
-        else:
-            correct_label = f"{target_note.letter} ({target_note.name_pt})"
-            distractor_labels = [f"{p} ({NOTE_NAMES_PT[p]})" for p in distractor_pitches[:3]]
+        correct_label = f"{target_note.name_pt} ({target_note.pitch})"
+        distractor_labels = [f"{NOTE_NAMES_PT[p]} ({p})" for p in distractors_pitches[:3]]
 
         options = distractor_labels + [correct_label]
         random.shuffle(options)
         correct_index = options.index(correct_label)
 
-        clef_pt = "Clave de Sol" if clef == "treble" else "Clave de Fá"
-        prompt = f"Identifica a nota exibida na pauta ({clef_pt}):"
-
+        clef_name = "Clave de Sol" if clef == "treble" else "Clave de Fá"
+        prompt = f"Identifica a nota desenhada na pauta na **{clef_name}**:"
         explanation = (
-            f"Muito bem! A nota assinalada na {clef_pt} é **{target_note.pitch} ({target_note.name_pt}{target_note.octave})** "
-            f"[Frequência: {target_note.frequency:.1f} Hz, MIDI: {target_note.midi}]."
+            f"Correto! A nota na pauta é **{target_note.name_pt}** ({target_note.pitch}{target_note.octave}), "
+            f"com frequência de **{target_note.frequency:.1f} Hz** (MIDI {target_note.midi})."
         )
 
         return QuizQuestion(
@@ -215,17 +236,78 @@ class QuizEngine:
         )
 
     @staticmethod
-    def generate_theory_question() -> QuizQuestion:
-        """Generates conceptual music theory questions regarding scales and intervals."""
-        q_type = random.choice(["scale_formula", "chord_formula", "interval_semitones"])
+    def generate_solfege_sing_question(difficulty: str = "beginner") -> QuizQuestion:
+        """
+        Generates a vocal Solfège Dictation exercise validated via real-time microphone pitch detection.
+        - beginner: Natural diatonic notes (C, D, E, F, G, A, B) with C4 reference pitch.
+        - intermediate: Chromatic notes and larger melodic jumps from reference.
+        - advanced: Challenging vocal intervals, sharps/flats, octave shifts.
+        """
+        ref_note = Note("C4")  # Reference Dó Central (261.6 Hz)
+
+        if difficulty == "beginner":
+            # Natural notes in C major scale
+            pool = [Note("C4"), Note("D4"), Note("E4"), Note("F4"), Note("G4"), Note("A4"), Note("B4")]
+        elif difficulty == "intermediate":
+            # Chromatic notes or 3rd/5th jumps
+            pool = [
+                Note("C#4"), Note("D#4"), Note("F#4"), Note("G#4"), Note("A#4"),
+                Note("E4"), Note("G4"), Note("A4"), Note("C5"),
+            ]
+        else:
+            # Extended vocal range
+            pool = [
+                Note("G3"), Note("A3"), Note("B3"), Note("C4"), Note("C#4"), Note("D4"),
+                Note("E4"), Note("F4"), Note("F#4"), Note("G4"), Note("A4"), Note("B4"), Note("C5"), Note("D5")
+            ]
+
+        target_note = random.choice(pool)
+
+        # Options for UI fallback/selection
+        other_notes = [n for n in pool if n.normalized_pitch != target_note.normalized_pitch]
+        if len(other_notes) < 3:
+            other_notes = [Note(p + "4") for p in ["C", "D", "E", "F", "G", "A", "B"] if p != target_note.pitch]
+        random.shuffle(other_notes)
+
+        correct_label = f"{target_note.name_pt} ({target_note.pitch}{target_note.octave})"
+        distractor_labels = [f"{n.name_pt} ({n.pitch}{n.octave})" for n in other_notes[:3]]
+        options = distractor_labels + [correct_label]
+        random.shuffle(options)
+        correct_index = options.index(correct_label)
+
+        prompt = f"🎤 Ditado de Solfejo: Canta a nota **{target_note.name_pt}** ({target_note.pitch}{target_note.octave})"
+        explanation = (
+            f"Excelente! Cantaste afinado a nota **{target_note.name_pt}** ({target_note.pitch}{target_note.octave}), "
+            f"com frequência fundamental de **{target_note.frequency:.1f} Hz**."
+        )
+
+        return QuizQuestion(
+            question_type=QuestionType.SOLFEGE_SING,
+            prompt_text=prompt,
+            category="treino_auditivo",
+            options=options,
+            correct_index=correct_index,
+            explanation=explanation,
+            notes_to_play=[ref_note],
+            play_mode="melodic_asc",
+            target_note=target_note,
+            reference_note=ref_note,
+            staff_note=target_note,
+        )
+
+    @staticmethod
+    def generate_theory_question(topic: str = "mixed") -> QuizQuestion:
+        """Generates a multiple-choice music theory conceptual exercise."""
+        topics = ["scale_formula", "chord_formula", "interval_semitones"]
+        q_type = random.choice(topics) if topic == "mixed" else topic
 
         if q_type == "scale_formula":
-            key = random.choice(["major", "natural_minor", "harmonic_minor", "major_pentatonic", "minor_pentatonic"])
+            key = random.choice(["major", "natural_minor", "harmonic_minor", "pentatonic_major", "dorian"])
             scale_def = SCALE_TYPES[key]
             other_defs = [s for k, s in SCALE_TYPES.items() if k != key]
             random.shuffle(other_defs)
 
-            prompt = f"Qual é a fórmula de intervalos da **{scale_def.name_pt}**?"
+            prompt = f"Qual é o padrão de intervalos (Tons e Semitons) da **{scale_def.name_pt}**?"
             correct_label = scale_def.formula_steps
             distractors = [s.formula_steps for s in other_defs[:3]]
             options = distractors + [correct_label]
@@ -233,9 +315,8 @@ class QuizEngine:
             correct_index = options.index(correct_label)
 
             explanation = (
-                f"Correto! A **{scale_def.name_pt}** é estruturada como:\n"
-                f"• Passos: {scale_def.formula_steps}\n"
-                f"• Graus: {scale_def.formula_degrees}\n"
+                f"Correto! A **{scale_def.name_pt}** é construída com a fórmula de passos: "
+                f"**{scale_def.formula_steps}** (onde T=Tom e S=Semi-tom).\n"
                 f"Descrição: {scale_def.description}"
             )
             sample_scale = Scale(Note("C", 4), key)
@@ -260,7 +341,7 @@ class QuizEngine:
                 f"Descrição: {chord_def.description}"
             )
             sample_chord = Chord(Note("C", 4), key)
-            notes_to_play = sample_chord.notes
+            notes_to_play = chord_obj_notes = sample_chord.notes
 
         else:  # interval_semitones
             st = random.randint(1, 12)

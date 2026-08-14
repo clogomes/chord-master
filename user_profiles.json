@@ -5,63 +5,8 @@
       "username": "Utilizador 1",
       "avatar": "🎵",
       "created_at": 1786722008.659711,
-      "completed_lessons": [],
-      "categories": {
-        "treino_auditivo": {
-          "total_attempts": 0,
-          "correct_count": 0,
-          "current_streak": 0,
-          "best_streak": 0
-        },
-        "leitura_pauta": {
-          "total_attempts": 0,
-          "correct_count": 0,
-          "current_streak": 0,
-          "best_streak": 0
-        },
-        "teoria": {
-          "total_attempts": 0,
-          "correct_count": 0,
-          "current_streak": 0,
-          "best_streak": 0
-        }
-      },
-      "history": []
-    },
-    "Beatriz": {
-      "username": "Beatriz",
-      "avatar": "🎹",
-      "created_at": 1786722009.036708,
-      "completed_lessons": [
-        "chap1_fundamentals",
-        "chap2_intervals"
-      ],
-      "categories": {
-        "treino_auditivo": {
-          "total_attempts": 0,
-          "correct_count": 0,
-          "current_streak": 0,
-          "best_streak": 0
-        },
-        "leitura_pauta": {
-          "total_attempts": 0,
-          "correct_count": 0,
-          "current_streak": 0,
-          "best_streak": 0
-        },
-        "teoria": {
-          "total_attempts": 0,
-          "correct_count": 0,
-          "current_streak": 0,
-          "best_streak": 0
-        }
-      },
-      "history": []
-    },
-    "Carlini": {
-      "username": "Carlini",
-      "avatar": "🎸",
-      "created_at": 1786724265.081036,
+      "xp": 0,
+      "unlocked_achievements": [],
       "completed_lessons": [],
       "categories": {
         "treino_auditivo": {
@@ -96,6 +41,119 @@
         }
       },
       "history": []
+    },
+    "Beatriz": {
+      "username": "Beatriz",
+      "avatar": "🎹",
+      "created_at": 1786722009.036708,
+      "xp": 0,
+      "unlocked_achievements": [],
+      "completed_lessons": [
+        "chap1_fundamentals",
+        "chap2_intervals"
+      ],
+      "categories": {
+        "treino_auditivo": {
+          "total_attempts": 0,
+          "correct_count": 0,
+          "current_streak": 0,
+          "best_streak": 0
+        },
+        "leitura_pauta": {
+          "total_attempts": 0,
+          "correct_count": 0,
+          "current_streak": 0,
+          "best_streak": 0
+        },
+        "teoria": {
+          "total_attempts": 0,
+          "correct_count": 0,
+          "current_streak": 0,
+          "best_streak": 0
+        },
+        "repertorio": {
+          "total_attempts": 0,
+          "correct_count": 0,
+          "current_streak": 0,
+          "best_streak": 0
+        },
+        "pratica_instrumento": {
+          "total_attempts": 0,
+          "correct_count": 0,
+          "current_streak": 0,
+          "best_streak": 0
+        }
+      },
+      "history": []
+    },
+    "Carlini": {
+      "username": "Carlini",
+      "avatar": "🎸",
+      "created_at": 1786724265.081036,
+      "xp": 53,
+      "unlocked_achievements": [],
+      "completed_lessons": [],
+      "categories": {
+        "treino_auditivo": {
+          "total_attempts": 1,
+          "correct_count": 1,
+          "current_streak": 1,
+          "best_streak": 1
+        },
+        "leitura_pauta": {
+          "total_attempts": 2,
+          "correct_count": 2,
+          "current_streak": 2,
+          "best_streak": 2
+        },
+        "teoria": {
+          "total_attempts": 0,
+          "correct_count": 0,
+          "current_streak": 0,
+          "best_streak": 0
+        },
+        "repertorio": {
+          "total_attempts": 0,
+          "correct_count": 0,
+          "current_streak": 0,
+          "best_streak": 0
+        },
+        "pratica_instrumento": {
+          "total_attempts": 0,
+          "correct_count": 0,
+          "current_streak": 0,
+          "best_streak": 0
+        }
+      },
+      "history": [
+        {
+          "timestamp": 1786725205.090837,
+          "category": "treino_auditivo",
+          "question_type": "ear_interval",
+          "is_correct": true,
+          "prompt": "Ouve as notas tocadas em modo descendente e identifica o intervalo:",
+          "user_answer": "Segunda Menor",
+          "correct_answer": "Segunda Menor"
+        },
+        {
+          "timestamp": 1786725239.9101481,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota exibida na pauta (Clave de Sol):",
+          "user_answer": "B (Si)",
+          "correct_answer": "B (Si)"
+        },
+        {
+          "timestamp": 1786725253.320341,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota exibida na pauta (Clave de Sol):",
+          "user_answer": "A (Lá)",
+          "correct_answer": "A (Lá)"
+        }
+      ]
     }
   }
 }
