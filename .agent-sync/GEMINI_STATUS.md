@@ -20,6 +20,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 17 — Formatação Markdown Enriquecida no Ecrã de Teoria — CONCLUÍDA
+- Data: 2026-08-14 19:25 (UTC+1)
+- Commit: 2384355
+- Resumo: Criado o módulo gui/markdown_renderer.py com parser puro de markdown (sem dependências externas) e renderizador visual que integra cabeçalhos h1/h2/h3 com fontes em cascata, separadores de linha (─), bullets com indentação, bold inline **...** via tags Tk, e tabelas markdown como widgets CTkFrame embutidos com alternância de cor por linha. O renderizador substituiu o plain .insert() nos três blocos de texto do TheoryScreen (conteúdo, piano_focus, guitar_focus). Criada a suite tests/test_markdown_renderer.py; total de 116/116 testes a passar com 100% de sucesso.
+- Ficheiros principais alterados: gui/markdown_renderer.py, gui/screens/theory_screen.py, tests/test_markdown_renderer.py, README.md
+
 ## Fase 16 — Dicas Práticas de Técnica e Ergonomia (Piano & Viola) — CONCLUÍDA
 - Data: 2026-08-14 19:20 (UTC+1)
 - Commit: ab5c1b6
