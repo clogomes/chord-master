@@ -147,7 +147,18 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 11. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
+### 11. 🎼 FASE 11 — Expansão do Catálogo de Escalas & Modos ([`core/scales.py`](file:///Users/clogomes/repo/chord-master/core/scales.py))
+- **Catálogo Completo com 16 Escalas e Modos Teóricos**:
+  - **7 Modos Gregos**: Jónio (Maior), Dórico, Frígio, Lídio, Mixolídio, Eólio (Menor Natural) e Lócrio.
+  - **Variantes Clássicas e Jazz**: Menor Harmónica, Menor Melódica e Escala Bebop Dominante.
+  - **Pentatónicas e Blues**: Pentatónica Maior, Pentatónica Menor e Escala Blues (com *Blue Note*).
+  - **Escalas Simétricas e Exóticas**: Escala de Tons Inteiros (Hexatónica Impressionista), Escala Cromática (12 semitons) e Escala Menor Húngara (Cigana com 2 intervalos aumentados).
+- **Validação Estrutural Rigorosa**:
+  - Todas as escalas iniciam na tónica (0 semitons) e fecham na oitava (12 semitons) com fórmulas intervalares padronizadas.
+
+---
+
+### 12. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
 - **Deteção de Frequência Fundamental ($f_0$) via Microfone**: Algoritmo de autocorrelação no domínio do tempo acelerado por FFT, com interpolação parabólica para precisão sub-amostra e rejeição inteligente de ruído ambiente (60 Hz a 1200 Hz).
 - **Mostrador Visual com Agulha Dinâmica**: Medidor de $-50$ a $+50$ cents com faixa de tolerância verde ($\pm 10$ cents) e orientações em tempo real (*"▲ Muito Grave — Estica a corda"*, *"▼ Muito Agudo — Afrouxa a corda"*, *"✓ AFINADO (No Ponto Perfeito!)"*).
 - **Afinador de Viola (6 Cordas)**: Cartões visuais para as 6 cordas padrão ($E2, A2, D3, G3, B3, E4$) que se iluminam automaticamente ao detetar a corda tocada, com botão para ouvir o tom de cada corda.
@@ -155,13 +166,13 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 12. 🎯 Prática com Instrumento Acústico Real
+### 13. 🎯 Prática com Instrumento Acústico Real
 - Prática de escalas, arpejos e repertório utilizando o teu **piano acústico** ou **viola/guitarra física**.
 - A aplicação "escuta" através do microfone, valida a nota e o desvio em cents, exigindo uma sustentação de 300 ms afinada antes de avançar automaticamente para a nota seguinte.
 
 ---
 
-### 13. 🎧 Treino Auditivo & Leitura de Pauta
+### 14. 🎧 Treino Auditivo & Leitura de Pauta
 - **Treino Auditivo (Ear Training)**:
   - Identificação de **Intervalos Melódicos** (ascendentes/descendentes) e **Harmónicos** (duas notas em simultâneo).
   - Identificação de **Qualidade de Acordes** (Maiores, Menores, Diminutos, Aumentados, Sétimas).
@@ -174,14 +185,14 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 14. 📥 Exportação de Progresso & Certificado de Estudo
+### 15. 📥 Exportação de Progresso & Certificado de Estudo
 - Botão **«📥 Exportar Progresso»** no ecrã de Estatísticas:
   - Gera um relatório formatado em Markdown (`relatorio_progresso_<aluno>.md`) pronto a imprimir ou partilhar.
   - Inclui data de emissão, nível e título de maestria, XP total, estado das 8 lições de teoria, métricas de precisão por categoria e lista de todas as medalhas e conquistas alcançadas.
 
 ---
 
-### 15. 🎨 Design System & Interface Moderna ([`gui/theme.py`](file:///Users/clogomes/repo/chord-master/gui/theme.py))
+### 16. 🎨 Design System & Interface Moderna ([`gui/theme.py`](file:///Users/clogomes/repo/chord-master/gui/theme.py))
 - **Paleta de Cores Harmoniosa**: Base moderna em tons de ardósia escura (*Slate-950* `#0B0F19`, *Slate-900* `#111827`, *Slate-800* `#1F2937`), com destaques em *Royal Indigo* (`#4F46E5`), *Emerald* (`#10B981`), *Sky Blue* (`#0284C7`), *Amber* (`#F59E0B`) e *Crimson* (`#EF4444`).
 - **Tipografia Otimizada e Legível**: Escala com mínimo de $14\text{px}$ para textos de corpo e $28\text{--}32\text{px}$ para títulos principais, garantindo máxima legibilidade.
 - **Proteção de Threads & Rate-Limiting**: Processamento assíncrono seguro com limitação de taxa de atualização gráfica (15 FPS), evitando travamentos ou sobrecarga da GUI.
@@ -245,7 +256,7 @@ chord-master/
 │       ├── practice_staff.py       # Exercícios de Leitura de Pauta
 │       └── stats_screen.py         # Painel de Estatísticas, Conquistas, Leaderboard e Exportação
 │
-└── tests/                          # 78 Testes Unitários Automatizados (100% de Sucesso)
+└── tests/                          # 80 Testes Unitários Automatizados (100% de Sucesso)
     ├── __init__.py
     ├── test_notes.py               # Testes de notas, frequências e conversões MIDI
     ├── test_intervals.py           # Testes de intervalos e transposição

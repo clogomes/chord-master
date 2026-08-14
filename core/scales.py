@@ -97,6 +97,69 @@ SCALE_TYPES: Dict[str, ScaleDefinition] = {
         formula_steps="Tom - Tom - Semitom - Tom - Tom - Semitom - Tom",
         formula_degrees="1 - 2 - 3 - 4 - 5 - 6 - ♭7",
         description="Escala maior com 7ª Menor. Típica do Rock clássico, Blues e música tradicional celta."
+    ),
+    "phrygian": ScaleDefinition(
+        key="phrygian",
+        name_pt="Modo Frígio",
+        name_en="Phrygian Mode",
+        intervals=[0, 1, 3, 5, 7, 8, 10, 12],
+        formula_steps="Semitom - Tom - Tom - Tom - Semitom - Tom - Tom",
+        formula_degrees="1 - ♭2 - ♭3 - 4 - 5 - ♭6 - ♭7",
+        description="Modo menor com 2ª menor marcante. Soa sombrio, tenso e com forte sonoridade flamenca e espanhola."
+    ),
+    "lydian": ScaleDefinition(
+        key="lydian",
+        name_pt="Modo Lídio",
+        name_en="Lydian Mode",
+        intervals=[0, 2, 4, 6, 7, 9, 11, 12],
+        formula_steps="Tom - Tom - Tom - Semitom - Tom - Tom - Semitom",
+        formula_degrees="1 - 2 - 3 - ♯4 - 5 - 6 - 7",
+        description="Modo maior com 4ª aumentada (trítono). Soa etéreo, sonhador, místico e muito utilizado em trilhas sonoras de cinema."
+    ),
+    "locrian": ScaleDefinition(
+        key="locrian",
+        name_pt="Modo Lócrio",
+        name_en="Locrian Mode",
+        intervals=[0, 1, 3, 5, 6, 8, 10, 12],
+        formula_steps="Semitom - Tom - Tom - Semitom - Tom - Tom - Tom",
+        formula_degrees="1 - ♭2 - ♭3 - 4 - ♭5 - ♭6 - ♭7",
+        description="O modo mais instável e tenso, com tónica diminuta (♭5). Muito usado no Metal extremo e Jazz moderno."
+    ),
+    "whole_tone": ScaleDefinition(
+        key="whole_tone",
+        name_pt="Escala de Tons Inteiros",
+        name_en="Whole Tone Scale",
+        intervals=[0, 2, 4, 6, 8, 10, 12],
+        formula_steps="Tom - Tom - Tom - Tom - Tom - Tom",
+        formula_degrees="1 - 2 - 3 - ♯4 - ♯5 - ♭7",
+        description="Escala simétrica composta unicamente por intervalos de 1 tom. Cria um ambiente onírico, flutuante e impressionista."
+    ),
+    "chromatic": ScaleDefinition(
+        key="chromatic",
+        name_pt="Escala Cromática",
+        name_en="Chromatic Scale",
+        intervals=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        formula_steps="Semitom x 12",
+        formula_degrees="1 - ♭2 - 2 - ♭3 - 3 - 4 - ♭5 - 5 - ♭6 - 6 - ♭7 - 7",
+        description="Contém todas as 12 notas do sistema temperado ocidental em semitons sucessivos."
+    ),
+    "bebop_dominant": ScaleDefinition(
+        key="bebop_dominant",
+        name_pt="Escala Bebop Dominante",
+        name_en="Bebop Dominant Scale",
+        intervals=[0, 2, 4, 5, 7, 9, 10, 11, 12],
+        formula_steps="Tom - Tom - Semitom - Tom - Tom - Semitom - Semitom - Semitom",
+        formula_degrees="1 - 2 - 3 - 4 - 5 - 6 - ♭7 - 7",
+        description="Escala mixolídia com nota de passagem cromática entre a 7ª menor e a tónica. Essencial no fraseado Jazz e Bebop."
+    ),
+    "hungarian_minor": ScaleDefinition(
+        key="hungarian_minor",
+        name_pt="Escala Menor Húngara",
+        name_en="Hungarian Minor Scale",
+        intervals=[0, 2, 3, 6, 7, 8, 11, 12],
+        formula_steps="Tom - Semitom - Tom e meio - Semitom - Semitom - Tom e meio - Semitom",
+        formula_degrees="1 - 2 - ♭3 - ♯4 - 5 - ♭6 - 7",
+        description="Possui dois intervalos aumentados de 1 tom e meio (graus 3-4 e 6-7), com sonoridade profundamente dramática e exótica."
     )
 }
 
