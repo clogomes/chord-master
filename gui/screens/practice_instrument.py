@@ -9,6 +9,7 @@ from core.songs import Song, SONG_LIBRARY, get_song_by_id
 from core.user_manager import UserManager
 from audio.player import get_audio_player
 from audio.pitch_listener import PitchListener
+from audio.metronome import Metronome, evaluate_rhythm_accuracy
 from gui.components.piano_keyboard import PianoKeyboard
 from gui.components.staff_canvas import StaffCanvas
 from gui.components.guitar_fretboard import GuitarFretboard
@@ -48,6 +49,16 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self._is_advancing: bool = False
         self.exercise_completed: bool = False
 
+        # Metronome, Rhythm & Auto Tempo Ramp
+        self.target_bpm: int = 100
+        self.current_ramp_bpm: int = 70
+        self.tempo_ramp_var = ctk.BooleanVar(value=False)
+        self.metronome = Metronome(bpm=100, on_beat=self._on_metronome_beat)
+        self.current_combo: int = 0
+        self.max_combo: int = 0
+        self.rhythm_score: int = 0
+        self._expected_note_timestamp: float = time.time()
+
         # GUI Throttling & safety guards
         self._is_gui_busy: bool = False
         self._last_gui_update: float = 0.0
@@ -55,9 +66,13 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         # Scoring
         self.correct_notes_count: int = 0
         self.total_notes_played: int = 0
+        self.session_mistakes: int = 0
 
         self._build_ui()
         self._setup_default_exercise()
+
+    def _on_metronome_beat(self, beat_num: int):
+        pass
 
     def _build_ui(self):
         # 1. Top Navigation Bar
@@ -129,13 +144,13 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
             font=theme.get_font(theme.FONT_BODY),
             height=34,
             corner_radius=theme.RADIUS_SM,
-            width=170,
+            width=160,
         )
         self.inst_select.set("🎹 Piano Acústico")
         self.inst_select.pack(side="left", padx=4)
 
         # Exercise Type
-        ctk.CTkLabel(cfg_bar, text="Exercício:", font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(14, 4))
+        ctk.CTkLabel(cfg_bar, text="Exercício:", font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(10, 4))
         self.exercise_type_select = ctk.CTkOptionMenu(
             cfg_bar,
             values=[
@@ -154,10 +169,55 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
             font=theme.get_font(theme.FONT_BODY),
             height=34,
             corner_radius=theme.RADIUS_SM,
-            width=260,
+            width=230,
         )
         self.exercise_type_select.set("Escala Maior de Dó")
         self.exercise_type_select.pack(side="left", padx=4)
+
+        # Metronome Toggle
+        self.metronome_btn = ctk.CTkButton(
+            cfg_bar,
+            text="⏱️ Metrónomo",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            fg_color=theme.COLOR_SURFACE_SECONDARY,
+            hover_color=theme.COLOR_SURFACE_HOVER,
+            height=34,
+            width=115,
+            corner_radius=theme.RADIUS_SM,
+            command=self._toggle_metronome,
+        )
+        self.metronome_btn.pack(side="left", padx=6)
+
+        # BPM Slider
+        self.bpm_slider = ctk.CTkSlider(
+            cfg_bar,
+            from_=40,
+            to=180,
+            number_of_steps=140,
+            width=90,
+            command=self._on_bpm_changed,
+        )
+        self.bpm_slider.set(self.target_bpm)
+        self.bpm_slider.pack(side="left", padx=2)
+
+        self.bpm_lbl = ctk.CTkLabel(
+            cfg_bar,
+            text=f"{self.target_bpm}",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            text_color=theme.COLOR_PRIMARY,
+            width=32,
+        )
+        self.bpm_lbl.pack(side="left", padx=2)
+
+        # Tempo Ramp Checkbox
+        self.ramp_checkbox = ctk.CTkCheckBox(
+            cfg_bar,
+            text="🏎️ Rampa (70%➔100%)",
+            variable=self.tempo_ramp_var,
+            command=self._on_tempo_ramp_toggled,
+            font=theme.get_font(theme.FONT_SMALL_BOLD),
+        )
+        self.ramp_checkbox.pack(side="left", padx=8)
 
         # Restart exercise button
         restart_btn = ctk.CTkButton(
@@ -166,12 +226,12 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color="#475569",
             hover_color="#334155",
-            width=100,
+            width=90,
             height=34,
             corner_radius=theme.RADIUS_SM,
             command=self._restart_exercise,
         )
-        restart_btn.pack(side="right", padx=14)
+        restart_btn.pack(side="right", padx=10)
 
         # 2.2 Live Tuner Gauge / Pitch Display Card
         self.tuner_card = ctk.CTkFrame(
@@ -467,10 +527,56 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
             self.tuner_card.configure(border_color=theme.COLOR_ACCENT_CRIMSON)
             self._matched_start_time = None
 
+    def _toggle_metronome(self):
+        if self.metronome.is_running:
+            self.metronome.stop()
+            self.metronome_btn.configure(
+                text="⏱️ Metrónomo",
+                fg_color=theme.COLOR_SURFACE_SECONDARY,
+                text_color=theme.COLOR_TEXT_PRIMARY,
+            )
+        else:
+            self.metronome.start()
+            self._expected_note_timestamp = time.time() + (60.0 / self.metronome.bpm)
+            self.metronome_btn.configure(
+                text="⏱️ A Tocar...",
+                fg_color=theme.COLOR_PRIMARY,
+                text_color="#FFFFFF",
+            )
+
+    def _on_bpm_changed(self, val):
+        bpm = int(float(val))
+        self.bpm_lbl.configure(text=str(bpm))
+        self.metronome.set_bpm(bpm)
+        self.target_bpm = bpm
+
+    def _on_tempo_ramp_toggled(self):
+        if self.tempo_ramp_var.get():
+            self.current_ramp_bpm = max(40, int(self.target_bpm * 0.70))
+            self.bpm_slider.set(self.current_ramp_bpm)
+            self.bpm_lbl.configure(text=f"{self.current_ramp_bpm} (Rampa)")
+            self.metronome.set_bpm(self.current_ramp_bpm)
+        else:
+            self.bpm_slider.set(self.target_bpm)
+            self.bpm_lbl.configure(text=str(self.target_bpm))
+            self.metronome.set_bpm(self.target_bpm)
+
     def _advance_to_next_target_note(self):
         self._is_advancing = True
         self.correct_notes_count += 1
         self.total_notes_played += 1
+
+        rhythm_feedback = ""
+        if self.metronome.is_running:
+            rating, delta_ms, pts = evaluate_rhythm_accuracy(self._expected_note_timestamp, time.time())
+            self.rhythm_score += pts
+            rhythm_feedback = f" • Ritmo: {rating} ({delta_ms:+.0f}ms)"
+            self._expected_note_timestamp = time.time() + (60.0 / self.metronome.bpm)
+
+        self.intonation_status_lbl.configure(
+            text=f"✓ Nota correta afinada!{rhythm_feedback}",
+            text_color=theme.COLOR_SUCCESS,
+        )
 
         self.audio_player.play_note(self.exercise_notes[self.current_note_idx], duration=0.4)
 
@@ -486,7 +592,25 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self.exercise_completed = True
         self.progress_bar.set(1.0)
         self.pitch_listener.stop_listening()
+        if self.metronome.is_running:
+            self.metronome.stop()
+            self.metronome_btn.configure(
+                text="⏱️ Metrónomo",
+                fg_color=theme.COLOR_SURFACE_SECONDARY,
+                text_color=theme.COLOR_TEXT_PRIMARY,
+            )
         self.mic_btn.configure(text="🎙️ Ativar Microfone", fg_color=theme.COLOR_SUCCESS)
+
+        ramp_msg = ""
+        if self.tempo_ramp_var.get() and self.session_mistakes == 0:
+            if self.current_ramp_bpm < self.target_bpm:
+                self.current_ramp_bpm = min(self.target_bpm, int(self.current_ramp_bpm + max(2, self.target_bpm * 0.05)))
+                self.bpm_slider.set(self.current_ramp_bpm)
+                self.bpm_lbl.configure(text=f"{self.current_ramp_bpm} (Rampa)")
+                self.metronome.set_bpm(self.current_ramp_bpm)
+                ramp_msg = f"\n🏎️ Rampa de Tempo avançou para {self.current_ramp_bpm} BPM!"
+            else:
+                ramp_msg = f"\n🏆 Atingiste a velocidade alvo completa ({self.target_bpm} BPM)!"
 
         stats = self.user_manager.record_attempt(
             category="pratica_instrumento",
@@ -498,13 +622,13 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         )
 
         self.intonation_status_lbl.configure(
-            text=f"🎉 Parabéns! Completaste «{self.exercise_title}» com o teu instrumento real!",
+            text=f"🎉 Parabéns! Completaste «{self.exercise_title}» com o teu instrumento real!{ramp_msg}",
             text_color=theme.COLOR_SUCCESS,
         )
 
         self.score_card.show_feedback(
             is_correct=True,
-            explanation=f"Excelente desempenho acústico no {self.instrument_type}! Tocaste e afinaste todas as {len(self.exercise_notes)} notas com sucesso.",
+            explanation=f"Excelente desempenho acústico no {self.instrument_type}! Tocaste e afinaste todas as {len(self.exercise_notes)} notas com sucesso.{ramp_msg}",
             stats=stats,
             can_replay=True,
         )
@@ -514,6 +638,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self.current_note_idx = 0
         self.correct_notes_count = 0
         self.total_notes_played = 0
+        self.session_mistakes = 0
         self.exercise_completed = False
         self._matched_start_time = None
         self._is_advancing = False
@@ -527,9 +652,13 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
 
     def _handle_back(self):
         self.pitch_listener.stop_listening()
+        if self.metronome.is_running:
+            self.metronome.stop()
         self.audio_player.stop_all()
         self.on_back()
 
     def destroy(self):
         self.pitch_listener.stop_listening()
+        if self.metronome.is_running:
+            self.metronome.stop()
         super().destroy()

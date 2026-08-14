@@ -60,6 +60,35 @@ class TestSongs(unittest.TestCase):
         none_song = get_song_by_id("non_existent_id")
         self.assertIsNone(none_song)
 
+    def test_time_signature_and_beats_per_measure(self):
+        fur_elise = get_song_by_id("fur_elise")
+        self.assertIsNotNone(fur_elise)
+        self.assertEqual(fur_elise.time_signature, "3/4")
+        self.assertEqual(fur_elise.beats_per_measure, 3.0)
+
+        ode = get_song_by_id("ode_to_joy")
+        self.assertIsNotNone(ode)
+        self.assertEqual(ode.time_signature, "4/4")
+        self.assertEqual(ode.beats_per_measure, 4.0)
+
+        nem = get_song_by_id("nothing_else_matters")
+        self.assertIsNotNone(nem)
+        self.assertEqual(nem.time_signature, "6/8")
+        self.assertEqual(nem.beats_per_measure, 3.0)
+
+    def test_tempo_ramp_calculation(self):
+        # Starts at 70% of target BPM and increases by ~5% until reaching target
+        target_bpm = 100
+        start_ramp_bpm = int(target_bpm * 0.70)
+        self.assertEqual(start_ramp_bpm, 70)
+
+        # Simulate 6 flawless repetitions
+        curr_bpm = start_ramp_bpm
+        for _ in range(6):
+            curr_bpm = min(target_bpm, int(curr_bpm + max(2, target_bpm * 0.05)))
+
+        self.assertEqual(curr_bpm, 100)
+
 
 if __name__ == "__main__":
     unittest.main()

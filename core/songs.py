@@ -25,6 +25,7 @@ class Song:
     difficulty: str  # "Iniciante", "Intermédio", "Avançado"
     bpm: int
     clef: str = "treble"  # "treble" ou "bass"
+    time_signature: str = "4/4"
     description: str = ""
     notes: List[SongNote] = field(default_factory=list)
 
@@ -35,6 +36,14 @@ class Song:
     @property
     def total_beats(self) -> float:
         return sum(sn.duration_beats for sn in self.notes)
+
+    @property
+    def beats_per_measure(self) -> float:
+        try:
+            num, den = self.time_signature.split("/")
+            return float(num) * (4.0 / float(den))
+        except Exception:
+            return 4.0
 
 
 def _sn(
@@ -282,6 +291,7 @@ SONG_LIBRARY: List[Song] = [
         difficulty="Intermédio",
         bpm=120,
         clef="treble",
+        time_signature="3/4",
         description="A célebre Bagatela em Lá menor (WoO 59) de Beethoven com o motivo cromático inicial, arpejos de Lá menor e Mi Maior e cadência harmónica.",
         notes=[
             _sn("E5", 1.0, 5, 5, 12, "Mi"),
@@ -332,6 +342,7 @@ SONG_LIBRARY: List[Song] = [
         difficulty="Intermédio",
         bpm=116,
         clef="treble",
+        time_signature="3/4",
         description="Do Pequeno Livro de Anna Magdalena Bach. A Seção A completa de 16 compassos em Sol Maior.",
         notes=[
             _sn("D5", 1.0, 5, 5, 10, "Ré"),
@@ -645,6 +656,7 @@ SONG_LIBRARY: List[Song] = [
         difficulty="Iniciante",
         bpm=70,
         clef="treble",
+        time_signature="6/8",
         description="A introdução mais famosa do heavy metal acústico. Toca-se inteiramente em cordas soltas no Mi menor (E2, G3, B3, E4) antes do tema principal.",
         notes=[
             # Arpejo de Cordas Soltas (Mi Menor)

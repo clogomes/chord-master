@@ -81,6 +81,8 @@ class PracticeSongScreen(ctk.CTkFrame):
 
         # Rhythm & Metronome Challenge Mode
         self.is_challenge_mode: bool = False
+        self.tempo_ramp_var = ctk.BooleanVar(value=False)
+        self.current_ramp_bpm: int = max(40, int(self.current_song.bpm * 0.70))
         self.metronome = Metronome(bpm=self.current_song.bpm, on_beat=self._on_metronome_beat)
         self.current_combo: int = 0
         self.max_combo: int = 0
@@ -389,14 +391,14 @@ class PracticeSongScreen(ctk.CTkFrame):
             text="BPM:",
             font=theme.get_font(theme.FONT_SMALL_BOLD),
             text_color=theme.COLOR_TEXT_MUTED,
-        ).pack(side="left", padx=(10, 4))
+        ).pack(side="left", padx=(8, 2))
 
         self.bpm_slider = ctk.CTkSlider(
             ctrl_bar,
             from_=40,
             to=180,
             number_of_steps=140,
-            width=110,
+            width=95,
             command=self._on_bpm_changed,
         )
         self.bpm_slider.set(self.current_song.bpm)
@@ -407,9 +409,19 @@ class PracticeSongScreen(ctk.CTkFrame):
             text=f"{self.current_song.bpm}",
             font=theme.get_font(theme.FONT_BODY_BOLD),
             text_color=theme.COLOR_PRIMARY,
-            width=35,
+            width=32,
         )
-        self.bpm_lbl.pack(side="left", padx=4)
+        self.bpm_lbl.pack(side="left", padx=2)
+
+        # Tempo Ramp Checkbox
+        self.ramp_checkbox = ctk.CTkCheckBox(
+            ctrl_bar,
+            text="🏎️ Rampa (70%➔100%)",
+            variable=self.tempo_ramp_var,
+            command=self._on_tempo_ramp_toggled,
+            font=theme.get_font(theme.FONT_SMALL_BOLD),
+        )
+        self.ramp_checkbox.pack(side="left", padx=8)
 
         # Progress bar
         self.progress_bar = ctk.CTkProgressBar(self.stage_scroll, height=7, progress_color=theme.COLOR_PRIMARY)
@@ -540,6 +552,17 @@ class PracticeSongScreen(ctk.CTkFrame):
         self._update_legend_text()
         self._highlight_active_note()
 
+    def _on_tempo_ramp_toggled(self):
+        if self.tempo_ramp_var.get():
+            self.current_ramp_bpm = max(40, int(self.current_song.bpm * 0.70))
+            self.bpm_slider.set(self.current_ramp_bpm)
+            self.bpm_lbl.configure(text=f"{self.current_ramp_bpm} (Rampa)")
+            self.metronome.set_bpm(self.current_ramp_bpm)
+        else:
+            self.bpm_slider.set(self.current_song.bpm)
+            self.bpm_lbl.configure(text=str(self.current_song.bpm))
+            self.metronome.set_bpm(self.current_song.bpm)
+
     def _load_song(self, song: Song):
         self._stop_demo_playback()
         self.current_song = song
@@ -553,34 +576,33 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.score_card.pack_forget()
 
         # Update Sidebar button styles
-        for i, btn in enumerate(self.song_buttons):
-            if SONG_LIBRARY[i].id == song.id:
-                btn.configure(
-                    fg_color=theme.COLOR_PRIMARY,
-                    text_color="#FFFFFF",
-                    hover_color=theme.COLOR_PRIMARY_HOVER,
-                    font=theme.get_font(theme.FONT_BODY_BOLD),
-                )
-            else:
-                btn.configure(
-                    fg_color=theme.COLOR_SURFACE_SECONDARY,
-                    text_color=theme.COLOR_TEXT_PRIMARY,
-                    hover_color=theme.COLOR_SURFACE_HOVER,
-                    font=theme.get_font(theme.FONT_BODY),
-                )
+        for btn in self.song_buttons:
+            btn.configure(
+                fg_color=theme.COLOR_SURFACE_SECONDARY,
+                text_color=theme.COLOR_TEXT_PRIMARY,
+                hover_color=theme.COLOR_SURFACE_HOVER,
+                font=theme.get_font(theme.FONT_BODY),
+            )
 
         # Update Info Card
         self.song_title_lbl.configure(text=f"{song.title} — {song.composer}")
-        self.song_meta_lbl.configure(text=f"Dificuldade: {song.difficulty} • BPM: {song.bpm} • {song.note_count} Notas")
+        self.song_meta_lbl.configure(text=f"Dificuldade: {song.difficulty} • Compasso: {song.time_signature} • BPM: {song.bpm} • {song.note_count} Notas")
         self.song_desc_lbl.configure(text=song.description)
 
         # Update Slider
-        self.bpm_slider.set(song.bpm)
-        self.bpm_lbl.configure(text=str(song.bpm))
-        self.metronome.set_bpm(song.bpm)
+        if self.tempo_ramp_var.get():
+            self.current_ramp_bpm = max(40, int(song.bpm * 0.70))
+            self.bpm_slider.set(self.current_ramp_bpm)
+            self.bpm_lbl.configure(text=f"{self.current_ramp_bpm} (Rampa)")
+            self.metronome.set_bpm(self.current_ramp_bpm)
+        else:
+            self.bpm_slider.set(song.bpm)
+            self.bpm_lbl.configure(text=str(song.bpm))
+            self.metronome.set_bpm(song.bpm)
 
-        # Update Staff clef
-        self.staff_view.clef = song.clef
+        # Update Staff clef & time signature
+        self.staff_view.set_clef(song.clef)
+        self.staff_view.set_time_signature(song.time_signature)
         self._update_legend_text()
         self._highlight_active_note()
 
@@ -596,8 +618,21 @@ class PracticeSongScreen(ctk.CTkFrame):
         pct = idx / float(total_notes) if total_notes > 0 else 0.0
         self.progress_bar.set(pct)
 
-        # 1. Staff Display
-        self.staff_view.set_single_note(note, color=theme.COLOR_SUCCESS)
+        # 1. Staff Display with Rhythmic Window & Barlines
+        window_size = 4
+        start_w = max(0, min(idx, total_notes - window_size))
+        end_w = min(total_notes, start_w + window_size)
+        sub_notes = [self.current_song.notes[k].note for k in range(start_w, end_w)]
+        sub_durs = [self.current_song.notes[k].duration_beats for k in range(start_w, end_w)]
+        sub_cols = []
+        for k in range(start_w, end_w):
+            if k < idx:
+                sub_cols.append("#64748B")
+            elif k == idx:
+                sub_cols.append(theme.COLOR_SUCCESS)
+            else:
+                sub_cols.append("#38BDF8")
+        self.staff_view.set_notes(sub_notes, sub_cols, durations=sub_durs)
 
         # 2. Piano Display with Fingering
         piano_fingering = {}
@@ -763,13 +798,24 @@ class PracticeSongScreen(ctk.CTkFrame):
         unlocked = self.user_manager.check_achievements()
         ach_msg = f"\n🏆 Desbloqueaste a medalha «{unlocked[0].title}» (+{unlocked[0].xp_reward} XP)!" if unlocked else ""
 
-        msg = f"🎉 Peça Concluída! Precisão: {accuracy:.0f}% • Maior Combo: 🔥 {self.max_combo}x{ach_msg}"
+        ramp_msg = ""
+        if self.tempo_ramp_var.get() and self.session_mistakes == 0:
+            if self.current_ramp_bpm < self.current_song.bpm:
+                self.current_ramp_bpm = min(self.current_song.bpm, int(self.current_ramp_bpm + max(2, self.current_song.bpm * 0.05)))
+                self.bpm_slider.set(self.current_ramp_bpm)
+                self.bpm_lbl.configure(text=f"{self.current_ramp_bpm} (Rampa)")
+                self.metronome.set_bpm(self.current_ramp_bpm)
+                ramp_msg = f"\n🏎️ Rampa de Tempo acelerou para {self.current_ramp_bpm} BPM!"
+            else:
+                ramp_msg = f"\n🏆 Atingiste o andamento alvo completo ({self.current_song.bpm} BPM)!"
+
+        msg = f"🎉 Peça Concluída! Precisão: {accuracy:.0f}% • Maior Combo: 🔥 {self.max_combo}x{ramp_msg}{ach_msg}"
         self.note_guide_lbl.configure(text=msg)
 
         # Show score card
         self.score_card.show_feedback(
             is_correct=is_passed,
-            explanation=f"Tocaste «{self.current_song.title}» com {accuracy:.0f}% de precisão e combo de {self.max_combo}x!",
+            explanation=f"Tocaste «{self.current_song.title}» com {accuracy:.0f}% de precisão e combo de {self.max_combo}x!{ramp_msg}",
             stats=stats,
             can_replay=True,
         )

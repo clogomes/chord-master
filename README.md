@@ -126,7 +126,18 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 9. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
+### 9. ⏱️ FASE 9 — Notação Rítmica Real & Prática de Tempo Guiada
+- **Fórmulas de Compasso & Barras de Compasso Vetoriais (`StaffCanvas`)**:
+  - Renderização da fórmula de compasso ($4/4$, $3/4$, $6/8$) logo após a clave e desenho automático de barras de divisão de compasso (*barlines*) com base na contagem cumulativa de tempos.
+  - Diferenciação visual de figuras rítmicas com cabeças de nota ocas para mínimas/semibreves ($\ge 2\text{ tempos}$) e cheias para semínimas/colcheias.
+- **Integração do Metrónomo na Prática com Instrumento Real**:
+  - O ecrã de prática acústica por microfone (`practice_instrument.py`) agora inclui metrónomo integrado e avaliação de precisão rítmica em milissegundos (*"Perfeito!"*, *"Bom"*, *"Adiantado"*, *"Atrasado"*).
+- **Rampa de Tempo Automática (70% ➔ 100% BPM)**:
+  - Prática lenta-para-rápido: o estudante começa a 70% da velocidade da música e, a cada repetição perfeita sem erros, o andamento acelera automaticamente ~5% até atingir o BPM alvo.
+
+---
+
+### 10. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
 - **Deteção de Frequência Fundamental ($f_0$) via Microfone**: Algoritmo de autocorrelação no domínio do tempo acelerado por FFT, com interpolação parabólica para precisão sub-amostra e rejeição inteligente de ruído ambiente (60 Hz a 1200 Hz).
 - **Mostrador Visual com Agulha Dinâmica**: Medidor de $-50$ a $+50$ cents com faixa de tolerância verde ($\pm 10$ cents) e orientações em tempo real (*"▲ Muito Grave — Estica a corda"*, *"▼ Muito Agudo — Afrouxa a corda"*, *"✓ AFINADO (No Ponto Perfeito!)"*).
 - **Afinador de Viola (6 Cordas)**: Cartões visuais para as 6 cordas padrão ($E2, A2, D3, G3, B3, E4$) que se iluminam automaticamente ao detetar a corda tocada, com botão para ouvir o tom de cada corda.
@@ -223,7 +234,7 @@ chord-master/
 │       ├── practice_staff.py       # Exercícios de Leitura de Pauta
 │       └── stats_screen.py         # Painel de Estatísticas, Conquistas, Leaderboard e Exportação
 │
-└── tests/                          # 73 Testes Unitários Automatizados (100% de Sucesso)
+└── tests/                          # 75 Testes Unitários Automatizados (100% de Sucesso)
     ├── __init__.py
     ├── test_notes.py               # Testes de notas, frequências e conversões MIDI
     ├── test_intervals.py           # Testes de intervalos e transposição

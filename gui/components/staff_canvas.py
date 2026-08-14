@@ -19,6 +19,7 @@ class StaffCanvas(ctk.CTkFrame):
         clef: str = "treble",
         line_spacing: int = 14,
         show_note_names: bool = False,
+        time_signature: Optional[str] = None,
         **kwargs,
     ):
         super().__init__(master, fg_color=("#F8FAFC", "#0F172A"), **kwargs)
@@ -27,8 +28,10 @@ class StaffCanvas(ctk.CTkFrame):
         self.clef = clef
         self.line_spacing = line_spacing
         self.show_note_names = show_note_names
+        self.time_signature = time_signature
 
         self.notes: List[Note] = []
+        self.durations: List[float] = []
         self.note_colors: List[str] = []
 
         # Coordinate references
@@ -51,9 +54,15 @@ class StaffCanvas(ctk.CTkFrame):
         self.clef = clef
         self.redraw()
 
-    def set_notes(self, notes: List[Note], colors: Optional[List[str]] = None):
-        """Sets notes to be rendered on the staff."""
+    def set_time_signature(self, time_signature: Optional[str]):
+        """Sets time signature (e.g. '4/4', '3/4', '6/8') and redraws."""
+        self.time_signature = time_signature
+        self.redraw()
+
+    def set_notes(self, notes: List[Note], colors: Optional[List[str]] = None, durations: Optional[List[float]] = None):
+        """Sets notes and optional durations to be rendered on the staff."""
         self.notes = list(notes)
+        self.durations = list(durations) if durations else [1.0] * len(self.notes)
         if colors:
             self.note_colors = colors
         else:
@@ -62,11 +71,12 @@ class StaffCanvas(ctk.CTkFrame):
 
     def set_single_note(self, note: Note, color: str = "#38BDF8"):
         """Displays a single note centered on the staff."""
-        self.set_notes([note], [color])
+        self.set_notes([note], [color], [1.0])
 
     def clear(self):
         """Clears all notes from the staff."""
         self.notes.clear()
+        self.durations.clear()
         self.note_colors.clear()
         self.redraw()
 
@@ -87,7 +97,7 @@ class StaffCanvas(ctk.CTkFrame):
         return y
 
     def redraw(self):
-        """Redraws the staff lines, clef symbol, ledger lines, and all notes."""
+        """Redraws the staff lines, clef symbol, time signature, barlines, ledger lines, and all notes."""
         self.canvas.delete("all")
 
         # 1. Draw 5 Staff Lines
@@ -114,7 +124,6 @@ class StaffCanvas(ctk.CTkFrame):
                 font=("Georgia", 56),
                 fill="#F8FAFC",
             )
-            # Clef Label
             self.canvas.create_text(
                 clef_x + 35,
                 self.staff_bottom_y + 24,
@@ -131,7 +140,6 @@ class StaffCanvas(ctk.CTkFrame):
                 font=("Georgia", 48),
                 fill="#F8FAFC",
             )
-            # Clef Label
             self.canvas.create_text(
                 clef_x + 35,
                 self.staff_bottom_y + 24,
@@ -140,13 +148,35 @@ class StaffCanvas(ctk.CTkFrame):
                 fill="#64748B",
             )
 
-        # 3. Draw Notes
+        # 3. Draw Time Signature (if present)
+        ts_offset_x = 0
+        if self.time_signature and "/" in self.time_signature:
+            ts_x = clef_x + 46
+            ts_offset_x = 32
+            num, den = self.time_signature.split("/")[:2]
+            # Draw Numerator & Denominator stacked
+            self.canvas.create_text(
+                ts_x,
+                self.staff_top_y + (1 * self.line_spacing),
+                text=num,
+                font=("Helvetica", 18, "bold"),
+                fill="#F8FAFC",
+            )
+            self.canvas.create_text(
+                ts_x,
+                self.staff_top_y + (3 * self.line_spacing),
+                text=den,
+                font=("Helvetica", 18, "bold"),
+                fill="#F8FAFC",
+            )
+
+        # 4. Draw Notes & Barlines
         if not self.notes:
             return
 
         num_notes = len(self.notes)
-        content_start_x = 130
-        available_width = end_x - content_start_x - 40
+        content_start_x = 120 + ts_offset_x
+        available_width = end_x - content_start_x - 30
 
         if num_notes == 1:
             note_x_positions = [content_start_x + available_width // 2]
@@ -154,21 +184,46 @@ class StaffCanvas(ctk.CTkFrame):
             spacing = available_width / max(1, num_notes - 1)
             note_x_positions = [content_start_x + int(i * spacing) for i in range(num_notes)]
 
+        # Calculate measure beats for barlines
+        beats_per_bar = 4.0
+        if self.time_signature and "/" in self.time_signature:
+            try:
+                n_val, d_val = self.time_signature.split("/")[:2]
+                beats_per_bar = float(n_val) * (4.0 / float(d_val))
+            except Exception:
+                beats_per_bar = 4.0
+
+        cum_beats = 0.0
         for i, note in enumerate(self.notes):
             nx = note_x_positions[i]
             ny = self._get_note_y(note)
             color = self.note_colors[i] if i < len(self.note_colors) else "#38BDF8"
+            dur = self.durations[i] if i < len(self.durations) else 1.0
+
+            # Draw barline if reaching measure boundary
+            cum_beats += dur
+            if num_notes > 2 and (cum_beats % beats_per_bar == 0) and i < num_notes - 1:
+                next_nx = note_x_positions[i + 1]
+                bar_x = (nx + next_nx) / 2.0
+                self.canvas.create_line(
+                    bar_x, self.staff_top_y,
+                    bar_x, self.staff_bottom_y,
+                    fill="#94A3B8",
+                    width=2,
+                )
 
             self._draw_ledger_lines(nx, ny)
-            self._draw_notehead(nx, ny, color)
+            self._draw_notehead(nx, ny, color, duration=dur)
             self._draw_accidental(nx, ny, note, color)
             self._draw_stem(nx, ny, color)
 
             if self.show_note_names:
+                dur_text = f"{dur:g}t" if dur != 1.0 else ""
+                label = f"{note.pitch} ({note.name_pt}) {dur_text}".strip()
                 self.canvas.create_text(
                     nx,
                     self.staff_bottom_y + 25,
-                    text=f"{note.pitch} ({note.name_pt})",
+                    text=label,
                     font=("Helvetica", 10, "bold"),
                     fill="#E2E8F0",
                 )
@@ -202,16 +257,17 @@ class StaffCanvas(ctk.CTkFrame):
                 )
                 curr_y -= self.line_spacing
 
-    def _draw_notehead(self, x: float, y: float, color: str):
-        """Draws an elliptical notehead."""
+    def _draw_notehead(self, x: float, y: float, color: str, duration: float = 1.0):
+        """Draws an elliptical notehead (hollow for half/whole notes, filled for quarter/eighth)."""
         rx = 8.5
         ry = 6.0
+        is_hollow = (duration >= 2.0)
         self.canvas.create_oval(
             x - rx, y - ry,
             x + rx, y + ry,
-            fill=color,
-            outline="#FFFFFF",
-            width=1.5,
+            fill="#1E293B" if is_hollow else color,
+            outline=color if is_hollow else "#FFFFFF",
+            width=2.5 if is_hollow else 1.5,
         )
 
     def _draw_accidental(self, x: float, y: float, note: Note, color: str):
