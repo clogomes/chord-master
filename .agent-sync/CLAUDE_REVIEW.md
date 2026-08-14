@@ -14,6 +14,114 @@ Cada entrada tem um veredito:
 
 ---
 
+## TRABALHO PEDIDO — Fases 10, 11, 12 (Acompanhamento Rítmico, Mais Escalas, Estúdio de Escalas)
+- Pedido por: Claude, a pedido do utilizador (clogomes), especificação já aprovada
+  pelo utilizador antes de ser escrita aqui.
+- Estado anterior: Fases 1-9 concluídas e aprovadas (ver histórico abaixo).
+  75+ testes atuais devem continuar a passar.
+- Implementa por ordem — a Fase 12 depende das Fases 10 e 11 estarem feitas.
+  Corre `python3 -m unittest discover tests` no fim de cada fase, e atualiza o
+  README.md no fim de CADA fase.
+
+### FASE 10 — Motor de Acompanhamento Rítmico Sintetizado
+Objetivo: dar ritmos de fundo para acompanhar a prática de repertório e (na
+Fase 12) de escalas, sem depender de amostras de áudio externas — mantendo o
+mesmo princípio já usado em `audio/synthesizer.py` (síntese local, sem
+ficheiros/licenciamento).
+
+- Cria `audio/backing_tracks.py`:
+  - Funções de síntese de bateria em numpy puro (sem dependências novas):
+    `synthesize_kick()`, `synthesize_snare()`, `synthesize_hihat(open: bool)`,
+    `synthesize_ride()`. Usa ruído branco moldado por envelope + um impulso
+    sinusoidal curto para o bombo (kick), seguindo o mesmo padrão ADSR já
+    usado em `Synthesizer.apply_adsr()` — reaproveita essa função em vez de
+    reimplementar envelopes.
+  - Dataclass `RhythmPattern` (id, name_pt, time_signature, steps_per_bar,
+    grid: lista de passos, cada passo com uma lista de batidas a tocar nesse
+    passo — kick/snare/hihat/ride).
+  - `BACKING_TRACK_LIBRARY: Dict[str, RhythmPattern]` com 5 estilos: Rock
+    Básico (4/4), Balada Lenta (4/4), Bossa Nova (4/4 sincopado), Blues
+    Shuffle (4/4 shuffle/12/8 feel), Valsa (3/4).
+  - Classe `BackingTrackPlayer` com `start(pattern_id, bpm)`, `stop()`,
+    `set_bpm(bpm)`, `set_volume(vol)`. Corre num thread daemon, com o mesmo
+    padrão de precisão de tempo já usado em `audio/metronome.py` — para
+    evitar dois relógios a dessincronizar, usa a mesma abordagem de
+    agendamento que o `Metronome` já usa (idealmente a mesma classe/mecanismo
+    de tick interno, não duas implementações de timing independentes).
+- Integração em `gui/screens/practice_song.py`: acrescenta um seletor de
+  estilo de acompanhamento + slider de volume perto do botão de metrónomo já
+  existente. Quando ativo, o `BackingTrackPlayer` toca em loop enquanto a
+  música/sessão decorre, e respeita a rampa de tempo da Fase 9 (chamando
+  `set_bpm()` quando o tempo sobe).
+- Testes em `tests/test_backing_tracks.py`: cada `RhythmPattern` tem exatamente
+  `steps_per_bar` passos consistentes com o `time_signature` (mesma lógica de
+  `beats_per_measure` já usada em `core/songs.py`); cada função de síntese
+  devolve bytes de áudio válidos e não vazios sem lançar exceções.
+
+### FASE 11 — Expansão do Catálogo de Escalas & Modos
+Objetivo: fechar uma lacuna real — o capítulo de teoria (`chap3_scales_modes`
+em `core/theory_content.py`) já descreve os 7 modos gregos, mas
+`core/scales.py` só implementa 4 (Jónio=major, Eólio=natural_minor, Dórico,
+Mixolídio). Frígio, Lídio e Lócrio são mencionados no texto mas não existem
+como escala tocável.
+
+Acrescenta a `SCALE_TYPES` em `core/scales.py`, seguindo exatamente o mesmo
+padrão das entradas existentes (`ScaleDefinition` com name_pt, name_en,
+intervals, formula_steps, formula_degrees, description):
+- `phrygian` — intervals [0,1,3,5,7,8,10,12]
+- `lydian` — intervals [0,2,4,6,7,9,11,12]
+- `locrian` — intervals [0,1,3,5,6,8,10,12]
+- `whole_tone` — intervals [0,2,4,6,8,10,12] (Escala de Tons Inteiros)
+- `chromatic` — intervals [0,1,2,3,4,5,6,7,8,9,10,11,12] (Escala Cromática)
+- `bebop_dominant` — intervals [0,2,4,5,7,9,10,11,12] (Maior + nota de
+  passagem cromática entre a 7ª menor e a oitava, típica do bebop/jazz)
+- `hungarian_minor` — intervals [0,2,3,6,7,8,11,12] (Menor Húngara, som
+  exótico/cigano)
+
+Confirma que `theory_screen.py` e `gui/components/guitar_fretboard.py` (o
+seletor/demonstração de escalas) já funcionam automaticamente com as escalas
+novas por iterarem `SCALE_TYPES` genericamente — se não funcionarem, ajusta
+para funcionarem sem hardcoding de nomes de escalas específicas.
+
+Testes em `tests/test_scales.py`: acrescenta um teste genérico que corre para
+TODAS as entradas de `SCALE_TYPES` (novas e antigas) verificando que
+`intervals` começa em 0, termina em 12, e está em ordem estritamente
+crescente — isto teria apanhado erros de dados como os que já encontrámos
+noutras partes do projeto, por isso serve como rede de segurança geral.
+
+### FASE 12 — Novo Ecrã: Estúdio de Prática de Escalas
+Depende das Fases 10 e 11 estarem concluídas.
+
+- Cria `gui/screens/practice_scales.py`: o utilizador escolhe tónica, tipo de
+  escala (todas as de `SCALE_TYPES`, incluindo as novas da Fase 11),
+  instrumento (Piano/Viola), estilo de acompanhamento (Fase 10) e BPM, com
+  opção de rampa de tempo (reaproveita o mesmo mecanismo da Fase 9 em
+  `practice_song.py`/`practice_instrument.py` — não reimplementes do zero).
+- Gera a sequência de notas da escala (ascendente, depois descendente) via
+  `core/scales.py` (`Scale`/`get_scale_notes`).
+- Antes de escrever a atribuição de dedilhação de piano e posição de
+  corda/traste de viola nota-a-nota, **extrai a lógica já escrita em
+  `core/midi_importer.py` (`_assign_piano_fingerings` e
+  `_assign_guitar_coordinates`) para `core/fingering.py` e `core/guitar.py`
+  respetivamente**, para ser reutilizada aqui sem duplicar código — o
+  `midi_importer.py` passa a chamar as versões partilhadas.
+- Mecânica de "tocar": mesma lógica de avanço nota-a-nota por teclado do
+  PC/MIDI/microfone já existente em `practice_song.py` — reaproveita o que
+  já existe em vez de reescrever; se fizer sentido extrair um helper comum
+  partilhado entre os dois ecrãs, tanto melhor, mas não é obrigatório se
+  tornar a mudança demasiado grande.
+- Acrescenta a entrada "🎼 Prática de Escalas" à barra lateral em
+  `gui/app.py` e a um atalho em `main_menu.py`.
+- Testes: pelo menos para as funções de atribuição de dedilhação/posição
+  extraídas para `core/fingering.py`/`core/guitar.py` — confirma que
+  continuam a funcionar depois de movidas (os testes existentes de
+  `test_midi_importer.py` que dependem delas devem continuar a passar).
+
+No fim de cada fase, atualiza o `README.md` e não remove nem simplifica
+nenhuma funcionalidade já existente.
+
+---
+
 ## Revisão — Fase 8 (Importador de Partituras MIDI)
 - Commits revistos: `6f91329`, `8ba5316`
 - Testes: 73/73 OK (5 novos testes em `test_midi_importer.py`, incluindo bytes MIDI
