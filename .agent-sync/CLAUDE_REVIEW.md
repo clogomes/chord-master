@@ -14,6 +14,48 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fases 13, 14, 15 e 16
+- Commits revistos: `6718d62` (F13), `83cb67f` (F14), `2f85e4f` (F15), `ab5c1b6` (F16)
+- Testes: 92/92 OK
+- App: arranca sem erros
+- **Veredito: APROVADO, com 1 nota de arquitetura na Fase 15 (não bloqueante)**
+
+### O que está muito bem feito
+- **Fase 13**: `gui/scroll_utils.py` resolve o scroll do rato com uma abordagem
+  sólida — associa recursivamente aos widgets filhos E volta a associar
+  dinamicamente via `<Enter>` para widgets adicionados depois (um detalhe que
+  nem pedi explicitamente, mas resolve um problema real de scrolls que só
+  funcionam nalgumas áreas). Aplicado a 8 ecrãs/componentes, mais do que os 2
+  que mencionei no pedido. Piano alargado para 4 oitavas onde fazia sentido,
+  mantendo a lógica de clave em `practice_staff.py` intacta.
+- **Fase 14**: implementação de manual de Karplus-Strong correta (buffer de
+  ruído do tamanho `sample_rate/frequência`, filtro de média + decaimento).
+  Testado com as 6 frequências reais das cordas da viola (82.4Hz a 329.6Hz)
+  mais A4. Cache com chave por instrumento, sem colisão piano/viola.
+- **Fase 16**: conteúdo de alta qualidade — inclui uma dica de "Rotina de
+  Prática com Rampa de Tempo" que liga diretamente à funcionalidade já
+  construída na Fase 9, exatamente a ligação que sugeri.
+
+### Nota de arquitetura (Fase 15, não bloqueante)
+`core/i18n_helpers.py` importa de `gui/i18n.py` (`from gui.i18n import
+get_language`). Isto inverte a direção de dependência documentada no
+`README.md` e no `.agent-sync/PROTOCOL.md`: "a lógica musical (core/) é 100%
+independente da interface gráfica". Na prática não causa erro agora
+(`gui/i18n.py` não importa customtkinter, e `core/__init__.py` não expõe
+`i18n_helpers`), mas é uma violação do princípio, e o `gui/i18n.py` pode vir
+a ganhar dependências gráficas no futuro sem ninguém perceber que isso
+quebraria o `core/`.
+
+**Correção simples**: move a lógica de estado de idioma e `UI_STRINGS` de
+`gui/i18n.py` para `core/i18n.py` (ou funde com `core/i18n_helpers.py`), e
+faz o `gui/app.py` importar de `core/` em vez do inverso. É mecânico, não
+precisa de mudar comportamento, só a localização do ficheiro e os imports.
+
+Podes avançar para a Fase 17 (ou o que o utilizador pedir a seguir) — este
+item fica registado para resolver, não bloqueia nada.
+
+---
+
 ## TRABALHO PEDIDO — Fases 13 a 17 (Feedback direto do utilizador a usar a app)
 - Pedido por: Claude, a pedido do utilizador (clogomes), que testou a app
   diretamente e reportou 6 problemas/pedidos concretos. Especificação já
