@@ -129,17 +129,30 @@ class MainMenuScreen(ctk.CTkFrame):
             col=0,
             icon="📖",
             title="Módulo de Teoria",
-            subtitle="Lições interativas de notas, intervalos, escalas e formação de acordes maiores/menores.",
+            subtitle="8 capítulos interativos: notas, intervalos, escalas, acordes, harmonia avançada e guias práticos.",
             button_text="Explorar Teoria",
             color_accent="#2563EB",
             target_screen="theory",
         )
 
-        # Card 2: Treino Auditivo
+        # Card 2: Tocar Repertório
         self._create_nav_card(
             cards_container,
             row=0,
             col=1,
+            icon="🎶",
+            title="Tocar Repertório",
+            subtitle="Aprende a tocar melodias famosas (Beethoven, Mozart, Bach) com guia de dedilhação e tablatura.",
+            button_text="Tocar Músicas",
+            color_accent="#D97706",
+            target_screen="practice_song",
+        )
+
+        # Card 3: Treino Auditivo
+        self._create_nav_card(
+            cards_container,
+            row=1,
+            col=0,
             icon="🎧",
             title="Treino Auditivo",
             subtitle="Ouve intervalos melódicos/harmónicos e acordes sintetizados e adivinha a sua sonoridade.",
@@ -148,30 +161,17 @@ class MainMenuScreen(ctk.CTkFrame):
             target_screen="practice_ear",
         )
 
-        # Card 3: Leitura de Pauta
+        # Card 4: Leitura de Pauta
         self._create_nav_card(
             cards_container,
             row=1,
-            col=0,
+            col=1,
             icon="🎼",
             title="Leitura de Pauta",
             subtitle="Pratica a identificação de notas na pauta musical com Clave de Sol e Clave de Fá.",
             button_text="Praticar Pauta",
             color_accent="#059669",
             target_screen="practice_staff",
-        )
-
-        # Card 4: Estatísticas
-        self._create_nav_card(
-            cards_container,
-            row=1,
-            col=1,
-            icon="📊",
-            title="Estatísticas & Histórico",
-            subtitle="Acompanha o teu progresso detalhado por categoria, histórico de respostas e líderes.",
-            button_text="Ver Estatísticas",
-            color_accent="#D97706",
-            target_screen="stats",
         )
 
     def _create_metric_item(self, parent, label: str, value: str, col: int):
