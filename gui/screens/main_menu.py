@@ -120,7 +120,7 @@ class MainMenuScreen(ctk.CTkFrame):
         cards_container = ctk.CTkFrame(self, fg_color="transparent")
         cards_container.pack(fill="both", expand=True, padx=24, pady=(4, 16))
         cards_container.grid_columnconfigure((0, 1), weight=1, uniform="group1")
-        cards_container.grid_rowconfigure((0, 1), weight=1, uniform="group1")
+        cards_container.grid_rowconfigure((0, 1, 2), weight=1, uniform="group1")
 
         # Card 1: Teoria Musical
         self._create_nav_card(
@@ -129,7 +129,7 @@ class MainMenuScreen(ctk.CTkFrame):
             col=0,
             icon="📖",
             title="Módulo de Teoria",
-            subtitle="8 capítulos interativos: notas, intervalos, escalas, acordes, harmonia avançada e guias práticos.",
+            subtitle="8 capítulos interativos: notas, intervalos, escalas, acordes, harmonia e guias práticos.",
             button_text="Explorar Teoria",
             color_accent="#2563EB",
             target_screen="theory",
@@ -142,36 +142,62 @@ class MainMenuScreen(ctk.CTkFrame):
             col=1,
             icon="🎶",
             title="Tocar Repertório",
-            subtitle="Aprende a tocar melodias famosas (Beethoven, Mozart, Bach) com guia de dedilhação e tablatura.",
+            subtitle="Toca peças famosas (Beethoven, Mozart, Bach) com guia de dedilhação e teclas do PC.",
             button_text="Tocar Músicas",
             color_accent="#D97706",
             target_screen="practice_song",
         )
 
-        # Card 3: Treino Auditivo
+        # Card 3: Instrumento Real (Microfone)
         self._create_nav_card(
             cards_container,
             row=1,
             col=0,
-            icon="🎧",
-            title="Treino Auditivo",
-            subtitle="Ouve intervalos melódicos/harmónicos e acordes sintetizados e adivinha a sua sonoridade.",
-            button_text="Iniciar Treino Auditivo",
-            color_accent="#7C3AED",
-            target_screen="practice_ear",
+            icon="🎙️",
+            title="Instrumento Real",
+            subtitle="Usa o microfone para tocar no teu piano ou viola acústica com afinador em tempo real.",
+            button_text="Praticar c/ Microfone",
+            color_accent="#DC2626",
+            target_screen="practice_instrument",
         )
 
-        # Card 4: Leitura de Pauta
+        # Card 4: Treino Auditivo
         self._create_nav_card(
             cards_container,
             row=1,
             col=1,
+            icon="🎧",
+            title="Treino Auditivo",
+            subtitle="Ouve intervalos melódicos/harmónicos e acordes sintetizados e adivinha a sonoridade.",
+            button_text="Treino Auditivo",
+            color_accent="#7C3AED",
+            target_screen="practice_ear",
+        )
+
+        # Card 5: Leitura de Pauta
+        self._create_nav_card(
+            cards_container,
+            row=2,
+            col=0,
             icon="🎼",
             title="Leitura de Pauta",
-            subtitle="Pratica a identificação de notas na pauta musical com Clave de Sol e Clave de Fá.",
+            subtitle="Identifica notas na pauta musical com Clave de Sol (𝄞) e Clave de Fá (𝄢).",
             button_text="Praticar Pauta",
             color_accent="#059669",
             target_screen="practice_staff",
+        )
+
+        # Card 6: Estatísticas
+        self._create_nav_card(
+            cards_container,
+            row=2,
+            col=1,
+            icon="📊",
+            title="Estatísticas & Líderes",
+            subtitle="Painel de progresso individual, precisão, histórico recente e tabela de estudantes.",
+            button_text="Ver Estatísticas",
+            color_accent="#8B5CF6",
+            target_screen="stats",
         )
 
     def _create_metric_item(self, parent, label: str, value: str, col: int):

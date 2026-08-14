@@ -30,6 +30,8 @@ class UserProfile:
         "treino_auditivo": CategoryStats(),
         "leitura_pauta": CategoryStats(),
         "teoria": CategoryStats(),
+        "repertorio": CategoryStats(),
+        "pratica_instrumento": CategoryStats(),
     })
     completed_lessons: List[str] = field(default_factory=list)
     history: List[ExerciseRecord] = field(default_factory=list)

@@ -10,6 +10,7 @@ from gui.screens.theory_screen import TheoryScreen
 from gui.screens.practice_ear import PracticeEarScreen
 from gui.screens.practice_staff import PracticeStaffScreen
 from gui.screens.practice_song import PracticeSongScreen
+from gui.screens.practice_instrument import PracticeInstrumentScreen
 from gui.screens.stats_screen import StatsScreen
 
 # Appearance configuration
@@ -95,6 +96,7 @@ class ChordMasterApp(ctk.CTk):
             ("main_menu", "🏠 Menu Principal"),
             ("theory", "📖 Teoria Musical"),
             ("practice_song", "🎶 Tocar Repertório"),
+            ("practice_instrument", "🎙️ Instrumento Real"),
             ("practice_ear", "🎧 Treino Auditivo"),
             ("practice_staff", "🎼 Leitura de Pauta"),
             ("stats", "📊 Estatísticas"),
@@ -244,6 +246,12 @@ class ChordMasterApp(ctk.CTk):
             )
         elif screen_name == "practice_song":
             self.current_screen_widget = PracticeSongScreen(
+                self.content_area,
+                user_manager=self.user_manager,
+                on_back=lambda: self.navigate_to("main_menu"),
+            )
+        elif screen_name == "practice_instrument":
+            self.current_screen_widget = PracticeInstrumentScreen(
                 self.content_area,
                 user_manager=self.user_manager,
                 on_back=lambda: self.navigate_to("main_menu"),

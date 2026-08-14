@@ -147,18 +147,22 @@ class StatsScreen(ctk.CTkFrame):
                 text_color="#065F46" if is_done else ("#64748B", "#94A3B8"),
             ).pack(padx=8, pady=8)
 
-        # 3. Category Breakdown Cards (3 Columns)
+        # 3. Category Breakdown Cards (5 Categories)
         cat_grid = ctk.CTkFrame(self.container, fg_color="transparent")
         cat_grid.pack(fill="x", pady=(0, 12))
         cat_grid.grid_columnconfigure((0, 1, 2), weight=1, uniform="cats")
 
         cats_data = [
+            ("repertorio", "🎵 Tocar Repertório", "#D97706"),
+            ("pratica_instrumento", "🎙️ Instrumento Real", "#DC2626"),
             ("treino_auditivo", "🎧 Treino Auditivo", "#7C3AED"),
             ("leitura_pauta", "🎼 Leitura de Pauta", "#059669"),
             ("teoria", "📖 Teoria Musical", "#2563EB"),
         ]
 
-        for col, (cat_key, cat_title, color) in enumerate(cats_data):
+        for idx, (cat_key, cat_title, color) in enumerate(cats_data):
+            row_idx = idx // 3
+            col_idx = idx % 3
             stats = user.categories.get(cat_key, None)
             card = ctk.CTkFrame(
                 cat_grid,
@@ -167,7 +171,7 @@ class StatsScreen(ctk.CTkFrame):
                 border_width=1,
                 border_color=("#E2E8F0", "#334155"),
             )
-            card.grid(row=0, column=col, padx=6, pady=4, sticky="nsew")
+            card.grid(row=row_idx, column=col_idx, padx=6, pady=4, sticky="nsew")
 
             ctk.CTkLabel(
                 card,
