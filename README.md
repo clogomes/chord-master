@@ -97,6 +97,8 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 - **Análise Inteligente do Histórico de Exercícios**:
   - Analisa as últimas 50 tentativas do perfil do aluno em `user.history` com decaimento exponencial de recência (os erros recentes têm maior peso).
   - Identifica automaticamente as áreas de maior dificuldade (*pontos fracos*) entre Treino Auditivo, Leitura de Pauta, Teoria, Repertório e Instrumento.
+- **Integração do Modo Adaptativo nos Ecrãs de Prática**:
+  - Toggles integrados **«🧠 Modo Adaptativo»** nos ecrãs de Treino Auditivo e Leitura de Pauta para gerar dinamicamente perguntas orientadas às fraquezas do estudante.
 - **Cartão Personalizado no Dashboard Inicial**:
   - Exibe no topo do menu principal o cartão **«🎯 Recomendado para ti hoje: [Categoria Mais Fraca]»** com explicação do motivo da recomendação e botão direto **«Praticar Agora →»**.
 - **Geração de Desafios Adaptativos**:
@@ -107,8 +109,8 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 ### 7. 📈 FASE 7 — Painel de Análise de Progresso com Gráficos em Canvas ([`gui/screens/stats_screen.py`](file:///Users/clogomes/repo/chord-master/gui/screens/stats_screen.py))
 - **Gráfico de Linha de Tendência de Precisão (Últimas 4 Semanas)**:
   - Renderizado nativamente em `tk.Canvas` com interpolação suave, eixos graduados de $0\%$ a $100\%$, linhas de grelha subtis e pontos com halo que destacam a percentagem de cada semana.
-- **Gráfico de Barras Horizontais de Comparação entre Categorias**:
-  - Comparação lado a lado do aproveitamento em Treino Auditivo, Leitura de Pauta, Teoria Musical e Repertório, facilitando a identificação imediata de onde o aluno precisa focar o estudo.
+- **Gráfico de Barras Horizontais com as 5 Categorias Completas**:
+  - Comparação lado a lado do aproveitamento em *Treino Auditivo*, *Leitura de Pauta*, *Teoria Musical*, *Repertório & Músicas* e *Instrumento & Solfejo*, permitindo ao estudante visualizar num relance onde está o seu desempenho.
 - **Calendário de Atividade Estilo GitHub (~90 Dias)**:
   - Grelha de consistência de 14 semanas ($14 \times 7$ dias) com escala de intensidade em esmeralda (*Dark Slate* a *Vibrant Emerald* `#34D399`), marcadores de meses e dias da semana, e contador de dias ativos.
 

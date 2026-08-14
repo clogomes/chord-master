@@ -204,7 +204,7 @@ class StatsScreen(ctk.CTkFrame):
 
         trend_canvas = tk.Canvas(
             trend_card,
-            height=210,
+            height=240,
             bg="#111827",
             highlightthickness=0,
         )
@@ -230,7 +230,7 @@ class StatsScreen(ctk.CTkFrame):
 
         cat_canvas = tk.Canvas(
             cat_card,
-            height=210,
+            height=240,
             bg="#111827",
             highlightthickness=0,
         )
@@ -502,23 +502,24 @@ class StatsScreen(ctk.CTkFrame):
             canvas.create_text(x, h - 14, text=lbl, fill="#9CA3AF", font=("Helvetica", 10))
 
     def _draw_category_bars(self, canvas: tk.Canvas, user: UserProfile):
-        """Draws horizontal percentage comparison bars for the 4 main study categories."""
+        """Draws horizontal percentage comparison bars for the 5 main study categories."""
         canvas.delete("all")
         w = canvas.winfo_width() or 440
-        h = 210
+        h = 240
 
         categories = [
             ("Treino Auditivo", "treino_auditivo", "#4F46E5"),
             ("Leitura de Pauta", "leitura_pauta", "#0284C7"),
             ("Teoria Musical", "teoria", "#F59E0B"),
             ("Repertório & Músicas", "repertorio", "#8B5CF6"),
+            ("Instrumento & Solfejo", "pratica_instrumento", "#10B981"),
         ]
 
-        pad_l = 135
+        pad_l = 150
         pad_r = 65
         pad_t = 16
-        bar_h = 22
-        spacing = 46
+        bar_h = 18
+        spacing = 42
 
         for idx, (title, cat_key, col) in enumerate(categories):
             y = pad_t + idx * spacing

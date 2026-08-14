@@ -149,6 +149,45 @@ class TestAdaptiveEngine(unittest.TestCase):
         self.assertIsInstance(q, QuizQuestion)
         self.assertTrue(len(q.options) >= 2)
 
+    def test_adaptive_question_distribution_tends_to_weak_area(self):
+        # Create a user with heavy mistakes in sight reading (leitura_pauta)
+        now = time.time()
+        user = UserProfile(username="Aluno", avatar="🎹")
+        for i in range(15):
+            user.history.append(
+                ExerciseRecord(
+                    timestamp=now - 200 + i * 5,
+                    category="leitura_pauta",
+                    question_type="staff_note",
+                    is_correct=False,
+                    prompt="Nota?",
+                    user_answer="Dó",
+                    correct_answer="Sol",
+                )
+            )
+        for i in range(15):
+            user.history.append(
+                ExerciseRecord(
+                    timestamp=now - 200 + i * 5,
+                    category="treino_auditivo",
+                    question_type="ear_interval",
+                    is_correct=True,
+                    prompt="Intervalo?",
+                    user_answer="5ª",
+                    correct_answer="5ª",
+                )
+            )
+
+        # Generate 40 questions and count category occurrences
+        cat_counts = {}
+        for _ in range(40):
+            q = generate_adaptive_question(user, difficulty="intermediate")
+            cat_counts[q.category] = cat_counts.get(q.category, 0) + 1
+
+        # The weakest area (leitura_pauta) should be generated significantly more often (around 60% of times)
+        self.assertGreater(cat_counts.get("leitura_pauta", 0), cat_counts.get("teoria", 0))
+        self.assertGreaterEqual(cat_counts.get("leitura_pauta", 0), 15)
+
 
 if __name__ == "__main__":
     unittest.main()

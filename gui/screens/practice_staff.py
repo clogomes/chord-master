@@ -1,7 +1,8 @@
 """Interactive Staff Reading practice screen for Treble and Bass clefs."""
 from typing import Callable, List, Optional
 import customtkinter as ctk
-from core.quiz_engine import QuizEngine, QuizQuestion
+from core.quiz_engine import QuizEngine, QuizQuestion, QuestionType
+from core.adaptive_engine import generate_adaptive_question
 from core.user_manager import UserManager
 from audio.player import get_audio_player
 from gui.components.staff_canvas import StaffCanvas
@@ -88,6 +89,18 @@ class PracticeStaffScreen(ctk.CTkFrame):
             font=ctk.CTkFont(family="Helvetica", size=12),
         )
         self.accidentals_check.pack(side="left", padx=16, pady=10)
+
+        # Adaptive Mode Toggle Switch
+        self.adaptive_var = ctk.BooleanVar(value=False)
+        self.adaptive_switch = ctk.CTkSwitch(
+            settings_frame,
+            text="🧠 Modo Adaptativo",
+            variable=self.adaptive_var,
+            command=self.load_new_question,
+            font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"),
+            progress_color="#059669",
+        )
+        self.adaptive_switch.pack(side="right", padx=16, pady=10)
 
         # Main scroll container
         self.main_container = ctk.CTkScrollableFrame(self, fg_color=("#F8FAFC", "#0F172A"))
@@ -182,10 +195,22 @@ class PracticeStaffScreen(ctk.CTkFrame):
         else:
             self.piano_view.set_range(start_octave=2, num_octaves=2)
 
-        self.current_question = QuizEngine.generate_staff_reading_question(
-            clef=clef_key,
-            include_accidentals=include_acc,
-        )
+        if hasattr(self, "adaptive_var") and self.adaptive_var.get():
+            q_cand = generate_adaptive_question(self.user_manager.current_user, difficulty="intermediate")
+            if q_cand.staff_note:
+                self.current_question = q_cand
+                if self.current_question.clef:
+                    clef_key = self.current_question.clef
+            else:
+                self.current_question = QuizEngine.generate_staff_reading_question(
+                    clef=clef_key,
+                    include_accidentals=include_acc,
+                )
+        else:
+            self.current_question = QuizEngine.generate_staff_reading_question(
+                clef=clef_key,
+                include_accidentals=include_acc,
+            )
 
         self.prompt_label.configure(text=self.current_question.prompt_text)
         self.staff_view.set_clef(clef_key)

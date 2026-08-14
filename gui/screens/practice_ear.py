@@ -3,6 +3,7 @@ import time
 from typing import Callable, List, Optional
 import customtkinter as ctk
 from core.quiz_engine import QuizEngine, QuizQuestion, QuestionType
+from core.adaptive_engine import generate_adaptive_question
 from core.user_manager import UserManager
 from core.notes import Note
 from audio.player import get_audio_player
@@ -118,6 +119,18 @@ class PracticeEarScreen(ctk.CTkFrame):
         )
         self.diff_select.set("Iniciante")
         self.diff_select.pack(side="left", padx=6, pady=10)
+
+        # Adaptive Mode Toggle Switch
+        self.adaptive_var = ctk.BooleanVar(value=False)
+        self.adaptive_switch = ctk.CTkSwitch(
+            settings_frame,
+            text="🧠 Modo Adaptativo",
+            variable=self.adaptive_var,
+            command=self.load_new_question,
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            progress_color=theme.COLOR_PRIMARY,
+        )
+        self.adaptive_switch.pack(side="right", padx=16, pady=10)
 
         # Exercise Main Scrollable Container
         self.main_container = ctk.CTkScrollableFrame(
@@ -254,7 +267,26 @@ class PracticeEarScreen(ctk.CTkFrame):
         diff_map = {"Iniciante": "beginner", "Intermédio": "intermediate", "Avançado": "advanced"}
         difficulty = diff_map.get(self.diff_select.get(), "beginner")
 
-        if "Solfejo" in ex_type or "Cantar" in ex_type:
+        if hasattr(self, "adaptive_var") and self.adaptive_var.get():
+            self.current_question = generate_adaptive_question(
+                self.user_manager.current_user,
+                difficulty=difficulty,
+            )
+            if self.current_question.question_type == QuestionType.SOLFEGE_SING:
+                self.vocal_mic_card.pack(fill="x", pady=(0, 12))
+                self.play_btn.configure(text="🔊 Ouvir Tom de Referência")
+                self.play_slow_btn.pack_forget()
+                self.vocal_detected_lbl.configure(text="Clica em «Ativar Microfone» e canta...", text_color=theme.COLOR_TEXT_MUTED)
+                self.vocal_cents_bar.set(0.5)
+            elif self.current_question.play_mode == "chord":
+                self.vocal_mic_card.pack_forget()
+                self.play_btn.configure(text="🔊 Ouvir Acorde")
+                self.play_slow_btn.pack(side="left", padx=6)
+            else:
+                self.vocal_mic_card.pack_forget()
+                self.play_btn.configure(text="🔊 Ouvir Pergunta")
+                self.play_slow_btn.pack(side="left", padx=6)
+        elif "Solfejo" in ex_type or "Cantar" in ex_type:
             self.current_question = QuizEngine.generate_solfege_sing_question(difficulty)
             self.vocal_mic_card.pack(fill="x", pady=(0, 12))
             self.play_btn.configure(text="🔊 Ouvir Tom de Referência")
