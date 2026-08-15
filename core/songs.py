@@ -25,6 +25,7 @@ class Song:
     difficulty: str  # "Iniciante", "Intermédio", "Avançado"
     bpm: int
     clef: str = "treble"  # "treble" ou "bass"
+    instrument: str = "piano"  # "piano" ou "guitar" / "viola"
     time_signature: str = "4/4"
     description: str = ""
     notes: List[SongNote] = field(default_factory=list)
