@@ -19,6 +19,13 @@ primeiro, antes de avançar.
 ---
 
 ## Histórico
+
+## Fase 21 — Conteúdo de Teoria Expandido & 4 Novos Módulos — CONCLUÍDA
+- Data: 2026-08-15 09:39 (UTC+1)
+- Commit: 9158e43
+- Resumo: Adicionados 4 novos capítulos de teoria musical (9-12): Ritmo & Compasso (BPM, figuras rítmicas, síncopa), Forma Musical (AB/ABA/Rondó/Sonata/Pop), Dinâmica & Expressão (pp→fff, legato/staccato/vibrato, fraseado, pedal), e Transposição Prática (círculo de quintas, armações de clave, capotraste). Todos os capítulos incluem exemplos práticos concretos e exercícios específicos para piano e viola. 134/134 testes a passar.
+- Ficheiros principais alterados: core/theory_content.py, README.md
+
 - **Fase 20**: Concluída (d2ba9e8)
   - **Resumo**: Redesign do ecrã de Teoria para unificar o conteúdo num só painel contínuo, remoção do selector de instrumento (exibe ambos por defeito) e substituição de todas as tags LaTeX por texto clean e formatado no `theory_content.py`.
   - **Ficheiros**: `gui/screens/theory_screen.py`, `core/theory_content.py`, `README.md`
