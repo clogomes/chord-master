@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Correção — AÇÕES NECESSÁRIAS: Resolução de Crash no Ecrã de Teoria & Suporte i18n em Inglês nos 12 Capítulos — CONCLUÍDA
+- Data: 2026-08-15 16:51 (UTC+1)
+- Commit: 34aa8bb
+- Resumo: Corrigido o erro de atributo em `gui/screens/theory_screen.py` substituindo as 6 ocorrências de `theme.COLOR_CARD_SURFACE` pelo token real `theme.COLOR_SURFACE`, resolvendo o crash ao abrir o ecrã de teoria. Adicionado suporte completo a tradução para Inglês (`_en`) na dataclass `TheoryChapter` e preenchidas as traduções didáticas de todos os 12 capítulos em `core/theory_content.py`. O `TheoryScreen` deteta e renderiza agora dinamicamente o idioma ativo (PT / EN). 155/155 testes a passar.
+- Ficheiros alterados: core/theory_content.py, gui/screens/theory_screen.py, tests/test_theory_i18n.py
+
 ## Correção — AÇÃO NECESSÁRIA: Campo `Song.instrument` Ligado à UI & Filtro de Repertório — CONCLUÍDA
 - Data: 2026-08-15 16:38 (UTC+1)
 - Commit: fa1cdd9
