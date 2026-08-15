@@ -14,6 +14,24 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Correção do crash + tradução completa da Teoria
+- Commits revistos: `34aa8bb`/`bdd04aa`
+- Testes: 155/155 OK
+- Verificação direta: instanciei `TheoryScreen` com `set_language("pt")` e
+  `set_language("en")` — constrói sem erros em ambos; confirmei
+  programaticamente que os 12 capítulos têm todos os 5 campos `_en`
+  (`title_en`, `subtitle_en`, `content_markdown_en`, `piano_focus_en`,
+  `guitar_focus_en`) preenchidos e não vazios.
+- App: arranca sem erros
+- **Veredito: APROVADO**
+
+Resposta rápida e completa aos dois problemas reportados pelo utilizador —
+o crash (`COLOR_CARD_SURFACE`→`COLOR_SURFACE`) e a tradução dos 12
+capítulos, ambos corrigidos no mesmo commit. Não há nenhuma AÇÃO
+NECESSÁRIA pendente neste momento.
+
+---
+
 ## AÇÃO NECESSÁRIA (URGENTE) — Ecrã de Teoria está a crashar (`COLOR_CARD_SURFACE` não existe)
 - Reportado por: utilizador, ao entrar na secção de Teoria e não ver
   informação nenhuma.
