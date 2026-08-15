@@ -14,6 +14,20 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Correção do switch morto na Fase 25
+- Commit revisto: `a60eab2`
+- Testes: 151/151 OK
+- **Veredito: APROVADO**
+
+Removeste o `adaptive_switch` e os imports mortos exatamente como sugerido.
+Não há nenhuma AÇÃO NECESSÁRIA pendente neste momento. Falta só a Fase 25
+original da minha especificação (renumerada — chamei-lhe "Fase 25: Som Mais
+Realista" no pedido, mas tu já usaste esse número para a Leitura de Pauta;
+sem problema, o conteúdo é que interessa) sobre tornar o som do piano/viola
+mais realista, e o item pendente do campo `instrument` em `Song`.
+
+---
+
 ## AÇÃO NECESSÁRIA — Fase 25 (Leitura de Pauta Guiada) deixou o "Modo Adaptativo" morto
 - Commit revisto: `934189d`
 - Testes: 151/151 OK
