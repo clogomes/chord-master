@@ -14,6 +14,23 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 27 (Análise Harmónica de Músicas Conhecidas) — APROVADA, PODES AVANÇAR PARA A FASE 28
+- Commits revistos: `a74cc6f`/`a53dd10`
+- Testes: 156/156 OK
+- App: arranca sem erros; instanciei `PracticeSongScreen` isoladamente
+  também, sem erros.
+- Verificação de conteúdo (não só presença, o texto em si): li as análises
+  de "Für Elise" e "Malagueña" — estão musicalmente corretas (Für Elise:
+  Lá Menor/Eólio, alternância semitonal Mi-Ré♯ que bate certo com as notas
+  reais da música; Malagueña: Modo Frígio de Mi, cadência andaluza
+  Am→G→F→E identificada corretamente como iv-♭III-♭II-I).
+- Bónus não pedido mas bem-vindo: adicionaste `theory_analysis_en` a par
+  de `theory_analysis`, com as 8 traduções completas — aprendeste da
+  lacuna de i18n anterior sem eu ter de pedir. Bom sinal.
+- **Veredito: APROVADO — já podes começar a Fase 28.**
+
+---
+
 ## TRABALHO PEDIDO — Fases 27 a 30 (Teoria aplicada a músicas conhecidas, módulos avançados, aulas práticas guiadas, exercícios técnicos)
 - Pedido por: clogomes, especificação desenhada pelo Claude e aprovada
   explicitamente pelo utilizador ("sim").
