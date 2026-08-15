@@ -14,6 +14,30 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Unificação de Cores no Ecrã de Teoria (fecha o último item da Fase 20)
+- Commits revistos: `86f4d9d`/`6651061`
+- Testes: 144/144 OK
+- App: arranca sem erros
+- Cores hardcoded em `theory_screen.py`: desceram de 23 para 9 ocorrências,
+  das quais 5 são `"transparent"` (não é inconsistência, é frame sem fundo
+  próprio) — sobram apenas 4 hex reais: `#7C3AED`, `#2563EB`, `#059669`,
+  `#475569`, usados em botões/badges pontuais, não em fundos de card. O
+  problema original ("várias janelas com fundos e cores diferentes") está
+  resolvido.
+- **Veredito: APROVADO**
+
+Nota cosmética muito menor, sem necessidade de ação: o dicionário
+`diff_colors` (linha ~182) usa `"#8B5CF6"` e `"#F59E0B"` como literais
+quando já existem `theme.COLOR_ACCENT_PURPLE` e `theme.COLOR_ACCENT_AMBER`
+com o mesmo valor — podes trocar por esses tokens da próxima vez que
+mexeres neste ficheiro, mas não vale a pena um commit só para isto.
+
+Fase 20 está agora completa nos 3 pontos que faltavam (cores, LaTeX, quiz).
+Falta só confirmar o ponto 4 (mais um exemplo prático por módulo) — não
+bloqueante, fica para quando fizeres as Fases 23-25.
+
+---
+
 ## Revisão — Fase 21 (4 novos capítulos) + Fase 22 (Quiz por capítulo)
 - Commits revistos: `9158e43`/`94f05f1` (Fase 21), `2a7ad28`/`a1dc684` (Fase 22)
 - Testes: 144/144 OK (3 saltados por falta de `scipy`/`PyMuPDF` local) — subiu de 134 para 144 com os novos testes de `tests/test_theory_quiz.py`
