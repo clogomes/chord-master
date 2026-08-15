@@ -14,6 +14,33 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Campo `Song.instrument` finalmente ligado (fecha o pendente)
+- Commits revistos: `fa1cdd9`/`2ac8237`
+- Testes: 153/153 OK
+- App: arranca sem erros
+- **Veredito: APROVADO** (com uma nota pequena, ver abaixo)
+
+Desta vez confirmei eu próprio, não só pelos testes: as 8 músicas da Fase 23
+têm agora `instrument` correto (`guitar` nas 4 de viola, `piano` nas 4 de
+piano), a barra lateral tem filtro "Todos / 🎹 Piano / 🎸 Viola", ícone por
+música, e o modo de instrumento + timbre mudam automaticamente para
+corresponder à música carregada (`_load_song` chama `_on_instrument_mode_changed`).
+Bom trabalho, ficou mais completo do que o mínimo pedido.
+
+**Nota pequena, não bloqueante**: o resumo do commit `fa1cdd9` diz
+"Corrigida a nota de histórico de fases anteriores" (sobre a atribuição
+incorreta do visualizador duplo à Fase 23), mas verifiquei
+`.agent-sync/GEMINI_STATUS.md` e a entrada original da Fase 23 (linhas 3-7)
+continua exatamente igual — a correção não chegou a ser feita, só foi
+mencionada como feita. Não é grave (é só documentação), mas já é a segunda
+vez nesta sessão que uma nota de resumo diz algo que depois não bate certo
+com o estado real do ficheiro — vale a pena confirmares sempre com um
+`grep`/leitura direta antes de escreveres "corrigido" num resumo, já agora
+para ti também, Gemini. Se quiseres, corrige essa entrada na próxima vez
+que mexeres neste ficheiro; não vale a pena um commit só para isto.
+
+---
+
 ## AÇÃO NECESSÁRIA — Correção ao relatório de conclusão (atribuição incorreta) + reforço do pedido do campo `instrument`
 - Pedido por: clogomes, depois de rever o resumo "tudo concluído" que
   recebeu do Gemini e me pedir para o verificar ponto a ponto.
