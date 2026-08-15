@@ -34,7 +34,7 @@ class TheoryScreen(ctk.CTkFrame):
         on_user_updated: Optional[Callable[[], None]] = None,
         **kwargs,
     ):
-        super().__init__(master, fg_color=("#F8FAFC", "#0B0F19"), **kwargs)
+        super().__init__(master, fg_color=theme.COLOR_BG, **kwargs)
         self.user_manager = user_manager
         self.on_back = on_back
         self.on_user_updated = on_user_updated
@@ -54,9 +54,10 @@ class TheoryScreen(ctk.CTkFrame):
         back_btn = ctk.CTkButton(
             nav_bar,
             text="← Voltar ao Menu",
-            font=ctk.CTkFont(family="Helvetica", size=13, weight="bold"),
-            fg_color="#475569",
-            hover_color="#334155",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            fg_color=theme.COLOR_SURFACE_SECONDARY,
+            hover_color=theme.COLOR_BORDER,
+            text_color=theme.COLOR_TEXT_PRIMARY,
             width=130,
             command=self.on_back,
         )
@@ -66,8 +67,8 @@ class TheoryScreen(ctk.CTkFrame):
         title_lbl = ctk.CTkLabel(
             nav_bar,
             text=f"📖 Teoria Musical & Prática ({user.avatar} {user.username})",
-            font=ctk.CTkFont(family="Helvetica", size=20, weight="bold"),
-            text_color=("#0F172A", "#F8FAFC"),
+            font=theme.get_font(theme.FONT_TITLE),
+            text_color=theme.COLOR_TEXT_PRIMARY,
         )
         title_lbl.pack(side="left", padx=14)
 
@@ -83,10 +84,10 @@ class TheoryScreen(ctk.CTkFrame):
         self.chapter_nav_frame = ctk.CTkScrollableFrame(
             main_layout,
             width=260,
-            corner_radius=12,
-            fg_color=("#F1F5F9", "#1E293B"),
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_CARD_SURFACE,
             border_width=1,
-            border_color=("#E2E8F0", "#334155"),
+            border_color=theme.COLOR_BORDER,
         )
         self.chapter_nav_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 10))
         bind_mousewheel(self.chapter_nav_frame)
@@ -94,8 +95,8 @@ class TheoryScreen(ctk.CTkFrame):
         ctk.CTkLabel(
             self.chapter_nav_frame,
             text="Capítulos do Curso",
-            font=ctk.CTkFont(family="Helvetica", size=14, weight="bold"),
-            text_color=("#0F172A", "#F8FAFC"),
+            font=theme.get_font(theme.FONT_SECTION),
+            text_color=theme.COLOR_TEXT_PRIMARY,
         ).pack(anchor="w", padx=10, pady=(8, 8))
 
         self._render_chapter_list()
@@ -103,10 +104,10 @@ class TheoryScreen(ctk.CTkFrame):
         # 2.2 Chapter Reader & Visualizers Area
         self.content_scroll = ctk.CTkScrollableFrame(
             main_layout,
-            corner_radius=12,
-            fg_color=("#F8FAFC", "#0F172A"),
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_BG,
             border_width=1,
-            border_color=("#E2E8F0", "#334155"),
+            border_color=theme.COLOR_BORDER,
         )
         self.content_scroll.grid(row=0, column=1, sticky="nsew")
         bind_mousewheel(self.content_scroll)
@@ -115,8 +116,6 @@ class TheoryScreen(ctk.CTkFrame):
         for btn in self.chapter_buttons:
             btn.destroy()
         self.chapter_buttons.clear()
-
-        user = self.user_manager.current_user
 
         for idx, chap in enumerate(THEORY_CHAPTERS):
             is_active = (idx == self.current_chapter_idx)
@@ -128,13 +127,13 @@ class TheoryScreen(ctk.CTkFrame):
             btn = ctk.CTkButton(
                 self.chapter_nav_frame,
                 text=btn_text,
-                font=ctk.CTkFont(family="Helvetica", size=12, weight="bold" if is_active else "normal"),
+                font=theme.get_font(theme.FONT_BODY_BOLD if is_active else theme.FONT_BODY),
                 anchor="w",
                 height=42,
-                corner_radius=8,
-                fg_color="#2563EB" if is_active else ("#E2E8F0", "#0F172A"),
-                text_color="#FFFFFF" if is_active else ("#1E293B", "#E2E8F0"),
-                hover_color="#1D4ED8" if is_active else ("#CBD5E1", "#334155"),
+                corner_radius=theme.RADIUS_MD,
+                fg_color=theme.COLOR_PRIMARY if is_active else theme.COLOR_SURFACE_SECONDARY,
+                text_color="#FFFFFF" if is_active else theme.COLOR_TEXT_PRIMARY,
+                hover_color=theme.COLOR_PRIMARY_HOVER if is_active else theme.COLOR_BORDER,
                 command=lambda i=idx: self._load_chapter(i),
             )
             btn.pack(fill="x", padx=6, pady=3)
@@ -150,17 +149,17 @@ class TheoryScreen(ctk.CTkFrame):
             status_mark = "✅ " if is_done else f"{THEORY_CHAPTERS[i].number}. "
             if i == chapter_idx:
                 btn.configure(
-                    fg_color="#2563EB",
+                    fg_color=theme.COLOR_PRIMARY,
                     text_color="#FFFFFF",
-                    hover_color="#1D4ED8",
-                    font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"),
+                    hover_color=theme.COLOR_PRIMARY_HOVER,
+                    font=theme.get_font(theme.FONT_BODY_BOLD),
                 )
             else:
                 btn.configure(
-                    fg_color=("#E2E8F0", "#0F172A"),
-                    text_color=("#1E293B", "#E2E8F0"),
-                    hover_color=("#CBD5E1", "#334155"),
-                    font=ctk.CTkFont(family="Helvetica", size=12, weight="normal"),
+                    fg_color=theme.COLOR_SURFACE_SECONDARY,
+                    text_color=theme.COLOR_TEXT_PRIMARY,
+                    hover_color=theme.COLOR_BORDER,
+                    font=theme.get_font(theme.FONT_BODY),
                 )
 
         # Clear and build chapter view in content_scroll
@@ -170,10 +169,10 @@ class TheoryScreen(ctk.CTkFrame):
         # 1. Chapter Title Header Card
         header_card = ctk.CTkFrame(
             self.content_scroll,
-            corner_radius=12,
-            fg_color=("#F1F5F9", "#1E293B"),
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_CARD_SURFACE,
             border_width=1,
-            border_color=("#E2E8F0", "#334155"),
+            border_color=theme.COLOR_BORDER,
         )
         header_card.pack(fill="x", padx=8, pady=(0, 10))
 
@@ -181,53 +180,53 @@ class TheoryScreen(ctk.CTkFrame):
         top_info.pack(fill="x", padx=16, pady=(12, 4))
 
         diff_colors = {
-            "Iniciante": "#10B981",
-            "Intermédio": "#3B82F6",
+            "Iniciante": theme.COLOR_SUCCESS,
+            "Intermédio": theme.COLOR_PRIMARY,
             "Avançado": "#8B5CF6",
             "Prático": "#F59E0B",
         }
-        diff_color = diff_colors.get(chap.difficulty, "#3B82F6")
+        diff_color = diff_colors.get(chap.difficulty, theme.COLOR_PRIMARY)
 
         badge = ctk.CTkLabel(
             top_info,
             text=f"  {chap.difficulty.upper()}  ",
-            font=ctk.CTkFont(family="Helvetica", size=11, weight="bold"),
+            font=theme.get_font(theme.FONT_BADGE),
             text_color="#FFFFFF",
             fg_color=diff_color,
-            corner_radius=6,
+            corner_radius=theme.RADIUS_SM,
         )
         badge.pack(side="left")
 
         ctk.CTkLabel(
             top_info,
             text=f"Capítulo {chap.number} • {chap.category}",
-            font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"),
-            text_color=("#64748B", "#94A3B8"),
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            text_color=theme.COLOR_TEXT_MUTED,
         ).pack(side="left", padx=10)
 
         ctk.CTkLabel(
             header_card,
             text=chap.title,
-            font=ctk.CTkFont(family="Helvetica", size=22, weight="bold"),
-            text_color=("#0F172A", "#F8FAFC"),
+            font=theme.get_font(theme.FONT_TITLE),
+            text_color=theme.COLOR_TEXT_PRIMARY,
         ).pack(anchor="w", padx=16, pady=(2, 2))
 
         ctk.CTkLabel(
             header_card,
             text=chap.subtitle,
-            font=ctk.CTkFont(family="Helvetica", size=14),
-            text_color=("#64748B", "#94A3B8"),
+            font=theme.get_font(theme.FONT_BODY),
+            text_color=theme.COLOR_TEXT_MUTED,
         ).pack(anchor="w", padx=16, pady=(0, 6))
 
         # Summary box
-        summary_box = ctk.CTkFrame(header_card, fg_color=("#E2E8F0", "#0F172A"), corner_radius=8)
+        summary_box = ctk.CTkFrame(header_card, fg_color=theme.COLOR_SURFACE_SECONDARY, corner_radius=theme.RADIUS_MD)
         summary_box.pack(fill="x", padx=16, pady=(4, 14))
 
         ctk.CTkLabel(
             summary_box,
             text=f"💡 **Objetivo**: {chap.summary}",
-            font=ctk.CTkFont(family="Helvetica", size=13),
-            text_color=("#1E293B", "#CBD5E1"),
+            font=theme.get_font(theme.FONT_BODY),
+            text_color=theme.COLOR_TEXT_PRIMARY,
             justify="left",
             wraplength=660,
         ).pack(anchor="w", padx=12, pady=8)
@@ -235,9 +234,9 @@ class TheoryScreen(ctk.CTkFrame):
         # 2. Main Theory Markdown Text Container
         text_card = ctk.CTkFrame(
             self.content_scroll,
-            corner_radius=theme.RADIUS_MD,
-            fg_color=("#F8FAFC", "#111827"),
-            border_width=theme.BORDER_WIDTH,
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_CARD_SURFACE,
+            border_width=1,
             border_color=theme.COLOR_BORDER,
         )
         text_card.pack(fill="x", padx=8, pady=(0, 10))
@@ -245,9 +244,9 @@ class TheoryScreen(ctk.CTkFrame):
         content_box = ctk.CTkTextbox(
             text_card,
             height=500,
-            corner_radius=theme.RADIUS_SM,
-            fg_color=("#FFFFFF", "#111827"),
-            text_color=("#0F172A", "#F1F5F9"),
+            corner_radius=theme.RADIUS_MD,
+            fg_color=theme.COLOR_CARD_SURFACE,
+            text_color=theme.COLOR_TEXT_PRIMARY,
             font=theme.get_font(theme.FONT_BODY),
             wrap="word",
         )
@@ -273,7 +272,7 @@ class TheoryScreen(ctk.CTkFrame):
         ctk.CTkLabel(
             self.content_scroll,
             text="📝 Quiz do Capítulo",
-            font=ctk.CTkFont(family="Helvetica", size=18, weight="bold"),
+            font=theme.get_font(theme.FONT_SECTION),
             text_color=theme.COLOR_TEXT_PRIMARY,
         ).pack(anchor="w", padx=16, pady=(10, 5))
 
@@ -290,32 +289,32 @@ class TheoryScreen(ctk.CTkFrame):
             ctk.CTkLabel(
                 self.content_scroll,
                 text=f"🎉 Parabéns! Completaste o quiz com {correct}/{total} de precisão.",
-                font=ctk.CTkFont(family="Helvetica", size=14, weight="bold"),
+                font=theme.get_font(theme.FONT_BODY_BOLD),
                 text_color=theme.COLOR_SUCCESS,
             ).pack(pady=10)
 
     def _build_interactive_demo_area(self, chap: TheoryChapter):
         demo_card = ctk.CTkFrame(
             self.content_scroll,
-            corner_radius=12,
-            fg_color=("#F1F5F9", "#1E293B"),
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_CARD_SURFACE,
             border_width=1,
-            border_color=("#E2E8F0", "#334155"),
+            border_color=theme.COLOR_BORDER,
         )
         demo_card.pack(fill="x", padx=8, pady=(0, 12))
 
         ctk.CTkLabel(
             demo_card,
             text="🎛️ Laboratório Interativo: Experimenta o Som e a Digitação",
-            font=ctk.CTkFont(family="Helvetica", size=15, weight="bold"),
-            text_color=("#0F172A", "#F8FAFC"),
+            font=theme.get_font(theme.FONT_SUBTITLE),
+            text_color=theme.COLOR_TEXT_PRIMARY,
         ).pack(anchor="w", padx=16, pady=(12, 6))
 
         # Controls Row
         ctrl_row = ctk.CTkFrame(demo_card, fg_color="transparent")
         ctrl_row.pack(fill="x", padx=16, pady=(2, 8))
 
-        ctk.CTkLabel(ctrl_row, text="Tónica / Nota:", font=ctk.CTkFont(family="Helvetica", size=12, weight="bold")).pack(side="left", padx=(0, 4))
+        ctk.CTkLabel(ctrl_row, text="Tónica / Nota:", font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(0, 4))
 
         self.root_select = ctk.CTkOptionMenu(
             ctrl_row,
@@ -495,10 +494,10 @@ class TheoryScreen(ctk.CTkFrame):
     def _build_completion_footer(self, chap: TheoryChapter):
         footer = ctk.CTkFrame(
             self.content_scroll,
-            corner_radius=12,
-            fg_color=("#F1F5F9", "#1E293B"),
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_CARD_SURFACE,
             border_width=1,
-            border_color=("#E2E8F0", "#334155"),
+            border_color=theme.COLOR_BORDER,
         )
         footer.pack(fill="x", padx=8, pady=(0, 10))
 
@@ -508,17 +507,18 @@ class TheoryScreen(ctk.CTkFrame):
         status_lbl = ctk.CTkLabel(
             footer,
             text=f"Estado para {user.avatar} {user.username}: " + ("✅ Concluído com Sucesso" if is_done else "⏳ Lição Pendente"),
-            font=ctk.CTkFont(family="Helvetica", size=14, weight="bold"),
-            text_color="#10B981" if is_done else "#F59E0B",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            text_color=theme.COLOR_SUCCESS if is_done else "#F59E0B",
         )
         status_lbl.pack(side="left", padx=18, pady=14)
 
         action_btn = ctk.CTkButton(
             footer,
             text="✓ Já Aprendi (Marcar como Concluído)" if not is_done else "Desmarcar Lição",
-            font=ctk.CTkFont(family="Helvetica", size=13, weight="bold"),
-            fg_color="#059669" if not is_done else "#475569",
-            hover_color="#047857" if not is_done else "#334155",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            fg_color=theme.COLOR_SUCCESS if not is_done else theme.COLOR_SURFACE_SECONDARY,
+            hover_color=theme.COLOR_SUCCESS_HOVER if not is_done else theme.COLOR_BORDER,
+            text_color="#FFFFFF" if not is_done else theme.COLOR_TEXT_PRIMARY,
             width=230,
             height=36,
             command=lambda: self._toggle_chapter_completion(chap.id, status_lbl, action_btn),
