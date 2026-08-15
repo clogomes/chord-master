@@ -474,7 +474,21 @@ class PracticeSongScreen(ctk.CTkFrame):
             wraplength=640,
             justify="left",
         )
-        self.song_desc_lbl.pack(anchor="w", padx=16, pady=(0, 12))
+        self.song_desc_lbl.pack(anchor="w", padx=16, pady=(0, 6))
+
+        # Theory Analysis Button
+        self.theory_analysis_btn = ctk.CTkButton(
+            self.info_card,
+            text="🎓 Ver Análise Teórica",
+            font=theme.get_font(theme.FONT_SMALL_BOLD),
+            fg_color=theme.COLOR_PRIMARY,
+            hover_color=theme.COLOR_PRIMARY_HOVER,
+            text_color="#FFFFFF",
+            height=30,
+            corner_radius=theme.RADIUS_SM,
+            command=self._show_theory_analysis_modal,
+        )
+        self.theory_analysis_btn.pack(anchor="w", padx=16, pady=(0, 12))
 
         # Playback Controls & Metronome Bar
         ctrl_bar = ctk.CTkFrame(
@@ -816,6 +830,14 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.song_meta_lbl.configure(text=f"Dificuldade: {song.difficulty} • Compasso: {song.time_signature} • BPM: {song.bpm} • {song.note_count} Notas")
         self.song_desc_lbl.configure(text=song.description)
 
+        from gui.i18n import get_language
+        lang = get_language()
+        if hasattr(self, "theory_analysis_btn"):
+            if song.get_theory_analysis(lang):
+                self.theory_analysis_btn.pack(anchor="w", padx=16, pady=(0, 12))
+            else:
+                self.theory_analysis_btn.pack_forget()
+
         # Update Slider
         if self.tempo_ramp_var.get():
             self.current_ramp_bpm = max(40, int(song.bpm * 0.70))
@@ -1116,6 +1138,39 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.midi_manager.stop_listening()
         self.audio_player.stop_all()
         self.on_back()
+
+    def _show_theory_analysis_modal(self):
+        if not self.current_song:
+            return
+
+        from gui.i18n import get_language
+        lang = get_language()
+        analysis_text = self.current_song.get_theory_analysis(lang)
+        if not analysis_text:
+            return
+
+        top = ctk.CTkToplevel(self)
+        top.title(f"🎓 Análise Teórica — {self.current_song.title}")
+        top.geometry("640x480")
+        top.configure(fg_color=theme.COLOR_BG)
+
+        # Ensure top window receives focus
+        top.transient(self.winfo_toplevel())
+        top.grab_set()
+
+        card = ctk.CTkFrame(top, corner_radius=theme.RADIUS_LG, fg_color=theme.COLOR_SURFACE, border_width=1, border_color=theme.COLOR_BORDER)
+        card.pack(fill="both", expand=True, padx=16, pady=16)
+
+        header_lbl = ctk.CTkLabel(card, text=f"{self.current_song.title} ({self.current_song.composer})", font=theme.get_font(theme.FONT_TITLE), text_color=theme.COLOR_TEXT_PRIMARY)
+        header_lbl.pack(anchor="w", padx=16, pady=(16, 8))
+
+        textbox = ctk.CTkTextbox(card, corner_radius=theme.RADIUS_MD, fg_color=theme.COLOR_SURFACE_SECONDARY, text_color=theme.COLOR_TEXT_PRIMARY, font=theme.get_font(theme.FONT_BODY), wrap="word")
+        textbox.pack(fill="both", expand=True, padx=16, pady=(0, 12))
+
+        render_markdown_to_textbox(textbox, analysis_text, base_font_size=13)
+
+        close_btn = ctk.CTkButton(card, text="Fechar", font=theme.get_font(theme.FONT_BODY_BOLD), fg_color=theme.COLOR_PRIMARY, hover_color=theme.COLOR_PRIMARY_HOVER, command=top.destroy)
+        close_btn.pack(anchor="e", padx=16, pady=(0, 16))
 
     def destroy(self):
         self._unbind_keyboard_events()

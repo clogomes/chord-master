@@ -28,7 +28,14 @@ class Song:
     instrument: str = "piano"  # "piano" ou "guitar" / "viola"
     time_signature: str = "4/4"
     description: str = ""
+    theory_analysis: Optional[str] = None
+    theory_analysis_en: Optional[str] = None
     notes: List[SongNote] = field(default_factory=list)
+
+    def get_theory_analysis(self, lang: str = "pt") -> Optional[str]:
+        if lang == "en" and self.theory_analysis_en:
+            return self.theory_analysis_en
+        return self.theory_analysis
 
     @property
     def note_count(self) -> int:
@@ -747,6 +754,16 @@ SONG_LIBRARY: List[Song] = [
         clef="treble",
         instrument="piano",
         description="Clássico tema de Beethoven focado no piano.",
+        theory_analysis="""### 🎓 Análise Harmónica & Estrutural
+
+• **Tonalidade**: Lá Menor (Am) / Modo Eólio.
+• **Tema Principal**: O famoso motivo semitonal alternado **Mi - Dó♯ (E5 - D♯5)** cria uma tensão cromática resolvida em **Si4 - Dó5 - Lá4**.
+• **Conexão com a Teoria**: Exemplo vivo do **Capítulo 2 (Intervalos - 2ª Menor)** e da oscilação de sensível expressiva.""",
+        theory_analysis_en="""### 🎓 Harmonic & Structural Analysis
+
+• **Key**: A Minor (Am) / Aeolian Mode.
+• **Main Theme**: The iconic semitone motif alternating **E5 - D♯5** creates chromatic tension resolving to **B4 - C5 - A4**.
+• **Theory Link**: Practical application of **Chapter 2 (Minor 2nd Interval)**.""",
         notes=[_sn("E5", 1.0), _sn("D#5", 1.0), _sn("E5", 1.0), _sn("D#5", 1.0), _sn("E5", 1.0), _sn("B4", 1.0), _sn("D5", 1.0), _sn("C5", 1.0), _sn("A4", 2.0)]
     ),
     Song(
@@ -758,6 +775,16 @@ SONG_LIBRARY: List[Song] = [
         clef="bass",
         instrument="piano",
         description="Famoso adágio da Sonata ao Luar, focado no piano.",
+        theory_analysis="""### 🎓 Análise Harmónica & Estrutural
+
+• **Tonalidade**: Dó♯ Menor (C♯m).
+• **Arpejo Triádico**: O acompanhamento desdobra tríades em colcheias ternárias (**Sol♯ - Dó♯ - Mi**).
+• **Conexão com a Teoria**: Aplicação direta do **Capítulo 4 (Formação de Tríades & Inversões)**.""",
+        theory_analysis_en="""### 🎓 Harmonic & Structural Analysis
+
+• **Key**: C♯ Minor (C♯m).
+• **Triadic Arpeggio**: The accompaniment unfolds triads in triplet eighths (**G♯ - C♯ - E**).
+• **Theory Link**: Direct application of **Chapter 4 (Triad Construction & Inversions)**.""",
         notes=[_sn("G#3", 1.0), _sn("C#4", 1.0), _sn("E4", 1.0), _sn("G#3", 1.0), _sn("C#4", 1.0), _sn("E4", 1.0)]
     ),
     Song(
@@ -769,6 +796,16 @@ SONG_LIBRARY: List[Song] = [
         clef="treble",
         instrument="piano",
         description="Melodia etérea de Satie.",
+        theory_analysis="""### 🎓 Análise Harmónica & Estrutural
+
+• **Tonalidade**: Ré Maior (D Major) com sonoridade modal Lídia.
+• **Progressão**: Alternância suave entre **Gmaj7** e **Dmaj7**.
+• **Conexão com a Teoria**: Ilustra o **Capítulo 5 (Tétrades maj7)** e o **Capítulo 3 (Modo Lídio)**.""",
+        theory_analysis_en="""### 🎓 Harmonic & Structural Analysis
+
+• **Key**: D Major with Lydian modal feel.
+• **Progression**: Smooth oscillation between **Gmaj7** and **Dmaj7**.
+• **Theory Link**: Demonstrates **Chapter 5 (maj7 Seventh Chords)** and **Chapter 3 (Lydian Mode)**.""",
         notes=[_sn("F#4", 2.0), _sn("A4", 1.0), _sn("G4", 2.0), _sn("F#4", 1.0), _sn("C#4", 2.0)]
     ),
     Song(
@@ -780,6 +817,16 @@ SONG_LIBRARY: List[Song] = [
         clef="treble",
         instrument="piano",
         description="Clássico cânone focado no piano.",
+        theory_analysis="""### 🎓 Análise Harmónica & Estrutural
+
+• **Tonalidade**: Dó Maior.
+• **Progressão de Baixo Ostinato**: **I - V - vi - iii - IV - I - IV - V** (C - G - Am - Em - F - C - F - G).
+• **Conexão com a Teoria**: Uma das progressões encadeadas mais célebres da história, explicada no **Capítulo 5 (Campo Harmónico Maior)**.""",
+        theory_analysis_en="""### 🎓 Harmonic & Structural Analysis
+
+• **Key**: C Major.
+• **Ground Bass Progression**: **I - V - vi - iii - IV - I - IV - V** (C - G - Am - Em - F - C - F - G).
+• **Theory Link**: One of the most iconic harmonic sequences in history, featured in **Chapter 5 (Major Diatonic Field)**.""",
         notes=[_sn("C4", 1.0), _sn("G3", 1.0), _sn("A3", 1.0), _sn("E3", 1.0), _sn("F3", 1.0), _sn("C3", 1.0), _sn("F3", 1.0), _sn("G3", 1.0)]
     ),
     # 4 Guitar-focused
@@ -792,6 +839,16 @@ SONG_LIBRARY: List[Song] = [
         clef="treble",
         instrument="guitar",
         description="Tradicional tema espanhol para viola.",
+        theory_analysis="""### 🎓 Análise Harmónica & Estrutural
+
+• **Tonalidade / Modo**: Modo Frígio de Mi (E Phrygian / Cadência Andaluza).
+• **Progressão Harmónica**: **Am → G → F → E** (iv - ♭III - ♭II - I).
+• **Conexão com a Teoria**: Demonstração perfeita do **Capítulo 3 (Modo Frígio & Sonoridade Flamenca)**.""",
+        theory_analysis_en="""### 🎓 Harmonic & Structural Analysis
+
+• **Key / Mode**: E Phrygian / Andalusian Cadence.
+• **Progression**: **Am → G → F → E** (iv - ♭III - ♭II - I).
+• **Theory Link**: Perfect showcase of **Chapter 3 (Phrygian Mode & Flamenco Sound)**.""",
         notes=[_sn("E4", 1.0), _sn("F4", 1.0), _sn("E4", 1.0), _sn("D4", 1.0), _sn("C4", 1.0), _sn("B3", 1.0)]
     ),
     Song(
@@ -803,6 +860,16 @@ SONG_LIBRARY: List[Song] = [
         clef="treble",
         instrument="guitar",
         description="Clássico folk americano.",
+        theory_analysis="""### 🎓 Análise Harmónica & Estrutural
+
+• **Tonalidade**: Lá Menor (Am) em métrica de 6/8.
+• **Progressão Harmónica**: **Am - C - D - F - Am - E - Am - E**.
+• **Conexão com a Teoria**: Exemplo magistral de **Dórico (presença do D Maior com Fá♯)** e **Modo Eólio com Dominante (E Maior)**.""",
+        theory_analysis_en="""### 🎓 Harmonic & Structural Analysis
+
+• **Key**: A Minor (Am) in 6/8 time.
+• **Progression**: **Am - C - D - F - Am - E - Am - E**.
+• **Theory Link**: Features Dorian modal color (D Major with F♯) alongside dominant resolution.""",
         notes=[_sn("A3", 1.0), _sn("C4", 1.0), _sn("E4", 1.0), _sn("A4", 1.0), _sn("E4", 1.0), _sn("C4", 1.0)]
     ),
     Song(
@@ -813,8 +880,18 @@ SONG_LIBRARY: List[Song] = [
         bpm=84,
         clef="treble",
         instrument="guitar",
-        description="Peça essencial no repertório de guitarra clássica.",
-        notes=[_sn("E5", 1.0), _sn("E5", 1.0), _sn("E5", 1.0), _sn("D5", 1.0), _sn("C5", 1.0), _sn("B4", 1.0)]
+        description="Famosa melodia tradicional de violão.",
+        theory_analysis="""### 🎓 Análise Harmónica & Estrutural
+
+• **Tonalidade**: Mi Menor (Em) transitando para Mi Maior (E).
+• **Estrutura Ternária**: Parte A em tom menor (melancólico) e Parte B em tom maior (luminoso).
+• **Conexão com a Teoria**: Aplicação prática de **Mútua Homónima (Capítulo 3 & 6)**.""",
+        theory_analysis_en="""### 🎓 Harmonic & Structural Analysis
+
+• **Key**: E Minor (Em) shifting to E Major (E).
+• **Ternary Structure**: Part A in minor, Part B in major.
+• **Theory Link**: Parallel Major/Minor key shift (**Chapter 3 & 6**).""",
+        notes=[_sn("E4", 1.0), _sn("B3", 1.0), _sn("G3", 1.0), _sn("E4", 1.0), _sn("B3", 1.0), _sn("G3", 1.0)]
     ),
     Song(
         id="guitar_greensleeves_full",
@@ -824,8 +901,18 @@ SONG_LIBRARY: List[Song] = [
         bpm=100,
         clef="treble",
         instrument="guitar",
-        description="Arranjo dedilhado clássico de Greensleeves.",
-        notes=[_sn("A3", 1.0), _sn("C4", 1.5), _sn("D4", 0.5), _sn("E4", 1.5), _sn("F4", 0.5), _sn("E4", 1.0)]
+        description="Melodia tradicional renascentista para viola.",
+        theory_analysis="""### 🎓 Análise Harmónica & Estrutural
+
+• **Tonalidade / Modo**: Modo Dórico de Lá (A Dorian) / Escala Menor Melódica.
+• **Progressão**: Alternância entre o grau i (Am), ♭VII (G) e a sensível V (E7).
+• **Conexão com a Teoria**: Exemplifica a flexibilidade das escalas menores do **Capítulo 3**.""",
+        theory_analysis_en="""### 🎓 Harmonic & Structural Analysis
+
+• **Key / Mode**: A Dorian / Melodic Minor.
+• **Progression**: Alternation between i (Am), ♭VII (G), and dominant V (E7).
+• **Theory Link**: Showcases minor scale flexibility (**Chapter 3**).""",
+        notes=[_sn("A3", 1.0), _sn("C4", 1.0), _sn("D4", 1.0), _sn("E4", 1.5), _sn("F4", 0.5), _sn("E4", 1.0)]
     ),
 ]
 

@@ -36,3 +36,15 @@ class TestSongsExpansion(unittest.TestCase):
         for song_id in piano_songs:
             song = next(s for s in SONG_LIBRARY if s.id == song_id)
             self.assertEqual(song.instrument, "piano", f"Song {song_id} should have instrument='piano'")
+
+    def test_theory_analysis_field(self):
+        analyzed_songs = [
+            "piano_fur_elise", "piano_moonlight", "piano_gymnopedie", "piano_canon_c",
+            "guitar_malaguena", "guitar_house_rising_sun", "guitar_spanish_romance", "guitar_greensleeves_full"
+        ]
+        for song_id in analyzed_songs:
+            song = next(s for s in SONG_LIBRARY if s.id == song_id)
+            self.assertIsNotNone(song.theory_analysis, f"Song {song_id} should have theory_analysis")
+            self.assertIsNotNone(song.theory_analysis_en, f"Song {song_id} should have theory_analysis_en")
+            self.assertIn("Análise", song.get_theory_analysis("pt"))
+            self.assertIn("Analysis", song.get_theory_analysis("en"))

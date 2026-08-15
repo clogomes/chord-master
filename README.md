@@ -51,6 +51,7 @@ Um curso completo de harmonia e teoria desde os conceitos fundamentais até téc
 
 ### 4. 🎶 Estúdio de Repertório & Tocar Peças (16 Músicas Completas)
 Estúdio de execução interativa com pauta iluminada, teclas destacadas com número de dedo e posição de corda/traste, contendo as **16 músicas completas na íntegra** (clássicos, cancioneiro tradicional e temas lendários de rock acústico):
+- **Análise Harmónica Didática (Fase 27)**: Botão *"🎓 Ver Análise Teórica"* disponível para peças didáticas de piano e viola (*Für Elise*, *Sonata ao Luar*, *Gymnopédie*, *Cânone*, *Malagueña*, *House of the Rising Sun*, *Romance Anónimo*, *Greensleeves*), detalhando a tonalidade, modo, forma e conexões teóricas com o curso.
 - **16 Peças do Repertório Clássico, Tradicional & Rock**:
   1. *Hino à Alegria* (Ludwig van Beethoven — 9ª Sinfonia Completa: Frase A + A' + Ponte B + Conclusão)
   2. *Brilha, Brilha Estrelinha* (W. A. Mozart / Tradicional — Forma Ternária Completa A-B-A)
