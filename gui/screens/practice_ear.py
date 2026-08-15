@@ -133,6 +133,22 @@ class PracticeEarScreen(ctk.CTkFrame):
         )
         self.adaptive_switch.pack(side="right", padx=16, pady=10)
 
+        # Mode Toggle (Learn / Test)
+        mode_frame = ctk.CTkFrame(self, fg_color="transparent")
+        mode_frame.pack(fill="x", padx=20, pady=(0, 6))
+        
+        self.mode_select = ctk.CTkSegmentedButton(
+            mode_frame,
+            values=["🎓 Modo Aprender (Guiado)", "🎯 Modo Testar (Desafio)"],
+            command=lambda v: self._on_mode_changed(),
+            selected_color=theme.COLOR_PRIMARY,
+            selected_hover_color=theme.COLOR_PRIMARY_HOVER,
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            height=36,
+        )
+        self.mode_select.set("🎯 Modo Testar (Desafio)")
+        self.mode_select.pack(fill="x", padx=0, pady=0)
+
         # Exercise Main Scrollable Container
         self.main_container = ctk.CTkScrollableFrame(
             self,
@@ -143,6 +159,72 @@ class PracticeEarScreen(ctk.CTkFrame):
         )
         self.main_container.pack(fill="both", expand=True, padx=20, pady=(0, 14))
         bind_mousewheel(self.main_container)
+
+        # Guided Learning Card
+        self.learning_card = ctk.CTkFrame(
+            self.main_container,
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_SURFACE,
+            border_width=1,
+            border_color=theme.COLOR_BORDER,
+        )
+        # Will be packed dynamically when in Learn Mode
+        
+        self.learning_title_lbl = ctk.CTkLabel(
+            self.learning_card,
+            text="Mnemónica Musical",
+            font=theme.get_font(theme.FONT_TITLE),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+        )
+        self.learning_title_lbl.pack(pady=(16, 4))
+        
+        from gui.components.staff_canvas import StaffCanvas
+        from gui.components.piano_keyboard import PianoKeyboard
+        
+        self.learning_vis_frame = ctk.CTkFrame(self.learning_card, fg_color="transparent")
+        self.learning_vis_frame.pack(fill="x", pady=4, padx=16)
+        
+        self.learning_staff = StaffCanvas(self.learning_vis_frame, width=400, height=120, clef="treble")
+        self.learning_staff.pack(pady=4)
+        
+        self.learning_piano = PianoKeyboard(
+            self.learning_vis_frame,
+            start_octave=3,
+            num_octaves=2,
+            key_width=25,
+            key_height=100,
+        )
+        self.learning_piano.pack(pady=4)
+
+        self.learning_songs_lbl = ctk.CTkLabel(
+            self.learning_card,
+            text="",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            text_color=theme.COLOR_PRIMARY,
+            wraplength=600,
+        )
+        self.learning_songs_lbl.pack(pady=(8, 4))
+
+        self.learning_desc_lbl = ctk.CTkLabel(
+            self.learning_card,
+            text="",
+            font=theme.get_font(theme.FONT_BODY),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+            wraplength=600,
+        )
+        self.learning_desc_lbl.pack(pady=(4, 12), padx=20)
+
+        self.learning_play_btn = ctk.CTkButton(
+            self.learning_card,
+            text="🔊 Ouvir Exemplo Guiado",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            fg_color=theme.COLOR_SUCCESS,
+            hover_color=theme.COLOR_SUCCESS_HOVER,
+            corner_radius=theme.RADIUS_MD,
+            height=40,
+            command=self._play_guided_example,
+        )
+        self.learning_play_btn.pack(pady=(0, 16))
 
         # Audio playback & question card
         self.play_card = ctk.CTkFrame(
@@ -258,12 +340,36 @@ class PracticeEarScreen(ctk.CTkFrame):
             on_next=self.load_new_question,
         )
 
+    def _on_mode_changed(self):
+        self.load_new_question()
+
+    def _play_guided_example(self):
+        if not self.current_question:
+            return
+        # Play notes
+        self.play_question_audio_slow()
+        
+        # Display notes on staff and piano
+        notes = self.current_question.notes_to_play
+        if notes:
+            self.learning_staff.set_notes(notes)
+            self.learning_piano.highlight_notes(notes, color=theme.COLOR_SUCCESS)
+            
+        # Enable test options now that the user listened
+        for btn in self.option_buttons:
+            btn.configure(state="normal")
+        self.learning_play_btn.configure(text="🔊 Ouvir Novamente")
+
     def load_new_question(self):
         self._stop_listening()
         self.is_answered = False
         self._sustain_start_time = None
         self._is_evaluating_singing = False
         self.score_card.pack_forget()
+        self.learning_card.pack_forget()
+        self.learning_staff.set_notes([])
+        self.learning_piano.clear_highlights()
+        self.learning_play_btn.configure(text="🔊 Ouvir Exemplo Guiado")
 
         ex_type = self.type_select.get()
         diff_map = {"Iniciante": "beginner", "Intermédio": "intermediate", "Avançado": "advanced"}
@@ -306,16 +412,46 @@ class PracticeEarScreen(ctk.CTkFrame):
             self.play_btn.configure(text="🔊 Ouvir Intervalo")
             self.play_slow_btn.pack(side="left", padx=6)
 
+        is_learn_mode = ("Aprender" in self.mode_select.get())
+        if is_learn_mode and self.current_question.question_type == QuestionType.EAR_INTERVAL:
+            # Only show learning card for intervals
+            from core.ear_mnemonics import get_mnemonic_by_code
+            import re
+            
+            # Extract short code from correct answer (e.g. "Terça Maior (M3)")
+            match = re.search(r'\((.*?)\)', self.current_question.correct_answer)
+            if match:
+                code = match.group(1)
+                mnemonic = get_mnemonic_by_code(code)
+                if mnemonic:
+                    self.learning_title_lbl.configure(text=f"Mnemónica: {mnemonic.name} ({code})")
+                    self.learning_songs_lbl.configure(text=f"🎵 {mnemonic.songs}")
+                    self.learning_desc_lbl.configure(text=f"📋 {mnemonic.description}")
+                    self.learning_card.pack(fill="x", pady=(4, 12))
+                    self.play_card.pack_forget()
+                else:
+                    self.learning_card.pack_forget()
+                    self.play_card.pack(fill="x", pady=(4, 12))
+            else:
+                self.learning_card.pack_forget()
+                self.play_card.pack(fill="x", pady=(4, 12))
+        else:
+            self.learning_card.pack_forget()
+            self.play_card.pack(fill="x", pady=(4, 12))
+
         self.prompt_label.configure(text=self.current_question.prompt_text)
         self._render_options()
 
-        # Automatically play prompt audio on new question
-        self.after(250, self.play_question_audio)
+        if not is_learn_mode:
+            # Automatically play prompt audio on new question
+            self.after(250, self.play_question_audio)
 
     def _render_options(self):
         for btn in self.option_buttons:
             btn.destroy()
         self.option_buttons.clear()
+
+        is_learn_mode = ("Aprender" in self.mode_select.get())
 
         for idx, opt_text in enumerate(self.current_question.options):
             r = idx // 2
@@ -329,6 +465,7 @@ class PracticeEarScreen(ctk.CTkFrame):
                 fg_color=theme.COLOR_SURFACE_SECONDARY,
                 hover_color=theme.COLOR_SURFACE_HOVER,
                 text_color=theme.COLOR_TEXT_PRIMARY,
+                state="disabled" if (is_learn_mode and self.current_question.question_type == QuestionType.EAR_INTERVAL) else "normal",
                 command=lambda i=idx: self.handle_answer(i),
             )
             btn.grid(row=r, column=c, padx=6, pady=6, sticky="nsew")
