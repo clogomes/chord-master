@@ -244,7 +244,25 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
-### 20. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
+### 20. 🎨 FASE 20 — Redesign Visual Unificado do Ecrã de Teoria ([`gui/screens/theory_screen.py`](file:///Users/clogomes/repo/chord-master/gui/screens/theory_screen.py))
+- **Painel de Leitura Único**: As 3 caixas de texto separadas (conteúdo principal, foco no piano, foco na viola) foram fundidas numa única `CTkTextbox` contínua de `height=500`, com cabeçalhos de secção markdown (`### 🎹 Aplicação no Piano`, `### 🎸 Aplicação na Viola`) e divisores `---` integrados.
+- **Cores Unificadas**: Removidos os cartões azuis (piano) e âmbar (viola) com fundos diferentes — toda a área de conteúdo usa `fg_color=(\"#F8FAFC\", \"#111827\")` consistente.
+- **Fórmulas LaTeX Limpas**: Substituídas todas as expressões `$$\\text{...}$$` e marcadores LaTeX por texto markdown simples e legível com Unicode (♯, ♭, →, ×, etc.).
+- **Seletor Removido**: Eliminado o seletor Piano/Viola/Ambos — o conteúdo de ambos os instrumentos é sempre visível no fluxo contínuo de leitura.
+
+---
+
+### 21. 📚 FASE 21 — Conteúdo de Teoria Expandido & 4 Novos Módulos ([`core/theory_content.py`](file:///Users/clogomes/repo/chord-master/core/theory_content.py))
+- **4 Novos Capítulos** (9 a 12):
+  - **Cap. 9 — Ritmo, Compasso & Pulsação**: BPM, métricas, figuras rítmicas (semibreve a semicolcheia), síncopa e contratempos, com exercícios práticos de independência rítmica piano e padrões de palhetada viola.
+  - **Cap. 10 — Forma Musical & Estrutura**: Formas binária (AB), ternária (ABA), rondó (ABACA) e sonata, estrutura de canção pop, repetição e variação — com exercícios de composição em 4 acordes.
+  - **Cap. 11 — Dinâmica, Articulação & Expressão**: Escala pp→fff, articulações (legato, staccato, sforzando), fraseado musical com cúpula, agógica (rubato, rit., accel.) e uso do pedal de sustain.
+  - **Cap. 12 — Transposição Prática & Ciclo das Tonalidades**: Círculo de quintas completo, tabela de armações de clave, transposição passo-a-passo com exemplo concreto, capotraste na viola e instrumentos transpositores.
+- Todos os capítulos têm **exemplos práticos concretos** integrados no corpo do texto.
+
+---
+
+### 22. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
 - **Deteção de Frequência Fundamental ($f_0$) via Microfone**: Algoritmo de autocorrelação no domínio do tempo acelerado por FFT, com interpolação parabólica para precisão sub-amostra e rejeição inteligente de ruído ambiente (60 Hz a 1200 Hz).
 - **Mostrador Visual com Agulha Dinâmica**: Medidor de $-50$ a $+50$ cents com faixa de tolerância verde ($\pm 10$ cents) e orientações em tempo real (*"▲ Muito Grave — Estica a corda"*, *"▼ Muito Agudo — Afrouxa a corda"*, *"✓ AFINADO (No Ponto Perfeito!)"*).
 - **Afinador de Viola (6 Cordas)**: Cartões visuais para as 6 cordas padrão ($E2, A2, D3, G3, B3, E4$) que se iluminam automaticamente ao detetar a corda tocada, com botão para ouvir o tom de cada corda.

@@ -532,4 +532,371 @@ Qualquer um destes 5 formatos pode ser deslocado para a frente no braço usando 
 """,
         interactive_demo="guitar_fretboard",
     ),
+
+    # ----------------------------------------------------
+    # CAPÍTULO 9 — Ritmo, Compasso & Pulsação
+    # ----------------------------------------------------
+    TheoryChapter(
+        id="chap9_rhythm",
+        number=9,
+        title="Ritmo, Compasso & Pulsação",
+        subtitle="A dimensão temporal da música: tempo, métricas e figuras rítmicas",
+        difficulty="Iniciante",
+        category="Fundamentos",
+        summary="Compreende como a música se organiza no tempo: o que é o pulso, o compasso, as figuras rítmicas e como ler e executar ritmos simples e compostos.",
+        content_markdown="""
+### 1. O Pulso e o Tempo
+O **pulso** (ou batida) é a unidade de tempo constante e regular que estrutura toda a música — como o tick do metrónomo. O **tempo** define a velocidade dessa batida, medido em **BPM (Beats Per Minute)**:
+• 60 BPM = 1 batida por segundo (Largo)
+• 100 BPM = velocidade moderada de marcha
+• 160 BPM = rápido (Allegro)
+
+**Exemplo prático**: Bate palmas regularmente enquanto ouves uma música. Se consegues manter-te sincronizado, estás a sentir o pulso.
+
+---
+
+### 2. O Compasso
+O compasso organiza os pulsos em grupos regulares. A **fração de compasso** (ou clave de tempo) indica:
+• **Numerador**: quantas batidas há por compasso
+• **Denominador**: qual figura rítmica vale 1 batida
+
+| Compasso | Leitura | Carácter |
+| --- | --- | --- |
+| 4/4 | 4 semínimas por compasso | Marcha, Pop, Rock |
+| 3/4 | 3 semínimas por compasso | Valsa, Canção de embalar |
+| 6/8 | 6 colcheias (2 grupos de 3) | Barcarola, Jig irlandesa |
+| 2/4 | 2 semínimas por compasso | Marcha militar, Polca |
+
+---
+
+### 3. Figuras Rítmicas e seus Valores
+| Figura | Nome PT | Valor (em 4/4) | Símbolo |
+| --- | --- | --- | --- |
+| Semibreve | Whole note | 4 batidas | ○ |
+| Mínima | Half note | 2 batidas | ♩ aberta |
+| Semínima | Quarter note | 1 batida | ♩ |
+| Colcheia | Eighth note | 1/2 batida | ♪ |
+| Semicolcheia | Sixteenth note | 1/4 batida | ♬ |
+
+**Ponto de aumentação**: Acrescenta metade do valor à figura. Ex: Semínima com ponto = 1 + 0.5 = **1.5 batidas**.
+
+---
+
+### 4. Pausa e Silêncio
+Cada figura tem uma pausa correspondente com o mesmo valor de duração. As pausas são tão musicais quanto as notas — o silêncio cria tensão, espaço e expressão.
+
+---
+
+### 5. Síncopa e Contratempos
+A **síncopa** ocorre quando o acento cai num tempo fraco ou entre tempos, criando surpresa rítmica. É a base do jazz, funk e bossa nova.
+
+**Exemplo prático de síncopa**: Em 4/4, em vez de acentuar os tempos 1-2-3-4, acentua os tempos "e" (entre 1 e 2) — dás um salto rítmico que "engana" o ouvido de forma agradável.
+""",
+        piano_focus="""
+🎹 **Exercício de Ritmo no Piano**:
+1. Usa o **metrónomo** a 60 BPM.
+2. Toca a nota C4 (Dó central) com a mão direita em semínimas (1 nota por batida).
+3. Com a mão esquerda, toca C3 em mínimas (1 nota a cada 2 batidas).
+4. Aumenta progressivamente para 80 BPM → 100 BPM quando sentires estabilidade.
+5. Experimenta valsa (3/4): 1 nota grave no tempo 1, 2 acordes leves nos tempos 2 e 3 (boom-chick-chick).
+
+**Exercício de independência rítmica**: Toca com a MD um ritmo em semínimas (1-2-3-4) e com a ME colcheias (1-e-2-e-3-e-4-e). Começa devagar — a independência das mãos é um dos maiores desafios do piano.
+""",
+        guitar_focus="""
+🎸 **Ritmo na Viola**:
+• O ritmo na guitarra expressa-se sobretudo na **mão direita** (palhetada ou dedilhado).
+• Padrão de palhetada em 4/4 básico: **↓ ↓ ↑ ↓ ↑** (tempo 1: baixo, 2: baixo, "e": cima, 3: baixo, "e": cima).
+• Para valsa (3/4): **↓ ↑ ↑** — acenta fortemente o primeiro tempo.
+
+**Exercício prático**: Com o acorde de Lá menor (Am) aberto:
+1. Toca só as palhetadas para baixo nos 4 tempos durante 4 compassos.
+2. Adiciona as palhetadas para cima entre os tempos.
+3. Varia o padrão criando o teu próprio groove.
+""",
+        interactive_demo="notes",
+    ),
+
+    # ----------------------------------------------------
+    # CAPÍTULO 10 — Forma Musical & Estrutura
+    # ----------------------------------------------------
+    TheoryChapter(
+        id="chap10_form",
+        number=10,
+        title="Forma Musical & Estrutura",
+        subtitle="Como a música se organiza em secções, temas e arcos dramáticos",
+        difficulty="Intermédio",
+        category="Composição",
+        summary="Aprende a reconhecer e utilizar as formas musicais mais comuns — de simples estruturas AB a complexas formas de sonata — e como a repetição e o contraste criam significado.",
+        content_markdown="""
+### 1. O que é a Forma Musical?
+A **forma** é a arquitectura de uma peça — como as secções se organizam no tempo para criar unidade, variedade e significado. Reconhecer a forma ajuda a:
+• Aprender repertório mais depressa (sabes o que vem a seguir)
+• Memorizar de forma mais eficiente
+• Improvisar com estrutura
+
+---
+
+### 2. Formas Fundamentais
+
+**Forma Binária (AB)**
+Duas secções contrastantes. Frequente em danças barrocas.
+• A: Tema principal (frequentemente termina na dominante)
+• B: Desenvolvimento e regresso à tónica
+*Exemplo*: Muitos Minuetos de Bach e Handel.
+
+**Forma Ternária (ABA)**
+A secção A regressa após um contraste B. Cria sensação de regresso a casa.
+*Exemplos*: Noturnos de Chopin, Blues de 12 compassos (AAB), a maioria das canções pop.
+
+**Forma Rondó (ABACA...)**
+Um refrão (A) alterna com episódios diferentes (B, C...). Muito usado em finais de concertos clássicos.
+
+**Forma Sonata (Exposição → Desenvolvimento → Reexposição)**
+A forma mais complexa e influente da música erudita:
+• **Exposição**: Apresenta 2 temas — Tema I (tónica) e Tema II (dominante/relativa maior)
+• **Desenvolvimento**: Fragmenta e transforma os temas, modula por várias tonalidades, cria tensão máxima
+• **Reexposição**: Ambos os temas regressam à tónica, resolvendo a tensão
+
+---
+
+### 3. Estrutura de uma Canção Pop/Rock
+| Secção | Função | Compassos típicos |
+| --- | --- | --- |
+| Intro | Estabelece o ambiente | 4–8 compassos |
+| Verso | Conta a história | 8–16 compassos |
+| Pré-refrão | Cria tensão ascendente | 4–8 compassos |
+| Refrão | Clímax emocional e melódico | 8–16 compassos |
+| Ponte | Contraste — nova perspectiva | 8 compassos |
+| Outro/Fade | Encerramento | 4–8 compassos |
+
+---
+
+### 4. Repetição e Variação
+A música usa repetição para criar familiaridade e coerência, e variação para manter o interesse. Algumas técnicas:
+• **Sequência**: Repete um motivo a alturas diferentes (ex: subindo grau a grau)
+• **Aumentação/Diminuição**: O mesmo motivo em valores rítmicos maiores/menores
+• **Inversão**: O motivo de pernas para o ar (o que subia desce, e vice-versa)
+""",
+        piano_focus="""
+🎹 **Análise de Forma ao Piano**:
+1. Pega numa peça que já saibas (ex: "Ode à Alegria").
+2. Identifica onde as secções começam e terminam — marca com lápis na partitura.
+3. Pergunta: esta secção é repetição, variação ou contraste?
+
+**Exercício de composição simples (Forma ABA)**:
+• A (4 compassos): Improvisa uma melodia simples em Dó Maior, toca-a duas vezes.
+• B (4 compassos): Muda para Lá menor (relativa menor) — cria contraste de carácter.
+• A' (4 compassos): Regressa à melodia original — podes ornamentá-la ligeiramente.
+""",
+        guitar_focus="""
+🎸 **Forma no Contexto da Viola**:
+• Aprende a reconhecer versos e refrões pelas progressões de acordes — o refrão normalmente resolve de forma mais conclusiva na tónica.
+• **Progressão de verso típica**: Am - F - C - G (carácter aberto, interrogativo)
+• **Progressão de refrão típica**: C - G - Am - F (mais resolutiva, "completa")
+• Experimenta tocar ambas e sente a diferença emocional.
+
+**Exercício**: Cria uma música em forma ABA com apenas 4 acordes:
+• A: G - D - Em - C (Sol Maior — luminoso)
+• B: Em - C - G - D (Meu menor — mais íntimo)
+• A: G - D - Em - C (regresso)
+""",
+        interactive_demo="chords",
+    ),
+
+    # ----------------------------------------------------
+    # CAPÍTULO 11 — Dinâmica, Articulação & Expressão
+    # ----------------------------------------------------
+    TheoryChapter(
+        id="chap11_dynamics",
+        number=11,
+        title="Dinâmica, Articulação & Expressão Musical",
+        subtitle="Como o volume, o toque e o fraseado transformam notas em emoção",
+        difficulty="Intermédio",
+        category="Interpretação",
+        summary="Domina as ferramentas da expressão musical: dinâmicas (pp a ff), articulações (legato, staccato, acento), fraseado e uso do pedal — os elementos que separam tocar notas de fazer música.",
+        content_markdown="""
+### 1. Dinâmicas — O Volume como Expressão
+As indicações de dinâmica dizem-nos com que intensidade tocar. São sempre relativas ao contexto da peça:
+
+| Símbolo | Nome | Significado |
+| --- | --- | --- |
+| ppp | Pianississimo | Extremamente suave |
+| pp | Pianissimo | Muito suave |
+| p | Piano | Suave |
+| mp | Mezzo-piano | Moderadamente suave |
+| mf | Mezzo-forte | Moderadamente forte |
+| f | Forte | Forte |
+| ff | Fortissimo | Muito forte |
+| fff | Fortississimo | Extremamente forte |
+
+**Crescendo (< )**: Aumento gradual de volume.
+**Decrescendo/Diminuendo (> )**: Diminuição gradual de volume.
+
+*Dica de interpretação*: Uma nota **p** tocada após um longo **ff** parece ainda mais silenciosa do que seria de outra forma — o ouvido é relativo, não absoluto.
+
+---
+
+### 2. Articulações — Como Tocar as Notas
+• **Legato**: Notas ligadas sem interrupção. Notado por uma **ligadura de expressão** (arco curvo). Cria fluidez e cantabilidade.
+• **Staccato**: Notas curtas e separadas (ponto acima/abaixo da nota). Cria leveza, humor, dança.
+• **Acento (>)**: Nota tocada com ênfase súbita de volume.
+• **Tenuto (—)**: Mantém a nota pelo seu valor total, com ligeiro peso.
+• **Sforzando (sfz/sf)**: Acento súbito e forte numa nota específica.
+
+---
+
+### 3. Fraseado Musical
+O fraseado é a arte de organizar as notas em **frases musicais** com início, desenvolvimento e conclusão — como frases faladas. Uma boa frase musical:
+• Tem uma **cúpula** (nota mais alta ou mais intensa) para a qual todas as outras confluem
+• Respira: deixa espaço antes de começar a próxima frase
+• Conta uma história: início → tensão → resolução
+
+**Exemplo**: Na melodia de "Happy Birthday", as primeiras 4 notas formam uma frase que "pergunta", e as 4 seguintes "respondem".
+
+---
+
+### 4. Agógica — Flexibilidade de Tempo
+• **Rubato**: Liberdade expressiva no tempo — atrasar aqui, acelerar ali. Usado extensivamente em Chopin e Brahms.
+• **Ritardando (rit.)**: Abrandar gradualmente.
+• **Accelerando (accel.)**: Acelerar gradualmente.
+• **A tempo**: Regressar ao tempo original.
+""",
+        piano_focus="""
+🎹 **Dinâmica e Expressão no Piano**:
+• O piano é o instrumento com **maior gama dinâmica** — do ppp ao fff.
+• **Toque de peso**: Para tocar forte, usa o peso natural do braço em vez de força muscular dos dedos — o som fica mais cheio e menos duro.
+• **Toque de legato**: Para ligar notas, levanta o dedo anterior apenas quando o próximo está completamente pressionado.
+
+**Exercício de dinâmica**: Toca a escala de Dó Maior (C-D-E-F-G-A-B-C) de forma crescente (muito suave em C, fortíssimo em C agudo), depois de forma decrescente. Faz isto sem acelerar — o volume e o ritmo são independentes.
+
+**Uso do Pedal de Sustain**:
+• Pressiona o pedal com o calcanhar no chão e o pé inclinado para a frente.
+• Troca o pedal (levanta e pressiona de novo) a cada mudança harmónica para evitar misturar acordes diferentes.
+""",
+        guitar_focus="""
+🎸 **Expressão na Viola/Guitarra**:
+• **Dinâmica de mão direita**: Toca mais perto da boca (ponte) para som mais brilhante e forte; mais perto do braço (escala) para som mais suave e aveludado.
+• **Vibrato**: Oscila ligeiramente o dedo da mão esquerda no traste para criar vibração de tom — acrescenta emoção e sustain à nota.
+  - Vibrato de pulso: o pulso esquerdo oscila para cima e para baixo.
+  - Vibrato de braço: todo o antebraço gira ligeiramente.
+• **Bend (dobrar a corda)**: Puxa a corda lateralmente para elevar o tom — efeito expressivo do blues e rock.
+
+**Exercício de fraseado**: Toca uma melodia simples (ex: os primeiros 8 compassos de "Greensleeves") com staccato, depois com legato, depois com vibrato em cada nota longa. Sente como cada articulação cria uma emoção completamente diferente.
+""",
+        interactive_demo="notes",
+    ),
+
+    # ----------------------------------------------------
+    # CAPÍTULO 12 — Transposição Prática & Tonalidades
+    # ----------------------------------------------------
+    TheoryChapter(
+        id="chap12_transposition",
+        number=12,
+        title="Transposição Prática & Ciclo das Tonalidades",
+        subtitle="Mover música entre tonalidades e dominar o círculo de quintas em contexto prático",
+        difficulty="Avançado",
+        category="Teoria Aplicada",
+        summary="Aprende a transpor melodias e acordes para qualquer tonalidade, a usar o círculo de quintas como mapa de navegação harmónica, e a identificar rapidamente a armação de clave de qualquer tom.",
+        content_markdown="""
+### 1. O que é Transpor?
+**Transpor** significa mover toda uma peça (ou secção) para uma tonalidade diferente, mantendo as relações intervalares entre todas as notas. O resultado soa igual mas numa altura diferente.
+
+**Porquê transpor?**
+• Adaptar à tessitura do cantor ou instrumento
+• Facilitar a execução (ex: num instrumento transpositor como clarinete em Si♭)
+• Criar contraste dentro da mesma peça (modulação)
+
+---
+
+### 2. O Círculo de Quintas — Mapa de Tonalidades
+O círculo de quintas organiza as 12 tonalidades de forma que cada tonalidade adjacente difere por apenas **1 acidente** (1 sustenido ou 1 bemol a mais/menos):
+
+**Tonalidades com Sustenidos** (sentido horário, adicionando ♯):
+C → G → D → A → E → B → F♯/G♭
+
+**Tonalidades com Bemóis** (sentido anti-horário, adicionando ♭):
+C → F → B♭ → E♭ → A♭ → D♭ → G♭/F♯
+
+**Regra para sustenidos**: O último ♯ adicionado é sempre o **7º grau** da nova tonalidade (um semitom abaixo da tónica).
+**Regra para bemóis**: O penúltimo ♭ é sempre a **tónica** da nova tonalidade.
+
+---
+
+### 3. Como Transpor uma Melodia (Passo a Passo)
+**Exemplo**: Transpor "Parabéns" de Dó Maior para Sol Maior (subir uma 5ª perfeita):
+
+1. Identifica a tonalidade de origem: **Dó Maior** (sem acidentes)
+2. Identifica a tonalidade de destino: **Sol Maior** (1 sustenido: F♯)
+3. Calcula o intervalo de transposição: C → G = **5ª Perfeita (7 semitons)**
+4. Sobe cada nota da melodia 7 semitons:
+   - C (Dó) → G (Sol)
+   - D (Ré) → A (Lá)
+   - E (Mi) → B (Si)
+   - F (Fá) → C (Dó)
+   - G (Sol) → D (Ré)
+5. Aplica os acidentes da nova armação de clave (F torna-se F♯)
+
+---
+
+### 4. Tabela de Armações de Clave
+| Tonalidade Maior | Relativa Menor | # de Acidentes | Acidentes |
+| --- | --- | --- | --- |
+| Dó / C | Lá m / Am | 0 | — |
+| Sol / G | Mi m / Em | 1♯ | F♯ |
+| Ré / D | Si m / Bm | 2♯ | F♯, C♯ |
+| Lá / A | Fá♯m / F♯m | 3♯ | F♯, C♯, G♯ |
+| Mi / E | Dó♯m / C♯m | 4♯ | F♯, C♯, G♯, D♯ |
+| Fá / F | Ré m / Dm | 1♭ | B♭ |
+| Si♭ / B♭ | Sol m / Gm | 2♭ | B♭, E♭ |
+| Mi♭ / E♭ | Dó m / Cm | 3♭ | B♭, E♭, A♭ |
+
+---
+
+### 5. Instrumentos Transpositores
+Alguns instrumentos soam numa tonalidade diferente da escrita:
+• **Clarinete em Si♭**: Soa 1 Tom abaixo — escreve-se 1 Tom acima do som desejado
+• **Trompa em Fá**: Soa uma 5ª abaixo
+• **Saxofone Alto em Mi♭**: Soa uma 6ª maior abaixo
+• **Piano e Viola**: Não transpositores — o que está escrito é o que soa.
+""",
+        piano_focus="""
+🎹 **Transposição ao Piano**:
+• O piano é ideal para aprender transposição porque podes **ver** as teclas e **ouvir** imediatamente o resultado.
+
+**Exercício de transposição prática**:
+1. Toca a escala de Dó Maior: C-D-E-F-G-A-B-C (apenas teclas brancas).
+2. Agora toca Sol Maior: G-A-B-C-D-E-F♯-G (a única mudança é F → F♯).
+3. Faz o mesmo para Ré Maior: D-E-F♯-G-A-B-C♯-D.
+
+**Padrão das Escalas Maiores**: Sempre T-T-ST-T-T-T-ST (Tom-Tom-Semitom-Tom-Tom-Tom-Semitom). Aplica este padrão a qualquer nota de início e obtens a escala maior correspondente.
+
+**Transpor acordes**: Para transpor uma progressão Am-F-C-G para Lá Maior (transposição ascendente de 1ª Maior):
+- Am → Bm
+- F → G
+- C → D
+- G → A
+""",
+        guitar_focus="""
+🎸 **Transposição na Viola — A Capotraste**:
+A **capotraste** (ou cejilha) é a ferramenta de transposição por excelência na guitarra:
+• Coloca a capo no traste N → toda a guitarra sobe N semitons.
+• **Vantagem**: Podes usar as mesmas formas de acordes abertos mas em qualquer tonalidade.
+
+**Exemplo prático**:
+• Acorde aberto de Sol (G): [320003]
+• Com capo no 2º traste → soa como Lá Maior (A)
+• Com capo no 5º traste → soa como Dó Maior (C)
+
+**Tabela de capo rápida**:
+| Acorde digitado | Capo 1 | Capo 2 | Capo 3 | Capo 5 |
+| --- | --- | --- | --- | --- |
+| C | C♯ | D | E♭ | F |
+| G | G♯ | A | B♭ | C |
+| D | E♭ | E | F | G |
+| Em | Fm | F♯m | Gm | Am |
+
+**Exercício**: Aprende a progressão G-Em-C-D. Agora coloca a capo no 2º traste e toca as mesmas formas — a música está agora em Lá Maior!
+""",
+        interactive_demo="circle_of_fifths",
+    ),
 ]
