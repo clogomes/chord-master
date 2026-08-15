@@ -15,6 +15,7 @@ from gui.components.staff_canvas import StaffCanvas
 from gui.components.guitar_fretboard import GuitarFretboard
 from gui.scroll_utils import bind_mousewheel
 from gui.markdown_renderer import render_markdown_to_textbox
+from gui import theme
 
 
 class TheoryScreen(ctk.CTkFrame):
@@ -38,7 +39,6 @@ class TheoryScreen(ctk.CTkFrame):
         self.audio_player = get_audio_player()
 
         self.current_chapter_idx = 0
-        self.display_instrument_mode = "Ambos"  # "Piano", "Viola", "Ambos"
         self.chapter_buttons: List[ctk.CTkButton] = []
 
         self._build_ui()
@@ -69,26 +69,6 @@ class TheoryScreen(ctk.CTkFrame):
         )
         title_lbl.pack(side="left", padx=14)
 
-        # Instrument View Selector
-        inst_box = ctk.CTkFrame(nav_bar, fg_color="transparent")
-        inst_box.pack(side="right")
-
-        ctk.CTkLabel(
-            inst_box,
-            text="Instrumento:",
-            font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"),
-            text_color=("#64748B", "#94A3B8"),
-        ).pack(side="left", padx=(0, 6))
-
-        self.inst_segmented = ctk.CTkSegmentedButton(
-            inst_box,
-            values=["🎹 Piano", "🎸 Viola", "🎹 + 🎸 Ambos"],
-            command=self._on_instrument_mode_changed,
-            selected_color="#2563EB",
-            selected_hover_color="#1D4ED8",
-        )
-        self.inst_segmented.set("🎹 + 🎸 Ambos")
-        self.inst_segmented.pack(side="left")
 
         # 2. Main Two-Column Layout (Chapter Sidebar + Content)
         main_layout = ctk.CTkFrame(self, fg_color="transparent")
@@ -157,20 +137,6 @@ class TheoryScreen(ctk.CTkFrame):
             )
             btn.pack(fill="x", padx=6, pady=3)
             self.chapter_buttons.append(btn)
-
-    def _on_instrument_mode_changed(self, mode: str):
-        if "Piano" in mode and "Viola" not in mode:
-            self.display_instrument_mode = "Piano"
-        elif "Viola" in mode and "Piano" not in mode:
-            self.display_instrument_mode = "Viola"
-        else:
-            self.display_instrument_mode = "Ambos"
-        self._load_chapter(self.current_chapter_idx)
-        if self.on_user_updated:
-            try:
-                self.on_user_updated()
-            except Exception:
-                pass
 
     def _load_chapter(self, chapter_idx: int):
         self.current_chapter_idx = chapter_idx
@@ -267,69 +233,26 @@ class TheoryScreen(ctk.CTkFrame):
         # 2. Main Theory Markdown Text Container
         text_card = ctk.CTkFrame(
             self.content_scroll,
-            corner_radius=12,
-            fg_color=("#F1F5F9", "#1E293B"),
-            border_width=1,
-            border_color=("#E2E8F0", "#334155"),
+            corner_radius=theme.RADIUS_MD,
+            fg_color=("#F8FAFC", "#111827"),
+            border_width=theme.BORDER_WIDTH,
+            border_color=theme.COLOR_BORDER,
         )
         text_card.pack(fill="x", padx=8, pady=(0, 10))
 
         content_box = ctk.CTkTextbox(
             text_card,
-            height=280,
-            corner_radius=8,
-            fg_color=("#FFFFFF", "#0F172A"),
-            text_color=("#0F172A", "#F8FAFC"),
-            font=ctk.CTkFont(family="Helvetica", size=13),
+            height=500,
+            corner_radius=theme.RADIUS_SM,
+            fg_color=("#FFFFFF", "#111827"),
+            text_color=("#0F172A", "#F1F5F9"),
+            font=theme.get_font(theme.FONT_BODY),
             wrap="word",
         )
         content_box.pack(fill="both", expand=True, padx=14, pady=14)
-        render_markdown_to_textbox(content_box, chap.content_markdown, base_font_size=13)
-
-        # 3. Practical Instrument Guides (Piano & Viola)
-        if self.display_instrument_mode in ["Piano", "Ambos"]:
-            piano_card = ctk.CTkFrame(
-                self.content_scroll,
-                corner_radius=12,
-                fg_color=("#EFF6FF", "#172554"),
-                border_width=1,
-                border_color=("#BFDBFE", "#1E40AF"),
-            )
-            piano_card.pack(fill="x", padx=8, pady=(0, 8))
-
-            piano_box = ctk.CTkTextbox(
-                piano_card,
-                height=110,
-                corner_radius=8,
-                fg_color=("#EFF6FF", "#172554"),
-                text_color=("#1E40AF", "#DBEAFE"),
-                font=ctk.CTkFont(family="Helvetica", size=13),
-                wrap="word",
-            )
-            piano_box.pack(fill="both", expand=True, padx=14, pady=14)
-            render_markdown_to_textbox(piano_box, chap.piano_focus, base_font_size=13)
-
-        if self.display_instrument_mode in ["Viola", "Ambos"]:
-            guitar_card = ctk.CTkFrame(
-                self.content_scroll,
-                corner_radius=12,
-                fg_color=("#FEF3C7", "#451A03"),
-                border_width=1,
-                border_color=("#FDE68A", "#92400E"),
-            )
-            guitar_card.pack(fill="x", padx=8, pady=(0, 10))
-
-            guitar_box = ctk.CTkTextbox(
-                guitar_card,
-                height=110,
-                corner_radius=8,
-                fg_color=("#FEF3C7", "#451A03"),
-                text_color=("#92400E", "#FEF3C7"),
-                font=ctk.CTkFont(family="Helvetica", size=13),
-                wrap="word",
-            )
-            guitar_box.pack(fill="both", expand=True, padx=14, pady=14)
-            render_markdown_to_textbox(guitar_box, chap.guitar_focus, base_font_size=13)
+        
+        combined_markdown = chap.content_markdown.strip() + "\n\n---\n\n### 🎹 Aplicação no Piano\n\n" + chap.piano_focus.strip() + "\n\n---\n\n### 🎸 Aplicação na Viola\n\n" + chap.guitar_focus.strip()
+        render_markdown_to_textbox(content_box, combined_markdown, base_font_size=13)
 
         # 4. Interactive Demonstrator Suite (Piano + Viola + Staff)
         self._build_interactive_demo_area(chap)
@@ -429,33 +352,27 @@ class TheoryScreen(ctk.CTkFrame):
         self.demo_staff = StaffCanvas(demo_card, width=650, height=150, clef="treble", show_note_names=True)
         self.demo_staff.pack(pady=4)
 
-        # 2. Piano Keyboard (if enabled)
-        if self.display_instrument_mode in ["Piano", "Ambos"]:
-            ctk.CTkLabel(
-                demo_card,
-                text="🎹 Como Tocar no Piano:",
-                font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"),
-                text_color=("#64748B", "#94A3B8"),
-            ).pack(anchor="w", padx=16, pady=(6, 2))
+        # 2. Piano Keyboard
+        ctk.CTkLabel(
+            demo_card,
+            text="🎹 Como Tocar no Piano:",
+            font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"),
+            text_color=("#64748B", "#94A3B8"),
+        ).pack(anchor="w", padx=16, pady=(6, 2))
 
-            self.demo_piano = PianoKeyboard(demo_card, start_octave=2, num_octaves=4, key_width=25, key_height=120)
-            self.demo_piano.pack(pady=(0, 6))
-        else:
-            self.demo_piano = None
+        self.demo_piano = PianoKeyboard(demo_card, start_octave=2, num_octaves=4, key_width=25, key_height=120)
+        self.demo_piano.pack(pady=(0, 6))
 
-        # 3. Guitar / Viola Fretboard (if enabled)
-        if self.display_instrument_mode in ["Viola", "Ambos"]:
-            ctk.CTkLabel(
-                demo_card,
-                text="🎸 Como Tocar na Viola / Guitarra (Braço & Dedilhado):",
-                font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"),
-                text_color=("#64748B", "#94A3B8"),
-            ).pack(anchor="w", padx=16, pady=(6, 2))
+        # 3. Guitar / Viola Fretboard
+        ctk.CTkLabel(
+            demo_card,
+            text="🎸 Como Tocar na Viola / Guitarra (Braço & Dedilhado):",
+            font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"),
+            text_color=("#64748B", "#94A3B8"),
+        ).pack(anchor="w", padx=16, pady=(6, 2))
 
-            self.demo_guitar = GuitarFretboard(demo_card, width=650, height=155, num_frets=14)
-            self.demo_guitar.pack(pady=(0, 8))
-        else:
-            self.demo_guitar = None
+        self.demo_guitar = GuitarFretboard(demo_card, width=650, height=155, num_frets=14)
+        self.demo_guitar.pack(pady=(0, 8))
 
         self._on_demo_state_change()
 
@@ -506,39 +423,33 @@ class TheoryScreen(ctk.CTkFrame):
         self.demo_staff.set_notes(notes, colors=colors)
 
         # 2. Update Piano
-        if self.demo_piano:
-            midi_map = {n.midi: ("#10B981" if i == 0 else "#38BDF8") for i, n in enumerate(notes)}
-            self.demo_piano.highlight_by_midi(midi_map)
-            elem = self.element_select.get()
-            if "Tríade" in elem or "Acorde" in elem or "Sétima" in elem or "Maior com" in elem or "Menor com" in elem or "Justa" in elem or "Terça" in elem:
-                fingering = get_chord_piano_fingering(notes, hand="right")
-                self.demo_piano.set_fingering(fingering)
-            else:
-                self.demo_piano.set_fingering({})
+        midi_map = {n.midi: ("#10B981" if i == 0 else "#38BDF8") for i, n in enumerate(notes)}
+        self.demo_piano.highlight_by_midi(midi_map)
+        elem = self.element_select.get()
+        if "Tríade" in elem or "Acorde" in elem or "Sétima" in elem or "Maior com" in elem or "Menor com" in elem or "Justa" in elem or "Terça" in elem:
+            fingering = get_chord_piano_fingering(notes, hand="right")
+            self.demo_piano.set_fingering(fingering)
+        else:
+            self.demo_piano.set_fingering({})
 
         # 3. Update Guitar / Viola
-        if self.demo_guitar:
-            root_name = self.root_select.get()
-            elem = self.element_select.get()
+        root_name = self.root_select.get()
+        elem = self.element_select.get()
+        symbol = root_name
+        if "Tríade Menor" in elem:
+            symbol = f"{root_name}m"
+        elif "Sétima da Dominante" in elem:
+            symbol = f"{root_name}7"
+        elif "Maior com 7ª Maior" in elem:
+            symbol = f"{root_name}maj7"
+        elif "Menor com 7ª" in elem:
+            symbol = f"{root_name}m7"
 
-            # Check if there is a matching guitar chord shape in library
-            symbol = root_name
-            if "Tríade Menor" in elem:
-                symbol = f"{root_name}m"
-            elif "Sétima da Dominante" in elem:
-                symbol = f"{root_name}7"
-            elif "Maior com 7ª Maior" in elem:
-                symbol = f"{root_name}maj7"
-            elif "Menor com 7ª" in elem:
-                symbol = f"{root_name}m7"
-
-            shape = self.demo_guitar.model.get_chord_shape(symbol)
-            if shape:
-                self.demo_guitar.set_chord_shape(shape)
-            else:
-                # Highlight notes on fretboard as a scale
-                self.demo_guitar.highlight_scale(notes)
-
+        shape = self.demo_guitar.model.get_chord_shape(symbol)
+        if shape:
+            self.demo_guitar.set_chord_shape(shape)
+        else:
+            self.demo_guitar.highlight_scale(notes)
     def _play_demo_audio_block(self):
         notes, _ = self._get_current_demo_notes()
         self.audio_player.play_chord(notes, duration=1.4)

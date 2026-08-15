@@ -156,7 +156,7 @@ Quando invertemos as duas notas de um intervalo (por exemplo, Dó-Sol vira Sol-D
 ### 1. A Escala Maior Natural
 A **Escala Maior** é o pilar de toda a harmonia tonal ocidental. A sua fórmula em tons (T) e semitons (ST) é:
 
-$$\\text{Tom} - \\text{Tom} - \\text{Semitom} - \\text{Tom} - \\text{Tom} - \\text{Tom} - \\text{Semitom} \\quad (T - T - ST - T - T - T - ST)$$
+**T – T – ST – T – T – T – ST**
 
 Graus da escala: **1 - 2 - 3 - 4 - 5 - 6 - 7**.
 Exemplo em Dó Maior: **C - D - E - F - G - A - B - C**.
@@ -164,22 +164,22 @@ Exemplo em Dó Maior: **C - D - E - F - G - A - B - C**.
 ---
 
 ### 2. As Três Escalas Menores
-1. **Menor Natural (Modo Eólio)**: Fórmula: $T - ST - T - T - ST - T - T$ (Graus: $1 - 2 - \\flat 3 - 4 - 5 - \\flat 6 - \\flat 7$).
-2. **Menor Harmónica**: Eleva o 7º grau para criar uma sensível a 1 semitom da tónica (Graus: $1 - 2 - \\flat 3 - 4 - 5 - \\flat 6 - 7$). Gera o exótico salto de 1 tom e meio entre o 6º e 7º grau.
-3. **Menor Melódica**: Eleva tanto o 6º como o 7º grau na subida para suavizar a condução melódica (Graus: $1 - 2 - \\flat 3 - 4 - 5 - 6 - 7$).
+1. **Menor Natural (Modo Eólio)**: Fórmula: **T - ST - T - T - ST - T - T** (Graus: **1 - 2 - ♭3 - 4 - 5 - ♭6 - ♭7**).
+2. **Menor Harmónica**: Eleva o 7º grau para criar uma sensível a 1 semitom da tónica (Graus: **1 - 2 - ♭3 - 4 - 5 - ♭6 - 7**). Gera o exótico salto de 1 tom e meio entre o 6º e 7º grau.
+3. **Menor Melódica**: Eleva tanto o 6º como o 7º grau na subida para suavizar a condução melódica (Graus: **1 - 2 - ♭3 - 4 - 5 - 6 - 7**).
 
 ---
 
 ### 3. Os 7 Modos Gregos
 Os modos são permutações da escala maior iniciando em cada um dos seus 7 graus:
 
-1. **Jónio (I)**: Escala Maior padrão ($1, 2, 3, 4, 5, 6, 7$) — Alegre, estável.
-2. **Dórico (ii)**: Menor com 6ª Maior ($1, 2, \\flat 3, 4, 5, 6, \\flat 7$) — Jazz, elegante, nostálgico (*So What* de Miles Davis).
-3. **Frígio (iii)**: Menor com 2ª Menor ($1, \\flat 2, \\flat 3, 4, 5, \\flat 6, \\flat 7$) — Flamenco, espanhol, misterioso.
-4. **Lídio (IV)**: Maior com 4ª Aumentada ($1, 2, 3, \\sharp 4, 5, 6, 7$) — Místico, etéreo, bandas sonoras de cinema.
-5. **Mixolídio (V)**: Maior com 7ª Menor ($1, 2, 3, 4, 5, 6, \\flat 7$) — Blues, Rock clássico, *Sweet Child O' Mine*.
-6. **Eólio (vi)**: Menor Natural padrão ($1, 2, \\flat 3, 4, 5, \\flat 6, \\flat 7$) — Melancólico, solene.
-7. **Lócrio (vii°)**: Diminuto com 2ª menor e 5ª diminuta ($1, \\flat 2, \\flat 3, 4, \\flat 5, \\flat 6, \\flat 7$) — Tenso, instável.
+1. **Jónio (I)**: Escala Maior padrão (**1, 2, 3, 4, 5, 6, 7**) — Alegre, estável.
+2. **Dórico (ii)**: Menor com 6ª Maior (**1, 2, ♭3, 4, 5, 6, ♭7**) — Jazz, elegante, nostálgico (*So What* de Miles Davis).
+3. **Frígio (iii)**: Menor com 2ª Menor (**1, ♭2, ♭3, 4, 5, ♭6, ♭7**) — Flamenco, espanhol, misterioso.
+4. **Lídio (IV)**: Maior com 4ª Aumentada (**1, 2, 3, ♯4, 5, 6, 7**) — Místico, etéreo, bandas sonoras de cinema.
+5. **Mixolídio (V)**: Maior com 7ª Menor (**1, 2, 3, 4, 5, 6, ♭7**) — Blues, Rock clássico, *Sweet Child O' Mine*.
+6. **Eólio (vi)**: Menor Natural padrão (**1, 2, ♭3, 4, 5, ♭6, ♭7**) — Melancólico, solene.
+7. **Lócrio (vii°)**: Diminuto com 2ª menor e 5ª diminuta (**1, ♭2, ♭3, 4, ♭5, ♭6, ♭7**) — Tenso, instável.
 
 ---
 
@@ -231,25 +231,25 @@ Uma **tríade** é um acorde formado por **3 notas sobrepostas em intervalos de 
 
 | Tipo de Tríade | Símbolo | Fórmula de Graus | Intervalos Consecutivos | Exemplo (Dó) | Caráter Emocional |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Maior** | C, CM | $1 - 3 - 5$ | Terça Maior (4st) + Terça Menor (3st) | C - E - G | Alegre, brilhante, estável |
-| **Menor** | Cm, C- | $1 - \\flat 3 - 5$ | Terça Menor (3st) + Terça Maior (4st) | C - E♭ - G | Melancólico, emotivo |
-| **Diminuta** | Cdim, C° | $1 - \\flat 3 - \\flat 5$ | Terça Menor (3st) + Terça Menor (3st) | C - E♭ - G♭ | Tenso, sombrio, dramático |
-| **Aumentada** | Caug, C+ | $1 - 3 - \\sharp 5$ | Terça Maior (4st) + Terça Maior (4st) | C - E - G♯ | Misterioso, suspenso |
+| **Maior** | C, CM | **1 - 3 - 5** | Terça Maior (4st) + Terça Menor (3st) | C - E - G | Alegre, brilhante, estável |
+| **Menor** | Cm, C- | **1 - ♭3 - 5** | Terça Menor (3st) + Terça Maior (4st) | C - E♭ - G | Melancólico, emotivo |
+| **Diminuta** | Cdim, C° | **1 - ♭3 - ♭5** | Terça Menor (3st) + Terça Menor (3st) | C - E♭ - G♭ | Tenso, sombrio, dramático |
+| **Aumentada** | Caug, C+ | **1 - 3 - ♯5** | Terça Maior (4st) + Terça Maior (4st) | C - E - G♯ | Misterioso, suspenso |
 
 ---
 
 ### 3. Acordes Suspensos (Sus4 e Sus2)
 Substituem a terça pela quarta ou segunda, eliminando a definição de maior/menor:
-• **Sus4**: $1 - 4 - 5$ (Ex: C - F - G). Cria forte expectativa de resolver na terça maior.
-• **Sus2**: $1 - 2 - 5$ (Ex: C - D - G). Tem sonoridade aberta, suave e moderna.
+• **Sus4**: **1 - 4 - 5** (Ex: C - F - G). Cria forte expectativa de resolver na terça maior.
+• **Sus2**: **1 - 2 - 5** (Ex: C - D - G). Tem sonoridade aberta, suave e moderna.
 
 ---
 
 ### 4. Inversões de Acordes
 A nota mais grave tocada no acorde (o **Baixo**) define o estado de inversão:
-• **Posição Fundamental**: A tónica está no baixo ($1 - 3 - 5$). Ex: C no baixo → C/C.
-• **1ª Inversão**: A terça está no baixo ($3 - 5 - 1$). Ex: E no baixo → C/E.
-• **2ª Inversão**: A quinta está no baixo ($5 - 1 - 3$). Ex: G no baixo → C/G.
+• **Posição Fundamental**: A tónica está no baixo (**1 - 3 - 5**). Ex: C no baixo → C/C.
+• **1ª Inversão**: A terça está no baixo (**3 - 5 - 1**). Ex: E no baixo → C/E.
+• **2ª Inversão**: A quinta está no baixo (**5 - 1 - 3**). Ex: G no baixo → C/G.
 
 *Aplicações de Voice Leading*: As inversões permitem que as notas do baixo se movam por graus conjuntos (passos de 1 ou 2 semitons) em vez de grandes saltos, tornando a música muito mais fluida e elegante.
 """,
@@ -287,7 +287,7 @@ A nota mais grave tocada no acorde (o **Baixo**) define o estado de inversão:
 ### 1. O Campo Harmónico Maior
 Ao construir tríades sobre cada grau da escala maior usando apenas as notas da escala, obtemos os 7 acordes da tonalidade:
 
-$$\\mathbf{I} \\text{ (Maior)} \\quad \\mathbf{ii} \\text{ (menor)} \\quad \\mathbf{iii} \\text{ (menor)} \\quad \\mathbf{IV} \\text{ (Maior)} \\quad \\mathbf{V} \\text{ (Maior)} \\quad \\mathbf{vi} \\text{ (menor)} \\quad \\mathbf{vii^\\circ} \\text{ (diminuto)}$$
+**I (Maior)   ii (menor)   iii (menor)   IV (Maior)   V (Maior)   vi (menor)   vii° (diminuto)**
 
 Exemplo no Campo Harmónico de **Dó Maior**:
 • **I**: C (Dó Maior)
@@ -310,11 +310,11 @@ Exemplo no Campo Harmónico de **Dó Maior**:
 ### 3. Tétrades: Acordes com Sétima (4 Notas)
 Ao adicionar uma quarta nota a 1 terça de distância da quinta, criamos as **Tétrades**:
 
-• **Maior com 7ª Maior (maj7 / $\\Delta$)**: $1 - 3 - 5 - 7$ (Graus I e IV). Sonoridade doce, sofisticada, jazz e bossa nova (ex: Cmaj7).
-• **Dominante com 7ª (7)**: $1 - 3 - 5 - \\flat 7$ (Grau V). Contém o trítono entre a 3ª e a 7ª menor (ex: G7 resolvendo em C).
-• **Menor com 7ª (m7)**: $1 - \\flat 3 - 5 - \\flat 7$ (Graus ii, iii e vi). Sonoridade suave e aveludada (ex: Dm7, Am7).
-• **Meio-Diminuto (m7$\\flat$5 / $\\oslash$)**: $1 - \\flat 3 - \\flat 5 - \\flat 7$ (Grau vii°). Tenso e dramático, o grau ii em tonalidades menores (ex: Bm7b5).
-• **Diminuto Completo (dim7 / °7)**: $1 - \\flat 3 - \\flat 5 - \\flat\\flat 7$. Acorde simétrico de 4 terças menores consecutivas.
+• **Maior com 7ª Maior (maj7 / **Δ**)**: **1 - 3 - 5 - 7** (Graus I e IV). Sonoridade doce, sofisticada, jazz e bossa nova (ex: Cmaj7).
+• **Dominante com 7ª (7)**: **1 - 3 - 5 - ♭7** (Grau V). Contém o trítono entre a 3ª e a 7ª menor (ex: G7 resolvendo em C).
+• **Menor com 7ª (m7)**: **1 - ♭3 - 5 - ♭7** (Graus ii, iii e vi). Sonoridade suave e aveludada (ex: Dm7, Am7).
+• **Meio-Diminuto (m7**♭**5 / **ø**)**: **1 - ♭3 - ♭5 - ♭7** (Grau vii°). Tenso e dramático, o grau ii em tonalidades menores (ex: Bm7b5).
+• **Diminuto Completo (dim7 / °7)**: **1 - ♭3 - ♭5 - ♭♭7**. Acorde simétrico de 4 terças menores consecutivas.
 
 ---
 
@@ -371,8 +371,8 @@ Qualquer acorde diatónico maior ou menor do campo harmónico pode ser antecedid
 ### 2. Empréstimo Modal (Intercâmbio Modal)
 Consiste em 'pedir emprestados' acordes da escala homónima menor para usar numa tonalidade maior:
 
-• **O Subdominante Menor (iv)**: Usar **Fm** em vez de **F** em tom de Dó Maior (progressão clássica: $I \\to IV \\to iv \\to I$, ex: $C \\to F \\to Fm \\to C$). Soa extremamente emotivo e nostálgico.
-• **$\\flat\\text{VI}$ e $\\flat\\text{VII}$**: Usar A♭ e B♭ em tom de Dó Maior (muito comum no Rock e Cinema).
+• **O Subdominante Menor (iv)**: Usar **Fm** em vez de **F** em tom de Dó Maior (progressão clássica: **I → IV → iv → I**, ex: **C → F → Fm → C**). Soa extremamente emotivo e nostálgico.
+• **♭VI** e **♭VII**: Usar A♭ e B♭ em tom de Dó Maior (muito comum no Rock e Cinema).
 
 ---
 
@@ -380,8 +380,8 @@ Consiste em 'pedir emprestados' acordes da escala homónima menor para usar numa
 Todo o acorde dominante com 7ª pode ser substituído por outro dominante localizado a **1 trítono de distância**:
 • Em Dó Maior, o dominante normal é **G7** (notas: G - B - D - F).
 • O trítono entre as notas **B** e **F** é exatamente o mesmo presente no acorde de **D♭7** (notas: D♭ - F - A♭ - C♭/B).
-• Logo, podemos substituir $Dm7 \\to G7 \\to C$ por $Dm7 \\to \\mathbf{D\\flat 7} \\to C$.
-• *Vantagem*: O baixo desce cromaticamente por meio-tom ($D \\to D\\flat \\to C$), criando a assinatura harmónica da Bossa Nova e do Jazz contemporâneo!
+• Logo, podemos substituir **Dm7 → G7 → C** por **Dm7 → D♭7 → C**.
+• *Vantagem*: O baixo desce cromaticamente por meio-tom (**D → D♭→ C**), criando a assinatura harmónica da Bossa Nova e do Jazz contemporâneo!
 """,
         piano_focus="""
 🎹 **No Piano**:
@@ -439,13 +439,13 @@ Em ambas as mãos, os dedos são numerados do polegar ao mindinho:
 1. **Acordes em Bloco (Root + Chords)**:
    - Mão Esquerda: Toca a fundamental ou oitava no 1º tempo do compasso.
    - Mão Direita: Toca a tríade/tétrade em ritmo estável (ex: semínimas ou síncopes).
-2. **Baixo Alberti**: Arpejo clássico $1 - 5 - 3 - 5$ (muito comum em Mozart e no Pop clássico).
+2. **Baixo Alberti**: Arpejo clássico **1 - 5 - 3 - 5** (muito comum em Mozart e no Pop clássico).
 3. **Arpejo Balada 1-5-8-9-10**:
    - Mão Esquerda dedilha a Fundamental (1), Quinta (5), Oitava (8) e Nona (9) criando uma textura orquestral contínua e moderna.
 """,
         piano_focus="""
 🎹 **Exercício Recomendado**:
-1. Toca a progressão $I - vi - IV - V$ em Dó Maior (C - Am - F - G).
+1. Toca a progressão **I - vi - IV - V** em Dó Maior (C - Am - F - G).
 2. Na mão esquerda, toca a nota fundamental em oitavas graves.
 3. Na mão direita, usa inversões para manter a mão quase no mesmo sítio:
    - C: [G - C - E]
@@ -496,7 +496,7 @@ Em ambas as mãos, os dedos são numerados do polegar ao mindinho:
 
 ### 2. O Sistema CAGED
 O **Sistema CAGED** baseia-se no facto de existirem **5 formas de acordes abertos fundamentais**:
-$$\\mathbf{C} \\text{ (Dó)} \\quad \\mathbf{A} \\text{ (Lá)} \\quad \\mathbf{G} \\text{ (Sol)} \\quad \\mathbf{E} \\text{ (Mi)} \\quad \\mathbf{D} \\text{ (Ré)}$$
+**C (Dó)   A (Lá)   G (Sol)   E (Mi)   D (Ré)**
 
 Qualquer um destes 5 formatos pode ser deslocado para a frente no braço usando uma **Pestana** (o dedo indicador a fazer de capotraste móvel), permitindo tocar **qualquer acorde em 5 posições diferentes** ao longo de todo o instrumento!
 
