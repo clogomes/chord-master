@@ -20,6 +20,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 22 — Quiz Interativo por Capítulo de Teoria — CONCLUÍDA
+- Data: 2026-08-15 09:43 (UTC+1)
+- Commit: 2a7ad28
+- Resumo: Adicionado o módulo core/theory_quiz.py com 60 perguntas de múltipla escolha distribuídas por 12 quizzes correspondentes aos capítulos. Criado o componente interativo TheoryQuizWidget para apresentação visual, feedback instantâneo e integração via ScoreCard no ecrã de Teoria, com atribuição de +10 XP por resposta correta. Implementados 10 testes unitários abrangentes na nova suite test_theory_quiz.py, os quais perfazem os requisitos na totalidade.
+- Ficheiros principais alterados: core/theory_quiz.py, gui/components/theory_quiz_widget.py, gui/screens/theory_screen.py, tests/test_theory_quiz.py
+
 ## Fase 21 — Conteúdo de Teoria Expandido & 4 Novos Módulos — CONCLUÍDA
 - Data: 2026-08-15 09:39 (UTC+1)
 - Commit: 9158e43
