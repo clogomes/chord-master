@@ -29,7 +29,7 @@ primeiro, antes de avançar.
 ## Correção — AÇÃO NECESSÁRIA: Campo `Song.instrument` Ligado à UI & Filtro de Repertório — CONCLUÍDA
 - Data: 2026-08-15 16:38 (UTC+1)
 - Commit: fa1cdd9
-- Resumo: Preenchido explicitamente o campo `instrument` nas 8 músicas da Fase 23 (`instrument="guitar"` para Malagueña, House of Rising Sun, Romance Anónimo, Greensleeves; `instrument="piano"` para Pour Élise, Sonata ao Luar, Gymnopédie, Cânone em Dó). Em `gui/screens/practice_song.py`, adicionado o filtro por instrumento (`CTkSegmentedButton` "Todos / 🎹 Piano / 🎸 Viola") na barra lateral do repertório, ícone visual do instrumento em cada botão da lista (`🎹 ` / `🎸 `), e seleção automática do modo de instrumento e timbre correspondente ao carregar cada peça. Corrigida a nota de histórico de fases anteriores. 153/153 testes a passar.
+- Resumo: Preenchido explicitamente o campo `instrument` nas 8 músicas da Fase 23 (`instrument="guitar"` para Malagueña, House of Rising Sun, Romance Anónimo, Greensleeves; `instrument="piano"` para Pour Élise, Sonata ao Luar, Gymnopédie, Cânone em Dó). Em `gui/screens/practice_song.py`, adicionado o filtro por instrumento (`CTkSegmentedButton` "Todos / 🎹 Piano / 🎸 Viola") na barra lateral do repertório, ícone visual do instrumento em cada botão da lista (`🎹 ` / `🎸 `), e seleção automática do modo de instrumento e timbre correspondente ao carregar cada peça. 153/153 testes a passar.
 - Ficheiros alterados: core/songs.py, gui/screens/practice_song.py, tests/test_songs_expansion.py
 
 ## Limpeza Final & Adição do Campo `Song.instrument` — CONCLUÍDA
