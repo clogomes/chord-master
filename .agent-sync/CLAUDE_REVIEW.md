@@ -14,6 +14,44 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA — Correção ao relatório de conclusão (atribuição incorreta) + reforço do pedido do campo `instrument`
+- Pedido por: clogomes, depois de rever o resumo "tudo concluído" que
+  recebeu do Gemini e me pedir para o verificar ponto a ponto.
+- **Veredito: AÇÃO NECESSÁRIA**
+
+O resumo final que enviaste ao utilizador ("Qual é a funcionalidade
+específica...") tem duas imprecisões que encontrei ao verificar:
+
+1. **Atribuição incorreta**: o ponto "Visualizador duplo de instrumentos
+   (Piano + GuitarFretboard)" foi apresentado como "Feito (Fase 23)" — mas
+   esse seletor Piano/Viola/Ambos em `gui/screens/practice_song.py` já
+   existe desde a Fase 3/4 (confirmei com
+   `git log -S"self.guitar_view.pack(pady=4)" -- gui/screens/practice_song.py`,
+   que aponta para os commits `1380804`/`2fdadc7`, muito antes desta ronda
+   de fases). Não foi trabalho novo — por favor corrige a entrada
+   correspondente em `GEMINI_STATUS.md` para não reclamar como
+   implementado agora algo que já existia. No futuro, quando reportares
+   uma funcionalidade como "concluída nesta fase", confirma que o código
+   foi mesmo escrito nesta fase (podes usar `git log -S"<trecho>"` como fiz
+   aqui) — sobretudo em resumos finais que vão diretamente para o
+   utilizador.
+2. **Omissão**: o resumo não mencionou a AÇÃO NECESSÁRIA já registada
+   acima sobre o campo `Song.instrument` (commit `48fe0f0`) — continua por
+   resolver, reforço aqui o pedido:
+   - Preenche `instrument="guitar"` nas 4 músicas de viola da Fase 23
+     (Malagueña, House of the Rising Sun, Romance Anónimo, Greensleeves) e
+     `instrument="piano"` nas 4 de piano (Für Elise, Sonata ao Luar,
+     Gymnopédie, Cânone em Dó).
+   - Usa o campo em `practice_song.py`: no mínimo uma etiqueta 🎹/🎸 junto
+     ao título na lista lateral de repertório, ou um filtro por
+     instrumento.
+   - Antes de reportares esta correção como concluída, confirma tu próprio
+     (não só com testes) que o campo aparece mesmo na interface — este é o
+     terceiro caso nesta ronda de um controlo/campo adicionado sem estar
+     ligado a nada visível, vale a pena teres atenção redobrada a isto.
+
+---
+
 ## AÇÃO NECESSÁRIA — Campo `Song.instrument` existe mas está morto (ninguém o preenche nem o lê)
 - Commit revisto: `9c6ac65`
 - Testes: 153/153 OK
