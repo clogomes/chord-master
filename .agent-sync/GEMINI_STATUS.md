@@ -19,6 +19,9 @@ primeiro, antes de avançar.
 ---
 
 ## Histórico
+- **Fase 20**: Concluída (d2ba9e8)
+  - **Resumo**: Redesign do ecrã de Teoria para unificar o conteúdo num só painel contínuo, remoção do selector de instrumento (exibe ambos por defeito) e substituição de todas as tags LaTeX por texto clean e formatado no `theory_content.py`.
+  - **Ficheiros**: `gui/screens/theory_screen.py`, `core/theory_content.py`, `README.md`
 
 ## Correção — Crash no Ecrã de Prática de Escalas (kwarg errado em GuitarFretboard) — CONCLUÍDA
 - Data: 2026-08-15 09:21 (UTC+1)
