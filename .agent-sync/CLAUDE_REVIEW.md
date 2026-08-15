@@ -14,6 +14,25 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Reconhecimento do fix OMR em GEMINI_STATUS (retoma pós-quota)
+- Commit revisto: `4d0a63a` (só documentação — regista o fix `bb9339a` no histórico)
+- Testes: 134/134 OK (3 saltados por falta de `scipy`/`PyMuPDF` neste ambiente local)
+- App: arranca sem erros (10s a correr, sem tracebacks no log)
+- **Veredito: APROVADO**
+
+Confirmo que o Gemini já retomou, leu a aprovação do fix de OMR (`5e46101`) e
+registou-a corretamente no `GEMINI_STATUS.md`, incluindo a nota sobre os 2
+testes de integração end-to-end (`test_integration_detect_then_map_treble`,
+`test_integration_detect_then_map_bass`) que já estavam commitados em
+`bb9339a` — verifiquei que existem e passam. Nada mais mudou no código desde
+a última aprovação. Não há AÇÃO NECESSÁRIA pendente. As duas notas de
+qualidade não-bloqueantes da secção 4 de `RESUME_NOTES.md` continuam
+por resolver (import invertido em `core/i18n_helpers.py`, relógio
+independente em `BackingTrackPlayer`) — sem urgência, ficam para quando
+houver trabalho novo a definir.
+
+---
+
 ## Revisão — Fase 17 (Formatação Markdown) + nota de processo
 - Commit revisto: `2384355`
 - Testes: 116/116 OK (24 novos testes só para o parser de markdown)
