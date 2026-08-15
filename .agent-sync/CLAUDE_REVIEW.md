@@ -14,6 +14,153 @@ Cada entrada tem um veredito:
 
 ---
 
+## TRABALHO PEDIDO — Fases 20 a 25 (Teoria mais rica, pedagogia guiada, repertório e som mais realistas)
+- Pedido por: clogomes, especificação desenhada pelo Claude e já aprovada
+  pelo utilizador ("sim, avança") antes de ser escrita aqui.
+- **Ordem obrigatória**: corrige primeiro a AÇÃO NECESSÁRIA da secção
+  seguinte (crash na Prática de Escalas) antes de começares qualquer uma
+  destas fases — segue a regra de ordem do `PROTOCOL.md`.
+- Todas as fases abaixo são independentes entre si (podes implementar pela
+  ordem que preferires depois de resolvida a AÇÃO NECESSÁRIA), mas mantém
+  cada fase no seu próprio commit, com `git add <ficheiros específicos>`.
+- Corre `python3 -m unittest discover tests` no fim de cada fase — os 134
+  testes atuais devem continuar a passar, e adiciona testes novos para
+  qualquer função pura nova (ex: novo tipo de escala, novo campo `Song`).
+
+### FASE 20 — Teoria Musical: Unificação Visual + Correção de Fórmulas + Quiz por Módulo
+**Problema confirmado pelo Claude**: `gui/screens/theory_screen.py` usa
+dezenas de cores hex distintas hardcoded (`#FEF3C7`/`#451A03`,
+`#EFF6FF`/`#172554`, `#2563EB`, `#7C3AED`, `#059669`, `#475569`, etc.) em
+vez do sistema de tokens já existente em `gui/theme.py`
+(`COLOR_BG`, `COLOR_SURFACE`, `COLOR_SURFACE_SECONDARY`, `COLOR_BORDER`,
+`COLOR_PRIMARY`, `COLOR_SUCCESS_BG`, ...) — daí o aspeto de "várias janelas
+com fundos e cores diferentes" reportado pelo utilizador. Além disso,
+`core/theory_content.py` tem 4 blocos de LaTeX cru nunca renderizado
+(linhas 159, 290, 375, 499 — ex: `$$\text{Tom} - \text{Tom} - ...$$`), que
+aparece literal e ilegível no ecrã porque `gui/markdown_renderer.py` não
+interpreta LaTeX.
+
+1. **Unificação de cores**: substitui todas as cores hardcoded em
+   `theory_screen.py` (fundos de cards, badges de dificuldade, banners de
+   dica) pelos tokens de `theme.py`. Usa um único par fundo/superfície
+   (`COLOR_BG`/`COLOR_SURFACE`/`COLOR_SURFACE_SECONDARY`) para todos os
+   cards e scrollable frames, e no máximo 2 cores de destaque do conjunto
+   já existente (ex: `COLOR_PRIMARY` para o capítulo ativo/CTA,
+   `COLOR_SUCCESS_BG`+`COLOR_SUCCESS_BORDER` só para caixas de dica
+   prática) — não uses simultaneamente âmbar+azul+roxo+verde como acontece
+   agora.
+2. **Corrigir fórmulas em LaTeX**: substitui as 4 ocorrências em
+   `theory_content.py` por texto normal formatado com a sintaxe que
+   `markdown_renderer.py` já sabe interpretar (negrito `**...**`,
+   marcadores `•`). Exemplo para a linha 159:
+   `**Tom – Tom – Semitom – Tom – Tom – Tom – Semitom** (T‑T‑ST‑T‑T‑T‑ST)`
+   em vez de `$$\text{Tom} - \text{Tom} - \text{Semitom}...$$`. Revê as
+   outras 3 ocorrências da mesma forma (acordes com graus romanos, notas
+   do círculo de quintas).
+3. **Quiz no final de cada módulo**: estende `TheoryChapter`
+   (`core/theory_content.py`) com um novo campo, ex:
+   `quiz_question_ids: List[str]` ou gera as perguntas em runtime a partir
+   do conteúdo do capítulo reaproveitando `QuizEngine`/`category="teoria"`
+   já existente em `core/quiz_engine.py`. No fim do conteúdo de cada
+   capítulo em `theory_screen.py`, adiciona um botão "🧠 Testar
+   Conhecimentos" que abre um mini-quiz de ~5 perguntas relacionadas com
+   esse capítulo (reaproveita o `ScoreCard` já usado nos outros ecrãs de
+   prática para mostrar feedback/pontuação no final).
+4. **Aprofundar conteúdo**: em cada um dos 8 capítulos existentes, expande
+   `content_markdown`, `piano_focus` e `guitar_focus` com mais profundidade
+   e pelo menos um exemplo prático concreto e acionável por módulo (ex:
+   "Experimenta tocar X agora no teclado/pauta abaixo").
+
+### FASE 21 — Novos Módulos de Teoria
+Adiciona novos capítulos a `THEORY_CHAPTERS` em `core/theory_content.py`
+(atualmente só 8), seguindo exatamente a mesma estrutura dos existentes
+(`content_markdown` + `piano_focus` + `guitar_focus` + `interactive_demo` +
+quiz da Fase 20). Sugestão de módulos novos, podes ajustar:
+- Cifras e Leadsheets (como ler e tocar a partir de cifras de acordes).
+- Voicings e Inversões de Acordes ao Piano.
+- Empréstimo Modal e Modulação (aprofunda o que já está mencionado na
+  linha 375 do capítulo de harmonia).
+- Ritmo, Levadas e Divisão Rítmica (complementa a Fase 9 já implementada,
+  do lado teórico).
+- Harmonização de Melodias (como escolher acordes para uma melodia dada).
+
+### FASE 22 — Treino Auditivo: Pedagogia Guiada
+**Problema confirmado**: `gui/screens/practice_ear.py` vai direto para um
+quiz classificativo (identifica o intervalo/acorde tocado) sem nenhum
+passo de aprendizagem prévio — `core/quiz_engine.py::generate_ear_interval_question`
+e `generate_ear_chord_question` só geram pergunta+opções, sem fase de
+demonstração guiada antes da primeira tentativa de cada tipo.
+1. Antes da primeira pergunta de cada tipo de intervalo/acorde numa sessão,
+   mostra um passo de "escuta guiada": toca a nota de referência, depois o
+   alvo, com o nome e a mnemónica (`Interval.mnemonic`) visíveis desde já
+   (não escondidos até responder, como acontece agora na `explanation`).
+2. Torna os 3 níveis de dificuldade já existentes (`beginner`/
+   `intermediate`/`advanced`, usados em `generate_ear_chord_question`)
+   progressivos e desbloqueáveis por precisão, reaproveitando
+   `core/adaptive_engine.py::get_weak_areas` para decidir quando subir de
+   nível, em vez do utilizador escolher o nível manualmente sem orientação.
+
+### FASE 23 — Leitura de Pauta: Passo-a-Passo
+**Problema confirmado**: `gui/screens/practice_staff.py` mostra uma nota
+aleatória em qualquer posição da pauta via
+`QuizEngine.generate_staff_reading_question`, sem qualquer método de
+contagem ensinado ao formando.
+1. Modo iniciante: restringe as notas geradas a um pequeno conjunto
+   próximo da linha de referência (ex: apenas a 2ª linha e os espaços
+   adjacentes), com uma anotação visual sobreposta na `StaffCanvas`
+   ("conta a partir desta linha") a indicar o método de leitura.
+2. Expande o alcance de notas disponíveis progressivamente conforme a
+   precisão do formando sobe, usando a mesma lógica adaptativa da Fase 22
+   (`get_weak_areas`/`get_recommendation`).
+
+### FASE 24 — Repertório: Mais Músicas, Ritmos e Instrumentos
+1. Acrescenta um campo `instrument: str` (`"piano"` / `"guitar"` /
+   `"ambos"`) à classe `Song` em `core/songs.py`, e adiciona mais músicas à
+   biblioteca (atualmente 16), incluindo peças pensadas especificamente
+   para piano e outras especificamente para viola — filtra/mostra esta
+   informação na lista de repertório em `practice_song.py`.
+2. Expande `audio/backing_tracks.py::BACKING_TRACK_LIBRARY` (atualmente 5
+   estilos: rock_basic, slow_ballad, bossa_nova, blues_shuffle, waltz) com
+   mais padrões — sugestão: funk, reggae, samba, marcha.
+3. Adiciona uma voz de **baixo sintetizado** à grelha rítmica de
+   `RhythmPattern` (atualmente só bateria: kick/snare/hihat/ride) —
+   segue o padrão de síntese 100% local já usado (`audio/synthesizer.py`),
+   com uma linha de baixo simples (tónica/quinta) sincronizada ao acorde
+   da música/escala em prática. Adiciona controlo de volume independente
+   por voz (bateria vs. baixo) em `BackingTrackPlayer`, e uma variante de
+   timbre por padrão (ex: baquetas vs. escovas na caixa, mais suave na
+   balada/bossa, mais dura no rock).
+4. Adiciona a **Escala Frígia Dominante** (Escala Espanhola/Flamenca,
+   fórmula `[0,1,4,5,7,8,10,12]`) a `core/scales.py::SCALE_TYPES` — som
+   distinto dos modos já existentes, boa opção pedagógica. Segue o mesmo
+   padrão das outras entradas (`name_pt`, `name_en`, `formula_degrees`,
+   `formula_steps`, `description`) e o teste genérico
+   `test_all_scale_types_structure_and_intervals` já existente deve
+   continuar a passar sem alterações (valida qualquer entrada nova
+   automaticamente).
+
+### FASE 25 — Som Mais Realista
+**Contexto**: piano usa síntese aditiva fixa
+(`audio/synthesizer.py::generate_single_frequency`), viola/guitarra usa
+Karplus-Strong (`generate_plucked_string`) — ambos sem variação por
+dinâmica (volume tocado) ou registo (grave vs. agudo).
+1. Piano: introduz leve desafinação entre parciais harmónicos (efeito de
+   "stretch tuning", real em pianos acústicos — os harmónicos agudos são
+   ligeiramente mais altos que o múltiplo exato da fundamental), brilho
+   tímbrico sensível ao volume tocado (mais energia nos harmónicos
+   superiores quando `volume` é mais alto), e um pequeno transiente de
+   "martelo" (ruído curto e percussivo) no ataque da nota, antes do corpo
+   tonal.
+2. Viola/Guitarra: varia o `decay_factor` do Karplus-Strong e o espectro do
+   ruído inicial (mais brilhante/áspero vs. mais macio) consoante o
+   `volume` recebido por `generate_plucked_string`, para simular a
+   diferença real entre dedilhado suave e forte.
+3. Mantém o teste `tests/test_synthesizer.py` a passar — ajusta ou adiciona
+   asserções que validem a nova variação por volume (ex: energia espectral
+   mais alta com `volume` maior), sem quebrar as existentes.
+
+---
+
 ## AÇÃO NECESSÁRIA — Crash na Prática de Escalas (ecrã fica em branco)
 - Encontrado por: Claude, ao investigar o reporte do utilizador "a secção de
   prática de escalas não aparece informação nenhuma".
