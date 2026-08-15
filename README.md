@@ -457,3 +457,13 @@ python3 -m unittest discover -v tests
 - Novos estilos rítmicos sintetizados localmente: Jazz Swing, Bolero, Valsa.
 - Controlo de volumes separados e seleção de timbres (Glockenspiel, Cordas).
 - Visualizador com modo simultâneo (Dual View) para Piano e Viola.
+
+### Fase 24 — Treino Auditivo Guiado com Mnemónicas
+- Adicionado modo duplo (Aprender/Testar) ao ecrã de treino auditivo.
+- Integração de mnemónicas musicais para identificação rápida de todos os intervalos.
+- Exibição visual de notas num teclado/pauta mini para guiar o utilizador na audição.
+- Biblioteca de mnemónicas com exemplos reais como "Tubarão", "Star Wars" e "Os Simpsons".
+### Fase 25 — Leitura de Pauta Guiada Passo-a-Passo
+- Guia interativo passo-a-passo no ecrã de leitura de pauta.
+- 4 Níveis progressivos (Notas nas linhas, nos espaços, suplementares, mistura com acidentes).
+- Dicas visuais e foco adaptativo em pontos fracos (repetição de notas erradas).

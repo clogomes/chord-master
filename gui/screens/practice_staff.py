@@ -2,13 +2,16 @@
 from typing import Callable, List, Optional
 import customtkinter as ctk
 from core.quiz_engine import QuizEngine, QuizQuestion, QuestionType
-from core.adaptive_engine import generate_adaptive_question
+from core.adaptive_engine import generate_adaptive_question, get_weak_areas
+from core.staff_tutor import get_note_explanation, generate_tutor_pool, LEVELS_INFO
 from core.user_manager import UserManager
 from audio.player import get_audio_player
 from gui.components.staff_canvas import StaffCanvas
 from gui.components.piano_keyboard import PianoKeyboard
 from gui.components.score_card import ScoreCard
 from gui.scroll_utils import bind_mousewheel
+from gui import theme
+import random
 
 
 class PracticeStaffScreen(ctk.CTkFrame):
@@ -31,6 +34,10 @@ class PracticeStaffScreen(ctk.CTkFrame):
         self.current_question: Optional[QuizQuestion] = None
         self.option_buttons: List[ctk.CTkButton] = []
         self.is_answered = False
+        self.current_level = 1
+        self.show_hint_var = ctk.BooleanVar(value=False)
+        self.weak_notes = {}
+
 
         self._build_ui()
         self.load_new_question()
@@ -81,15 +88,23 @@ class PracticeStaffScreen(ctk.CTkFrame):
         self.clef_select.set("Clave de Sol (𝄞)")
         self.clef_select.pack(side="left", padx=6, pady=10)
 
-        self.accidentals_var = ctk.BooleanVar(value=False)
-        self.accidentals_check = ctk.CTkCheckBox(
+        self.level_select = ctk.CTkOptionMenu(
             settings_frame,
-            text="Incluir Acidentes (♯/♭)",
-            variable=self.accidentals_var,
-            command=self.load_new_question,
+            values=[f"Nível {info['level']}: {info['name']}" for info in LEVELS_INFO],
+            command=self._on_level_changed,
             font=ctk.CTkFont(family="Helvetica", size=12),
         )
-        self.accidentals_check.pack(side="left", padx=16, pady=10)
+        self.level_select.set("Nível 1: Notas nas Linhas")
+        self.level_select.pack(side="left", padx=16, pady=10)
+
+        self.hint_check = ctk.CTkCheckBox(
+            settings_frame,
+            text="👁️ Mostrar Dica de Posição",
+            variable=self.show_hint_var,
+            command=self._on_hint_toggled,
+            font=ctk.CTkFont(family="Helvetica", size=12),
+        )
+        self.hint_check.pack(side="left", padx=16, pady=10)
 
         # Adaptive Mode Toggle Switch
         self.adaptive_var = ctk.BooleanVar(value=False)
@@ -128,6 +143,26 @@ class PracticeStaffScreen(ctk.CTkFrame):
 
         self.staff_view = StaffCanvas(self.staff_card, width=640, height=170, clef="treble", show_note_names=False)
         self.staff_view.pack(pady=4)
+        
+        # 💡 Guia Passo-a-Passo
+        self.tutor_frame = ctk.CTkFrame(self.staff_card, fg_color=theme.COLOR_SUCCESS_BG, corner_radius=8)
+        self.tutor_frame.pack(fill="x", padx=20, pady=8)
+        self.tutor_lbl = ctk.CTkLabel(
+            self.tutor_frame, 
+            text="💡 Guia Passo-a-Passo", 
+            font=ctk.CTkFont(family="Helvetica", size=13, weight="bold"),
+            text_color=theme.COLOR_SUCCESS
+        )
+        self.tutor_lbl.pack(anchor="w", padx=10, pady=(6,0))
+        self.tutor_desc = ctk.CTkLabel(
+            self.tutor_frame, 
+            text="", 
+            font=ctk.CTkFont(family="Helvetica", size=13),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+            wraplength=600,
+            justify="left"
+        )
+        self.tutor_desc.pack(anchor="w", padx=10, pady=(0,6))
 
         play_btn = ctk.CTkButton(
             self.staff_card,
@@ -181,51 +216,100 @@ class PracticeStaffScreen(ctk.CTkFrame):
             on_replay=self._play_current_note,
         )
 
+    def _on_level_changed(self, choice: str):
+        # Nível X: ... -> extrai o X
+        import re
+        m = re.search(r"Nível (\d+)", choice)
+        if m:
+            self.current_level = int(m.group(1))
+        self.load_new_question()
+        
+    def _on_hint_toggled(self):
+        if self.current_question and self.current_question.staff_note:
+            if self.show_hint_var.get():
+                self.staff_view.set_position_hint(self.current_question.staff_note, "#34D399")
+            else:
+                self.staff_view.set_position_hint(None)
+        
     def load_new_question(self):
-        """Generates and displays a new random staff reading question."""
+        """Generates and displays a new random staff reading question based on the selected level."""
         self.is_answered = False
         self.feedback_card.pack_forget()
         self.piano_view.clear_highlights()
+        self.staff_view.set_position_hint(None)
 
         clef_pt = self.clef_select.get()
         clef_key = "treble" if "Sol" in clef_pt else "bass"
-        include_acc = self.accidentals_var.get()
-
+        
         # Update piano range according to clef
         if clef_key == "treble":
             self.piano_view.set_range(start_octave=4, num_octaves=2)
         else:
             self.piano_view.set_range(start_octave=2, num_octaves=2)
 
-        if hasattr(self, "adaptive_var") and self.adaptive_var.get():
-            q_cand = generate_adaptive_question(self.user_manager.current_user, difficulty="intermediate")
-            if q_cand.staff_note:
-                self.current_question = q_cand
-                if self.current_question.clef:
-                    clef_key = self.current_question.clef
-            else:
-                self.current_question = QuizEngine.generate_staff_reading_question(
-                    clef=clef_key,
-                    include_accidentals=include_acc,
-                )
-        else:
-            self.current_question = QuizEngine.generate_staff_reading_question(
-                clef=clef_key,
-                include_accidentals=include_acc,
-            )
+        pool = generate_tutor_pool(self.current_level, clef_key, include_accidentals=(self.current_level == 4))
+        if not pool:
+            return
+            
+        # Weak-spot focus logic
+        weighted_pool = list(pool)
+        for n in pool:
+            if n.pitch in self.weak_notes:
+                weighted_pool.extend([n] * self.weak_notes[n.pitch])
+                
+        target_note = random.choice(weighted_pool)
+        
+        from core.quiz_engine import QuizQuestion, QuestionType
+        from core.notes import NOTE_NAMES, NOTE_NAMES_PT
+        all_possible_pitches = list(NOTE_NAMES)
+        distractors_pitches = [p for p in all_possible_pitches if p != target_note.pitch]
+        random.shuffle(distractors_pitches)
+
+        correct_label = f"{target_note.name_pt} ({target_note.pitch})"
+        distractor_labels = [f"{NOTE_NAMES_PT[p]} ({p})" for p in distractors_pitches[:3]]
+
+        options = distractor_labels + [correct_label]
+        random.shuffle(options)
+        correct_index = options.index(correct_label)
+
+        clef_name = "Clave de Sol" if clef_key == "treble" else "Clave de Fá"
+        prompt = f"Identifica a nota desenhada na pauta na **{clef_name}**:"
+        explanation = (
+            f"Correto! A nota na pauta é **{target_note.name_pt}** ({target_note.pitch}{target_note.octave}), "
+            f"com frequência de **{target_note.frequency:.1f} Hz** (MIDI {target_note.midi})."
+        )
+        
+        self.current_question = QuizQuestion(
+            question_type=QuestionType.STAFF_NOTE,
+            prompt_text=prompt,
+            category="leitura_pauta",
+            options=options,
+            correct_index=correct_index,
+            explanation=explanation,
+            notes_to_play=[target_note],
+            play_mode="melodic_asc",
+            staff_note=target_note,
+            clef=clef_key,
+        )
 
         self.prompt_label.configure(text=self.current_question.prompt_text)
         self.staff_view.set_clef(clef_key)
-        if self.current_question.staff_note:
-            self.staff_view.set_single_note(self.current_question.staff_note, color="#38BDF8")
+        self.staff_view.set_single_note(self.current_question.staff_note, color="#38BDF8")
+        
+        # Update Tutor Info
+        tutor_text = get_note_explanation(self.current_question.staff_note, clef_key)
+        self.tutor_desc.configure(text=tutor_text)
+        
+        if self.show_hint_var.get():
+            self.staff_view.set_position_hint(self.current_question.staff_note, "#34D399")
 
         for i, opt_text in enumerate(self.current_question.options):
             btn = self.option_buttons[i]
             btn.configure(
                 text=opt_text,
-                fg_color=("#E2E8F0", "#334155"),
-                text_color=("#0F172A", "#F8FAFC"),
-                hover_color=("#CBD5E1", "#475569"),
+                fg_color=theme.COLOR_SURFACE_SECONDARY,
+                text_color=theme.COLOR_TEXT_PRIMARY,
+                hover_color=theme.COLOR_SURFACE_HOVER,
                 state="normal",
             )
 
@@ -249,6 +333,13 @@ class PracticeStaffScreen(ctk.CTkFrame):
         self.is_answered = True
         correct_index = self.current_question.correct_index
         is_correct = selected_index == correct_index
+
+        target_pitch = self.current_question.staff_note.pitch
+        if not is_correct:
+            self.weak_notes[target_pitch] = self.weak_notes.get(target_pitch, 0) + 1
+        else:
+            if target_pitch in self.weak_notes and self.weak_notes[target_pitch] > 0:
+                self.weak_notes[target_pitch] -= 1
 
         # Play note sound upon answering
         self._play_current_note()

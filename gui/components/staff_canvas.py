@@ -33,6 +33,9 @@ class StaffCanvas(ctk.CTkFrame):
         self.notes: List[Note] = []
         self.durations: List[float] = []
         self.note_colors: List[str] = []
+        
+        self.hint_note: Optional[Note] = None
+        self.hint_color: str = "#34D399"
 
         # Coordinate references
         self.staff_top_y = (self.canvas_height - (4 * self.line_spacing)) // 2
@@ -95,6 +98,12 @@ class StaffCanvas(ctk.CTkFrame):
         diff_steps = note.diatonic_step - base_step
         y = self.staff_bottom_y - (diff_steps * (self.line_spacing / 2.0))
         return y
+        
+    def set_position_hint(self, note: Optional[Note], color: str = "#34D399"):
+        """Sets an optional position hint (line/space highlight) for the given note."""
+        self.hint_note = note
+        self.hint_color = color
+        self.redraw()
 
     def redraw(self):
         """Redraws the staff lines, clef symbol, time signature, barlines, ledger lines, and all notes."""
@@ -111,6 +120,16 @@ class StaffCanvas(ctk.CTkFrame):
                 start_x, y, end_x, y,
                 fill=line_color,
                 width=2,
+            )
+
+        # 1.5 Draw position hint if any
+        if getattr(self, "hint_note", None):
+            hy = self._get_note_y(self.hint_note)
+            self.canvas.create_line(
+                start_x + 120, hy, end_x - 30, hy,
+                fill=self.hint_color,
+                width=self.line_spacing,
+                stipple="gray50" if hasattr(self.canvas, "create_line") else ""  # Soften
             )
 
         # 2. Draw Clef Symbol
