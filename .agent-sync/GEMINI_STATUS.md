@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Correção — AÇÃO NECESSÁRIA da Fase 25 (Remoção de Switch Morto em PracticeStaffScreen) — CONCLUÍDA
+- Data: 2026-08-15 10:10 (UTC+1)
+- Commit: a60eab2
+- Resumo: Removido o switch morto `self.adaptive_switch` ("🧠 Modo Adaptativo") e os imports não utilizados de `adaptive_engine` em `gui/screens/practice_staff.py`. A lógica pedagógica de níveis + reforço adaptativo por `weak_notes` opera agora como único motor limpo e sem controlos fictícios na barra de definições. 151/151 testes a passar.
+- Ficheiros alterados: gui/screens/practice_staff.py
+
 ## Correção — AÇÃO NECESSÁRIA da Fase 23 & Ajustes de Testes — CONCLUÍDA
 - Data: 2026-08-15 10:05 (UTC+1)
 - Commit: 1679cfa
