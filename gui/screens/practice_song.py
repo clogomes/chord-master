@@ -87,6 +87,8 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.current_ramp_bpm: int = max(40, int(self.current_song.bpm * 0.70))
         self.metronome = Metronome(bpm=self.current_song.bpm, on_beat=self._on_metronome_beat)
         self.backing_player = BackingTrackPlayer(bpm=self.current_song.bpm, volume=0.65)
+        self.song_volume: float = 0.80
+        self.selected_instrument: str = "piano"
         self.current_combo: int = 0
         self.max_combo: int = 0
         self.rhythm_score: int = 0
@@ -573,9 +575,9 @@ class PracticeSongScreen(ctk.CTkFrame):
         ctk.CTkLabel(vol_frame, text="Timbre:", font=theme.get_font(theme.FONT_SMALL)).pack(side="left")
         self.timbre_select = ctk.CTkOptionMenu(
             vol_frame,
-            values=["🎹 Piano", "🎸 Viola", "🔔 Glockenspiel", "🎻 Cordas"],
+            values=["🎹 Piano", "🎸 Viola"],
             command=self._on_timbre_changed,
-            width=120, height=30
+            width=110, height=30
         )
         self.timbre_select.set("🎹 Piano")
         self.timbre_select.pack(side="left", padx=4)
@@ -685,13 +687,16 @@ class PracticeSongScreen(ctk.CTkFrame):
 
     
     def _on_song_vol_changed(self, val):
-        pass
+        self.song_volume = float(val)
 
     def _on_rhythm_vol_changed(self, val):
         self.backing_player.set_volume(float(val))
 
     def _on_timbre_changed(self, val):
-        pass
+        if "Viola" in str(val):
+            self.selected_instrument = "guitar"
+        else:
+            self.selected_instrument = "piano"
 
     def _on_bpm_changed(self, value):
         val = int(value)
@@ -938,7 +943,12 @@ class PracticeSongScreen(ctk.CTkFrame):
             self.rhythm_score += pts * min(4, 1 + (self.current_combo // 5))
 
         sn = self.current_song.notes[self.current_note_idx]
-        self.audio_player.play_note(sn.note, duration=0.6)
+        self.audio_player.play_note(
+            sn.note,
+            duration=0.6,
+            volume=self.song_volume,
+            instrument=self.selected_instrument,
+        )
 
         if self.current_note_idx < len(self.current_song.notes) - 1:
             self.current_note_idx += 1
@@ -1046,7 +1056,12 @@ class PracticeSongScreen(ctk.CTkFrame):
         note_duration_sec = beat_duration_sec * sn.duration_beats
 
         self._highlight_active_note()
-        self.audio_player.play_note(sn.note, duration=note_duration_sec * 0.9)
+        self.audio_player.play_note(
+            sn.note,
+            duration=note_duration_sec * 0.9,
+            volume=self.song_volume,
+            instrument=self.selected_instrument,
+        )
 
         self.current_note_idx += 1
         delay_ms = int(note_duration_sec * 1000)
