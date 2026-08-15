@@ -14,6 +14,43 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA — Crash na Prática de Escalas (ecrã fica em branco)
+- Encontrado por: Claude, ao investigar o reporte do utilizador "a secção de
+  prática de escalas não aparece informação nenhuma".
+- **Causa raiz confirmada** (reproduzida diretamente, instanciando
+  `PracticeScalesScreen` fora da app):
+  Em `gui/screens/practice_scales.py`, `_build_ui()` (linha ~347) cria o
+  `GuitarFretboard` com `on_position_clicked=self._on_guitar_fret_clicked`.
+  Mas `GuitarFretboard.__init__` (`gui/components/guitar_fretboard.py`) não
+  tem nenhum parâmetro `on_position_clicked` — o parâmetro real chama-se
+  `on_note_clicked` e recebe um único argumento `Note` (ver o uso correto em
+  `gui/screens/practice_song.py:605`, `on_note_clicked=self._on_user_guitar_click`).
+  Como `on_position_clicked` não é reconhecido, cai no `**kwargs` e é passado
+  ao `CTkFrame` subjacente, que rejeita o argumento com
+  `ValueError: ['on_position_clicked'] are not supported arguments.` — isto
+  acontece dentro do `__init__` do próprio ecrã, por isso o ecrã nunca chega
+  a ser construído (daí aparecer em branco/vazio ao navegar até lá).
+- **Correção necessária**:
+  1. Em `_build_ui()`, mudar `on_position_clicked=self._on_guitar_fret_clicked`
+     para `on_note_clicked=self._on_guitar_fret_clicked`.
+  2. Mudar a assinatura de `_on_guitar_fret_clicked(self, string_idx: int, fret: int)`
+     para `_on_guitar_fret_clicked(self, note: Note)`, e simplificar o corpo
+     para chamar diretamente `self._process_played_note(note)` (o mapeamento
+     string/fret → Note já é feito dentro do próprio `GuitarFretboard` antes
+     de invocar o callback — não precisa de `GuitarFretboardModel().get_note_at(...)`
+     outra vez).
+  3. Verificar se `_on_physical_key_press` (teclas 1-6 para cordas da viola)
+     ainda faz sentido com esta mudança — atualmente usa
+     `self.guitar_coords[self.current_note_idx]` diretamente, o que continua
+     válido e não precisa de alteração.
+- **Como validar depois da correção**: correr
+  `python3 -c "import customtkinter as ctk; from core.user_manager import UserManager; from gui.screens.practice_scales import PracticeScalesScreen; root=ctk.CTk(); um=UserManager(); um.current_user or um.create_user('T'); PracticeScalesScreen(root, um, lambda: None).pack(); root.update()"`
+  sem exceções, e confirmar visualmente na app que o ecrã "🎼 Prática de
+  Escalas" mostra a pauta, teclado, fretboard e descrição da escala.
+- **Veredito: AÇÃO NECESSÁRIA — corrigir antes de qualquer fase nova.**
+
+---
+
 ## Revisão — Reconhecimento do fix OMR em GEMINI_STATUS (retoma pós-quota)
 - Commit revisto: `4d0a63a` (só documentação — regista o fix `bb9339a` no histórico)
 - Testes: 134/134 OK (3 saltados por falta de `scipy`/`PyMuPDF` neste ambiente local)
