@@ -26,6 +26,11 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 25 — Leitura de Pauta Guiada Passo-a-Passo — CONCLUÍDA
+- Data: 2026-08-15T10:04:48+01:00
+- Commit: 934189d
+- Resumo: Adicionado o guia interativo `core/staff_tutor.py` com explicações passo-a-passo (níveis 1 a 4). Atualizado `gui/screens/practice_staff.py` com o painel de guia, checkbox para dica de posição na pauta e histórico de erros (pontos fracos focados). O `StaffCanvas` foi estendido para suportar destaque de linhas/espaços.
+- Ficheiros principais alterados: gui/screens/practice_staff.py, core/staff_tutor.py, tests/test_practice_staff_pedagogy.py, gui/components/staff_canvas.py, README.md
 ## Limpeza & Unificação de Tema em TheoryScreen — CONCLUÍDA
 - Data: 2026-08-15 09:58 (UTC+1)
 - Commit: 86f4d9d
