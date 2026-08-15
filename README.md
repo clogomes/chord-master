@@ -452,3 +452,8 @@ python3 -m unittest discover -v tests
 - **Conta / Repositório:** [`clogomes@gmail.com`](https://github.com/clogomes/chord-master)
 - **Tecnologias:** Python 3, CustomTkinter, NumPy, Pygame, SoundDevice.
 - **Licença:** MIT License (Código aberto para estudo e prática musical).
+### Fase 23 — Leitura de Partituras OMR e Estúdio Expandido
+- Expansão do repertório com 8 novas músicas completas para piano e viola.
+- Novos estilos rítmicos sintetizados localmente: Jazz Swing, Bolero, Valsa.
+- Controlo de volumes separados e seleção de timbres (Glockenspiel, Cordas).
+- Visualizador com modo simultâneo (Dual View) para Piano e Viola.

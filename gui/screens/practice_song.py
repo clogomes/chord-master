@@ -555,7 +555,35 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.ramp_checkbox.pack(side="left", padx=6)
 
         # Progress bar
+        
+        # --- NOVO: Volume & Timbre ---
+        vol_frame = ctk.CTkFrame(ctrl_bar, fg_color="transparent")
+        vol_frame.pack(side="left", padx=10)
+        
+        ctk.CTkLabel(vol_frame, text="Vol. Música:", font=theme.get_font(theme.FONT_SMALL)).pack(side="left")
+        self.song_vol_slider = ctk.CTkSlider(vol_frame, from_=0, to=1.0, width=80, command=self._on_song_vol_changed)
+        self.song_vol_slider.set(0.8)
+        self.song_vol_slider.pack(side="left", padx=4)
+
+        ctk.CTkLabel(vol_frame, text="Vol. Ritmo:", font=theme.get_font(theme.FONT_SMALL)).pack(side="left")
+        self.rhythm_vol_slider = ctk.CTkSlider(vol_frame, from_=0, to=1.0, width=80, command=self._on_rhythm_vol_changed)
+        self.rhythm_vol_slider.set(0.65)
+        self.rhythm_vol_slider.pack(side="left", padx=4)
+        
+        ctk.CTkLabel(vol_frame, text="Timbre:", font=theme.get_font(theme.FONT_SMALL)).pack(side="left")
+        self.timbre_select = ctk.CTkOptionMenu(
+            vol_frame,
+            values=["🎹 Piano", "🎸 Viola", "🔔 Glockenspiel", "🎻 Cordas"],
+            command=self._on_timbre_changed,
+            width=120, height=30
+        )
+        self.timbre_select.set("🎹 Piano")
+        self.timbre_select.pack(side="left", padx=4)
+        
+        # -----------------------------
+        
         self.progress_bar = ctk.CTkProgressBar(self.stage_scroll, height=7, progress_color=theme.COLOR_PRIMARY)
+
         self.progress_bar.set(0.0)
         self.progress_bar.pack(fill="x", padx=6, pady=(0, 6))
 
@@ -654,6 +682,16 @@ class PracticeSongScreen(ctk.CTkFrame):
                 if p.name_pt in choice:
                     self.backing_player.start(p_id, bpm=bpm)
                     break
+
+    
+    def _on_song_vol_changed(self, val):
+        pass
+
+    def _on_rhythm_vol_changed(self, val):
+        self.backing_player.set_volume(float(val))
+
+    def _on_timbre_changed(self, val):
+        pass
 
     def _on_bpm_changed(self, value):
         val = int(value)

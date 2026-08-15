@@ -117,124 +117,24 @@ class RhythmPattern:
     grid: List[List[str]]  # Each step has list of instruments: ["kick", "snare", "hihat_closed", "hihat_open", "ride"]
 
 
-# 5 Standard Accompaniment Patterns
+
+# 8 Standard Accompaniment Patterns
 BACKING_TRACK_LIBRARY: Dict[str, RhythmPattern] = {
-    "rock_basic": RhythmPattern(
-        id="rock_basic",
-        name_pt="Rock Básico (4/4)",
-        time_signature="4/4",
-        steps_per_bar=16,  # 16th notes
-        grid=[
-            ["kick", "hihat_closed"],   # 1
-            [],                         # e
-            ["hihat_closed"],           # &
-            [],                         # a
-            ["snare", "hihat_closed"],  # 2
-            [],                         # e
-            ["hihat_closed"],           # &
-            [],                         # a
-            ["kick", "hihat_closed"],   # 3
-            ["kick"],                   # e
-            ["hihat_closed"],           # &
-            [],                         # a
-            ["snare", "hihat_closed"],  # 4
-            [],                         # e
-            ["hihat_closed"],           # &
-            ["hihat_open"],             # a
-        ]
-    ),
-    "slow_ballad": RhythmPattern(
-        id="slow_ballad",
-        name_pt="Balada Lenta (4/4)",
-        time_signature="4/4",
-        steps_per_bar=16,
-        grid=[
-            ["kick", "ride"],           # 1
-            [],
-            ["ride"],                   # &
-            [],
-            ["snare", "ride"],          # 2
-            [],
-            ["ride"],                   # &
-            ["kick"],                   # ghost
-            ["kick", "ride"],           # 3
-            [],
-            ["ride"],                   # &
-            [],
-            ["snare", "ride"],          # 4
-            [],
-            ["ride"],                   # &
-            [],
-        ]
-    ),
-    "bossa_nova": RhythmPattern(
-        id="bossa_nova",
-        name_pt="Bossa Nova (4/4 Sincopado)",
-        time_signature="4/4",
-        steps_per_bar=16,
-        grid=[
-            ["kick", "snare", "hihat_closed"],  # 1
-            [],
-            ["hihat_closed"],
-            ["snare"],                          # syncopation
-            ["hihat_closed"],
-            [],
-            ["kick", "snare", "hihat_closed"],  # 2&
-            [],
-            ["hihat_closed"],
-            ["snare"],
-            ["kick", "hihat_closed"],
-            [],
-            ["snare", "hihat_closed"],
-            [],
-            ["hihat_closed"],
-            ["snare"],
-        ]
-    ),
-    "blues_shuffle": RhythmPattern(
-        id="blues_shuffle",
-        name_pt="Blues Shuffle (4/4 Swing/12/8)",
-        time_signature="4/4",
-        steps_per_bar=12,  # 4 beats x 3 triplet subdivisions
-        grid=[
-            ["kick", "ride"],           # 1
-            [],
-            ["ride"],                   # swing skip
-            ["snare", "ride"],          # 2
-            [],
-            ["ride"],
-            ["kick", "ride"],           # 3
-            [],
-            ["ride"],
-            ["snare", "ride"],          # 4
-            [],
-            ["ride"],
-        ]
-    ),
-    "waltz": RhythmPattern(
-        id="waltz",
-        name_pt="Valsa Clássica (3/4)",
-        time_signature="3/4",
-        steps_per_bar=12,  # 3 beats x 4 16th notes (or 6 8ths)
-        grid=[
-            ["kick", "hihat_closed"],   # Beat 1 (Downbeat)
-            [],
-            ["hihat_closed"],
-            [],
-            ["snare", "hihat_closed"],  # Beat 2
-            [],
-            ["hihat_closed"],
-            [],
-            ["snare", "hihat_closed"],  # Beat 3
-            [],
-            ["hihat_open"],
-            [],
-        ]
-    ),
+    "rock": RhythmPattern(id="rock", name_pt="Rock (4/4)", time_signature="4/4", steps_per_bar=16, grid=[["kick", "hihat_closed"], [], ["hihat_closed"], [], ["snare", "hihat_closed"], [], ["hihat_closed"], [], ["kick", "hihat_closed"], ["kick"], ["hihat_closed"], [], ["snare", "hihat_closed"], [], ["hihat_closed"], ["hihat_open"]]),
+    "pop": RhythmPattern(id="pop", name_pt="Pop (4/4)", time_signature="4/4", steps_per_bar=16, grid=[["kick", "hihat_closed"], [], ["hihat_closed"], [], ["snare", "hihat_closed"], [], ["hihat_closed"], [], ["kick", "hihat_closed"], [], ["hihat_closed"], [], ["snare", "hihat_closed"], [], ["hihat_closed"], []]),
+    "16beat": RhythmPattern(id="16beat", name_pt="16 Beat (4/4)", time_signature="4/4", steps_per_bar=16, grid=[["kick", "hihat_closed"], ["hihat_closed"], ["hihat_closed"], ["hihat_closed"], ["snare", "hihat_closed"], ["hihat_closed"], ["kick", "hihat_closed"], ["hihat_closed"], ["kick", "hihat_closed"], ["hihat_closed"], ["hihat_closed"], ["hihat_closed"], ["snare", "hihat_closed"], ["hihat_closed"], ["hihat_closed"], ["hihat_closed"]]),
+    "disco": RhythmPattern(id="disco", name_pt="Disco (4/4)", time_signature="4/4", steps_per_bar=16, grid=[["kick", "hihat_closed"], [], ["hihat_open"], [], ["snare", "hihat_closed", "kick"], [], ["hihat_open"], [], ["kick", "hihat_closed"], [], ["hihat_open"], [], ["snare", "hihat_closed", "kick"], [], ["hihat_open"], []]),
+    "bossa_nova": RhythmPattern(id="bossa_nova", name_pt="Bossa Nova (4/4)", time_signature="4/4", steps_per_bar=16, grid=[["kick", "snare", "hihat_closed"], [], ["hihat_closed"], ["snare"], ["hihat_closed"], [], ["kick", "snare", "hihat_closed"], [], ["hihat_closed"], ["snare"], ["kick", "hihat_closed"], [], ["snare", "hihat_closed"], [], ["hihat_closed"], ["snare"]]),
+    "jazz_swing": RhythmPattern(id="jazz_swing", name_pt="Jazz Swing (4/4)", time_signature="4/4", steps_per_bar=12, grid=[["kick", "ride"], [], ["ride"], ["snare", "hihat_closed", "ride"], [], ["ride"], ["kick", "ride"], [], ["ride"], ["snare", "hihat_closed", "ride"], [], ["ride"]]),
+    "waltz_34": RhythmPattern(id="waltz_34", name_pt="Valsa (3/4)", time_signature="3/4", steps_per_bar=12, grid=[["kick", "hihat_closed"], [], ["hihat_closed"], [], ["snare", "hihat_closed"], [], ["hihat_closed"], [], ["snare", "hihat_closed"], [], ["hihat_closed"], []]),
+    "bolero": RhythmPattern(id="bolero", name_pt="Bolero (4/4)", time_signature="4/4", steps_per_bar=16, grid=[["kick", "hihat_closed"], [], ["hihat_closed"], [], ["snare", "hihat_closed"], [], ["kick", "hihat_closed"], ["kick"], ["kick", "hihat_closed"], [], ["hihat_closed"], [], ["snare", "hihat_closed"], [], ["hihat_closed"], []]),
 }
 
-
 class BackingTrackPlayer:
+    @staticmethod
+    def get_available_styles():
+        return list(BACKING_TRACK_LIBRARY.keys())
+
     """
     Background rhythm groove player driven by synthesized acoustic drum instruments.
     Maintains tempo precision and lock-free thread synchronization.

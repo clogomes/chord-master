@@ -735,7 +735,91 @@ SONG_LIBRARY: List[Song] = [
             _sn("G3", 2.5, 1, 3, 0, "Sol!"),
         ],
     ),
+
+    # NOVO: 4 Piano-focused
+    Song(
+        id="piano_fur_elise",
+        title="Pour Élise (Tema)",
+        composer="Ludwig van Beethoven",
+        difficulty="Iniciante",
+        bpm=130,
+        clef="treble",
+        description="Clássico tema de Beethoven focado no piano.",
+        notes=[_sn("E5", 1.0), _sn("D#5", 1.0), _sn("E5", 1.0), _sn("D#5", 1.0), _sn("E5", 1.0), _sn("B4", 1.0), _sn("D5", 1.0), _sn("C5", 1.0), _sn("A4", 2.0)]
+    ),
+    Song(
+        id="piano_moonlight",
+        title="Sonata ao Luar (Adagio)",
+        composer="Ludwig van Beethoven",
+        difficulty="Intermédio",
+        bpm=60,
+        clef="bass",
+        description="Famoso adágio da Sonata ao Luar, focado no piano.",
+        notes=[_sn("G#3", 1.0), _sn("C#4", 1.0), _sn("E4", 1.0), _sn("G#3", 1.0), _sn("C#4", 1.0), _sn("E4", 1.0)]
+    ),
+    Song(
+        id="piano_gymnopedie",
+        title="Gymnopédie No. 1",
+        composer="Erik Satie",
+        difficulty="Intermédio",
+        bpm=75,
+        clef="treble",
+        description="Melodia etérea de Satie.",
+        notes=[_sn("F#4", 2.0), _sn("A4", 1.0), _sn("G4", 2.0), _sn("F#4", 1.0), _sn("C#4", 2.0)]
+    ),
+    Song(
+        id="piano_canon_c",
+        title="Cânone em Dó Maior",
+        composer="Johann Pachelbel",
+        difficulty="Iniciante",
+        bpm=90,
+        clef="treble",
+        description="Clássico cânone focado no piano.",
+        notes=[_sn("C4", 1.0), _sn("G3", 1.0), _sn("A3", 1.0), _sn("E3", 1.0), _sn("F3", 1.0), _sn("C3", 1.0), _sn("F3", 1.0), _sn("G3", 1.0)]
+    ),
+    # NOVO: 4 Guitar-focused
+    Song(
+        id="guitar_malaguena",
+        title="Malagueña (Tema Flamenco)",
+        composer="Tradicional Espanhol",
+        difficulty="Iniciante",
+        bpm=120,
+        clef="treble",
+        description="Tradicional tema espanhol para viola.",
+        notes=[_sn("E4", 1.0), _sn("F4", 1.0), _sn("E4", 1.0), _sn("D4", 1.0), _sn("C4", 1.0), _sn("B3", 1.0)]
+    ),
+    Song(
+        id="guitar_house_rising_sun",
+        title="The House of the Rising Sun",
+        composer="Tradicional / Folk",
+        difficulty="Intermédio",
+        bpm=110,
+        clef="treble",
+        description="Clássico folk americano.",
+        notes=[_sn("A3", 1.0), _sn("C4", 1.0), _sn("E4", 1.0), _sn("A4", 1.0), _sn("E4", 1.0), _sn("C4", 1.0)]
+    ),
+    Song(
+        id="guitar_spanish_romance",
+        title="Romance Anónimo (Romance de Amor)",
+        composer="Tradicional Espanhol",
+        difficulty="Intermédio",
+        bpm=84,
+        clef="treble",
+        description="Peça essencial no repertório de guitarra clássica.",
+        notes=[_sn("E5", 1.0), _sn("E5", 1.0), _sn("E5", 1.0), _sn("D5", 1.0), _sn("C5", 1.0), _sn("B4", 1.0)]
+    ),
+    Song(
+        id="guitar_greensleeves_full",
+        title="Greensleeves (Arranjo para Viola)",
+        composer="Tradicional Inglês",
+        difficulty="Iniciante",
+        bpm=100,
+        clef="treble",
+        description="Arranjo dedilhado clássico de Greensleeves.",
+        notes=[_sn("A3", 1.0), _sn("C4", 1.5), _sn("D4", 0.5), _sn("E4", 1.5), _sn("F4", 0.5), _sn("E4", 1.0)]
+    ),
 ]
+
 
 
 def get_song_by_id(song_id: str) -> Optional[Song]:
@@ -744,3 +828,16 @@ def get_song_by_id(song_id: str) -> Optional[Song]:
         if song.id == song_id:
             return song
     return None
+
+
+from core.fingering import assign_piano_fingerings
+from core.guitar import assign_guitar_coordinates
+
+for song in SONG_LIBRARY:
+    if song.notes and all(sn.piano_finger is None for sn in song.notes):
+        p_fingers = assign_piano_fingerings([sn.note for sn in song.notes])
+        g_coords = assign_guitar_coordinates([sn.note for sn in song.notes])
+        for i, sn in enumerate(song.notes):
+            if i < len(p_fingers): sn.piano_finger = p_fingers[i]
+            if i < len(g_coords):
+                sn.guitar_string, sn.guitar_fret = g_coords[i]
