@@ -245,7 +245,20 @@ class PracticeSongScreen(ctk.CTkFrame):
             font=theme.get_font(theme.FONT_SECTION),
             text_color=theme.COLOR_TEXT_PRIMARY,
         )
-        self.sidebar_title_lbl.pack(anchor="w", padx=12, pady=(4, 6))
+        self.sidebar_title_lbl.pack(anchor="w", padx=12, pady=(4, 4))
+
+        # Instrument Filter Segmented Button
+        self.song_filter_seg = ctk.CTkSegmentedButton(
+            self.song_sidebar,
+            values=["Todos", "🎹 Piano", "🎸 Viola"],
+            command=lambda _val: self._populate_song_sidebar(),
+            selected_color=theme.COLOR_PRIMARY,
+            selected_hover_color=theme.COLOR_PRIMARY_HOVER,
+            font=theme.get_font(theme.FONT_SMALL_BOLD),
+            height=28,
+        )
+        self.song_filter_seg.set("Todos")
+        self.song_filter_seg.pack(fill="x", padx=6, pady=(0, 8))
 
         self.songs_btn_container = ctk.CTkFrame(self.song_sidebar, fg_color="transparent")
         self.songs_btn_container.pack(fill="x")
@@ -270,14 +283,24 @@ class PracticeSongScreen(ctk.CTkFrame):
             btn.destroy()
         self.song_buttons.clear()
 
+        filter_val = self.song_filter_seg.get() if hasattr(self, "song_filter_seg") else "Todos"
         all_songs = SONG_LIBRARY + self.user_songs
-        self.sidebar_title_lbl.configure(text=f"Biblioteca de Peças ({len(all_songs)})")
 
-        for s in all_songs:
+        if "Piano" in filter_val:
+            filtered_songs = [s for s in all_songs if getattr(s, "instrument", "piano") == "piano"]
+        elif "Viola" in filter_val:
+            filtered_songs = [s for s in all_songs if getattr(s, "instrument", "piano") == "guitar"]
+        else:
+            filtered_songs = all_songs
+
+        self.sidebar_title_lbl.configure(text=f"Biblioteca de Peças ({len(filtered_songs)})")
+
+        for s in filtered_songs:
             is_active = (self.current_song and self.current_song.id == s.id)
+            inst_icon = "🎸 " if getattr(s, "instrument", "piano") == "guitar" else "🎹 "
             btn = ctk.CTkButton(
                 self.songs_btn_container,
-                text=f"{s.title}\n{s.composer} ({s.difficulty})",
+                text=f"{inst_icon}{s.title}\n{s.composer} ({s.difficulty})",
                 font=theme.get_font(theme.FONT_BODY),
                 anchor="w",
                 height=52,
@@ -761,6 +784,23 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.rhythm_score = 0
         self.song_completed = False
         self.score_card.pack_forget()
+
+        # Auto-set timbre and instrument mode based on song's primary instrument
+        song_inst = getattr(song, "instrument", "piano")
+        if song_inst == "guitar":
+            self.selected_instrument = "guitar"
+            if hasattr(self, "timbre_select"):
+                self.timbre_select.set("🎸 Viola")
+            if hasattr(self, "inst_segmented"):
+                self.inst_segmented.set("🎸 Viola")
+                self._on_instrument_mode_changed("🎸 Viola")
+        else:
+            self.selected_instrument = "piano"
+            if hasattr(self, "timbre_select"):
+                self.timbre_select.set("🎹 Piano")
+            if hasattr(self, "inst_segmented"):
+                self.inst_segmented.set("🎹 Piano")
+                self._on_instrument_mode_changed("🎹 Piano")
 
         # Update Sidebar button styles
         for btn in self.song_buttons:

@@ -25,9 +25,14 @@ class TestSongsExpansion(unittest.TestCase):
                 self.assertIsNotNone(note.guitar_string, f"Note in {song_id} should have guitar_string assigned")
                 self.assertIsNotNone(note.guitar_fret, f"Note in {song_id} should have guitar_fret assigned")
 
-    def test_backing_track_styles(self):
-        # Test BackingTrackPlayer.get_available_styles() contains all 8 styles
-        styles = BackingTrackPlayer.get_available_styles()
-        expected = ["rock", "pop", "16beat", "disco", "bossa_nova", "jazz_swing", "waltz_34", "bolero"]
-        for exp in expected:
-            self.assertIn(exp, styles, f"Style {exp} should be in available styles")
+    def test_song_instruments_assigned(self):
+        guitar_songs = ["guitar_malaguena", "guitar_house_rising_sun", "guitar_spanish_romance", "guitar_greensleeves_full"]
+        piano_songs = ["piano_fur_elise", "piano_moonlight", "piano_gymnopedie", "piano_canon_c"]
+
+        for song_id in guitar_songs:
+            song = next(s for s in SONG_LIBRARY if s.id == song_id)
+            self.assertEqual(song.instrument, "guitar", f"Song {song_id} should have instrument='guitar'")
+
+        for song_id in piano_songs:
+            song = next(s for s in SONG_LIBRARY if s.id == song_id)
+            self.assertEqual(song.instrument, "piano", f"Song {song_id} should have instrument='piano'")

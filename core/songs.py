@@ -737,7 +737,7 @@ SONG_LIBRARY: List[Song] = [
         ],
     ),
 
-    # NOVO: 4 Piano-focused
+    # 4 Piano-focused
     Song(
         id="piano_fur_elise",
         title="Pour Élise (Tema)",
@@ -745,6 +745,7 @@ SONG_LIBRARY: List[Song] = [
         difficulty="Iniciante",
         bpm=130,
         clef="treble",
+        instrument="piano",
         description="Clássico tema de Beethoven focado no piano.",
         notes=[_sn("E5", 1.0), _sn("D#5", 1.0), _sn("E5", 1.0), _sn("D#5", 1.0), _sn("E5", 1.0), _sn("B4", 1.0), _sn("D5", 1.0), _sn("C5", 1.0), _sn("A4", 2.0)]
     ),
@@ -755,6 +756,7 @@ SONG_LIBRARY: List[Song] = [
         difficulty="Intermédio",
         bpm=60,
         clef="bass",
+        instrument="piano",
         description="Famoso adágio da Sonata ao Luar, focado no piano.",
         notes=[_sn("G#3", 1.0), _sn("C#4", 1.0), _sn("E4", 1.0), _sn("G#3", 1.0), _sn("C#4", 1.0), _sn("E4", 1.0)]
     ),
@@ -765,6 +767,7 @@ SONG_LIBRARY: List[Song] = [
         difficulty="Intermédio",
         bpm=75,
         clef="treble",
+        instrument="piano",
         description="Melodia etérea de Satie.",
         notes=[_sn("F#4", 2.0), _sn("A4", 1.0), _sn("G4", 2.0), _sn("F#4", 1.0), _sn("C#4", 2.0)]
     ),
@@ -775,10 +778,11 @@ SONG_LIBRARY: List[Song] = [
         difficulty="Iniciante",
         bpm=90,
         clef="treble",
+        instrument="piano",
         description="Clássico cânone focado no piano.",
         notes=[_sn("C4", 1.0), _sn("G3", 1.0), _sn("A3", 1.0), _sn("E3", 1.0), _sn("F3", 1.0), _sn("C3", 1.0), _sn("F3", 1.0), _sn("G3", 1.0)]
     ),
-    # NOVO: 4 Guitar-focused
+    # 4 Guitar-focused
     Song(
         id="guitar_malaguena",
         title="Malagueña (Tema Flamenco)",
@@ -786,6 +790,7 @@ SONG_LIBRARY: List[Song] = [
         difficulty="Iniciante",
         bpm=120,
         clef="treble",
+        instrument="guitar",
         description="Tradicional tema espanhol para viola.",
         notes=[_sn("E4", 1.0), _sn("F4", 1.0), _sn("E4", 1.0), _sn("D4", 1.0), _sn("C4", 1.0), _sn("B3", 1.0)]
     ),
@@ -796,6 +801,7 @@ SONG_LIBRARY: List[Song] = [
         difficulty="Intermédio",
         bpm=110,
         clef="treble",
+        instrument="guitar",
         description="Clássico folk americano.",
         notes=[_sn("A3", 1.0), _sn("C4", 1.0), _sn("E4", 1.0), _sn("A4", 1.0), _sn("E4", 1.0), _sn("C4", 1.0)]
     ),
@@ -806,6 +812,7 @@ SONG_LIBRARY: List[Song] = [
         difficulty="Intermédio",
         bpm=84,
         clef="treble",
+        instrument="guitar",
         description="Peça essencial no repertório de guitarra clássica.",
         notes=[_sn("E5", 1.0), _sn("E5", 1.0), _sn("E5", 1.0), _sn("D5", 1.0), _sn("C5", 1.0), _sn("B4", 1.0)]
     ),
@@ -816,6 +823,7 @@ SONG_LIBRARY: List[Song] = [
         difficulty="Iniciante",
         bpm=100,
         clef="treble",
+        instrument="guitar",
         description="Arranjo dedilhado clássico de Greensleeves.",
         notes=[_sn("A3", 1.0), _sn("C4", 1.5), _sn("D4", 0.5), _sn("E4", 1.5), _sn("F4", 0.5), _sn("E4", 1.0)]
     ),
