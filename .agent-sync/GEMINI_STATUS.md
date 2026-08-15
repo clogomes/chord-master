@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Correção — AÇÃO NECESSÁRIA da Fase 23 & Ajustes de Testes — CONCLUÍDA
+- Data: 2026-08-15 10:05 (UTC+1)
+- Commit: 1679cfa
+- Resumo: Repostos os 5 ritmos de acompanhamento originais em `audio/backing_tracks.py` (`rock_basic`, `slow_ballad`, `bossa_nova`, `blues_shuffle`, `waltz`) juntamente com aliases (`rock`, `waltz_34`) e os novos ritmos expandidos (`pop`, `16beat`, `disco`, `jazz_swing`, `bolero`), eliminando qualquer risco de `KeyError` no `BackingTrackPlayer.start()`. Em `gui/screens/practice_song.py`, removidos os handlers falsos com `pass`: ligada a alteração de volume da música a `self.song_volume` e a seleção de timbre a `self.selected_instrument` ("piano" / "guitar"), passando ambos aos métodos `audio_player.play_note`. Corrigida asserção `pitch_with_octave` em `tests/test_practice_staff_pedagogy.py`. 151/151 testes a passar.
+- Ficheiros alterados: audio/backing_tracks.py, gui/screens/practice_song.py, tests/test_practice_staff_pedagogy.py
+
 ## Fase 24 — Treino Auditivo Guiado com Mnemónicas — CONCLUÍDA
 - Data: 2026-08-15T10:05:00+01:00
 - Commit: 417b76e
