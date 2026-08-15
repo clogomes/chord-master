@@ -467,3 +467,7 @@ python3 -m unittest discover -v tests
 - Guia interativo passo-a-passo no ecrã de leitura de pauta.
 - 4 Níveis progressivos (Notas nas linhas, nos espaços, suplementares, mistura com acidentes).
 - Dicas visuais e foco adaptativo em pontos fracos (repetição de notas erradas).
+
+### Fase 26 — Síntese Sonora Realista (Piano & Viola)
+- Piano: modelo multi-harmónico com curva ADSR por oitava, transitório de ataque (martelo) e calor acústico simulado.
+- Viola/Guitarra: modelo Karplus-Strong enriquecido com filtro de ressonância acústica do corpo, vibrato natural dinâmico e resposta tonal variante ao ataque (mais quente ou brilhante).

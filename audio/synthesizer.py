@@ -89,40 +89,68 @@ class Synthesizer:
     ) -> bytes:
         """
         Generates 16-bit PCM WAV bytes for a single musical note.
-        Combines fundamental with 3 harmonics for a pleasant warm acoustic tone.
+        Combines fundamental with 5 harmonics for a pleasant warm acoustic tone,
+        with per-octave ADSR, hammer transient click, and subtle chorus (warmth).
         """
         sample_rate = cls.SAMPLE_RATE
         total_samples = int(sample_rate * duration)
 
         if HAS_NUMPY:
             t = np.linspace(0, duration, total_samples, endpoint=False)
-            # Additive synthesis with harmonics
-            waveform = (
-                1.00 * np.sin(2 * np.pi * frequency * t) +
-                0.30 * np.sin(2 * np.pi * frequency * 2 * t) +
-                0.12 * np.sin(2 * np.pi * frequency * 3 * t) +
-                0.05 * np.sin(2 * np.pi * frequency * 4 * t)
+            
+            freqs = [frequency, frequency*2, frequency*3, frequency*4, frequency*5, frequency*6]
+            amps = [1.0, 0.5, 0.25, 0.12, 0.06, 0.03]
+            
+            waveform = np.zeros(total_samples, dtype=np.float32)
+            for f, a in zip(freqs, amps):
+                waveform += a * np.sin(2 * np.pi * f * t)
+                waveform += a * 0.4 * np.sin(2 * np.pi * (f + 0.15) * t)
+                waveform += a * 0.4 * np.sin(2 * np.pi * (f - 0.15) * t)
+                
+            waveform = waveform / np.max(np.abs(waveform))
+            
+            octave_scale = max(0.2, 440.0 / max(50.0, frequency))
+            waveform = cls.apply_adsr(
+                waveform, 
+                sample_rate,
+                attack_ms=5.0,
+                decay_ms=300.0 * octave_scale,
+                sustain_level=0.3,
+                release_ms=100.0 * octave_scale
             )
-            # Normalize peak amplitude
-            waveform = waveform / 1.47
-            waveform = cls.apply_adsr(waveform, sample_rate)
+            
+            click_len = int(sample_rate * 0.003)
+            if click_len > 0:
+                click = np.random.uniform(-1.0, 1.0, click_len) * np.linspace(1.0, 0.0, click_len)
+                waveform[:click_len] += click * 0.15
+                
             waveform = waveform * volume
-
-            # Convert to 16-bit signed PCM
             pcm_data = np.int16(np.clip(waveform * 32767, -32768, 32767)).tobytes()
         else:
+            import random
             samples = []
+            freqs = [frequency, frequency*2, frequency*3, frequency*4, frequency*5, frequency*6]
+            amps = [1.0, 0.5, 0.25, 0.12, 0.06, 0.03]
             for i in range(total_samples):
                 t = i / float(sample_rate)
-                val = (
-                    1.00 * math.sin(2 * math.pi * frequency * t) +
-                    0.30 * math.sin(2 * math.pi * frequency * 2 * t) +
-                    0.12 * math.sin(2 * math.pi * frequency * 3 * t) +
-                    0.05 * math.sin(2 * math.pi * frequency * 4 * t)
-                ) / 1.47
-                samples.append(val)
+                val = 0.0
+                for f, a in zip(freqs, amps):
+                    val += a * math.sin(2 * math.pi * f * t)
+                    val += a * 0.4 * math.sin(2 * math.pi * (f + 0.15) * t)
+                    val += a * 0.4 * math.sin(2 * math.pi * (f - 0.15) * t)
+                if i < int(sample_rate * 0.003):
+                    val += random.uniform(-1.0, 1.0) * (1.0 - i/(sample_rate*0.003)) * 0.5
+                samples.append(val / 3.0)
 
-            samples = cls.apply_adsr(samples, sample_rate)
+            octave_scale = max(0.2, 440.0 / max(50.0, frequency))
+            samples = cls.apply_adsr(
+                samples, 
+                sample_rate,
+                attack_ms=5.0,
+                decay_ms=300.0 * octave_scale,
+                sustain_level=0.3,
+                release_ms=100.0 * octave_scale
+            )
             pcm_bytes = bytearray()
             for s in samples:
                 val = int(max(-1.0, min(1.0, s * volume)) * 32767)
@@ -141,66 +169,140 @@ class Synthesizer:
     ) -> bytes:
         """
         Synthesizes a realistic plucked string (acoustic guitar/viola) using the Karplus-Strong
-        physical modeling algorithm (filtered delay line with noise excitation).
+        physical modeling algorithm (filtered delay line with noise excitation), 
+        enhanced with natural vibrato and acoustic body resonance.
         """
         sample_rate = cls.SAMPLE_RATE
         total_samples = int(sample_rate * duration)
         if frequency <= 0 or total_samples <= 0:
             return cls._create_wav_header(b"", sample_rate)
 
-        # Buffer length corresponding to fundamental wavelength
         n_delay = max(2, int(round(sample_rate / frequency)))
 
         if HAS_NUMPY:
             rng = np.random.default_rng(seed=42)
-            # Initial pluck excitation: band-limited noise burst
             buffer = rng.uniform(-1.0, 1.0, n_delay).astype(np.float32)
+            
+            if volume < 0.7:
+                smooth_factor = 1.0 - volume
+                buffer[1:] = buffer[1:] * (1.0 - smooth_factor) + buffer[:-1] * smooth_factor
+                
             samples = np.zeros(total_samples, dtype=np.float32)
+            
+            vibrato_rate = 4.5
+            vibrato_depth = 0.004
+            base_delay = sample_rate / frequency
+            t_arr = np.linspace(0, duration, total_samples, endpoint=False)
+            ramp = np.clip(t_arr / 0.2, 0.0, 1.0)
+            delay_modulation = base_delay * (1.0 + ramp * vibrato_depth * np.sin(2 * np.pi * vibrato_rate * t_arr))
+            
+            write_ptr = 0
+            max_delay = int(base_delay * 1.05) + 2
+            delay_buffer = np.zeros(max_delay, dtype=np.float32)
+            delay_buffer[:n_delay] = buffer
+            
+            fc = 150.0 / sample_rate
+            r = 0.85
+            a1 = -2.0 * r * np.cos(2.0 * np.pi * fc)
+            a2 = r * r
+            b0 = (1.0 - r) * np.sqrt(1.0 - r)
+            body_out = np.zeros(total_samples, dtype=np.float32)
 
-            # Karplus-Strong lowpass feedback loop
             for i in range(total_samples):
-                idx = i % n_delay
-                next_idx = (idx + 1) % n_delay
-                val = buffer[idx]
+                curr_delay = delay_modulation[i]
+                read_idx = write_ptr - curr_delay
+                
+                idx_int = int(np.floor(read_idx))
+                frac = read_idx - idx_int
+                
+                idx_1 = idx_int % max_delay
+                idx_2 = (idx_int + 1) % max_delay
+                
+                val = delay_buffer[idx_1] * (1.0 - frac) + delay_buffer[idx_2] * frac
                 samples[i] = val
-                # Averaging filter + loss damping
-                buffer[idx] = 0.5 * (val + buffer[next_idx]) * decay_factor
+                
+                filtered_val = 0.5 * (val + delay_buffer[(idx_int - 1) % max_delay]) * decay_factor
+                delay_buffer[write_ptr] = filtered_val
+                write_ptr = (write_ptr + 1) % max_delay
+                
+                if i >= 2:
+                    body_out[i] = b0 * val - a1 * body_out[i-1] - a2 * body_out[i-2]
 
-            # Normalize peak
-            peak = float(np.max(np.abs(samples)))
+            final_out = samples * 0.7 + body_out * 0.3
+
+            peak = float(np.max(np.abs(final_out)))
             if peak > 0:
-                samples = samples / peak
+                final_out = final_out / peak
 
-            # Smooth release envelope to avoid click at end
-            samples = cls.apply_adsr(
-                samples,
+            final_out = cls.apply_adsr(
+                final_out,
                 sample_rate,
                 attack_ms=2.0,
                 decay_ms=duration * 400.0,
                 sustain_level=0.4,
                 release_ms=35.0,
             )
-            samples = samples * volume
-            pcm_data = np.int16(np.clip(samples * 32767, -32768, 32767)).tobytes()
+            final_out = final_out * volume
+            pcm_data = np.int16(np.clip(final_out * 32767, -32768, 32767)).tobytes()
         else:
             import random
             random.seed(42)
             buffer = [random.uniform(-1.0, 1.0) for _ in range(n_delay)]
+            
+            if volume < 0.7:
+                smooth_factor = 1.0 - volume
+                for i in range(1, n_delay):
+                    buffer[i] = buffer[i] * (1.0 - smooth_factor) + buffer[i-1] * smooth_factor
+                    
             samples = [0.0] * total_samples
-
+            
+            vibrato_rate = 4.5
+            vibrato_depth = 0.004
+            base_delay = sample_rate / frequency
+            
+            write_ptr = 0
+            max_delay = int(base_delay * 1.05) + 2
+            delay_buffer = [0.0] * max_delay
+            for i in range(n_delay):
+                delay_buffer[i] = buffer[i]
+                
+            fc = 150.0 / sample_rate
+            r = 0.85
+            a1 = -2.0 * r * math.cos(2.0 * math.pi * fc)
+            a2 = r * r
+            b0 = (1.0 - r) * math.sqrt(1.0 - r)
+            body_out = [0.0] * total_samples
+            
             for i in range(total_samples):
-                idx = i % n_delay
-                next_idx = (idx + 1) % n_delay
-                val = buffer[idx]
+                t = i / float(sample_rate)
+                ramp = min(1.0, t / 0.2)
+                curr_delay = base_delay * (1.0 + ramp * vibrato_depth * math.sin(2 * math.pi * vibrato_rate * t))
+                
+                read_idx = write_ptr - curr_delay
+                idx_int = int(math.floor(read_idx))
+                frac = read_idx - idx_int
+                
+                idx_1 = idx_int % max_delay
+                idx_2 = (idx_int + 1) % max_delay
+                
+                val = delay_buffer[idx_1] * (1.0 - frac) + delay_buffer[idx_2] * frac
                 samples[i] = val
-                buffer[idx] = 0.5 * (val + buffer[next_idx]) * decay_factor
-
-            max_val = max(abs(s) for s in samples) if samples else 1.0
+                
+                filtered_val = 0.5 * (val + delay_buffer[(idx_int - 1) % max_delay]) * decay_factor
+                delay_buffer[write_ptr] = filtered_val
+                write_ptr = (write_ptr + 1) % max_delay
+                
+                if i >= 2:
+                    body_out[i] = b0 * val - a1 * body_out[i-1] - a2 * body_out[i-2]
+                    
+            final_out = [samples[i] * 0.7 + body_out[i] * 0.3 for i in range(total_samples)]
+            
+            max_val = max(abs(s) for s in final_out) if final_out else 1.0
             if max_val > 0:
-                samples = [s / max_val for s in samples]
+                final_out = [s / max_val for s in final_out]
 
-            samples = cls.apply_adsr(
-                samples,
+            final_out = cls.apply_adsr(
+                final_out,
                 sample_rate,
                 attack_ms=2.0,
                 decay_ms=duration * 400.0,
@@ -208,7 +310,7 @@ class Synthesizer:
                 release_ms=35.0,
             )
             pcm_bytes = bytearray()
-            for s in samples:
+            for s in final_out:
                 val = int(max(-1.0, min(1.0, s * volume)) * 32767)
                 pcm_bytes.extend(val.to_bytes(2, byteorder="little", signed=True))
             pcm_data = bytes(pcm_bytes)
