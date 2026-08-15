@@ -14,6 +14,70 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA — Fase 25 (Leitura de Pauta Guiada) deixou o "Modo Adaptativo" morto
+- Commit revisto: `934189d`
+- Testes: 151/151 OK
+- App: arranca sem erros
+- **Veredito: AÇÃO NECESSÁRIA** (o resto da fase está muito bem feito — ver
+  elogio abaixo — só este ponto preciso de corrigido)
+
+A reescrita de `load_new_question()` em `gui/screens/practice_staff.py`
+substituiu a lógica antiga (que verificava `self.adaptive_var.get()` e
+chamava `generate_adaptive_question`) por a nova lógica de níveis +
+`weak_notes`, mas **esqueceu-se de remover ou religar o switch "🧠 Modo
+Adaptativo"** que continua construído e visível na barra de definições
+(`self.adaptive_switch`, linhas ~110-119). Neste momento, o utilizador pode
+ligar esse switch e não acontece rigorosamente nada — `self.adaptive_var`
+nunca mais é lido em lado nenhum do ficheiro. `generate_adaptive_question`
+e `get_weak_areas` continuam importados no topo do ficheiro mas nunca
+usados (import morto).
+- **Corrigir**: como o novo sistema de níveis + `weak_notes` já faz um
+  trabalho equivalente (e mais granular) ao que o "Modo Adaptativo" fazia,
+  a opção mais simples é remover o switch e os 2 imports mortos. Se
+  preferires manter o conceito, liga-o ao novo sistema (ex: quando ativo,
+  ordena a seleção de nível/pool com `get_weak_areas` do
+  `adaptive_engine`, coerente com o resto da app). Não deixes um switch
+  visível que não faz nada — é o mesmo tipo de problema já apanhado na
+  Fase 23 (controlos de UI que fingem funcionar).
+
+**Elogio ao resto da Fase 25**: verifiquei manualmente a matemática de
+`core/staff_tutor.py::get_note_explanation` para várias notas em ambas as
+claves (ex: G4→"2ª linha", F4→"1º espaço" em Sol; G2→1ª linha, A2→"1º
+espaço" em Fá) — está tudo correto. O sistema de níveis progressivos
+(linhas → espaços → suplementares → acidentes) e o reforço adaptativo por
+`weak_notes` (pesa a escolha da próxima nota a favor de erros recentes) são
+exatamente o que foi pedido — bom trabalho.
+
+---
+
+## Revisão — Correção da Fase 23 + Fase 24 (Treino Auditivo Guiado)
+- Commits revistos: `1679cfa` (correção Fase 23), `9b2d6e1`/`7f36ff1` (Fase 24)
+- Testes: 151/151 OK
+- App: arranca sem erros
+- **Veredito: APROVADO**
+
+**Correção da Fase 23**: confirmei os 3 pontos da AÇÃO NECESSÁRIA
+anterior resolvidos — `BACKING_TRACK_LIBRARY` tem agora 12 estilos, com os
+5 originais preservados pelo `id` original (`rock_basic`, `slow_ballad`,
+`bossa_nova`, `blues_shuffle`, `waltz`) mais os novos; os stubs
+`_on_song_vol_changed`/`_on_timbre_changed` agora funcionam de verdade
+(`song_volume`/`selected_instrument` aplicados em `audio_player.play_note`);
+e removeste as opções falsas "Glockenspiel"/"Cordas" do dropdown de timbre
+em vez de as deixar sem síntese por trás — abordagem correta. Ainda falta
+o campo `instrument` na classe `Song` (pedido original da Fase 24), mas não
+é bloqueante — fica para quando voltares a mexer em `core/songs.py`.
+
+**Fase 24**: o modo "🎓 Aprender (Guiado)" — mnemónica + referência de som
+antes de testar, com as opções de resposta desativadas até ouvires o
+exemplo — resolve bem o problema pedagógico original ("difícil aprender só
+com a informação que tem"). Nota não bloqueante: só cobre
+`QuestionType.EAR_INTERVAL` — perguntas de acorde (`EAR_CHORD`) continuam
+sem o modo guiado, e o pedido de progressão automática de dificuldade por
+precisão (via `get_weak_areas`) não foi implementado, fica manual por
+dropdown. Podes considerar isto para uma iteração futura, não é urgente.
+
+---
+
 ## AÇÃO NECESSÁRIA — Fase 23 (Repertório): removeu estilos existentes + controlos falsos na UI
 - Commits revistos: `ddd6abf`/`9af5514`
 - Testes: 147/147 OK — **mas os testes novos não apanham os problemas
