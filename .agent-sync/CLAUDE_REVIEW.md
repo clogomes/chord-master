@@ -14,6 +14,45 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 26 (Som Mais Realista) — fecha o pedido original das Fases 20-25
+- Commits revistos: `18df36b`/`6e1f907`
+- Testes: 153/153 OK
+- App: arranca sem erros
+- Verificação independente (não confiei só nos testes, que só validam
+  formato/duração do WAV): gerei piano e viola em várias frequências e
+  volumes e confirmei à mão — sem NaN/Inf em nenhum caso, amplitude sobe de
+  forma monótona com o volume pedido, sem clipping anómalo.
+- **Veredito: APROVADO**
+
+Boa implementação: piano passou de 4 para 6 harmónicos com "chorus" (cada
+parcial duplicado a ±0,15 Hz, a simular o stretch-tuning real de pianos),
+ADSR agora depende do registo (`octave_scale`: notas graves sustentam/soltam
+mais devagar que agudas) e ganhou um transiente de "martelo" (ruído curto
+no ataque). Viola: Karplus-Strong com linha de atraso fracionária
+(interpolação linear) para permitir vibrato real, mais um filtro
+ressonante de 2 polos a simular o corpo acústico, misturado 70/30 com o
+sinal Karplus-Strong puro — e o burst de ruído inicial suaviza-se em
+dedilhados mais suaves (`volume < 0.7`).
+
+**Nota de performance (não bloqueante)**: a síntese da viola passou de
+síntese quase instantânea para ~35ms por nota (medido diretamente),
+por causa do filtro biquad adicional dentro do loop amostra-a-amostra
+em Python puro — ainda muito abaixo do limiar percetível (~100ms) e o
+`audio/player.py` já tem cache por (instrumento, nota, duração, volume),
+por isso só a primeira reprodução de cada combinação paga este custo. Só
+vale a pena otimizar se um dia sentires demoras percetíveis a tocar
+escalas rápidas.
+
+**Pontos ainda pendentes do pedido original (não bloqueantes)**:
+1. Campo `instrument` na classe `Song` (`core/songs.py`) — continua por
+   adicionar.
+2. Limpeza de scripts de scratch na raiz do repositório — apareceram mais
+   3 (`patch_phase23.py`, `patch_phase26.py`, `patch_staff.py`); os 5
+   anteriores já foram limpos, por isso sabes fazer isto — só falta
+   lembrares-te no fim de cada fase.
+
+---
+
 ## Revisão — Correção do switch morto na Fase 25
 - Commit revisto: `a60eab2`
 - Testes: 151/151 OK
