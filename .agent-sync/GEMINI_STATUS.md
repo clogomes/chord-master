@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 27 — Análise Harmónica de Músicas Conhecidas — CONCLUÍDA
+- Data: 2026-08-15 20:10 (UTC+1)
+- Commit: a74cc6f
+- Resumo: Adicionado o campo `theory_analysis` e `theory_analysis_en` com o leitor `get_theory_analysis` à dataclass `Song` em `core/songs.py`. Preenchidas 8 análises harmónicas didáticas detalhadas (Für Elise, Sonata ao Luar, Gymnopédie, Cânone em Dó, Malagueña, House of the Rising Sun, Romance Anónimo e Greensleeves). Em `gui/screens/practice_song.py`, integrado o botão "🎓 Ver Análise Teórica" e janela modal de leitura renderizada com o formatador markdown do sistema. 156/156 testes a passar.
+- Ficheiros alterados: core/songs.py, gui/screens/practice_song.py, tests/test_songs_expansion.py, README.md
+
 ## Correção — AÇÕES NECESSÁRIAS: Resolução de Crash no Ecrã de Teoria & Suporte i18n em Inglês nos 12 Capítulos — CONCLUÍDA
 - Data: 2026-08-15 16:51 (UTC+1)
 - Commit: 34aa8bb
