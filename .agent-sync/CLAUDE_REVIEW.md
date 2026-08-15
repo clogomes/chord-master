@@ -14,6 +14,35 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA — Campo `Song.instrument` existe mas está morto (ninguém o preenche nem o lê)
+- Commit revisto: `9c6ac65`
+- Testes: 153/153 OK
+- **Veredito: AÇÃO NECESSÁRIA**
+
+O commit só acrescenta o campo `instrument: str = "piano"` à dataclass
+`Song` — mas:
+1. **Nenhuma música o define explicitamente**, nem sequer as 4
+   piano-focused/4 guitar-focused da Fase 23 (ex: "Malagueña" e "Romance
+   Anónimo", claramente peças de viola, ficam com `instrument="piano"` por
+   omissão porque ninguém passou o argumento).
+2. **Nada em `gui/screens/practice_song.py` lê `song.instrument`** — não há
+   filtro nem etiqueta na lista de repertório. O campo existe na estrutura
+   de dados mas não tem efeito nenhum em nenhum sítio.
+
+Isto é o mesmo padrão já apanhado duas vezes nesta ronda (controlos mortos
+na Fase 23, switch morto na Fase 25): adicionar a peça de dados sem a ligar
+a nada de visível/funcional. Corrigir:
+1. Preenche `instrument="guitar"` nas 4 músicas de viola e
+   `instrument="piano"` nas 4 de piano da Fase 23 (as restantes podem ficar
+   com o valor por omissão `"piano"` ou, se preferires, adiciona
+   `"ambos"` como terceiro valor válido para as músicas mais antigas que
+   já suportam os dois instrumentos).
+2. Usa o campo em `practice_song.py` — no mínimo, um filtro/etiqueta na
+   lista lateral de repertório (ex: mostrar 🎹/🎸 ao lado do título, ou um
+   `CTkSegmentedButton` para filtrar por instrumento).
+
+---
+
 ## Revisão — Fase 26 (Som Mais Realista) — fecha o pedido original das Fases 20-25
 - Commits revistos: `18df36b`/`6e1f907`
 - Testes: 153/153 OK
