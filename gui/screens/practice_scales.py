@@ -5,7 +5,7 @@ import customtkinter as ctk
 from core.notes import Note
 from core.scales import Scale, SCALE_TYPES, ScaleDefinition
 from core.fingering import assign_piano_fingerings, get_scale_piano_fingering_description
-from core.guitar import assign_guitar_coordinates, GuitarFretboardModel
+from core.guitar import assign_guitar_coordinates
 from core.user_manager import UserManager
 from audio.player import get_audio_player
 from audio.metronome import Metronome, evaluate_rhythm_accuracy
@@ -349,7 +349,7 @@ class PracticeScalesScreen(ctk.CTkFrame):
             width=720,
             height=150,
             num_frets=15,
-            on_position_clicked=self._on_guitar_fret_clicked,
+            on_note_clicked=self._on_guitar_fret_clicked,
         )
 
         # Description / Formula Card
@@ -565,11 +565,9 @@ class PracticeScalesScreen(ctk.CTkFrame):
             return
         self._process_played_note(note)
 
-    def _on_guitar_fret_clicked(self, string_idx: int, fret: int):
+    def _on_guitar_fret_clicked(self, note: Note):
         if self.is_playing_demo or self.is_completed:
             return
-        model = GuitarFretboardModel()
-        note = model.get_note_at(string_idx, fret)
         self._process_played_note(note)
 
     def _on_midi_note_on(self, midi_num: int, velocity: int):
