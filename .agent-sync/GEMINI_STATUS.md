@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Limpeza Final & Adição do Campo `Song.instrument` — CONCLUÍDA
+- Data: 2026-08-15 16:31 (UTC+1)
+- Commit: 9c6ac65
+- Resumo: Adicionado o campo opcional `instrument: str = "piano"` à dataclass `Song` em `core/songs.py` (permitindo especificar `"piano"` ou `"guitar"` por omissão para cada peça do repertório) e efetuada a limpeza de todos os ficheiros temporários de scratch da raiz do repositório. 153/153 testes a passar.
+- Ficheiros alterados: core/songs.py
+
 ## Fase 26 — Síntese Sonora Realista (Piano & Viola) — CONCLUÍDA
 - Data: 2026-08-15T10:14:00+01:00
 - Commit: 18df36b
