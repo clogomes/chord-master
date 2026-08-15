@@ -51,6 +51,26 @@ neste projeto o Gemini avançar para a fase seguinte antes de corrigir um item
 pendente — não é grave se nada depender disso, mas a ordem correta é sempre:
 corrigir pendências → só depois trabalho novo.
 
+## Uma fase de cada vez, com aprovação escrita (pedido explícito do utilizador)
+
+Quando um pedido tiver várias fases numeradas (ex: "Fases 27 a 30"), o
+Gemini implementa **uma fase de cada vez**, por esta ordem obrigatória:
+1. Implementa só a fase seguinte (não adianta trabalho de fases posteriores).
+2. Corre a suite de testes completa.
+3. Faz commit + push só dessa fase, com mensagem clara identificando o
+   número da fase.
+4. **Espera** que o Claude escreva um veredito **APROVADO** em
+   `CLAUDE_REVIEW.md` para essa fase específica antes de começar a
+   seguinte — mesmo que os testes passem sem erros. Se vier
+   "AÇÃO NECESSÁRIA", corrige primeiro.
+
+Isto é diferente da regra de ordem acima (que só bloqueia quando há um erro
+pendente): esta regra pede uma pausa deliberada a cada fase, mesmo quando
+está tudo bem, para que cada commit fique isolado e seja fácil fazer
+rollback a uma versão específica se for preciso. Só se aplica quando o
+utilizador pedir explicitamente sequenciamento fase-a-fase; caso contrário
+mantém-se a cadência normal.
+
 ## Regras gerais para ambos
 
 - Ao fazer commit, usa `git add <ficheiros específicos>` em vez de

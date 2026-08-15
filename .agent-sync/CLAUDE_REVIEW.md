@@ -14,6 +14,125 @@ Cada entrada tem um veredito:
 
 ---
 
+## TRABALHO PEDIDO — Fases 27 a 30 (Teoria aplicada a músicas conhecidas, módulos avançados, aulas práticas guiadas, exercícios técnicos)
+- Pedido por: clogomes, especificação desenhada pelo Claude e aprovada
+  explicitamente pelo utilizador ("sim").
+- **REGRA DE EXECUÇÃO OBRIGATÓRIA para este pedido** (ver também a secção
+  nova em `PROTOCOL.md`, "Uma fase de cada vez, com aprovação escrita"):
+  implementa **só uma fase de cada vez**. Depois de cada fase: corre os
+  testes, faz commit + push (mensagem a identificar claramente o número da
+  fase, ex: "Fase 27: ..."), atualiza o `GEMINI_STATUS.md`, e **PARA** —
+  espera que o Claude escreva **APROVADO** em `CLAUDE_REVIEW.md` para essa
+  fase específica antes de começares a seguinte. Isto vale mesmo que os
+  testes passem sem nenhum erro — é um pedido explícito do utilizador para
+  ter pontos de rollback bem isolados. Não implementes a Fase 28 antes de
+  teres aprovação escrita da Fase 27, e assim sucessivamente.
+- Ordem: primeiro resolve qualquer AÇÃO NECESSÁRIA pendente (se houver
+  alguma acima desta entrada), só depois começas a Fase 27.
+
+### FASE 27 — Análise Harmónica de Músicas Conhecidas
+Liga a teoria ao repertório real, em vez de serem dois mundos separados.
+- Acrescenta um campo `theory_analysis: Optional[str] = None` (texto em
+  markdown) à dataclass `Song` em `core/songs.py`.
+- Preenche esse campo em ~8 músicas já existentes no repertório (escolhe
+  as mais didáticas — ex: Für Elise, Ode à Alegria, Pachelbel's Canon,
+  Greensleeves, Smoke on the Water, etc.), com uma breve análise: que
+  escala/modo usa, progressão de acordes principal, forma (ex: ABA), e uma
+  ligação a um conceito já ensinado nos capítulos de teoria (ex: "esta
+  progressão I-V-vi-IV é a mesma do capítulo 5 sobre campo harmónico").
+- Em `gui/screens/practice_song.py`, acrescenta um botão "🎓 Ver Análise
+  Teórica" (só visível quando a música tem `theory_analysis` preenchido)
+  que mostra esse conteúdo, reaproveitando `gui/markdown_renderer.py`
+  (o mesmo usado no ecrã de Teoria — não inventes um renderizador novo).
+- Adiciona/atualiza testes em `tests/test_songs.py` ou
+  `tests/test_songs_expansion.py` a confirmar que o campo existe e que as
+  músicas escolhidas o têm preenchido e não vazio.
+
+### FASE 28 — Módulos de Teoria Mais Avançados
+Acrescenta a `THEORY_CHAPTERS` (`core/theory_content.py`, atualmente 12)
+capítulos de nível mais sofisticado, seguindo exatamente a estrutura já
+existente (conteúdo + foco piano + foco viola + quiz via
+`core/theory_quiz.py`, mesmo padrão da Fase 22):
+- **Harmonia de Jazz Básica**: ii-V-I, forma de blues de 12 compassos,
+  relação acorde-escala (chord-scale theory) a um nível introdutório.
+- **Fundamentos de Improvisação**: escalas sobre acordes, guide tones
+  (3ª e 7ª), construção de frases simples.
+- **Contraponto & Condução de Vozes**: aprofunda o que hoje é só uma
+  menção rápida no capítulo "Formação de Acordes, Tríades & Inversões" —
+  regras básicas de movimento entre vozes (paralelo/contrário/oblíquo),
+  evitar quintas/oitavas paralelas.
+- **Técnicas de Prática Deliberada**: como praticar de forma eficaz
+  (prática lenta, repetição espaçada, isolar secções difíceis, "chunking")
+  — liga teoria a método de estudo, não só a conteúdo musical puro.
+- Lembra-te de atualizar `tests/test_theory_i18n.py` e o teste genérico de
+  integridade de capítulos (se existir) para cobrir os 4 novos — e de
+  preencher também os campos `_en` (título, subtítulo, conteúdo, foco
+  piano, foco viola), já que a Fase anterior corrigiu a tradução completa
+  e não queremos reabrir essa lacuna com capítulos novos.
+
+### FASE 29 — Acompanhamento de Aulas Práticas: Escuta e Correção Alargada
+**O que já existe**: `gui/screens/practice_instrument.py` já ouve o
+instrumento real por microfone (`audio/pitch_listener.py`, deteção
+monofónica por autocorrelação) e avança nota a nota com feedback de
+afinação — mas só com 10 exercícios fixos num dropdown, e feedback textual
+genérico ao errar.
+1. Substitui a lista fixa de exercícios (`exercise_type_select`, valores
+   hardcoded) pelo acesso dinâmico a **toda** a biblioteca de repertório
+   (`SONG_LIBRARY` + `load_user_songs()`), reaproveitando o padrão de
+   barra lateral com filtro já usado em `practice_song.py` (incluindo o
+   filtro por instrumento da Fase 23/`fa1cdd9`, já que faz sentido aqui
+   também — só mostrar músicas de piano quando o instrumento selecionado
+   é piano, etc.).
+2. Acrescenta um **Relatório da Aula** (`ScoreCard` já usado, ou um novo
+   componente semelhante) no fim de cada sessão: lista concreta de que
+   notas específicas falharam — nota esperada, nota detetada, desvio médio
+   em cents — não só uma percentagem agregada como acontece hoje. Guarda
+   esta lista durante a sessão (dict `{note.pitch: [lista de desvios]}`,
+   semelhante ao `weak_notes` já usado em `practice_staff.py` na Fase 25).
+3. Melhora o texto de `_process_pitch_on_gui` quando a nota está errada:
+   em vez de "Nota incorreta (detetado X, esperado Y)", calcula a
+   distância diatónica (`Note.diatonic_step`) entre a nota detetada e o
+   alvo e sugere a direção e a distância (ex: "Tocaste Ré, o alvo é Mi —
+   sobe um tom").
+4. **Fora de âmbito, por limitação técnica real, não tentes implementar**:
+   deteção de acordes/polifonia via microfone. O motor de deteção de pitch
+   atual é monofónico por desenho (autocorrelação para uma única
+   frequência fundamental) — deteção de várias notas em simultâneo
+   exigiria um motor de estimação multi-pitch bem mais complexo, fora do
+   âmbito desta fase. Mantém-te em melodias de uma nota de cada vez, como
+   já funciona hoje.
+
+### FASE 30 — Exercícios Técnicos: Aquecimento, Destreza e Força
+Novo módulo de treino técnico puro, separado do repertório e das escalas
+teóricas — para desenvolver a mão, não para tocar música.
+- Cria `core/technique_exercises.py`: dataclass `TechniqueExercise` (id,
+  name_pt, name_en, category: `"aquecimento"` / `"destreza"` /
+  `"forca_agilidade"`, instrument: `"piano"` / `"guitar"` / `"ambos"`,
+  difficulty, description, notes: lista de `Note` ou função geradora,
+  recommended_bpm_range: `Tuple[int, int]`).
+- Biblioteca inicial de exercícios:
+  - **Piano**: padrões de aquecimento de 5 dedos (ambas as mãos),
+    exercícios de independência ao estilo Hanon (sequências repetitivas
+    1-2-3-4-5 e variações), escalas cromáticas, arpejos em várias oitavas,
+    movimento contrário entre mãos.
+  - **Viola/Guitarra**: "spider walk" cromático (padrão 1-2-3-4 por corda
+    ao longo do braço), exercícios de salto de cordas, alternância de
+    palhetada, alongamento de dedos entre trastes.
+- Novo ecrã `gui/screens/practice_technique.py` — reaproveita a mecânica
+  já validada em `gui/screens/practice_scales.py` (teclado/braço
+  interativos, `Metronome` + rampa de tempo automática 70%→100%, avanço
+  nota-a-nota ao acertar) — não construas isto de raiz, copia o padrão que
+  já funciona e adapta à fonte de dados nova.
+- Regista em `.agent-sync/GEMINI_STATUS.md` e `gui/screens/__init__.py` /
+  `gui/app.py` a nova entrada de navegação ("💪 Exercícios Técnicos") no
+  menu principal, e usa `category="tecnica_instrumental"` em
+  `user_manager.record_attempt(...)` para aparecer nas estatísticas.
+- Opcional, só se for simples de encaixar: quando o utilizador escolhe uma
+  música de dificuldade "Avançado" em `practice_song.py`, sugere (não
+  força) um exercício de aquecimento relacionado antes de começar.
+
+---
+
 ## Revisão — Correção do crash + tradução completa da Teoria
 - Commits revistos: `34aa8bb`/`bdd04aa`
 - Testes: 155/155 OK
