@@ -2,7 +2,6 @@
 from typing import Callable, List, Optional
 import customtkinter as ctk
 from core.quiz_engine import QuizEngine, QuizQuestion, QuestionType
-from core.adaptive_engine import generate_adaptive_question, get_weak_areas
 from core.staff_tutor import get_note_explanation, generate_tutor_pool, LEVELS_INFO
 from core.user_manager import UserManager
 from audio.player import get_audio_player
@@ -105,18 +104,6 @@ class PracticeStaffScreen(ctk.CTkFrame):
             font=ctk.CTkFont(family="Helvetica", size=12),
         )
         self.hint_check.pack(side="left", padx=16, pady=10)
-
-        # Adaptive Mode Toggle Switch
-        self.adaptive_var = ctk.BooleanVar(value=False)
-        self.adaptive_switch = ctk.CTkSwitch(
-            settings_frame,
-            text="🧠 Modo Adaptativo",
-            variable=self.adaptive_var,
-            command=self.load_new_question,
-            font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"),
-            progress_color="#059669",
-        )
-        self.adaptive_switch.pack(side="right", padx=16, pady=10)
 
         # Main scroll container
         self.main_container = ctk.CTkScrollableFrame(self, fg_color=("#F8FAFC", "#0F172A"))
