@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 24 — Treino Auditivo Guiado com Mnemónicas — CONCLUÍDA
+- Data: 2026-08-15T10:05:00+01:00
+- Commit: 417b76e
+- Resumo: Adição de modo guiado e modo de teste no ecrã de treino auditivo. Integração de mnemónicas musicais ("Tubarão", "Star Wars", etc.) para melhorar o reconhecimento de intervalos auditivamente, bem como mini teclado/pauta e botão para ouvir exemplo.
+- Ficheiros principais alterados: gui/screens/practice_ear.py, core/ear_mnemonics.py, tests/test_ear_mnemonics.py, README.md
+
 ## Fase 25 — Leitura de Pauta Guiada Passo-a-Passo — CONCLUÍDA
 - Data: 2026-08-15T10:04:48+01:00
 - Commit: 934189d
