@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 26 — Síntese Sonora Realista (Piano & Viola) — CONCLUÍDA
+- Data: 2026-08-15T10:14:00+01:00
+- Commit: 18df36b
+- Resumo: Aprimorada a síntese aditiva do piano com harmónicos múltiplos, transiente de martelo e decaimento por oitava. Para viola/guitarra, o algoritmo Karplus-Strong ganhou um filtro de ressonância acústica do corpo, ataque dinâmico pelo volume e vibrato natural.
+- Ficheiros principais alterados: audio/synthesizer.py, tests/test_synthesizer_realism.py, README.md
+
 ## Correção — AÇÃO NECESSÁRIA da Fase 25 (Remoção de Switch Morto em PracticeStaffScreen) — CONCLUÍDA
 - Data: 2026-08-15 10:10 (UTC+1)
 - Commit: a60eab2
