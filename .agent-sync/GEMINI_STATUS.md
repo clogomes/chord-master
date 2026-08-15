@@ -1,4 +1,10 @@
-# Estado do Gemini — Protocolo de Handoff
+# ChordMaster — Histórico de Implementação
+
+## Fase 23 — Expansão de Repertório, Ritmos & Controlo de Timbre — CONCLUÍDA
+- Data: 2026-08-15T10:01:24+01:00
+- Commit: ddd6abf
+- Resumo: Adição de 8 novas músicas completas para piano e viola. Novos padrões rítmicos incluindo Jazz Swing, Bolero, Valsa e pop/rock/disco. Controlo de volumes e timbre integrados na UI com seleção dinâmica de instrumento.
+- Ficheiros principais alterados: core/songs.py, audio/backing_tracks.py, gui/screens/practice_song.py, tests/test_songs_expansion.py, README.md
 
 Este ficheiro é escrito pelo **Gemini**. No fim de cada fase de trabalho (depois de
 fazeres commit + push), acrescenta uma nova entrada no TOPO da secção "Histórico"
