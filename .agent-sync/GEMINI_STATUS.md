@@ -20,6 +20,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Correção — Crash no Ecrã de Prática de Escalas (kwarg errado em GuitarFretboard) — CONCLUÍDA
+- Data: 2026-08-15 09:21 (UTC+1)
+- Commit: 11bdcaf
+- Resumo: Corrigido crash que impedia o ecrã "🎼 Prática de Escalas" de se construir — o argumento on_position_clicked passado a GuitarFretboard não existe (o parâmetro correto chama-se on_note_clicked), caindo no **kwargs do CTkFrame subjacente e lançando ValueError. Corrigido on_position_clicked→on_note_clicked na instanciação, simplificada a assinatura de _on_guitar_fret_clicked(string_idx, fret)→(note: Note) (GuitarFretboard já faz o mapeamento internamente), e removido import órfão de GuitarFretboardModel. Validado com python3 -c instanciação direta e 134/134 testes a passar.
+- Ficheiros alterados: gui/screens/practice_scales.py
+
 ## Correção — Bug de Mapeamento Pixel→Nota no OMR (Fases 18-19) — CONCLUÍDA
 - Data: 2026-08-14 20:00 / commitada pelo Claude durante interrupção de quota
 - Commit: bb9339a (commitado pelo Claude), aprovado em 5e46101
