@@ -20,6 +20,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Limpeza & Unificação de Tema em TheoryScreen — CONCLUÍDA
+- Data: 2026-08-15 09:58 (UTC+1)
+- Commit: 86f4d9d
+- Resumo: Eliminadas todas as 23 ocorrências de cores hex e fontes hardcoded em `gui/screens/theory_screen.py`. Substituídas rigorosamente pelos tokens globais do Design System em `gui/theme.py` (`COLOR_BG`, `COLOR_CARD_SURFACE`, `COLOR_SURFACE_SECONDARY`, `COLOR_BORDER`, `COLOR_TEXT_PRIMARY`, `COLOR_TEXT_MUTED`, `FONT_TITLE`, `FONT_SECTION`, `FONT_BODY`, `FONT_BODY_BOLD`). Removidos ficheiros temporários de scratch da raiz. 144/144 testes a passar.
+- Ficheiros alterados: gui/screens/theory_screen.py
+
 ## Fase 22 — Quiz Interativo por Capítulo de Teoria — CONCLUÍDA
 - Data: 2026-08-15 09:43 (UTC+1)
 - Commit: 2a7ad28
