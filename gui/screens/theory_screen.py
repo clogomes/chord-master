@@ -85,7 +85,7 @@ class TheoryScreen(ctk.CTkFrame):
             main_layout,
             width=260,
             corner_radius=theme.RADIUS_LG,
-            fg_color=theme.COLOR_CARD_SURFACE,
+            fg_color=theme.COLOR_SURFACE,
             border_width=1,
             border_color=theme.COLOR_BORDER,
         )
@@ -117,12 +117,15 @@ class TheoryScreen(ctk.CTkFrame):
             btn.destroy()
         self.chapter_buttons.clear()
 
+        from gui.i18n import get_language
+        lang = get_language()
+
         for idx, chap in enumerate(THEORY_CHAPTERS):
             is_active = (idx == self.current_chapter_idx)
             is_done = self.user_manager.is_lesson_completed(chap.id)
 
             status_mark = "✅ " if is_done else f"{chap.number}. "
-            btn_text = f"{status_mark}{chap.title}"
+            btn_text = f"{status_mark}{chap.get_title(lang)}"
 
             btn = ctk.CTkButton(
                 self.chapter_nav_frame,
@@ -140,6 +143,9 @@ class TheoryScreen(ctk.CTkFrame):
             self.chapter_buttons.append(btn)
 
     def _load_chapter(self, chapter_idx: int):
+        from gui.i18n import get_language
+        lang = get_language()
+
         self.current_chapter_idx = chapter_idx
         chap = THEORY_CHAPTERS[chapter_idx]
 
@@ -170,7 +176,7 @@ class TheoryScreen(ctk.CTkFrame):
         header_card = ctk.CTkFrame(
             self.content_scroll,
             corner_radius=theme.RADIUS_LG,
-            fg_color=theme.COLOR_CARD_SURFACE,
+            fg_color=theme.COLOR_SURFACE,
             border_width=1,
             border_color=theme.COLOR_BORDER,
         )
@@ -197,23 +203,24 @@ class TheoryScreen(ctk.CTkFrame):
         )
         badge.pack(side="left")
 
+        chap_lbl = "Chapter" if lang == "en" else "Capítulo"
         ctk.CTkLabel(
             top_info,
-            text=f"Capítulo {chap.number} • {chap.category}",
+            text=f"{chap_lbl} {chap.number} • {chap.category}",
             font=theme.get_font(theme.FONT_BODY_BOLD),
             text_color=theme.COLOR_TEXT_MUTED,
         ).pack(side="left", padx=10)
 
         ctk.CTkLabel(
             header_card,
-            text=chap.title,
+            text=chap.get_title(lang),
             font=theme.get_font(theme.FONT_TITLE),
             text_color=theme.COLOR_TEXT_PRIMARY,
         ).pack(anchor="w", padx=16, pady=(2, 2))
 
         ctk.CTkLabel(
             header_card,
-            text=chap.subtitle,
+            text=chap.get_subtitle(lang),
             font=theme.get_font(theme.FONT_BODY),
             text_color=theme.COLOR_TEXT_MUTED,
         ).pack(anchor="w", padx=16, pady=(0, 6))
@@ -222,9 +229,10 @@ class TheoryScreen(ctk.CTkFrame):
         summary_box = ctk.CTkFrame(header_card, fg_color=theme.COLOR_SURFACE_SECONDARY, corner_radius=theme.RADIUS_MD)
         summary_box.pack(fill="x", padx=16, pady=(4, 14))
 
+        obj_label = "Goal" if lang == "en" else "Objetivo"
         ctk.CTkLabel(
             summary_box,
-            text=f"💡 **Objetivo**: {chap.summary}",
+            text=f"💡 **{obj_label}**: {chap.get_summary(lang)}",
             font=theme.get_font(theme.FONT_BODY),
             text_color=theme.COLOR_TEXT_PRIMARY,
             justify="left",
@@ -235,7 +243,7 @@ class TheoryScreen(ctk.CTkFrame):
         text_card = ctk.CTkFrame(
             self.content_scroll,
             corner_radius=theme.RADIUS_LG,
-            fg_color=theme.COLOR_CARD_SURFACE,
+            fg_color=theme.COLOR_SURFACE,
             border_width=1,
             border_color=theme.COLOR_BORDER,
         )
@@ -245,14 +253,16 @@ class TheoryScreen(ctk.CTkFrame):
             text_card,
             height=500,
             corner_radius=theme.RADIUS_MD,
-            fg_color=theme.COLOR_CARD_SURFACE,
+            fg_color=theme.COLOR_SURFACE,
             text_color=theme.COLOR_TEXT_PRIMARY,
             font=theme.get_font(theme.FONT_BODY),
             wrap="word",
         )
         content_box.pack(fill="both", expand=True, padx=14, pady=14)
         
-        combined_markdown = chap.content_markdown.strip() + "\n\n---\n\n### 🎹 Aplicação no Piano\n\n" + chap.piano_focus.strip() + "\n\n---\n\n### 🎸 Aplicação na Viola\n\n" + chap.guitar_focus.strip()
+        piano_header = "### 🎹 Piano Application" if lang == "en" else "### 🎹 Aplicação no Piano"
+        guitar_header = "### 🎸 Guitar / Viola Application" if lang == "en" else "### 🎸 Aplicação na Viola"
+        combined_markdown = chap.get_content_markdown(lang).strip() + f"\n\n---\n\n{piano_header}\n\n" + chap.get_piano_focus(lang).strip() + f"\n\n---\n\n{guitar_header}\n\n" + chap.get_guitar_focus(lang).strip()
         render_markdown_to_textbox(content_box, combined_markdown, base_font_size=13)
 
         # 4. Interactive Demonstrator Suite (Piano + Viola + Staff)
@@ -297,7 +307,7 @@ class TheoryScreen(ctk.CTkFrame):
         demo_card = ctk.CTkFrame(
             self.content_scroll,
             corner_radius=theme.RADIUS_LG,
-            fg_color=theme.COLOR_CARD_SURFACE,
+            fg_color=theme.COLOR_SURFACE,
             border_width=1,
             border_color=theme.COLOR_BORDER,
         )
@@ -495,7 +505,7 @@ class TheoryScreen(ctk.CTkFrame):
         footer = ctk.CTkFrame(
             self.content_scroll,
             corner_radius=theme.RADIUS_LG,
-            fg_color=theme.COLOR_CARD_SURFACE,
+            fg_color=theme.COLOR_SURFACE,
             border_width=1,
             border_color=theme.COLOR_BORDER,
         )

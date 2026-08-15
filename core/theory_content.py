@@ -17,6 +17,32 @@ class TheoryChapter:
     piano_focus: str
     guitar_focus: str
     interactive_demo: str  # "notes", "intervals", "scales", "chords", "fretboard", "circle_of_fifths"
+    
+    # Optional English translations (i18n)
+    title_en: str = ""
+    subtitle_en: str = ""
+    summary_en: str = ""
+    content_markdown_en: str = ""
+    piano_focus_en: str = ""
+    guitar_focus_en: str = ""
+
+    def get_title(self, lang: str = "pt") -> str:
+        return self.title_en if lang == "en" and self.title_en else self.title
+
+    def get_subtitle(self, lang: str = "pt") -> str:
+        return self.subtitle_en if lang == "en" and self.subtitle_en else self.subtitle
+
+    def get_summary(self, lang: str = "pt") -> str:
+        return self.summary_en if lang == "en" and self.summary_en else self.summary
+
+    def get_content_markdown(self, lang: str = "pt") -> str:
+        return self.content_markdown_en if lang == "en" and self.content_markdown_en else self.content_markdown
+
+    def get_piano_focus(self, lang: str = "pt") -> str:
+        return self.piano_focus_en if lang == "en" and self.piano_focus_en else self.piano_focus
+
+    def get_guitar_focus(self, lang: str = "pt") -> str:
+        return self.guitar_focus_en if lang == "en" and self.guitar_focus_en else self.guitar_focus
 
 
 THEORY_CHAPTERS: List[TheoryChapter] = [
@@ -72,6 +98,45 @@ A pauta (ou pentagrama) é composta por **5 linhas e 4 espaços**, contados de b
 • **Ataque na Ponta dos Dedos**: Pressiona as cordas rigorosamente com a ponta dos dedos (a 90º da escala) para evitar que a almofada do dedo encoste e abafe as cordas soltas vizinhas.
 """,
         interactive_demo="notes",
+        title_en="Music Fundamentals & Notation",
+        subtitle_en="Properties of sound, notes, staff, clefs, and accidentals",
+        summary_en="Learn the foundations of musical language: the 12 chromatic notes, solfège and letter notation, the staff with Treble and Bass clefs, and how accidentals work.",
+        content_markdown_en="""
+### 1. The 12 Western Music Notes
+Western music organizes audible frequencies into repeating cycles called **Octaves**. Each octave is divided into **12 equal semitones**:
+
+• **7 Natural Notes**: C, D, E, F, G, A, B.
+• **5 Altered Notes (Accidentals)**: C♯/D♭, D♯/E♭, F♯/G♭, G♯/A♭, A♯/B♭.
+
+---
+
+### 2. Accidentals and Enharmonics
+• **Sharp (♯)**: Raises the pitch by **1 semitone**. E.g.: C → C♯.
+• **Flat (♭)**: Lowers the pitch by **1 semitone**. E.g.: D → D♭.
+• **Natural (♮)**: Cancels previous accidentals, restoring the natural note.
+• **Enharmonics**: Notes with different names that share the **same acoustic frequency** (e.g. C♯ and D♭).
+
+---
+
+### 3. Musical Staff & Clefs
+The staff consists of **5 lines and 4 spaces**, counted from bottom to top:
+
+• **Treble Clef (𝄞)**: Used for higher pitch ranges (piano right hand, guitar, violin). Places **G on the 2nd line**.
+• **Bass Clef (𝄢)**: Used for lower pitch ranges (piano left hand, bass guitar, cello). Places **F on the 4th line**.
+• **Middle C (C4)**: Meeting point between both clefs, placed on the 1st ledger line below the treble staff.
+""",
+        piano_focus_en="""
+🎹 **On Piano**:
+• White keys correspond to the 7 natural notes (C, D, E, F, G, A, B).
+• Black keys are accidentals (grouped in pairs of 2 and trios of 3).
+• **Middle C (C4)** is located to the left of the 2-black-key group closest to the center.
+""",
+        guitar_focus_en="""
+🎸 **On Guitar / Viola**:
+• Standard tuning of the 6 open strings: **E2 - A2 - D3 - G3 - B3 - E4**.
+• Each fret advances by exactly **1 semitone**.
+• Guitar music is written in **Treble Clef**, sounding one octave lower than written.
+""",
     ),
 
     # ----------------------------------------------------
@@ -139,6 +204,43 @@ Quando invertemos as duas notas de um intervalo (por exemplo, Dó-Sol vira Sol-D
 • **Pressão Mínima**: Experimenta tocar uma nota aliviando a força até trastejar, e depois aperta apenas o milímetro suficiente para soar limpa — evita gastar o dobro da energia necessária.
 """,
         interactive_demo="intervals",
+        title_en="Intervals & Harmonic Physics",
+        subtitle_en="The fundamental building blocks of harmony and consonances",
+        summary_en="Discover what intervals are, how to measure note distances in semitones, melodic vs harmonic intervals, and ear training mnemonics.",
+        content_markdown_en="""
+### 1. What is an Interval?
+An **interval** is the distance in pitch between two musical notes. It is the fundamental building block from which melodies, scales, and chords are built.
+
+• **Melodic Interval**: Notes are played sequentially (one after another).
+• **Harmonic Interval**: Notes are played simultaneously.
+
+---
+
+### 2. Complete Intervals Table (0 to 12 Semitones)
+• **0 Semitones (P1)**: Perfect Unison
+• **1 Semitone (m2)**: Minor 2nd (Jaws theme)
+• **2 Semitones (M2)**: Major 2nd (Happy Birthday)
+• **3 Semitones (m3)**: Minor 3rd (Greensleeves)
+• **4 Semitones (M3)**: Major 3rd (Oh When the Saints)
+• **5 Semitones (P4)**: Perfect 4th (Amazing Grace)
+• **6 Semitones (TT)**: Tritone (The Simpsons)
+• **7 Semitones (P5)**: Perfect 5th (Star Wars)
+• **8 Semitones (m6)**: Minor 6th (Love Story)
+• **9 Semitones (M6)**: Major 6th (My Bonnie)
+• **10 Semitones (m7)**: Minor 7th (The Winner Takes It All)
+• **11 Semitones (M7)**: Major 7th (Take On Me)
+• **12 Semitones (P8)**: Perfect Octave (Somewhere Over the Rainbow)
+""",
+        piano_focus_en="""
+🎹 **On Piano**:
+• Minor 2nd = Immediately adjacent black/white key (or E-F, B-C).
+• Perfect 5th = Natural distance of hand in rest position (thumb to pinky).
+""",
+        guitar_focus_en="""
+🎸 **On Guitar / Viola**:
+• 1 Semitone = 1 Fret distance on the same string.
+• Perfect 5th = 1 string down and 2 frets forward.
+""",
     ),
 
     # ----------------------------------------------------
@@ -205,6 +307,38 @@ O Círculo de Quintas organiza as 12 armações de clave:
 • **Mão Esquerda Estável**: Mantém os dedos curvados e perto das cordas mesmo quando não estão a tocar — dedos que voam longe do braço perdem preciosas frações de segundo.
 """,
         interactive_demo="scales",
+        title_en="Scales, Greek Modes & Circle of Fifths",
+        subtitle_en="Tonal, modal melodic structures and key signatures",
+        summary_en="Learn formulaic structures for Major, Minor (Natural, Harmonic, Melodic), Pentatonic scales, Greek modes, and Circle of Fifths.",
+        content_markdown_en="""
+### 1. Major Scale Formula
+The **Major Scale** formula in Whole (W) and Half (H) steps is:
+
+**W – W – H – W – W – W – H**
+
+Degrees: **1 - 2 - 3 - 4 - 5 - 6 - 7**.
+Example in C Major: **C - D - E - F - G - A - B - C**.
+
+---
+
+### 2. The 7 Greek Modes
+1. **Ionian (I)**: Major Scale (**1, 2, 3, 4, 5, 6, 7**) — Bright, stable.
+2. **Dorian (ii)**: Minor with Major 6th (**1, 2, ♭3, 4, 5, 6, ♭7**) — Jazz, cool.
+3. **Phrygian (iii)**: Minor with Minor 2nd (**1, ♭2, ♭3, 4, 5, ♭6, ♭7**) — Spanish, exotic.
+4. **Lydian (IV)**: Major with Augmented 4th (**1, 2, 3, ♯4, 5, 6, 7**) — Ethereal, filmic.
+5. **Mixolydian (V)**: Major with Minor 7th (**1, 2, 3, 4, 5, 6, ♭7**) — Blues, Rock.
+6. **Aeolian (vi)**: Natural Minor (**1, 2, ♭3, 4, 5, ♭6, ♭7**) — Sad, dark.
+7. **Locrian (vii°)**: Diminished (**1, ♭2, ♭3, 4, ♭5, ♭6, ♭7**) — Unstable.
+""",
+        piano_focus_en="""
+🎹 **On Piano**:
+• C Major scale uses only white keys.
+• Fingering pattern for C Major (Right Hand): **1-2-3-1-2-3-4-5** (thumb under after 3rd finger E).
+""",
+        guitar_focus_en="""
+🎸 **On Guitar / Viola**:
+• Major scale box pattern: 3-notes-per-string system across 6 strings.
+""",
     ),
 
     # ----------------------------------------------------
@@ -270,6 +404,34 @@ A nota mais grave tocada no acorde (o **Baixo**) define o estado de inversão:
 • **Troca Antecipada no Ar**: Ao mudar de acorde, move todos os dedos em bloco no ar já com a forma do próximo acorde, em vez de assentar um dedo de cada vez.
 """,
         interactive_demo="chords",
+        title_en="Chord Construction, Triads & Inversions",
+        subtitle_en="Triad anatomy, suspended chords, and voice leading",
+        summary_en="Understand how notes stack in 3rds to form chords, structural differences between Major, Minor, Diminished, and Augmented triads, and inversions.",
+        content_markdown_en="""
+### 1. What is a Triad?
+A **triad** is a 3-note chord built by stacking thirds:
+1. **Root (1)**: Defines the chord name.
+2. **Third (3)**: Defines Major or Minor quality.
+3. **Fifth (5)**: Defines stability or tension (Perfect, Diminished, Augmented).
+
+---
+
+### 2. The 4 Basic Triad Types
+• **Major (C)**: 1 - 3 - 5 (C - E - G)
+• **Minor (Cm)**: 1 - ♭3 - 5 (C - E♭ - G)
+• **Diminished (Cdim)**: 1 - ♭3 - ♭5 (C - E♭ - G♭)
+• **Augmented (Caug)**: 1 - 3 - ♯5 (C - E - G♯)
+""",
+        piano_focus_en="""
+🎹 **On Piano**:
+• Root position C Major: fingers 1-3-5 on C - E - G.
+• 1st Inversion (C/E): fingers 1-2-5 on E - G - C.
+• 2nd Inversion (C/G): fingers 1-3-5 on G - C - E.
+""",
+        guitar_focus_en="""
+🎸 **On Guitar / Viola**:
+• Open C chord (X-3-2-0-1-0) doubles the root and 3rd.
+""",
     ),
 
     # ----------------------------------------------------
@@ -343,6 +505,41 @@ Ao adicionar uma quarta nota a 1 terça de distância da quinta, criamos as **T�
 • **Sincronismo Polegar + Dedos (PIMA)**: O polegar toca o baixo no tempo forte e os dedos I-M-A puxam as 3 cordas agudas em uníssono como uma pinça coordenada.
 """,
         interactive_demo="fretboard",
+        title_en="Harmonic Field, Tonal Functions & Seventh Chords",
+        subtitle_en="Harmonic progressions matrix, functional harmony, and 7th chords",
+        summary_en="Learn how to harmonize major/minor scales to build diatonic fields, Tonic/Subdominant/Dominant functions, and 7th chords (maj7, 7, m7, m7b5).",
+        content_markdown_en="""
+### 1. Major Harmonic Field
+Building triads on each degree of the Major scale yields 7 diatonic chords:
+
+**I (Major)   ii (minor)   iii (minor)   IV (Major)   V (Major)   vi (minor)   vii° (diminished)**
+
+Example in C Major: **C, Dm, Em, F, G, Am, Bdim**.
+
+---
+
+### 2. Fundamental Harmonic Functions
+1. **Tonic (I, vi, iii)**: Rest, stability, resolution.
+2. **Subdominant (IV, ii)**: Moderate motion, preparation.
+3. **Dominant (V, vii°)**: Maximum tension, strong pull toward Tonic.
+
+---
+
+### 3. Seventh Chords (4-Note Tetrads)
+• **Major 7th (maj7)**: 1 - 3 - 5 - 7 (e.g. Cmaj7)
+• **Dominant 7th (7)**: 1 - 3 - 5 - ♭7 (e.g. G7)
+• **Minor 7th (m7)**: 1 - ♭3 - 5 - ♭7 (e.g. Dm7, Am7)
+• **Half-Diminished (m7♭5)**: 1 - ♭3 - ♭5 - ♭7 (e.g. Bm7b5)
+""",
+        piano_focus_en="""
+🎹 **On Piano**:
+• Use rootless voicings: left hand plays root, right hand plays guide tones (3rd & 7th).
+• Common progression: **ii7 - V7 - Imaj7** (e.g. Dm7 → G7 → Cmaj7).
+""",
+        guitar_focus_en="""
+🎸 **On Guitar / Viola**:
+• Drop 2 and Drop 3 chord shapes across middle string sets.
+""",
     ),
 
     # ----------------------------------------------------
@@ -404,6 +601,34 @@ Todo o acorde dominante com 7ª pode ser substituído por outro dominante locali
 • **Substituição de Baixos com o Polegar**: Nas cordas graves 6 e 5, usa o polegar com peso natural para dar clareza aos baixos cromáticos descendentes.
 """,
         interactive_demo="circle_of_fifths",
+        title_en="Advanced Harmony, Modulation & Modal Interchange",
+        subtitle_en="Secondary dominants, modal borrowing, and tritone substitution",
+        summary_en="Master secondary dominants (V7/V), modal borrowing (like minor iv and bVI), tritone substitution (SubV7), and smooth modulations.",
+        content_markdown_en="""
+### 1. Secondary Dominants (V7 / X)
+Any diatonic chord can be preceded by its own dominant chord (a Major 7th chord 1 fifth above):
+• **V7 / V**: Dominant of the Dominant (e.g. D7 → G7 in C Major).
+• **V7 / ii**: Dominant of the ii chord (e.g. A7 → Dm in C Major).
+
+---
+
+### 2. Modal Borrowing
+Borrowing chords from the parallel minor scale into a major key:
+• **Minor Subdominant (iv)**: Using **Fm** instead of **F** in C Major (**C → F → Fm → C**).
+
+---
+
+### 3. Tritone Substitution (SubV7)
+Replacing a dominant 7th chord with another dominant 1 tritone away (e.g. **Dm7 → D♭7 → Cmaj7** instead of G7).
+""",
+        piano_focus_en="""
+🎹 **On Piano**:
+• SubV7 creates smooth chromatic voice leading in the bass (D → D♭ → C).
+""",
+        guitar_focus_en="""
+🎸 **On Guitar / Viola**:
+• Tritone substitution simply slides the dominant chord shape 1 fret down.
+""",
     ),
 
     # ----------------------------------------------------
@@ -465,6 +690,31 @@ Em ambas as mãos, os dedos são numerados do polegar ao mindinho:
 • **Treino de Ouvido Harmónico**: Toca um acorde de piano no estúdio e tenta reproduzir o mesmo som na viola de ouvido, encontrando os trastes certos.
 """,
         interactive_demo="piano_interactive",
+        title_en="Practical Piano & Keyboard Guide",
+        subtitle_en="Posture, fingering, hand coordination, and chord voicings",
+        summary_en="Essential guide to playing piano with sound technique: finger numbering, scale fingerings, hand independence, and accompaniment patterns.",
+        content_markdown_en="""
+### 1. Piano Finger Numbering
+• **1**: Thumb
+• **2**: Index
+• **3**: Middle
+• **4**: Ring
+• **5**: Pinky
+
+---
+
+### 2. Posture & Touch
+• Curved, relaxed hands like holding a soft tennis ball.
+• Wrists aligned with forearms.
+""",
+        piano_focus_en="""
+🎹 **Recommended Exercise**:
+• Play **I - vi - IV - V** in C Major (C - Am - F - G) using voice leading inversions.
+""",
+        guitar_focus_en="""
+🎸 **Cross-Instrument Tip**:
+• Understanding piano voicings helps guitarists visualize chord notes across frets.
+""",
     ),
 
     # ----------------------------------------------------
@@ -531,6 +781,21 @@ Qualquer um destes 5 formatos pode ser deslocado para a frente no braço usando 
   - 5 min: Prática de palhetada alternada e improvisação sobre backing track.
 """,
         interactive_demo="guitar_fretboard",
+        title_en="Practical Guitar & CAGED System Guide",
+        subtitle_en="Fretboard navigation, barre chords, fingerpicking, and mobile chord shapes",
+        summary_en="Master the guitar fretboard: the CAGED system for 5 positions per chord, pain-free barre technique, and PIMA fingerpicking.",
+        content_markdown_en="""
+### 1. The CAGED System
+The **CAGED System** is based on 5 open chord shapes: **C - A - G - E - D**. Sliding any shape with a barre allows playing **any chord in 5 fretboard regions**.
+""",
+        piano_focus_en="""
+🎹 **Cross-Instrument Tip**:
+• View CAGED shapes as movable chromatic blocks across 2D string matrices.
+""",
+        guitar_focus_en="""
+🎸 **Recommended Exercise**:
+• Play G Major in 3 positions: Open G, E-shape (3rd fret), A-shape (10th fret).
+""",
     ),
 
     # ----------------------------------------------------
@@ -614,6 +879,31 @@ A **síncopa** ocorre quando o acento cai num tempo fraco ou entre tempos, crian
 3. Varia o padrão criando o teu próprio groove.
 """,
         interactive_demo="notes",
+        title_en="Rhythm, Meter & Pulse",
+        subtitle_en="The temporal dimension of music: tempo, meters, and rhythmic values",
+        summary_en="Understand how music organizes in time: pulse, meters, note values, rest durations, and syncopation.",
+        content_markdown_en="""
+### 1. Pulse and Tempo
+The **pulse** is the regular beat structuring music. **Tempo** measures its speed in **BPM (Beats Per Minute)**:
+• 60 BPM = 1 beat/sec (Largo)
+• 120 BPM = Moderate speed
+• 160 BPM = Fast (Allegro)
+
+---
+
+### 2. Time Signatures
+• **4/4**: 4 quarter notes per measure (Pop, Rock)
+• **3/4**: 3 quarter notes per measure (Waltz)
+• **6/8**: 6 eighth notes per measure (Compound)
+""",
+        piano_focus_en="""
+🎹 **Piano Rhythm Practice**:
+• Play C4 quarter notes with right hand while left hand plays C3 half notes at 60 BPM.
+""",
+        guitar_focus_en="""
+🎸 **Guitar Strumming**:
+• 4/4 Basic Strum Pattern: **↓ ↓ ↑ ↓ ↑** (Down, Down, Up, Down, Up).
+""",
     ),
 
     # ----------------------------------------------------
@@ -701,6 +991,25 @@ A música usa repetição para criar familiaridade e coerência, e variação pa
 • A: G - D - Em - C (regresso)
 """,
         interactive_demo="chords",
+        title_en="Musical Form & Structure",
+        subtitle_en="How music organizes in sections, themes, and dramatic arcs",
+        summary_en="Learn to recognize common musical forms (AB, ABA, Rondo, Sonata) and how repetition and contrast build musical narrative.",
+        content_markdown_en="""
+### 1. What is Musical Form?
+**Form** is the architecture of a piece — organizing sections in time to create unity, contrast, and dramatic arc.
+
+• **Binary Form (AB)**: Two contrasting sections.
+• **Ternary Form (ABA)**: Section A returns after a B contrast.
+• **Rondo (ABACA)**: Repeating main refrain (A) alternating with episodes (B, C).
+""",
+        piano_focus_en="""
+🎹 **Piano Form Analysis**:
+• Identify section boundaries and mark thematic returns.
+""",
+        guitar_focus_en="""
+🎸 **Guitar Song Structure**:
+• Recognize verse vs chorus chord progressions.
+""",
     ),
 
     # ----------------------------------------------------
@@ -784,6 +1093,33 @@ O fraseado é a arte de organizar as notas em **frases musicais** com início, d
 **Exercício de fraseado**: Toca uma melodia simples (ex: os primeiros 8 compassos de "Greensleeves") com staccato, depois com legato, depois com vibrato em cada nota longa. Sente como cada articulação cria uma emoção completamente diferente.
 """,
         interactive_demo="notes",
+        title_en="Dynamics, Articulation & Expression",
+        subtitle_en="How volume, touch, and phrasing turn notes into emotion",
+        summary_en="Master dynamic range (pp to ff), articulations (legato, staccato, accents), musical phrasing, and pedal technique.",
+        content_markdown_en="""
+### 1. Dynamics
+• **pp**: Pianissimo (Very soft)
+• **p**: Piano (Soft)
+• **mf**: Mezzo-forte (Medium loud)
+• **f**: Forte (Loud)
+• **ff**: Fortissimo (Very loud)
+
+---
+
+### 2. Articulations
+• **Legato**: Smooth, connected notes.
+• **Staccato**: Short, detached notes.
+• **Accent (>)**: Emphasized note.
+""",
+        piano_focus_en="""
+🎹 **Dynamics on Piano**:
+• Use arm weight for forte tones, controlled fingertips for pianissimo.
+""",
+        guitar_focus_en="""
+🎸 **Guitar Expression**:
+• Right-hand position changes tone (near bridge = bright, near fretboard = soft).
+• Add vibrato on long sustained notes.
+""",
     ),
 
     # ----------------------------------------------------
@@ -898,5 +1234,28 @@ A **capotraste** (ou cejilha) é a ferramenta de transposição por excelência 
 **Exercício**: Aprende a progressão G-Em-C-D. Agora coloca a capo no 2º traste e toca as mesmas formas — a música está agora em Lá Maior!
 """,
         interactive_demo="circle_of_fifths",
+        title_en="Practical Transposition & Key Signatures",
+        subtitle_en="Shifting music between keys and applying the Circle of Fifths",
+        summary_en="Learn to transpose melodies and chords to any key, use the Circle of Fifths as a harmonic map, and identify key signatures.",
+        content_markdown_en="""
+### 1. What is Transposition?
+**Transposing** means shifting a whole piece or section to a different key while maintaining interval relationships.
+
+---
+
+### 2. Transposing Step-by-Step
+1. Identify source key (e.g. C Major).
+2. Identify destination key (e.g. G Major).
+3. Calculate interval distance (5th = +7 semitones).
+4. Shift every note by +7 semitones.
+""",
+        piano_focus_en="""
+🎹 **Piano Transposition**:
+• Apply the **W-W-H-W-W-W-H** pattern starting from any pitch to build its major scale.
+""",
+        guitar_focus_en="""
+🎸 **Guitar Capo Transposition**:
+• Placing a capo on fret N raises pitch by N semitones, using open chord shapes in new keys.
+""",
     ),
 ]
