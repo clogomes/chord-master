@@ -20,6 +20,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Correção — Bug de Mapeamento Pixel→Nota no OMR (Fases 18-19) — CONCLUÍDA
+- Data: 2026-08-14 20:00 / commitada pelo Claude durante interrupção de quota
+- Commit: bb9339a (commitado pelo Claude), aprovado em 5e46101
+- Resumo: Corrigido bug sistemático em core/omr_importer.py::map_pixel_to_note() — ref_idx usava min(1, len-1) que apontava à 2ª linha do TOPO, quando devia apontar à 2ª linha do FUNDO (max(0, len-2), índice 3 numa pauta de 5). Todas as notas importadas saíam 4 graus diatónicos (uma 4ª) abaixo do correto. Corrigidos também os testes TestMapPixelToNote que replicavam a mesma assunção errada. Adicionados 2 testes de integração end-to-end (treble + bass) que usam detect_staff_lines() real em vez de fixtures à mão — estes testes teriam apanhado o bug originalmente. 134/134 testes a passar.
+- Ficheiros alterados: core/omr_importer.py, tests/test_omr_importer.py
+
 ## Fases 18 e 19 — OMR: Motor de Reconhecimento Ótico de Partituras + Ecrã de Revisão — CONCLUÍDAS
 - Data: 2026-08-14 19:38 (UTC+1)
 - Commit: 991cd58
