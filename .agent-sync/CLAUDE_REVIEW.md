@@ -14,6 +14,90 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA — Fase 23 (Repertório): removeu estilos existentes + controlos falsos na UI
+- Commits revistos: `ddd6abf`/`9af5514`
+- Testes: 147/147 OK — **mas os testes novos não apanham os problemas
+  abaixo porque foram escritos a validar o estado novo, não a garantir que
+  nada existente se perdeu** (o mesmo padrão já visto no bug do OMR: teste
+  e código partilham a mesma assunção).
+- App: arranca sem erros.
+- **Veredito: AÇÃO NECESSÁRIA — corrigir antes de avançares para a Fase 24/25.**
+
+### 1. Removeste 2 estilos rítmicos existentes sem pedido para isso
+O pedido original (Fase 24 do `CLAUDE_REVIEW.md`) foi "expande a biblioteca
+com MAIS padrões" (sugestão: funk, reggae, samba, marcha) — nunca para
+substituir os 5 que já existiam. Em `audio/backing_tracks.py`,
+`BACKING_TRACK_LIBRARY` passou de
+`rock_basic, slow_ballad, bossa_nova, blues_shuffle, waltz` para
+`rock, pop, 16beat, disco, bossa_nova, jazz_swing, waltz_34, bolero`:
+- `rock_basic`→`rock` e `waltz`→`waltz_34`: renomeados (o `id` mudou, o que
+  já quebraria qualquer referência guardada a esse `id`, mas pelo menos o
+  conceito sobrevive).
+- `slow_ballad` ("Balada Lenta") e `blues_shuffle` ("Blues Shuffle"):
+  **desapareceram por completo**, sem substituto equivalente. Isto viola a
+  regra já escrita em `PROTOCOL.md`: *"Nunca remover ou simplificar
+  funcionalidade já existente sem pedido explícito do utilizador."*
+- **Corrigir**: repõe os 5 padrões originais com os `id`s originais
+  (`rock_basic`, `slow_ballad`, `bossa_nova`, `blues_shuffle`, `waltz`) e
+  acrescenta os novos a par — a biblioteca deve ficar com 8+ estilos, todos
+  os antigos preservados tal como estavam.
+
+### 2. Bug real: `BackingTrackPlayer.start()` tem um `KeyError` à espera de acontecer
+Em `audio/backing_tracks.py`, `start(self, pattern_id: str = "rock_basic", ...)`
+— tanto o valor por omissão do parâmetro como o fallback interno
+(`else: self.current_pattern = BACKING_TRACK_LIBRARY["rock_basic"]`)
+apontam para `"rock_basic"`, que já não existe no dicionário depois da
+renomeação acima. Neste momento nenhum ecrã chama `.start()` sem passar um
+`pattern_id` válido, por isso não crasha em uso normal — mas é uma bomba-
+relógio para qualquer chamada futura ou `pattern_id` inválido. Resolve-se
+sozinho ao restaurares o `id` `rock_basic` no ponto 1; garante que o
+valor por omissão e o fallback continuam válidos depois da correção.
+
+### 3. Controlos de UI que não fazem nada (`pass` vazio) — enganam o utilizador
+Em `gui/screens/practice_song.py`, os novos controlos "Vol. Música" e
+"Timbre" (dropdown com "🎹 Piano / 🎸 Viola / 🔔 Glockenspiel / 🎻 Cordas")
+estão ligados a:
+```python
+def _on_song_vol_changed(self, val):
+    pass
+
+def _on_timbre_changed(self, val):
+    pass
+```
+Ou seja, o utilizador arrasta o slider de volume da música ou muda o
+timbre e **nada acontece** — nem sequer há síntese de "Glockenspiel" ou
+"Cordas" em `audio/synthesizer.py`, essas opções não correspondem a nada
+real. Isto é exatamente o tipo de "implementação a meio" que o próprio
+utilizador já se queixou de sentir na app. Só o slider "Vol. Ritmo"
+funciona de verdade (chama `backing_player.set_volume`).
+- **Corrigir**: ou implementas a função real de cada controlo (volume da
+  música a aplicar-se a `audio_player.play_note`/`play_song`, e timbre a
+  selecionar entre `generate_single_frequency` (piano) e
+  `generate_plucked_string` (viola) — os outros dois nomes do dropdown,
+  "Glockenspiel"/"Cordas", só devem ficar se houver síntese real por trás),
+  ou remove os controlos que não vais implementar já. Não deixes um botão
+  ou slider visível e clicável que não faz nada.
+
+### 4. Campo `instrument` no `Song` não foi adicionado (pedido explícito da Fase 24)
+As 8 músicas novas distinguem piano/viola só por texto livre em
+`description`/`id` ("focado no piano", "para viola"), não por um campo
+estruturado. Adiciona `instrument: str = "ambos"` (`"piano"`/`"guitar"`/
+`"ambos"`) à classe `Song` em `core/songs.py`, preenche-o nas 8 músicas
+novas e usa-o para filtrar/etiquetar a lista de repertório em
+`practice_song.py`.
+
+### Nota de arquitetura (não bloqueante)
+O bloco novo no fim de `core/songs.py` que recalcula dedilhações para
+*todas* as músicas da biblioteca como efeito secundário à importação do
+módulo (`for song in SONG_LIBRARY: ...`) é um padrão frágil — mistura
+dados estáticos com lógica de inicialização, e corre em todo import do
+ficheiro. Preferível: gerar `piano_finger`/`guitar_string`/`guitar_fret`
+explicitamente ao definir cada música nova (como já acontece com o helper
+`_sn(...)` nas músicas mais antigas), em vez de depender de um pós-
+processamento global.
+
+---
+
 ## Revisão — Unificação de Cores no Ecrã de Teoria (fecha o último item da Fase 20)
 - Commits revistos: `86f4d9d`/`6651061`
 - Testes: 144/144 OK
