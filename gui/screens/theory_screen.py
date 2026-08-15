@@ -13,6 +13,8 @@ from audio.player import get_audio_player
 from gui.components.piano_keyboard import PianoKeyboard
 from gui.components.staff_canvas import StaffCanvas
 from gui.components.guitar_fretboard import GuitarFretboard
+from gui.components.theory_quiz_widget import TheoryQuizWidget
+from core.theory_quiz import CHAPTER_QUIZZES
 from gui.scroll_utils import bind_mousewheel
 from gui.markdown_renderer import render_markdown_to_textbox
 from gui import theme
@@ -259,6 +261,38 @@ class TheoryScreen(ctk.CTkFrame):
 
         # 5. Lesson Completion Banner
         self._build_completion_footer(chap)
+
+        # 6. Chapter Quiz
+        self._build_quiz_area(chap)
+
+    def _build_quiz_area(self, chap: TheoryChapter):
+        quiz = next((q for q in CHAPTER_QUIZZES if q.chapter_id == chap.id), None)
+        if not quiz:
+            return
+
+        ctk.CTkLabel(
+            self.content_scroll,
+            text="📝 Quiz do Capítulo",
+            font=ctk.CTkFont(family="Helvetica", size=18, weight="bold"),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+        ).pack(anchor="w", padx=16, pady=(10, 5))
+
+        self.quiz_widget = TheoryQuizWidget(
+            self.content_scroll,
+            chapter_quiz=quiz,
+            on_complete=self._on_quiz_complete,
+            user_manager=self.user_manager
+        )
+        self.quiz_widget.pack(fill="x", padx=8, pady=(0, 20))
+
+    def _on_quiz_complete(self, correct: int, total: int):
+        if hasattr(self, 'quiz_widget') and self.quiz_widget.winfo_exists():
+            ctk.CTkLabel(
+                self.content_scroll,
+                text=f"🎉 Parabéns! Completaste o quiz com {correct}/{total} de precisão.",
+                font=ctk.CTkFont(family="Helvetica", size=14, weight="bold"),
+                text_color=theme.COLOR_SUCCESS,
+            ).pack(pady=10)
 
     def _build_interactive_demo_area(self, chap: TheoryChapter):
         demo_card = ctk.CTkFrame(

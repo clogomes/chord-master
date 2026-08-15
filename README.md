@@ -262,6 +262,13 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 
 ---
 
+### 22. 📝 FASE 22 — Quiz Interativo por Capítulo de Teoria ([`gui/components/theory_quiz_widget.py`](file:///Users/clogomes/repo/chord-master/gui/components/theory_quiz_widget.py))
+- **Módulo de Quizzes por Capítulo**: Implementado um banco de 60 questões de múltipla escolha (5 perguntas por capítulo) focadas no conteúdo didático, em `core/theory_quiz.py`.
+- **Componente Visual de Teste**: Criado `TheoryQuizWidget` para apresentação interativa, com opção única, validação imediata e feedback detalhado através de `ScoreCard`.
+- **Integração no Ecrã de Teoria**: O quiz aparece no final da lição para consolidar o conhecimento, premiando o utilizador com 10 XP por resposta correta.
+
+---
+
 ### 22. 🎙️ Lamiré & Afinador Cromático de Alta Precisão
 - **Deteção de Frequência Fundamental ($f_0$) via Microfone**: Algoritmo de autocorrelação no domínio do tempo acelerado por FFT, com interpolação parabólica para precisão sub-amostra e rejeição inteligente de ruído ambiente (60 Hz a 1200 Hz).
 - **Mostrador Visual com Agulha Dinâmica**: Medidor de $-50$ a $+50$ cents com faixa de tolerância verde ($\pm 10$ cents) e orientações em tempo real (*"▲ Muito Grave — Estica a corda"*, *"▼ Muito Agudo — Afrouxa a corda"*, *"✓ AFINADO (No Ponto Perfeito!)"*).
