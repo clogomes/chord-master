@@ -14,6 +14,62 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA (URGENTE) — Ecrã de Teoria está a crashar (`COLOR_CARD_SURFACE` não existe)
+- Reportado por: utilizador, ao entrar na secção de Teoria e não ver
+  informação nenhuma.
+- **Causa raiz confirmada** (reproduzida diretamente, instanciando
+  `TheoryScreen` fora da app):
+  ```
+  AttributeError: module 'gui.theme' has no attribute 'COLOR_CARD_SURFACE'
+  ```
+  Introduzido no commit `86f4d9d` (o refactor de unificação de cores da
+  Fase 20, que eu próprio aprovei) — `gui/screens/theory_screen.py` usa
+  `theme.COLOR_CARD_SURFACE` em 6 sítios (linhas 88, 173, 238, 248, 300,
+  498), mas esse token **nunca existiu** em `gui/theme.py` (o token real
+  chama-se `theme.COLOR_SURFACE`). Como isto acontece dentro de
+  `_build_ui()`, chamado do `__init__`, o ecrã inteiro falha a construir —
+  daí aparecer em branco ao navegar até lá.
+- **Nota minha**: devia ter apanhado isto na revisão do `86f4d9d` — corri
+  `grep` para contar cores hardcoded mas não instanciei o ecrã para
+  confirmar que ainda construía. A partir de agora vou sempre instanciar
+  cada ecrã alterado, não só correr os testes automáticos.
+- **Corrigir**: substitui as 6 ocorrências de `theme.COLOR_CARD_SURFACE`
+  por `theme.COLOR_SURFACE` (é o token que já existia antes do refactor
+  para "superfície de card/container").
+- **Como validar**: correr
+  `python3 -c "import customtkinter as ctk; from core.user_manager import UserManager; from gui.screens.theory_screen import TheoryScreen; root=ctk.CTk(); um=UserManager(); um.current_user or um.create_user('T'); TheoryScreen(root, um, lambda: None).pack(); root.update()"`
+  sem exceções.
+
+## AÇÃO NECESSÁRIA — Conteúdo da Teoria não traduz para Inglês
+- Reportado por: utilizador, ao mudar o idioma para Inglês e ver o
+  conteúdo dos capítulos continuar em Português.
+- **Causa raiz confirmada**: a dataclass `TheoryChapter`
+  (`core/theory_content.py`) só tem campos de texto únicos —
+  `title`, `subtitle`, `summary`, `content_markdown`, `piano_focus`,
+  `guitar_focus` — todos só em Português, sem equivalentes `_en`. O resto
+  da app (`Interval`, `ScaleDefinition`, `ChordDefinition`) já segue o
+  padrão `name_pt`/`name_en` desde a Fase 15 (i18n), mas `TheoryChapter`
+  nunca foi adaptado a esse padrão — o alternador de idioma muda os rótulos
+  à volta (abas, botões, título do ecrã, via `gui/i18n.py::UI_STRINGS`),
+  mas não tem nada para consultar no conteúdo em si.
+- **Âmbito**: isto é maior do que uma correção pontual — precisa de
+  tradução real de conteúdo para os 12 capítulos (título, subtítulo,
+  resumo, conteúdo principal, foco piano, foco viola). Sugestão de
+  implementação: acrescenta `title_en`, `subtitle_en`, `summary_en`,
+  `content_markdown_en`, `piano_focus_en`, `guitar_focus_en` a
+  `TheoryChapter`, e em `gui/screens/theory_screen.py` usa
+  `gui.i18n.get_language()` para escolher qual campo mostrar (mesmo padrão
+  já usado em `core/i18n_helpers.py` para notas/escalas/acordes). As 12
+  perguntas de quiz por capítulo (`core/theory_quiz.py`) provavelmente
+  também precisam do mesmo tratamento — usa o teu critério, mas avisa se
+  ficarem de fora nesta fase.
+- Não é urgente ao ponto de bloquear tudo (a app funciona em português
+  sempre), mas é uma promessa não cumprida do alternador de idioma —
+  trata como AÇÃO NECESSÁRIA porque o Phase 15 já foi reportado como
+  "concluído" sem isto.
+
+---
+
 ## Revisão — Esclarecimento do resumo (fecha a nota anterior)
 - Commit revisto: `eb6ab53`
 - Testes: 153/153 OK
