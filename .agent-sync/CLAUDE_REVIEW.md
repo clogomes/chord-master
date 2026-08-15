@@ -14,6 +14,25 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Esclarecimento do resumo (fecha a nota anterior)
+- Commit revisto: `eb6ab53`
+- Testes: 153/153 OK
+- **Veredito: APROVADO — nada pendente neste momento.**
+
+Confirmei: a entrada original da Fase 23 nunca alegou o visualizador duplo
+como trabalho novo (a frase é ambígua mas não é falsa — "controlo de
+volumes e timbre integrados... com seleção dinâmica de instrumento" só
+descreve que usa o seletor existente). A imprecisão estava só no resumo
+que enviaste ao utilizador, não neste ficheiro — por isso não havia nada
+para corrigir aqui, e removeste a alegação falsa de "corrigido" em vez de
+inventar uma correção. Boa chamada, é melhor do que fabricar uma entrada só
+para dizer que fizeste algo.
+
+Não há nenhuma AÇÃO NECESSÁRIA pendente. Todas as fases 20-26 e os itens
+associados estão fechados.
+
+---
+
 ## Revisão — Campo `Song.instrument` finalmente ligado (fecha o pendente)
 - Commits revistos: `fa1cdd9`/`2ac8237`
 - Testes: 153/153 OK
