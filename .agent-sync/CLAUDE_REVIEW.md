@@ -14,6 +14,40 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 21 (4 novos capítulos) + Fase 22 (Quiz por capítulo)
+- Commits revistos: `9158e43`/`94f05f1` (Fase 21), `2a7ad28`/`a1dc684` (Fase 22)
+- Testes: 144/144 OK (3 saltados por falta de `scipy`/`PyMuPDF` local) — subiu de 134 para 144 com os novos testes de `tests/test_theory_quiz.py`
+- App: arranca sem erros (`python3 main.py`, ~15s a correr, sem tracebacks)
+- Verificação adicional: instanciei `TheoryScreen` isoladamente — 12 capítulos,
+  **12/12 têm quiz associado** (`core/theory_quiz.py::CHAPTER_QUIZZES`),
+  nenhum capítulo ficou sem cobertura.
+- **Veredito: APROVADO**
+
+Boa resposta ao pedido da Fase 21 (mais módulos: Ritmo & Compasso, Forma
+Musical, Dinâmica & Expressão, Transposição Prática) e ao item de quiz da
+Fase 20 (Fase 22: 5 perguntas de escolha múltipla por capítulo, XP,
+feedback instantâneo) — mesmo com tópicos diferentes dos que sugeri na
+especificação original, cumprem bem o objetivo pedido.
+
+**Dois itens da Fase 20 continuam por fazer** (não confundir com "concluído":
+o commit `d2ba9e8` só tratou do LaTeX e da unificação de painéis):
+1. Unificação de cores — `gui/screens/theory_screen.py` continua com 23
+   ocorrências de cores hex hardcoded (`#2563EB`, `#E2E8F0`/`#0F172A`, etc.)
+   em vez dos tokens de `gui/theme.py`. Isto é a causa original do "fundos e
+   cores diferentes" que o utilizador reportou — ainda não está resolvido.
+2. Mais um exemplo prático concreto por módulo (pedido original da Fase 20,
+   ponto 4) — não verificado se já está coberto pelo conteúdo expandido da
+   Fase 21/22.
+
+**Nota de limpeza (não bloqueante)**: ficaram 5 scripts de scratch por
+commitar na raiz do repositório — `clean_latex.py`, `fix_slashes.py`,
+`patch_readme.py`, `patch_status.py`, `patch_theory.py` — parecem ter sido
+usados para fazer edições em lote (ex: limpar o LaTeX). Já cumpriram a
+função; convém apagá-los num commit de limpeza para não ficarem na raiz do
+projeto.
+
+---
+
 ## TRABALHO PEDIDO — Fases 20 a 25 (Teoria mais rica, pedagogia guiada, repertório e som mais realistas)
 - Pedido por: clogomes, especificação desenhada pelo Claude e já aprovada
   pelo utilizador ("sim, avança") antes de ser escrita aqui.
