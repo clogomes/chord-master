@@ -62,8 +62,7 @@ class UserProfile:
     @property
     def due_reviews_count(self) -> int:
         now = time.time()
-        count = sum(1 for d in self.spaced_review_data.values() if d.get("due_at", 0) <= now or d.get("repetition_count", 0) == 0)
-        return count if count > 0 else (0 if len(self.spaced_review_data) > 0 else 10)
+        return sum(1 for d in self.spaced_review_data.values() if d.get("due_at", 0) <= now or d.get("repetition_count", 0) == 0)
 
     @property
     def leitner_box_counts(self) -> Dict[int, int]:

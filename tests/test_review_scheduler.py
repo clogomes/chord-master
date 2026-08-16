@@ -183,6 +183,39 @@ class TestQueueGeneration(unittest.TestCase):
         queue = get_due_review_queue(store, max_items=15)
         self.assertGreaterEqual(len(queue), 1)
 
+    def test_staff_skill_ids_use_pitch_with_octave(self):
+        """
+        Regression test: staff skill_ids from generate_default_atomic_skills() must
+        use note.pitch_with_octave (e.g. 'C4'), NOT note.pitch (e.g. 'C').
+        practice_staff.py generates ids at runtime using pitch_with_octave — this
+        ensures both sides share the same namespace so practice updates seeded items.
+        """
+        items = generate_default_atomic_skills()
+        staff_items = [i for i in items if i.skill_id.startswith("staff:")]
+        self.assertGreater(len(staff_items), 0)
+        for item in staff_items:
+            parts = item.skill_id.split(":")
+            pitch_part = parts[2]  # e.g. "C4"
+            self.assertRegex(
+                pitch_part,
+                r'^[A-G][#b]?\d$',
+                msg=f"Skill ID '{item.skill_id}' pitch part must include octave (e.g. C4, not C)"
+            )
+
+    def test_runtime_staff_skill_id_matches_seeded_namespace(self):
+        """
+        Verify that the runtime skill_id format 'staff:{clef}:{pitch_with_octave}'
+        produced by practice_staff.py matches what generate_default_atomic_skills() seeds.
+        """
+        from core.notes import Note
+        seeded_ids = {i.skill_id for i in generate_default_atomic_skills() if i.skill_id.startswith("staff:")}
+        note = Note("C4")
+        runtime_id = f"staff:treble:{note.pitch_with_octave}"
+        self.assertIn(runtime_id, seeded_ids, msg=(
+            f"Runtime skill_id '{runtime_id}' not in seeded namespace. "
+            "practice_staff.py and review_scheduler.py must use the same pitch format."
+        ))
+
 
 class TestUserManagerIntegration(unittest.TestCase):
     """Tests for spaced review persistence in UserManager."""
@@ -221,8 +254,8 @@ class TestUserManagerIntegration(unittest.TestCase):
 
     def test_due_reviews_count_on_fresh_profile(self):
         user = self.um.current_user
-        # Fresh empty profile → returns 10 (bootstrap hint)
-        self.assertEqual(user.due_reviews_count, 10)
+        # Fresh empty profile → returns 0 (real count, no invented numbers)
+        self.assertEqual(user.due_reviews_count, 0)
 
     def test_leitner_box_counts_empty(self):
         boxes = self.um.current_user.leitner_box_counts

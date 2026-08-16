@@ -348,7 +348,7 @@ class PracticeStaffScreen(ctk.CTkFrame):
         # Record atomic spaced review
         note = self.current_question.staff_note
         clef = getattr(self.current_question, "clef", "treble")
-        skill_id = f"staff:{clef}:{note.pitch}" if note else "staff:treble:unknown"
+        skill_id = f"staff:{clef}:{note.pitch_with_octave}" if note else "staff:treble:unknown"
         stats = self.user_manager.record_atomic_review(
             skill_id=skill_id,
             is_correct=is_correct,
