@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Correção Urgente Fase 36 & Blindagem de Tokens de Tema — CONCLUÍDA
+- Data: 2026-08-16T17:53:00+01:00
+- Commit: a20b8ac
+- Resumo: 1) Substituídos tokens inexistentes `COLOR_ACCENT_EMERALD` por `COLOR_SUCCESS` e `COLOR_SUCCESS_HOVER` em `glossary_screen.py` e `glossary_modal.py`, e `COLOR_CARD_SURFACE` por `COLOR_SURFACE` em `omr_review.py` (corrigindo também `from __future__ import annotations` na linha 1). 2) Adicionados aliases retrocompatíveis em `gui/theme.py`. 3) Criado teste de varrimento estático `tests/test_theme_tokens_scan.py` que valida por regex todos os tokens `theme.*` no pacote `gui/`. 4) Expandido o teste de fumo `tests/test_smoke.py` para instanciar e construir programaticamente cada um dos ecrãs e modais da aplicação. 5) Expandido o mapa de palavras-chave da auto-ligação com suporte a plurais e extração de aliases em parênteses (ex: 'guide tone', 'tetracordes', 'sensíveis'). 194/194 testes a passar.
+- Ficheiros principais alterados: gui/theme.py, gui/screens/glossary_screen.py, gui/components/glossary_modal.py, gui/screens/omr_review.py, gui/markdown_renderer.py, tests/test_theme_tokens_scan.py, tests/test_smoke.py
+
 ## Fase 36 — Glossário Musical Interativo & Auto-Ligação de Termos — CONCLUÍDA
 - Data: 2026-08-16T17:47:00+01:00
 - Commit: 5b5baa2
