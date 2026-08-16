@@ -345,11 +345,15 @@ class PracticeStaffScreen(ctk.CTkFrame):
             color = "#10B981" if is_correct else "#EF4444"
             self.piano_view.highlight_notes([self.current_question.staff_note], color=color)
 
-        # Record in user manager
-        stats = self.user_manager.record_attempt(
+        # Record atomic spaced review
+        note = self.current_question.staff_note
+        clef = getattr(self.current_question, "clef", "treble")
+        skill_id = f"staff:{clef}:{note.pitch}" if note else "staff:treble:unknown"
+        stats = self.user_manager.record_atomic_review(
+            skill_id=skill_id,
+            is_correct=is_correct,
             category="leitura_pauta",
             question_type=self.current_question.question_type.value,
-            is_correct=is_correct,
             prompt=self.current_question.prompt_text,
             user_answer=self.current_question.options[selected_index],
             correct_answer=self.current_question.correct_answer,

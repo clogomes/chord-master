@@ -185,7 +185,25 @@ class TheoryQuizWidget(ctk.CTkFrame):
             self.correct_count += 1
             if self.user_manager and self.user_manager.current_user:
                 self.user_manager.current_user.xp += 10
-                self.user_manager._save_users()
+
+        # Record atomic spaced review for this question
+        if self.user_manager and self.user_manager.current_user:
+            chapter_id = self.chapter_quiz.chapter_id
+            skill_id = f"theory:{chapter_id}:q{self.current_q_idx}"
+            q_text = q.get_question("pt") if hasattr(q, "get_question") else q.question
+            opt_text = (q.get_options("pt") if hasattr(q, "get_options") else q.options)[selected] if selected >= 0 else ""
+            correct_opt = (q.get_options("pt") if hasattr(q, "get_options") else q.options)[q.correct_index]
+            self.user_manager.record_atomic_review(
+                skill_id=skill_id,
+                is_correct=is_correct,
+                category="teoria",
+                question_type="theory_quiz",
+                prompt=q_text,
+                user_answer=opt_text,
+                correct_answer=correct_opt,
+            )
+        elif self.user_manager and self.user_manager.current_user:
+            self.user_manager.save()
 
         for i, rb in enumerate(self.option_radios):
             rb.configure(state="disabled")

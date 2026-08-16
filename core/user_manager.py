@@ -57,6 +57,31 @@ class UserProfile:
     })
     completed_lessons: List[str] = field(default_factory=list)
     history: List[ExerciseRecord] = field(default_factory=list)
+    spaced_review_data: Dict[str, Dict] = field(default_factory=dict)
+
+    @property
+    def due_reviews_count(self) -> int:
+        now = time.time()
+        count = sum(1 for d in self.spaced_review_data.values() if d.get("due_at", 0) <= now or d.get("repetition_count", 0) == 0)
+        return count if count > 0 else (0 if len(self.spaced_review_data) > 0 else 10)
+
+    @property
+    def leitner_box_counts(self) -> Dict[int, int]:
+        boxes = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+        for d in self.spaced_review_data.values():
+            rep = d.get("repetition_count", 0)
+            iv = d.get("interval_days", 0.0)
+            if rep == 0 or iv < 1.0:
+                boxes[1] += 1
+            elif iv < 3.0:
+                boxes[2] += 1
+            elif iv < 7.0:
+                boxes[3] += 1
+            elif iv < 21.0:
+                boxes[4] += 1
+            else:
+                boxes[5] += 1
+        return boxes
 
     @property
     def level_info(self) -> Dict:
@@ -305,8 +330,68 @@ class UserManager:
         user.unlocked_achievements.clear()
         self.save()
 
+    def record_atomic_review(
+        self,
+        skill_id: str,
+        is_correct: bool,
+        grade: Optional[int] = None,
+        category: str = "treino_auditivo",
+        question_type: str = "unknown",
+        prompt: str = "",
+        user_answer: str = "",
+        correct_answer: str = "",
+    ):
+        """
+        Records the outcome of an atomic skill practice item into the spaced repetition schedule.
+        Also logs general category stats and history for cross-module compatibility.
+        """
+        from core.review_scheduler import ReviewItem, apply_sm2_grade
+        user = self.current_user
+
+        # Fetch or build base ReviewItem
+        if skill_id in user.spaced_review_data:
+            item = ReviewItem.from_dict(user.spaced_review_data[skill_id])
+        else:
+            item = ReviewItem(
+                skill_id=skill_id,
+                category=category,
+                prompt_pt=prompt,
+                prompt_en=prompt,
+                question_type=question_type,
+                options_pt=[],
+                options_en=[],
+                correct_index=0,
+                explanation_pt="",
+                explanation_en="",
+            )
+
+        if grade is None:
+            grade = 5 if is_correct else 1
+
+        # Apply SM-2 update
+        apply_sm2_grade(item, grade=grade)
+        user.spaced_review_data[skill_id] = item.to_dict()
+
+        # Also update normal category stats
+        self.record_attempt(
+            category=category,
+            question_type=question_type,
+            is_correct=is_correct,
+            prompt=prompt,
+            user_answer=user_answer,
+            correct_answer=correct_answer,
+        )
+
+        return item
+
+    def get_daily_review_queue(self, max_items: int = 15):
+        """Constructs the daily spaced repetition review queue for the active user."""
+        from core.review_scheduler import get_due_review_queue
+        return get_due_review_queue(self.current_user.spaced_review_data, max_items=max_items)
+
     def save(self):
         data = {
+            "schema_version": 2,
             "active_user": self.active_username,
             "users": {}
         }
@@ -328,6 +413,7 @@ class UserManager:
                     for k, v in profile.categories.items()
                 },
                 "history": [asdict(r) for r in profile.history],
+                "spaced_review_data": profile.spaced_review_data,
             }
 
         try:
@@ -383,6 +469,7 @@ class UserManager:
                         categories=categories,
                         completed_lessons=udata.get("completed_lessons", []),
                         history=history,
+                        spaced_review_data=udata.get("spaced_review_data", {}),
                     )
                     self.profiles[profile.username] = profile
                 return

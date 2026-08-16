@@ -616,11 +616,20 @@ class PracticeEarScreen(ctk.CTkFrame):
             elif idx == chosen_index and not is_correct:
                 btn.configure(fg_color=theme.COLOR_ACCENT_CRIMSON, hover_color=theme.COLOR_ACCENT_CRIMSON_HOVER, text_color="#FFFFFF")
 
-        # Record attempt in UserManager
-        stats = self.user_manager.record_attempt(
+        # Record atomic spaced review in UserManager
+        skill_id = f"ear:{self.current_question.question_type.value}"
+        match = re.search(r'\((.*?)\)', self.current_question.correct_answer)
+        if match:
+            code = match.group(1)
+            direction = getattr(self.current_question, "play_mode", "melodic_asc")
+            dir_suffix = "desc" if "desc" in str(direction) else "asc"
+            skill_id = f"interval:{code}:{dir_suffix}"
+
+        stats = self.user_manager.record_atomic_review(
+            skill_id=skill_id,
+            is_correct=is_correct,
             category=self.current_question.category,
             question_type=self.current_question.question_type.value,
-            is_correct=is_correct,
             prompt=self.current_question.prompt_text,
             user_answer="Voz Afinada" if from_voice else self.current_question.options[chosen_index],
             correct_answer=self.current_question.correct_answer,

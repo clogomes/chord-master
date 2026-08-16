@@ -327,6 +327,17 @@ class MainMenuScreen(ctk.CTkFrame):
             color_accent="#0284C7",
             target_screen="glossary",
         )
+        self._create_nav_card(
+            cards_container,
+            row=5,
+            col=0,
+            icon="🔄",
+            title="Revisão de Hoje",
+            subtitle="Sistema de repetição espaçada SM-2: estuda hoje os itens marcados para revisão.",
+            button_text="Iniciar Revisão",
+            color_accent="#8B5CF6",
+            target_screen="daily_review",
+        )
 
     def _confirm_reset(self):
         user = self.user_manager.current_user

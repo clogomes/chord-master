@@ -229,6 +229,7 @@ class ChordMasterApp(ctk.CTk):
             ("practice_ear", t("nav_practice_ear", "🎧 Treino Auditivo")),
             ("practice_staff", t("nav_practice_staff", "🎼 Leitura de Pauta")),
             ("glossary", t("nav_glossary", "📚 Glossário Musical")),
+            ("daily_review", t("nav_daily_review", "🔄 Revisão de Hoje")),
             ("stats", t("nav_stats", "📊 Estatísticas & Alunos")),
         ]
 
@@ -392,6 +393,13 @@ class ChordMasterApp(ctk.CTk):
                 user_manager=self.user_manager,
                 on_back=lambda: self.navigate_to("main_menu"),
                 on_user_switched=self._on_user_switched,
+            )
+        elif screen_name == "daily_review":
+            from gui.screens.daily_review_screen import DailyReviewScreen
+            self.current_screen_widget = DailyReviewScreen(
+                self.content_area,
+                user_manager=self.user_manager,
+                on_back=lambda: self.navigate_to("main_menu"),
             )
         else:
             print(f"Aviso: Rota desconhecida '{screen_name}', redirecionando para main_menu")
