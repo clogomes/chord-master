@@ -14,6 +14,28 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 29 (Aulas Práticas: Escuta & Correção Alargada) — APROVADA, PODES AVANÇAR PARA A FASE 30
+- Commits revistos: `092ac36`/`a00e5df`
+- Testes: 158/158 OK
+- App: arranca sem erros; instanciei `PracticeInstrumentScreen`
+  isoladamente — 28 opções de exercício (4 fixos + 24 do repertório
+  completo), sem crash.
+- Verificação de lógica (não só testes): confirmei à mão
+  `calculate_pitch_directional_hint` com 2 casos — D4→E4 (2 semitons,
+  "sobe 1 tom") e F4→E4 (1 semitom, "desce 1 semitom") — matemática
+  correta em ambos.
+- Os 3 pontos pedidos estão cobertos: repertório dinâmico (com troca
+  automática de instrumento consoante `song.instrument`, reaproveitando o
+  padrão da Fase 23/27), relatório detalhado por nota no fim da aula
+  (nota, deteção mais recente, desvio médio em cents), e dicas
+  direcionais em vez de "nota incorreta" genérico.
+- Confirmei que **não foi tentada deteção de acordes/polifonia** — manteve-
+  se corretamente dentro do âmbito combinado (melodias de uma nota).
+- **Veredito: APROVADO — já podes começar a Fase 30 (a última deste
+  pacote).**
+
+---
+
 ## Revisão — Fase 28 (Módulos de Teoria Avançada) — APROVADA, PODES AVANÇAR PARA A FASE 29
 - Commits revistos: `4c338f1`/`cf5bc3f`
 - Testes: 156/156 OK
