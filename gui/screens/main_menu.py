@@ -288,11 +288,24 @@ class MainMenuScreen(ctk.CTkFrame):
             target_screen="practice_ear",
         )
 
-        # Card 8: Estatísticas & Alunos
+        # Card 8: Exercícios Técnicos
         self._create_nav_card(
             cards_container,
             row=3,
             col=1,
+            icon="💪",
+            title="Exercícios Técnicos",
+            subtitle="Prática deliberada: Hanon, arpejos, spider walks e treino de agilidade/independência.",
+            button_text="Treinar Técnica",
+            color_accent="#F59E0B",
+            target_screen="practice_technique",
+        )
+
+        # Card 9: Estatísticas & Alunos
+        self._create_nav_card(
+            cards_container,
+            row=4,
+            col=0,
             icon="📊",
             title="Estatísticas & Alunos",
             subtitle="Gráficos de evolução, mapa de atividade, leaderboard e exportação de certificados.",

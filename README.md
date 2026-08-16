@@ -93,6 +93,11 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
   - Acesso dinâmico a **toda a biblioteca de repertório** para praticar qualquer peça com piano ou viola física real.
   - **Relatório Detalhado da Aula** ao terminar a peça, listando que notas específicas falharam, número de tentativas fora do tom e desvio médio em cents.
 
+- **Módulo de Exercícios Técnicos & Aquecimento (Fase 30)**:
+  - Prática deliberada de **Aquecimento**, **Destreza** e **Força/Agilidade** para piano e viola.
+  - Exercícios clássicos de **Hanon No. 1**, padrões de 5 dedos, arpejos de oitavas, movimento contrário entre mãos, **Spider Walk cromático (1-2-3-4)**, saltos de corda e palhetada alternada rápida.
+  - Metrónomo com **rampa de tempo automática (70% ➔ 100% BPM)** e feedback rítmico em milissegundos.
+
 ---
 
 ### 5. 🎤 FASE 5 — Ditado de Solfejo Cantado com Validação Vocal por Microfone

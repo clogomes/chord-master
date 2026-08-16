@@ -15,6 +15,7 @@ from gui.screens.practice_staff import PracticeStaffScreen
 from gui.screens.practice_song import PracticeSongScreen
 from gui.screens.practice_scales import PracticeScalesScreen
 from gui.screens.practice_instrument import PracticeInstrumentScreen
+from gui.screens.practice_technique import PracticeTechniqueScreen
 from gui.screens.tuner_screen import LamireScreen
 from gui.screens.stats_screen import StatsScreen
 
@@ -354,6 +355,12 @@ class ChordMasterApp(ctk.CTk):
             )
         elif screen_name == "practice_instrument":
             self.current_screen_widget = PracticeInstrumentScreen(
+                self.content_area,
+                user_manager=self.user_manager,
+                on_back=lambda: self.navigate_to("main_menu"),
+            )
+        elif screen_name == "practice_technique":
+            self.current_screen_widget = PracticeTechniqueScreen(
                 self.content_area,
                 user_manager=self.user_manager,
                 on_back=lambda: self.navigate_to("main_menu"),

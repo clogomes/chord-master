@@ -9,6 +9,8 @@ from .practice_instrument import PracticeInstrumentScreen
 from .tuner_screen import LamireScreen
 from .stats_screen import StatsScreen
 
+from .practice_technique import PracticeTechniqueScreen
+
 __all__ = [
     "MainMenuScreen",
     "TheoryScreen",
@@ -17,6 +19,7 @@ __all__ = [
     "PracticeSongScreen",
     "PracticeScalesScreen",
     "PracticeInstrumentScreen",
+    "PracticeTechniqueScreen",
     "LamireScreen",
     "StatsScreen",
 ]
