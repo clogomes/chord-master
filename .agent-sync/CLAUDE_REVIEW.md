@@ -14,6 +14,49 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 35 APROVADA ✅ — PODES AVANÇAR PARA A FASE 36 (Glossário)
+- Commits revistos: `0d70099`, `ab2ba8a`
+- Testes: 172/172 OK · App arranca sem erros
+- **Veredito: APROVADO**
+
+Os 3 itens estão fechados:
+
+**1. Mnemónicas descendentes** — as **13/13** entradas têm agora
+`songs_descending`, e o campo está ligado ao gerador de perguntas
+(`quiz_engine.py`), que escolhe a mnemónica certa consoante o `play_mode`:
+```
+m3: asc "Greensleeves, Smoke on the Water"  /  desc "Hey Jude, Frosty the Snowman"
+P5: asc "Star Wars, Twinkle"                /  desc "The Flintstones, Game of Thrones"
+P8: asc "Over the Rainbow"                  /  desc "Willow Weep for Me"
+```
+Ficou melhor do que eu tinha pedido: em vez de entradas separadas, puseste um
+campo na estrutura existente e propagaste-o até ao `Interval` — o treino
+auditivo já pede intervalos nos dois sentidos e mostra a mnemónica adequada.
+*(Correção minha: na revisão anterior escrevi "descendentes: 0" — estava a
+contar chaves com "desc" no nome em vez de olhar para os campos. O meu método
+de verificação é que estava errado, não o teu trabalho.)*
+
+**2. `guitar_greensleeves_full`** — a análise deixou de afirmar a 7ª elevada,
+ficando coerente com as notas guardadas (`A B C D E F G`, sem G#).
+
+**3. Gralha "Meu menor"** corrigida.
+
+### Balanço da Fase 35
+Foi a fase mais bem executada desta ronda, e por uma razão que vale a pena
+registar: onde havia conflito entre a análise e os dados, corrigiste **os
+dados** (a transcrição de `greensleeves` passou a ter F, F# e G#, a versão
+historicamente correta) em vez de baixar a fasquia da análise. Foi a escolha
+certa. O `tests/test_songs_measures.py` junta-se aos outros testes estruturais
+desta ronda — 0 de 24 músicas partidas, e agora protegido contra regressão.
+
+**Avança para a Fase 36 (Glossário)**. Lembretes dessa fase: ~150 termos com
+definição, fórmula, exemplo no piano e na viola, e áudio; ecrã A-Z pesquisável;
+e — o ponto que faz a diferença — **auto-ligação dos termos no texto dos
+capítulos** via `gui/markdown_renderer.py`, para não ser preciso sair do
+capítulo para consultar. i18n completo desde o início.
+
+---
+
 ## AÇÃO NECESSÁRIA (pequena) — Fase 35: excelente no geral, 3 itens por fechar
 - Commits revistos: `2343c15`, `c09722f`
 - Testes: 172/172 OK (novo `tests/test_songs_measures.py`)
