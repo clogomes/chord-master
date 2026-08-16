@@ -1,3 +1,4 @@
+from gui.i18n import t
 """Main Menu screen with personalized user dashboard and module launcher cards."""
 from tkinter import messagebox
 from typing import Callable, Optional
@@ -116,7 +117,7 @@ class MainMenuScreen(ctk.CTkFrame):
 
         reset_prog_btn = ctk.CTkButton(
             right_btns,
-            text="↺ Reiniciar",
+            text=t("btn_restart", "↺ Reiniciar"),
             font=theme.get_font(theme.FONT_SMALL_BOLD),
             fg_color="transparent",
             text_color=theme.COLOR_ACCENT_CRIMSON,

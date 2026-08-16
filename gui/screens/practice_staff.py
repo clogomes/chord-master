@@ -1,3 +1,4 @@
+from gui.i18n import t
 """Interactive Staff Reading practice screen for Treble and Bass clefs."""
 from typing import Callable, List, Optional
 import customtkinter as ctk
@@ -48,7 +49,7 @@ class PracticeStaffScreen(ctk.CTkFrame):
 
         back_btn = ctk.CTkButton(
             nav_bar,
-            text="← Voltar ao Menu",
+            text=t("btn_back", "← Voltar ao Menu"),
             font=ctk.CTkFont(family="Helvetica", size=13, weight="bold"),
             fg_color="#475569",
             hover_color="#334155",
@@ -59,7 +60,7 @@ class PracticeStaffScreen(ctk.CTkFrame):
 
         title_lbl = ctk.CTkLabel(
             nav_bar,
-            text="🎼 Leitura de Pauta",
+            text=t("staff_reading_title", "🎼 Leitura de Pauta"),
             font=ctk.CTkFont(family="Helvetica", size=24, weight="bold"),
             text_color=("#0F172A", "#F8FAFC"),
         )
@@ -75,16 +76,16 @@ class PracticeStaffScreen(ctk.CTkFrame):
         )
         settings_frame.pack(fill="x", padx=20, pady=(4, 12))
 
-        ctk.CTkLabel(settings_frame, text="Clave:", font=ctk.CTkFont(family="Helvetica", size=12, weight="bold")).pack(side="left", padx=(14, 4), pady=10)
+        ctk.CTkLabel(settings_frame, text=t("clef_label", "Clave:"), font=ctk.CTkFont(family="Helvetica", size=12, weight="bold")).pack(side="left", padx=(14, 4), pady=10)
 
         self.clef_select = ctk.CTkSegmentedButton(
             settings_frame,
-            values=["Clave de Sol (𝄞)", "Clave de Fá (𝄢)"],
+            values=[t("clef_treble", "Clave de Sol (𝄞)"), t("clef_bass", "Clave de Fá (𝄢)")],
             command=lambda v: self.load_new_question(),
             selected_color="#059669",
             selected_hover_color="#047857",
         )
-        self.clef_select.set("Clave de Sol (𝄞)")
+        self.clef_select.set(t("clef_treble", "Clave de Sol (𝄞)"))
         self.clef_select.pack(side="left", padx=6, pady=10)
 
         self.level_select = ctk.CTkOptionMenu(

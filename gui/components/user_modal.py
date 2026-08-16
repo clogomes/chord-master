@@ -1,3 +1,4 @@
+from gui.i18n import t
 """User Profile management modal dialog for creating, switching, and managing student profiles."""
 from tkinter import messagebox
 from typing import Callable, Optional

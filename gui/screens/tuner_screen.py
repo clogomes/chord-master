@@ -1,3 +1,4 @@
+from gui.i18n import t
 """Lamiré & Chromatic Tuner screen with real-time microphone pitch detection and reference tone generator."""
 import math
 import time
@@ -57,7 +58,7 @@ class LamireScreen(ctk.CTkFrame):
 
         back_btn = ctk.CTkButton(
             nav_bar,
-            text="← Voltar ao Menu",
+            text=t("btn_back", "← Voltar ao Menu"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color="#475569",
             hover_color="#334155",
@@ -73,7 +74,7 @@ class LamireScreen(ctk.CTkFrame):
 
         ctk.CTkLabel(
             title_box,
-            text="🎙️ Lamiré & Afinador Cromático",
+            text=t("tuner_title", "🎙️ Lamiré & Afinador Cromático"),
             font=theme.get_font(theme.FONT_TITLE),
             text_color=theme.COLOR_TEXT_PRIMARY,
         ).pack(anchor="w")
@@ -88,7 +89,7 @@ class LamireScreen(ctk.CTkFrame):
         # Live Mic Toggle Button
         self.mic_toggle_btn = ctk.CTkButton(
             nav_bar,
-            text="🎙️ Ativar Microfone",
+            text=t("btn_start_mic", "🎙️ Ativar Microfone"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color=theme.COLOR_SUCCESS,
             hover_color=theme.COLOR_SUCCESS_HOVER,
@@ -349,7 +350,7 @@ class LamireScreen(ctk.CTkFrame):
     def _stop_listening(self):
         self.pitch_listener.stop_listening()
         self.mic_toggle_btn.configure(
-            text="🎙️ Ativar Microfone",
+            text=t("btn_start_mic", "🎙️ Ativar Microfone"),
             fg_color=theme.COLOR_SUCCESS,
             hover_color=theme.COLOR_SUCCESS_HOVER,
         )
@@ -406,7 +407,7 @@ class LamireScreen(ctk.CTkFrame):
 
         # Intonation Advice
         if abs(cents) <= 6.0:
-            status_text = "✓ AFINADO (No Ponto Perfeito!)"
+            status_text = t("tuner_in_tune", "✓ AFINADO (No Ponto Perfeito!)")
             status_color = theme.COLOR_SUCCESS
             self.tuner_card.configure(border_color=theme.COLOR_SUCCESS)
         elif abs(cents) <= 20.0:

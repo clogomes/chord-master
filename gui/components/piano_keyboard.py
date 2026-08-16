@@ -1,3 +1,4 @@
+from gui.i18n import t
 """Interactive, visually responsive 2-octave piano keyboard component with fingering support."""
 import tkinter as tk
 from typing import Callable, Dict, List, Optional, Set

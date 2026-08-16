@@ -1,3 +1,4 @@
+from gui.i18n import t
 """Vector musical staff canvas component for rendering Treble and Bass clefs, notes, and accidentals."""
 import tkinter as tk
 from typing import List, Optional, Tuple, Union

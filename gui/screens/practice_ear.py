@@ -1,3 +1,4 @@
+from gui.i18n import t
 """Interactive Ear Training & Vocal Solfège Practice Screen with PitchListener real-time validation."""
 import time
 from typing import Callable, List, Optional
@@ -53,7 +54,7 @@ class PracticeEarScreen(ctk.CTkFrame):
 
         back_btn = ctk.CTkButton(
             nav_bar,
-            text="← Voltar ao Menu",
+            text=t("btn_back", "← Voltar ao Menu"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color="#475569",
             hover_color="#334155",
@@ -104,21 +105,21 @@ class PracticeEarScreen(ctk.CTkFrame):
 
         ctk.CTkLabel(
             settings_frame,
-            text="Dificuldade:",
+            text=t("difficulty", "Dificuldade:"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             text_color=theme.COLOR_TEXT_PRIMARY,
         ).pack(side="left", padx=(16, 4), pady=12)
 
         self.diff_select = ctk.CTkSegmentedButton(
             settings_frame,
-            values=["Iniciante", "Intermédio", "Avançado"],
+            values=[t("diff_beginner", "Iniciante"), t("diff_intermediate", "Intermédio"), t("diff_advanced", "Avançado")],
             command=lambda v: self.load_new_question(),
             selected_color="#2563EB",
             selected_hover_color="#1D4ED8",
             font=theme.get_font(theme.FONT_BODY_BOLD),
             height=36,
         )
-        self.diff_select.set("Iniciante")
+        self.diff_select.set(t("diff_beginner", "Iniciante"))
         self.diff_select.pack(side="left", padx=6, pady=10)
 
         # Adaptive Mode Toggle Switch
@@ -372,7 +373,7 @@ class PracticeEarScreen(ctk.CTkFrame):
         self.learning_play_btn.configure(text="🔊 Ouvir Exemplo Guiado")
 
         ex_type = self.type_select.get()
-        diff_map = {"Iniciante": "beginner", "Intermédio": "intermediate", "Avançado": "advanced"}
+        diff_map = {t("diff_beginner", "Iniciante"): "beginner", t("diff_intermediate", "Intermédio"): "intermediate", t("diff_advanced", "Avançado"): "advanced"}
         difficulty = diff_map.get(self.diff_select.get(), "beginner")
 
         if hasattr(self, "adaptive_var") and self.adaptive_var.get():

@@ -1,3 +1,4 @@
+from gui.i18n import t
 """Interactive Technique Exercises Studio for Piano & Guitar Warmup, Dexterity, and Strength."""
 import time
 from typing import Callable, Dict, List, Optional, Tuple
@@ -13,7 +14,7 @@ from gui.components.staff_canvas import StaffCanvas
 from gui.components.guitar_fretboard import GuitarFretboard
 from gui.components.score_card import ScoreCard
 from gui.scroll_utils import bind_mousewheel
-from gui.i18n import get_language
+from gui.i18n import get_language, t
 from gui import theme
 
 PIANO_KEY_MAPPINGS = {
@@ -80,7 +81,7 @@ class PracticeTechniqueScreen(ctk.CTkFrame):
 
         back_btn = ctk.CTkButton(
             nav_bar,
-            text="← Voltar ao Menu",
+            text=t("btn_back", "← Voltar ao Menu"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color="#475569",
             hover_color="#334155",
@@ -122,7 +123,7 @@ class PracticeTechniqueScreen(ctk.CTkFrame):
         cfg_bar.pack(fill="x", padx=6, pady=(0, 10))
 
         # Category / Instrument Selector
-        ctk.CTkLabel(cfg_bar, text="Instrumento:", font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(14, 4), pady=12)
+        ctk.CTkLabel(cfg_bar, text=t("instrument_label", "Instrumento:"), font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(14, 4), pady=12)
         self.inst_segmented = ctk.CTkSegmentedButton(
             cfg_bar,
             values=["🎹 Piano", "🎸 Viola", "Todos"],
@@ -151,7 +152,7 @@ class PracticeTechniqueScreen(ctk.CTkFrame):
         # Metronome Toggle Button
         self.metronome_btn = ctk.CTkButton(
             cfg_bar,
-            text="⏱️ Metrónomo",
+            text=t("metronome", "⏱️ Metrónomo"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color=theme.COLOR_SURFACE_SECONDARY,
             hover_color=theme.COLOR_SURFACE_HOVER,
@@ -351,7 +352,7 @@ class PracticeTechniqueScreen(ctk.CTkFrame):
         if self.metronome.is_running:
             self.metronome.stop()
             self.metronome_btn.configure(
-                text="⏱️ Metrónomo",
+                text=t("metronome", "⏱️ Metrónomo"),
                 fg_color=theme.COLOR_SURFACE_SECONDARY,
                 text_color=theme.COLOR_TEXT_PRIMARY,
             )

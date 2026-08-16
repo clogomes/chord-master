@@ -1,3 +1,4 @@
+from gui.i18n import t
 """Live acoustic instrument practice screen with real-time microphone pitch listening and auto-advance."""
 import time
 from typing import Callable, Dict, List, Optional
@@ -55,7 +56,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self.audio_player = get_audio_player()
         self.pitch_listener = PitchListener(max_fps=15.0)
 
-        self.instrument_type: str = "Piano"  # "Piano" ou "Viola"
+        self.instrument_type: str = t("piano", "Piano")  # t("piano", "Piano") ou "Viola"
         self.exercise_type: str = "Escalas"
 
         self.exercise_notes: List[Note] = []
@@ -100,7 +101,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
 
         back_btn = ctk.CTkButton(
             nav_bar,
-            text="← Voltar ao Menu",
+            text=t("btn_back", "← Voltar ao Menu"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color="#475569",
             hover_color="#334155",
@@ -123,7 +124,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         # Microphone Toggle Button on top right
         self.mic_btn = ctk.CTkButton(
             nav_bar,
-            text="🎙️ Ativar Microfone",
+            text=t("btn_start_mic", "🎙️ Ativar Microfone"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color=theme.COLOR_SUCCESS,
             hover_color=theme.COLOR_SUCCESS_HOVER,
@@ -156,7 +157,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         cfg_bar.pack(fill="x", padx=6, pady=(0, 10))
 
         # Instrument Selector
-        ctk.CTkLabel(cfg_bar, text="Instrumento:", font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(14, 4), pady=12)
+        ctk.CTkLabel(cfg_bar, text=t("instrument_label", "Instrumento:"), font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(14, 4), pady=12)
         self.inst_select = ctk.CTkOptionMenu(
             cfg_bar,
             values=["🎹 Piano Acústico", "🎸 Viola / Guitarra"],
@@ -198,7 +199,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         # Metronome Toggle
         self.metronome_btn = ctk.CTkButton(
             cfg_bar,
-            text="⏱️ Metrónomo",
+            text=t("metronome", "⏱️ Metrónomo"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color=theme.COLOR_SURFACE_SECONDARY,
             hover_color=theme.COLOR_SURFACE_HOVER,
@@ -243,7 +244,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         # Restart exercise button
         restart_btn = ctk.CTkButton(
             cfg_bar,
-            text="↺ Reiniciar",
+            text=t("btn_restart", "↺ Reiniciar"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color="#475569",
             hover_color="#334155",
@@ -348,7 +349,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
             self.piano_view.pack_forget()
             self.guitar_view.pack(pady=4)
         else:
-            self.instrument_type = "Piano"
+            self.instrument_type = t("piano", "Piano")
             self.piano_view.pack(pady=4)
             self.guitar_view.pack_forget()
         self._highlight_target_note()
@@ -362,7 +363,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self.total_notes_played = 0
         self.exercise_completed = False
         self._matched_start_time = None
-        self.note_performance_history: Dict[str, List[dict]] = {}  # {pitch_with_octave: [{"detected": Note, "cents": float, "success": bool}]}
+        self.note_performance_history: Dict[str, List[dict]] = {}  # {pitch_with_octave: [{"detected": Note, t("tuner_cents", "cents"): float, "success": bool}]}
         self.score_card.pack_forget()
 
         if "Escala Maior de Dó" in choice:
@@ -399,7 +400,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
                 if song_inst == "guitar" and self.instrument_type != "Viola":
                     self.inst_select.set("🎸 Viola / Guitarra")
                     self._on_instrument_changed("🎸 Viola / Guitarra")
-                elif song_inst == "piano" and self.instrument_type != "Piano":
+                elif song_inst == "piano" and self.instrument_type != t("piano", "Piano"):
                     self.inst_select.set("🎹 Piano Acústico")
                     self._on_instrument_changed("🎹 Piano Acústico")
             else:
@@ -423,7 +424,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self.staff_view.set_single_note(target, color="#3B82F6")
 
         # 2. Piano
-        if self.instrument_type == "Piano":
+        if self.instrument_type == t("piano", "Piano"):
             self.piano_view.highlight_notes([target], color="#3B82F6")
             self.piano_view.set_fingering({target.midi: 1})
 
@@ -435,7 +436,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         if self.pitch_listener.is_listening:
             self.pitch_listener.stop_listening()
             self.mic_btn.configure(
-                text="🎙️ Ativar Microfone",
+                text=t("btn_start_mic", "🎙️ Ativar Microfone"),
                 fg_color=theme.COLOR_SUCCESS,
                 hover_color=theme.COLOR_SUCCESS_HOVER,
             )
@@ -520,7 +521,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
 
                 self.note_performance_history[pitch_key].append({
                     "detected": detected_note,
-                    "cents": cents,
+                    t("tuner_cents", "cents"): cents,
                     "success": True,
                 })
 
@@ -554,7 +555,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
 
             self.note_performance_history[pitch_key].append({
                 "detected": detected_note,
-                "cents": cents,
+                t("tuner_cents", "cents"): cents,
                 "success": False,
             })
 
@@ -562,7 +563,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         if self.metronome.is_running:
             self.metronome.stop()
             self.metronome_btn.configure(
-                text="⏱️ Metrónomo",
+                text=t("metronome", "⏱️ Metrónomo"),
                 fg_color=theme.COLOR_SURFACE_SECONDARY,
                 text_color=theme.COLOR_TEXT_PRIMARY,
             )
@@ -626,11 +627,11 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         if self.metronome.is_running:
             self.metronome.stop()
             self.metronome_btn.configure(
-                text="⏱️ Metrónomo",
+                text=t("metronome", "⏱️ Metrónomo"),
                 fg_color=theme.COLOR_SURFACE_SECONDARY,
                 text_color=theme.COLOR_TEXT_PRIMARY,
             )
-        self.mic_btn.configure(text="🎙️ Ativar Microfone", fg_color=theme.COLOR_SUCCESS)
+        self.mic_btn.configure(text=t("btn_start_mic", "🎙️ Ativar Microfone"), fg_color=theme.COLOR_SUCCESS)
 
         ramp_msg = ""
         if self.tempo_ramp_var.get() and self.session_mistakes == 0:
@@ -648,7 +649,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         for pitch_key, attempts in self.note_performance_history.items():
             failures = [att for att in attempts if not att["success"]]
             if failures:
-                avg_cents = sum(f["cents"] for f in failures) / float(len(failures))
+                avg_cents = sum(f[t("tuner_cents", "cents")] for f in failures) / float(len(failures))
                 last_det = failures[-1]["detected"]
                 failed_notes_summary.append(f"• **{pitch_key}**: {len(failures)} tentativa(s) fora do tom (detetado {last_det.pitch_with_octave}, desvio médio: {avg_cents:+.0f}c)")
 

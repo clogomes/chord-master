@@ -1,7 +1,7 @@
 """Thread-safe audio metronome with synthesized acoustic woodblock clicks and rhythm timing evaluator."""
 import threading
 import time
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional, Tuple, Any
 import numpy as np
 from audio.player import get_audio_player, HAS_PYGAME
 

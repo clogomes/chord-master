@@ -1,3 +1,4 @@
+from gui.i18n import t
 """Comprehensive Music Theory Academy screen with 8 progressive chapters, dual Piano + Viola fretboard, and interactive audio."""
 from typing import Callable, Dict, List, Optional, Tuple
 import customtkinter as ctk
@@ -53,7 +54,7 @@ class TheoryScreen(ctk.CTkFrame):
 
         back_btn = ctk.CTkButton(
             nav_bar,
-            text="← Voltar ao Menu",
+            text=t("btn_back", "← Voltar ao Menu"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color=theme.COLOR_SURFACE_SECONDARY,
             hover_color=theme.COLOR_BORDER,
@@ -94,7 +95,7 @@ class TheoryScreen(ctk.CTkFrame):
 
         ctk.CTkLabel(
             self.chapter_nav_frame,
-            text="Capítulos do Curso",
+            text=t("theory_course_chapters", "Capítulos do Curso"),
             font=theme.get_font(theme.FONT_SECTION),
             text_color=theme.COLOR_TEXT_PRIMARY,
         ).pack(anchor="w", padx=10, pady=(8, 8))
@@ -117,7 +118,7 @@ class TheoryScreen(ctk.CTkFrame):
             btn.destroy()
         self.chapter_buttons.clear()
 
-        from gui.i18n import get_language
+        from gui.i18n import get_language, t
         lang = get_language()
 
         for idx, chap in enumerate(THEORY_CHAPTERS):
@@ -143,7 +144,7 @@ class TheoryScreen(ctk.CTkFrame):
             self.chapter_buttons.append(btn)
 
     def _load_chapter(self, chapter_idx: int):
-        from gui.i18n import get_language
+        from gui.i18n import get_language, t
         lang = get_language()
 
         self.current_chapter_idx = chapter_idx
@@ -186,9 +187,9 @@ class TheoryScreen(ctk.CTkFrame):
         top_info.pack(fill="x", padx=16, pady=(12, 4))
 
         diff_colors = {
-            "Iniciante": theme.COLOR_SUCCESS,
-            "Intermédio": theme.COLOR_PRIMARY,
-            "Avançado": "#8B5CF6",
+            t("diff_beginner", "Iniciante"): theme.COLOR_SUCCESS,
+            t("diff_intermediate", "Intermédio"): theme.COLOR_PRIMARY,
+            t("diff_advanced", "Avançado"): "#8B5CF6",
             "Prático": "#F59E0B",
         }
         diff_color = diff_colors.get(chap.difficulty, theme.COLOR_PRIMARY)

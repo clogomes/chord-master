@@ -1,3 +1,4 @@
+from gui.i18n import t
 """Interactive Song Performance & Play-Along Studio for Piano and Viola/Guitar with physical keyboard, metronome challenge, and USB MIDI."""
 import time
 from tkinter import filedialog, messagebox
@@ -79,7 +80,7 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.current_song: Song = (self.user_songs[0] if self.user_songs else SONG_LIBRARY[0])
         self.current_note_idx: int = 0
         self.is_playing_demo: bool = False
-        self.instrument_mode: str = "Piano"  # "Piano", "Viola", "Ambos"
+        self.instrument_mode: str = t("piano", "Piano")  # t("piano", "Piano"), "Viola", "Ambos"
         self._demo_timer_id: Optional[str] = None
 
         # Rhythm, Metronome & Backing Tracks
@@ -152,7 +153,7 @@ class PracticeSongScreen(ctk.CTkFrame):
 
         back_btn = ctk.CTkButton(
             nav_bar,
-            text="← Voltar ao Menu",
+            text=t("btn_back", "← Voltar ao Menu"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color="#475569",
             hover_color="#334155",
@@ -217,7 +218,7 @@ class PracticeSongScreen(ctk.CTkFrame):
         # Import MIDI button
         import_btn = ctk.CTkButton(
             self.song_sidebar,
-            text="📂 Importar Música (.mid)",
+            text=t("btn_import_midi", "📂 Importar Música (.mid)"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color=theme.COLOR_PRIMARY,
             hover_color=theme.COLOR_PRIMARY_HOVER,
@@ -287,7 +288,7 @@ class PracticeSongScreen(ctk.CTkFrame):
         filter_val = self.song_filter_seg.get() if hasattr(self, "song_filter_seg") else "Todos"
         all_songs = SONG_LIBRARY + self.user_songs
 
-        if "Piano" in filter_val:
+        if t("piano", "Piano") in filter_val:
             filtered_songs = [s for s in all_songs if getattr(s, "instrument", "piano") == "piano"]
         elif "Viola" in filter_val:
             filtered_songs = [s for s in all_songs if getattr(s, "instrument", "piano") == "guitar"]
@@ -516,7 +517,7 @@ class PracticeSongScreen(ctk.CTkFrame):
 
         self.restart_btn = ctk.CTkButton(
             ctrl_bar,
-            text="↺ Reiniciar",
+            text=t("btn_restart", "↺ Reiniciar"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color="#475569",
             hover_color="#334155",
@@ -530,7 +531,7 @@ class PracticeSongScreen(ctk.CTkFrame):
         # Metronome Toggle Button
         self.metronome_btn = ctk.CTkButton(
             ctrl_bar,
-            text="⏱️ Metrónomo",
+            text=t("metronome", "⏱️ Metrónomo"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color=theme.COLOR_SURFACE_SECONDARY,
             hover_color=theme.COLOR_SURFACE_HOVER,
@@ -743,7 +744,7 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.backing_player.set_bpm(val)
 
     def _update_legend_text(self):
-        if self.instrument_mode == "Piano":
+        if self.instrument_mode == t("piano", "Piano"):
             text = (
                 "⌨️ **Atalhos de Teclado no Piano** (ou Teclado MIDI USB conectado):\n"
                 "• Teclas Brancas: [A] = Dó4, [S] = Ré4, [D] = Mi4, [F] = Fá4, [G] = Sol4, [H] = Lá4, [J] = Si4, [K] = Dó5, [L] = Ré5, [;] = Mi5\n"
@@ -760,11 +761,11 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.legend_lbl.configure(text=text)
 
     def _on_instrument_mode_changed(self, mode: str):
-        if "Piano" in mode and "Viola" not in mode:
-            self.instrument_mode = "Piano"
+        if t("piano", "Piano") in mode and "Viola" not in mode:
+            self.instrument_mode = t("piano", "Piano")
             self.piano_view.pack(pady=4)
             self.guitar_view.pack_forget()
-        elif "Viola" in mode and "Piano" not in mode:
+        elif "Viola" in mode and t("piano", "Piano") not in mode:
             self.instrument_mode = "Viola"
             self.piano_view.pack_forget()
             self.guitar_view.pack(pady=4)
@@ -831,7 +832,7 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.song_meta_lbl.configure(text=f"Dificuldade: {song.difficulty} • Compasso: {song.time_signature} • BPM: {song.bpm} • {song.note_count} Notas")
         self.song_desc_lbl.configure(text=song.description)
 
-        from gui.i18n import get_language
+        from gui.i18n import get_language, t
         lang = get_language()
         if hasattr(self, "theory_analysis_btn"):
             if song.get_theory_analysis(lang):
@@ -950,7 +951,7 @@ class PracticeSongScreen(ctk.CTkFrame):
 
         is_match = False
 
-        if self.instrument_mode in ["Piano", "Ambos"] and char in PIANO_KEY_MAPPINGS:
+        if self.instrument_mode in [t("piano", "Piano"), "Ambos"] and char in PIANO_KEY_MAPPINGS:
             played_pitch_oct = PIANO_KEY_MAPPINGS[char]
             played_note = Note(played_pitch_oct)
             if played_note.normalized_pitch == expected_note.normalized_pitch:
@@ -1144,7 +1145,7 @@ class PracticeSongScreen(ctk.CTkFrame):
         if not self.current_song:
             return
 
-        from gui.i18n import get_language
+        from gui.i18n import get_language, t
         lang = get_language()
         analysis_text = self.current_song.get_theory_analysis(lang)
         if not analysis_text:
@@ -1167,7 +1168,7 @@ class PracticeSongScreen(ctk.CTkFrame):
 
             render_markdown_to_textbox(textbox, analysis_text, base_font_size=13)
 
-            close_btn = ctk.CTkButton(card, text="Fechar", font=theme.get_font(theme.FONT_BODY_BOLD), fg_color=theme.COLOR_PRIMARY, hover_color=theme.COLOR_PRIMARY_HOVER, command=top.destroy)
+            close_btn = ctk.CTkButton(card, text=t("btn_close", "Fechar"), font=theme.get_font(theme.FONT_BODY_BOLD), fg_color=theme.COLOR_PRIMARY, hover_color=theme.COLOR_PRIMARY_HOVER, command=top.destroy)
             close_btn.pack(anchor="e", padx=16, pady=(0, 16))
 
             # Ensure top window receives focus after complete build

@@ -1,3 +1,4 @@
+from gui.i18n import t
 """Statistics, visual progress charts, activity calendar, leaderboard, and report exporter."""
 import datetime
 import time
@@ -40,7 +41,7 @@ class StatsScreen(ctk.CTkFrame):
 
         back_btn = ctk.CTkButton(
             nav_bar,
-            text="← Voltar ao Menu",
+            text=t("btn_back", "← Voltar ao Menu"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color="#475569",
             hover_color="#334155",
@@ -64,7 +65,7 @@ class StatsScreen(ctk.CTkFrame):
 
         export_btn = ctk.CTkButton(
             btns_right,
-            text="📥 Exportar Progresso",
+            text=t("btn_export", "📥 Exportar Progresso"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color=theme.COLOR_PRIMARY,
             hover_color=theme.COLOR_PRIMARY_HOVER,

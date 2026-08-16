@@ -1,7 +1,7 @@
 """USB MIDI hardware keyboard manager supporting plug-and-play input devices."""
 import threading
 import time
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Any
 from core.notes import Note, midi_to_note
 
 try:

@@ -1,3 +1,4 @@
+from gui.i18n import t
 """
 OMR Review & Manual Correction Screen — Phase 19.
 

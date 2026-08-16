@@ -1,3 +1,4 @@
+from gui.i18n import t
 """Interactive Scale Practice Studio with Piano, Guitar, Backing Tracks, Metronome, and USB MIDI."""
 import time
 from typing import Callable, Dict, List, Optional, Tuple
@@ -55,8 +56,8 @@ class PracticeScalesScreen(ctk.CTkFrame):
         # Scale Configuration
         self.current_root = "C"
         self.current_scale_key = "major"
-        self.direction_mode = "Ascendente & Descendente"
-        self.instrument_mode = "Piano"  # "Piano", "Viola", "Ambos"
+        self.direction_mode = t("dir_asc_desc", "Ascendente & Descendente")
+        self.instrument_mode = t("piano", "Piano")  # t("piano", "Piano"), "Viola", "Ambos"
 
         # Note sequence & performance tracking
         self.scale_notes: List[Note] = []
@@ -116,7 +117,7 @@ class PracticeScalesScreen(ctk.CTkFrame):
 
         back_btn = ctk.CTkButton(
             nav_bar,
-            text="← Voltar ao Menu",
+            text=t("btn_back", "← Voltar ao Menu"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color="#475569",
             hover_color="#334155",
@@ -161,7 +162,7 @@ class PracticeScalesScreen(ctk.CTkFrame):
         row1 = ctk.CTkFrame(cfg_card, fg_color="transparent")
         row1.pack(fill="x", padx=12, pady=(10, 6))
 
-        ctk.CTkLabel(row1, text="Tónica:", font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(0, 4))
+        ctk.CTkLabel(row1, text=t("root_note", "Tónica:"), font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(0, 4))
         self.root_select = ctk.CTkOptionMenu(
             row1,
             values=["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
@@ -173,7 +174,7 @@ class PracticeScalesScreen(ctk.CTkFrame):
         self.root_select.set("C")
         self.root_select.pack(side="left", padx=(0, 12))
 
-        ctk.CTkLabel(row1, text="Escala / Modo:", font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(0, 4))
+        ctk.CTkLabel(row1, text=t("scale_type", "Escala / Modo:"), font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(0, 4))
         scale_names = [f"{s.name_pt} ({s.key})" for s in SCALE_TYPES.values()]
         self.scale_select = ctk.CTkOptionMenu(
             row1,
@@ -186,23 +187,23 @@ class PracticeScalesScreen(ctk.CTkFrame):
         self.scale_select.set(scale_names[0])
         self.scale_select.pack(side="left", padx=(0, 12))
 
-        ctk.CTkLabel(row1, text="Sentido:", font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(0, 4))
+        ctk.CTkLabel(row1, text=t("direction", "Sentido:"), font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(0, 4))
         self.dir_select = ctk.CTkOptionMenu(
             row1,
-            values=["Ascendente & Descendente", "Apenas Ascendente", "Apenas Descendente"],
+            values=[t("dir_asc_desc", "Ascendente & Descendente"), t("dir_asc", "Apenas Ascendente"), t("dir_desc", "Apenas Descendente")],
             command=self._on_config_changed,
             width=200,
             height=34,
             corner_radius=theme.RADIUS_SM,
         )
-        self.dir_select.set("Ascendente & Descendente")
+        self.dir_select.set(t("dir_asc_desc", "Ascendente & Descendente"))
         self.dir_select.pack(side="left", padx=(0, 4))
 
         # Row 2: Instrument Mode, Metronome, Backing Track, BPM & Tempo Ramp
         row2 = ctk.CTkFrame(cfg_card, fg_color="transparent")
         row2.pack(fill="x", padx=12, pady=(4, 10))
 
-        ctk.CTkLabel(row2, text="Instrumento:", font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(0, 4))
+        ctk.CTkLabel(row2, text=t("instrument_label", "Instrumento:"), font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(0, 4))
         self.inst_select = ctk.CTkSegmentedButton(
             row2,
             values=["🎹 Piano", "🎸 Viola", "🎹 & 🎸 Ambos"],
@@ -216,7 +217,7 @@ class PracticeScalesScreen(ctk.CTkFrame):
         # Metronome Button
         self.metronome_btn = ctk.CTkButton(
             row2,
-            text="⏱️ Metrónomo",
+            text=t("metronome", "⏱️ Metrónomo"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color=theme.COLOR_SURFACE_SECONDARY,
             hover_color=theme.COLOR_SURFACE_HOVER,
@@ -290,7 +291,7 @@ class PracticeScalesScreen(ctk.CTkFrame):
 
         self.restart_btn = ctk.CTkButton(
             row2,
-            text="↺ Reiniciar",
+            text=t("btn_restart", "↺ Reiniciar"),
             font=theme.get_font(theme.FONT_BODY_BOLD),
             fg_color="#475569",
             hover_color="#334155",
@@ -376,11 +377,11 @@ class PracticeScalesScreen(ctk.CTkFrame):
         self.score_card = ScoreCard(self.container, on_next=self._restart_practice)
 
     def _on_instrument_changed(self, mode: str):
-        if "Piano" in mode and "Viola" not in mode:
-            self.instrument_mode = "Piano"
+        if t("piano", "Piano") in mode and "Viola" not in mode:
+            self.instrument_mode = t("piano", "Piano")
             self.piano_view.pack(pady=4)
             self.guitar_view.pack_forget()
-        elif "Viola" in mode and "Piano" not in mode:
+        elif "Viola" in mode and t("piano", "Piano") not in mode:
             self.instrument_mode = "Viola"
             self.piano_view.pack_forget()
             self.guitar_view.pack(pady=4)
@@ -416,9 +417,9 @@ class PracticeScalesScreen(ctk.CTkFrame):
         scale_obj = Scale(root_note, self.current_scale_key)
         asc_notes = list(scale_obj.notes)
 
-        if self.direction_mode == "Apenas Ascendente":
+        if self.direction_mode == t("dir_asc", "Apenas Ascendente"):
             self.scale_notes = asc_notes
-        elif self.direction_mode == "Apenas Descendente":
+        elif self.direction_mode == t("dir_desc", "Apenas Descendente"):
             self.scale_notes = list(reversed(asc_notes))
         else:  # Ascendente & Descendente
             desc_notes = list(reversed(asc_notes[:-1]))
@@ -501,7 +502,7 @@ class PracticeScalesScreen(ctk.CTkFrame):
         if self.metronome.is_running:
             self.metronome.stop()
             self.metronome_btn.configure(
-                text="⏱️ Metrónomo",
+                text=t("metronome", "⏱️ Metrónomo"),
                 fg_color=theme.COLOR_SURFACE_SECONDARY,
                 text_color=theme.COLOR_TEXT_PRIMARY,
             )
@@ -626,7 +627,7 @@ class PracticeScalesScreen(ctk.CTkFrame):
         self.progress_bar.set(1.0)
         if self.metronome.is_running:
             self.metronome.stop()
-            self.metronome_btn.configure(text="⏱️ Metrónomo", fg_color=theme.COLOR_SURFACE_SECONDARY)
+            self.metronome_btn.configure(text=t("metronome", "⏱️ Metrónomo"), fg_color=theme.COLOR_SURFACE_SECONDARY)
         self.backing_player.stop()
 
         total_attempts = self.session_correct + self.session_mistakes

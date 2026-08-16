@@ -1,3 +1,4 @@
+from gui.i18n import t
 """Interactive Guitar/Viola Fretboard and Chord Box Diagram component."""
 import tkinter as tk
 from typing import Callable, Dict, List, Optional, Set, Tuple

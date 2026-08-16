@@ -1,3 +1,4 @@
+from gui.i18n import t
 """Modern visual feedback card for quiz answers, streaks, and explanations."""
 from typing import Callable, Optional
 import customtkinter as ctk
