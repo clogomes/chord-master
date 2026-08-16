@@ -27,7 +27,7 @@ def generate_student_report_markdown(user: UserProfile) -> str:
     md.append("")
 
     # 2. Theory Chapters
-    md.append(f"## 📖 Progresso nas Lições Teóricas ({len(user.completed_lessons)}/8 Concluídas)")
+    md.append(f"## 📖 Progresso nas Lições Teóricas ({len(user.completed_lessons)}/{len(LESSON_IDS)} Concluídas)")
     for lid, ltitle in LESSON_IDS:
         status = "✅ Concluído" if lid in user.completed_lessons else "⏳ Pendente"
         md.append(f"- {status} — **{ltitle}**")
@@ -38,16 +38,10 @@ def generate_student_report_markdown(user: UserProfile) -> str:
     md.append(f"| Categoria | Tentativas | Acertos | Precisão | Maior Sequência |")
     md.append(f"| :--- | :---: | :---: | :---: | :---: |")
 
-    cat_names = {
-        "teoria": "📖 Teoria Musical",
-        "repertorio": "🎵 Tocar Repertório",
-        "pratica_instrumento": "🎯 Instrumento Real (Microfone)",
-        "treino_auditivo": "🎧 Treino Auditivo",
-        "leitura_pauta": "🎼 Leitura de Pauta",
-    }
-
-    for cat_key, cat_name in cat_names.items():
-        st = user.categories.get(cat_key, None)
+    from core.categories import CATEGORY_NAMES_PT
+    
+    for cat_key, st in user.categories.items():
+        cat_name = CATEGORY_NAMES_PT.get(cat_key, cat_key.replace("_", " ").title())
         if st and st.total_attempts > 0:
             acc = (st.correct_count / float(st.total_attempts)) * 100.0
             md.append(f"| {cat_name} | {st.total_attempts} | {st.correct_count} | {acc:.1f}% | 🔥 {st.best_streak} |")

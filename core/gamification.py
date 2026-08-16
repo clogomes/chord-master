@@ -34,7 +34,7 @@ ACHIEVEMENT_LIBRARY: List[Achievement] = [
     Achievement(
         id="theory_master",
         title="Mestre da Teoria",
-        description="Conclui todos os 8 capítulos da Academia de Teoria Musical.",
+        description="Conclui todas as lições da Academia de Teoria Musical.",
         icon="🎓",
         xp_reward=500,
         category="teoria",
@@ -47,22 +47,7 @@ ACHIEVEMENT_LIBRARY: List[Achievement] = [
         xp_reward=100,
         category="repertorio",
     ),
-    Achievement(
-        id="virtuoso_pianist",
-        title="Virtuoso das Teclas",
-        description="Toca Für Elise ou Hino à Alegria com mais de 90% de precisão.",
-        icon="🎹",
-        xp_reward=200,
-        category="repertorio",
-    ),
-    Achievement(
-        id="guitar_hero",
-        title="Mestre das 6 Cordas",
-        description="Toca uma música completa no modo Viola/Guitarra.",
-        icon="🎸",
-        xp_reward=150,
-        category="repertorio",
-    ),
+
     Achievement(
         id="perfect_ear",
         title="Ouvido Apurado",
@@ -79,14 +64,7 @@ ACHIEVEMENT_LIBRARY: List[Achievement] = [
         xp_reward=200,
         category="pauta",
     ),
-    Achievement(
-        id="pitch_perfect",
-        title="Afinação Impecável",
-        description="Afina com o teu instrumento real no Lamiré ou Prática com menos de 5 cents.",
-        icon="🎙️",
-        xp_reward=150,
-        category="geral",
-    ),
+
     Achievement(
         id="streak_fire",
         title="Em Chamas!",
@@ -103,14 +81,7 @@ ACHIEVEMENT_LIBRARY: List[Achievement] = [
         xp_reward=300,
         category="geral",
     ),
-    Achievement(
-        id="rhythm_master",
-        title="Mestre do Tempo",
-        description="Conclui uma música no Modo Desafio Rítmico com precisão excelente.",
-        icon="⏱️",
-        xp_reward=250,
-        category="repertorio",
-    ),
+
 ]
 
 

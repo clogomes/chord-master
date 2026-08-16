@@ -4,35 +4,7 @@ import time
 from typing import Any, Dict, List, Optional, Tuple
 from core.user_manager import UserProfile, ExerciseRecord
 from core.quiz_engine import QuizEngine, QuizQuestion, QuestionType
-
-
-CATEGORY_NAMES_PT = {
-    "treino_auditivo": "Treino Auditivo",
-    "leitura_pauta": "Leitura de Pauta",
-    "teoria": "Teoria Musical",
-    "repertorio": "Repertório Musical",
-    "pratica_instrumento": "Instrumento Acústico / Solfejo",
-    "tecnica": "Exercícios Técnicos",
-}
-
-CATEGORY_ROUTES = {
-    "treino_auditivo": "practice_ear",
-    "leitura_pauta": "practice_staff",
-    "teoria": "theory",
-    "repertorio": "practice_song",
-    "pratica_instrumento": "practice_instrument",
-    "tecnica": "practice_technique",
-}
-
-CATEGORY_TIPS = {
-    "treino_auditivo": "Pratica a identificação auditiva de 3ªs e 5ªs com as mnemónicas de canções.",
-    "leitura_pauta": "Foca-te na leitura rápida de notas nas linhas suplementares da pauta.",
-    "teoria": "Revê as fórmulas de intervalos (Tons e Semitons) e a construção de tríades.",
-    "repertorio": "Experimenta tocar com o metrônomo num andamento mais lento para fixar o ritmo.",
-    "pratica_instrumento": "Afina o teu instrumento com o Lamiré e sustenta as notas com som límpido.",
-    "tecnica": "Estuda os exercícios de Hanon e Spider Walk a 70% BPM com a rampa de tempo.",
-}
-
+from core.categories import CATEGORY_NAMES_PT, CATEGORY_ROUTES, CATEGORY_TIPS
 
 def get_weak_areas(user: UserProfile, max_recent: int = 50) -> List[Tuple[str, float]]:
     """
@@ -70,7 +42,7 @@ def get_weak_areas(user: UserProfile, max_recent: int = 50) -> List[Tuple[str, f
 
     results = []
     # Ensure all standard categories are considered
-    all_standard_cats = ["treino_auditivo", "leitura_pauta", "teoria", "repertorio", "pratica_instrumento"]
+    all_standard_cats = list(CATEGORY_NAMES_PT.keys())
     for cat in all_standard_cats:
         total_w = category_weights.get(cat, 0.0)
         if total_w > 0:

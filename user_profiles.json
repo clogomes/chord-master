@@ -90,7 +90,7 @@
       "username": "Carlini",
       "avatar": "🎸",
       "created_at": 1786724265.081036,
-      "xp": 1702,
+      "xp": 1828,
       "unlocked_achievements": [
         "first_step",
         "theory_scholar",
@@ -106,15 +106,15 @@
       ],
       "categories": {
         "treino_auditivo": {
-          "total_attempts": 1,
-          "correct_count": 1,
-          "current_streak": 1,
-          "best_streak": 1
+          "total_attempts": 6,
+          "correct_count": 3,
+          "current_streak": 0,
+          "best_streak": 2
         },
         "leitura_pauta": {
-          "total_attempts": 15,
-          "correct_count": 15,
-          "current_streak": 15,
+          "total_attempts": 19,
+          "correct_count": 17,
+          "current_streak": 2,
           "best_streak": 15
         },
         "teoria": {
@@ -134,6 +134,18 @@
           "correct_count": 0,
           "current_streak": 0,
           "best_streak": 0
+        },
+        "escalas_modos": {
+          "total_attempts": 1,
+          "correct_count": 1,
+          "current_streak": 1,
+          "best_streak": 1
+        },
+        "tecnica": {
+          "total_attempts": 1,
+          "correct_count": 1,
+          "current_streak": 1,
+          "best_streak": 1
         }
       },
       "history": [
@@ -280,6 +292,105 @@
           "prompt": "Identifica a nota desenhada na pauta na **Clave de Fá**:",
           "user_answer": "Mi (E)",
           "correct_answer": "Mi (E)"
+        },
+        {
+          "timestamp": 1786746979.856701,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": false,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Sol**:",
+          "user_answer": "Lá (A)",
+          "correct_answer": "Sol (G)"
+        },
+        {
+          "timestamp": 1786808478.464396,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": false,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Sol**:",
+          "user_answer": "Dó (C)",
+          "correct_answer": "Fá (F)"
+        },
+        {
+          "timestamp": 1786808602.6508029,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Sol**:",
+          "user_answer": "Mi (E)",
+          "correct_answer": "Mi (E)"
+        },
+        {
+          "timestamp": 1786814155.325658,
+          "category": "treino_auditivo",
+          "question_type": "ear_interval",
+          "is_correct": false,
+          "prompt": "Ouve o intervalo musical ascendente e identifica a sua classificação:",
+          "user_answer": "Terça Maior (M3)",
+          "correct_answer": "Segunda Maior (M2)"
+        },
+        {
+          "timestamp": 1786814176.492723,
+          "category": "treino_auditivo",
+          "question_type": "ear_interval",
+          "is_correct": false,
+          "prompt": "Ouve o intervalo musical ascendente e identifica a sua classificação:",
+          "user_answer": "Terça Maior (M3)",
+          "correct_answer": "Terça Menor (m3)"
+        },
+        {
+          "timestamp": 1786814186.0424829,
+          "category": "treino_auditivo",
+          "question_type": "ear_interval",
+          "is_correct": true,
+          "prompt": "Ouve o intervalo musical ascendente e identifica a sua classificação:",
+          "user_answer": "Quinta Justa (P5)",
+          "correct_answer": "Quinta Justa (P5)"
+        },
+        {
+          "timestamp": 1786814194.855754,
+          "category": "treino_auditivo",
+          "question_type": "ear_interval",
+          "is_correct": true,
+          "prompt": "Ouve o intervalo musical ascendente e identifica a sua classificação:",
+          "user_answer": "Quinta Justa (P5)",
+          "correct_answer": "Quinta Justa (P5)"
+        },
+        {
+          "timestamp": 1786814201.625897,
+          "category": "treino_auditivo",
+          "question_type": "ear_interval",
+          "is_correct": false,
+          "prompt": "Ouve o intervalo musical ascendente e identifica a sua classificação:",
+          "user_answer": "Oitava Justa (P8)",
+          "correct_answer": "Quarta Justa (P4)"
+        },
+        {
+          "timestamp": 1786814241.664083,
+          "category": "escalas_modos",
+          "question_type": "scale_performance",
+          "is_correct": true,
+          "prompt": "Escala: C Escala Maior (Jónio)",
+          "user_answer": "15/15 notas (88%)",
+          "correct_answer": "C Escala Maior (Jónio)"
+        },
+        {
+          "timestamp": 1786814562.1522298,
+          "category": "leitura_pauta",
+          "question_type": "staff_note",
+          "is_correct": true,
+          "prompt": "Identifica a nota desenhada na pauta na **Clave de Sol**:",
+          "user_answer": "Sol (G)",
+          "correct_answer": "Sol (G)"
+        },
+        {
+          "timestamp": 1786867038.384254,
+          "category": "tecnica",
+          "question_type": "technique_drill",
+          "is_correct": true,
+          "prompt": "Exercício",
+          "user_answer": "C4",
+          "correct_answer": "C4"
         }
       ]
     }

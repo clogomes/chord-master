@@ -220,7 +220,7 @@ class ChordMasterApp(ctk.CTk):
     def _build_nav_buttons(self):
         nav_items = [
             ("main_menu", t("nav_main_menu", "🏠 Menu Principal")),
-            ("theory", t("nav_theory", "📖 Teoria Musical (8 Cap)")),
+            ("theory", t("nav_theory", f"📖 Teoria Musical ({len(LESSON_IDS)} Cap)")),
             ("practice_song", t("nav_practice_song", "🎶 Tocar Repertório")),
             ("practice_scales", t("nav_practice_scales", "🎼 Prática de Escalas")),
             ("lamire", t("nav_lamire", "🎙️ Lamiré & Afinador")),

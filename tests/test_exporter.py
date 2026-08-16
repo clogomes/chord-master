@@ -19,7 +19,7 @@ class TestExporter(unittest.TestCase):
         md = generate_student_report_markdown(user)
         self.assertIn("Ana", md)
         self.assertIn("450 XP", md)
-        self.assertIn("Cap 1: Fundamentos & Notação", md)
+        self.assertIn("Fundamentos da Música", md)
         self.assertIn("Primeiro Passo", md)
 
     def test_export_student_report_file(self):

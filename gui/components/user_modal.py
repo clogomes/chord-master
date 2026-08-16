@@ -186,7 +186,7 @@ class UserManagementModal(ctk.CTkToplevel):
                 text_color=name_color,
             ).pack(anchor="w")
 
-            detail_text = f"Lições: {len(profile.completed_lessons)}/8 • Precisão: {profile.accuracy_rate:.0f}% ({profile.total_attempts} ex.)"
+            detail_text = f"Lições: {len(profile.completed_lessons)}/{len(LESSON_IDS)} • Precisão: {profile.accuracy_rate:.0f}% ({profile.total_attempts} ex.)"
             sub_color = "#DBEAFE" if is_active else theme.COLOR_TEXT_MUTED
             ctk.CTkLabel(
                 info_box,

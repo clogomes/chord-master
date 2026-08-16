@@ -77,10 +77,10 @@ class TestBackingTracks(unittest.TestCase):
         self.assertEqual(player.volume, 0.0)
 
         # Start and Stop
-        player.start(pattern_id="rock_basic", bpm=110)
+        player.start(pattern_id="rock", bpm=110)
         self.assertTrue(player.is_playing)
         self.assertIsNotNone(player.current_pattern)
-        self.assertEqual(player.current_pattern.id, "rock_basic")
+        self.assertEqual(player.current_pattern.id, "rock")
 
         player.stop()
         self.assertFalse(player.is_playing)

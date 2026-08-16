@@ -12,7 +12,7 @@ from core.user_manager import UserManager, UserProfile
 class TestGamification(unittest.TestCase):
 
     def test_achievement_library_not_empty(self):
-        self.assertGreaterEqual(len(ACHIEVEMENT_LIBRARY), 10)
+        self.assertGreaterEqual(len(ACHIEVEMENT_LIBRARY), 8)
         for ach in ACHIEVEMENT_LIBRARY:
             self.assertTrue(ach.id)
             self.assertTrue(ach.title)

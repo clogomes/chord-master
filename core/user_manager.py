@@ -11,16 +11,8 @@ from core.gamification import (
     get_achievement_by_id,
 )
 
-LESSON_IDS = [
-    ("chap1_fundamentals", "Cap 1: Fundamentos & Notação"),
-    ("chap2_intervals", "Cap 2: Intervalos & Física Harmónica"),
-    ("chap3_scales_modes", "Cap 3: Escalas, Modos & 5ªs"),
-    ("chap4_chords_triads", "Cap 4: Formação de Acordes & Tríades"),
-    ("chap5_harmonic_field", "Cap 5: Campo Harmónico & Tétrades"),
-    ("chap6_advanced_harmony", "Cap 6: Harmonia Avançada & Modulação"),
-    ("chap7_piano_guide", "Cap 7: Guia Prático de Piano"),
-    ("chap8_guitar_guide", "Cap 8: Guia Prático de Viola (CAGED)"),
-]
+from core.theory_content import THEORY_CHAPTERS
+LESSON_IDS = [(c.id, c.title) for c in THEORY_CHAPTERS]
 
 AVATAR_CHOICES = [
     "🎵", "🎹", "🎸", "🎼", "🎻", "🎺", "🎷", "🥁", "🎧", "🌟", "⚡", "🔥"
@@ -60,6 +52,8 @@ class UserProfile:
         "teoria": CategoryStats(),
         "repertorio": CategoryStats(),
         "pratica_instrumento": CategoryStats(),
+        "escalas_modos": CategoryStats(),
+        "tecnica": CategoryStats(),
     })
     completed_lessons: List[str] = field(default_factory=list)
     history: List[ExerciseRecord] = field(default_factory=list)
@@ -206,7 +200,7 @@ class UserManager:
                 unlocked = True
             elif ach.id == "theory_scholar" and len(user.completed_lessons) >= 4:
                 unlocked = True
-            elif ach.id == "theory_master" and len(user.completed_lessons) >= 8:
+            elif ach.id == "theory_master" and len(user.completed_lessons) >= len(LESSON_IDS):
                 unlocked = True
             elif ach.id == "first_melody" and user.categories.get("repertorio", CategoryStats()).correct_count >= 1:
                 unlocked = True
@@ -345,6 +339,8 @@ class UserManager:
                         "teoria": CategoryStats(),
                         "repertorio": CategoryStats(),
                         "pratica_instrumento": CategoryStats(),
+                        "escalas_modos": CategoryStats(),
+                        "tecnica": CategoryStats(),
                     }
                     for ck, cv in udata.get("categories", {}).items():
                         categories[ck] = CategoryStats(

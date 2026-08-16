@@ -168,7 +168,7 @@ class StatsScreen(ctk.CTkFrame):
 
         prog_badge = ctk.CTkLabel(
             header_row,
-            text=f"Lições: {len(user.completed_lessons)}/8 ({user.lessons_progress_percent:.0f}%)",
+            text=f"Lições: {len(user.completed_lessons)}/{len(LESSON_IDS)} ({user.lessons_progress_percent:.0f}%)",
             font=theme.get_font(theme.FONT_BADGE),
             text_color=theme.COLOR_SUCCESS,
         )
@@ -356,7 +356,7 @@ class StatsScreen(ctk.CTkFrame):
 
         ctk.CTkLabel(
             lessons_card,
-            text="Progresso nas 8 Lições Teóricas",
+            text=f"Progresso nas {len(LESSON_IDS)} Lições Teóricas",
             font=theme.get_font(theme.FONT_SECTION),
             text_color=theme.COLOR_TEXT_PRIMARY,
         ).pack(anchor="w", padx=18, pady=(14, 8))
@@ -432,7 +432,7 @@ class StatsScreen(ctk.CTkFrame):
                 text_color="#FFFFFF" if is_active else theme.COLOR_TEXT_PRIMARY,
             ).pack(side="left", padx=14, pady=8)
 
-            txt_info = f"XP: {u.xp}  •  Lições: {len(u.completed_lessons)}/8  •  Precisão: {u.accuracy_rate:.0f}%"
+            txt_info = f"XP: {u.xp}  •  Lições: {len(u.completed_lessons)}/{len(LESSON_IDS)}  •  Precisão: {u.accuracy_rate:.0f}%"
             ctk.CTkLabel(
                 row_f,
                 text=txt_info,
@@ -504,19 +504,13 @@ class StatsScreen(ctk.CTkFrame):
             canvas.create_text(x, h - 14, text=lbl, fill="#9CA3AF", font=("Helvetica", 10))
 
     def _draw_category_bars(self, canvas: tk.Canvas, user: UserProfile):
-        """Draws horizontal percentage comparison bars for the 5 main study categories."""
+        """Draws horizontal percentage comparison bars for all study categories."""
         canvas.delete("all")
         w = canvas.winfo_width() or 440
         h = 280
 
-        categories = [
-            ("Treino Auditivo", "treino_auditivo", "#4F46E5"),
-            ("Leitura de Pauta", "leitura_pauta", "#0284C7"),
-            ("Teoria Musical", "teoria", "#F59E0B"),
-            ("Repertório & Músicas", "repertorio", "#8B5CF6"),
-            ("Instrumento & Solfejo", "pratica_instrumento", "#10B981"),
-            ("Exercícios Técnicos", "tecnica", "#EF4444"),
-        ]
+        from core.categories import CATEGORY_NAMES_PT, CATEGORY_COLORS
+        categories = [(v, k, CATEGORY_COLORS.get(k, "#6B7280")) for k, v in CATEGORY_NAMES_PT.items()]
 
         pad_l = 150
         pad_r = 65
