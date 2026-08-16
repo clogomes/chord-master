@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 35 — Correção Rigorosa de Erros de Conteúdo Musical — CONCLUÍDA
+- Data: 2026-08-16T17:36:00+01:00
+- Commit: 2343c15
+- Resumo: Correção de 6 análises harmónicas em songs.py de acordo com as notas reais (Lá menor Eólio em Greensleeves, Menor Harmónica em Für Elise, Jónico em Gymnopédie, Frígio Dominante em Malagueña, etc). Ajuste rítmico de todas as 24 peças em SONG_LIBRARY para fecharem compassos inteiros exatos. Unificação da fonte de verdade das mnemónicas auditivas (com adição de mnemónicas descendentes) em ear_mnemonics.py e sincronização com intervals.py e theory_content.py. Correção de erros teóricos nos capítulos de transposição, rootless voicings de Jazz (G7 = F-A-B-E), substituição tritónica e forma AAB do Blues. Ajustes nos exercícios técnicos (Hanon 1, Spider Walk 1-2-3-4, salto de cordas, ligação do BPM slider em runtime) e no tutor de pauta. 180/180 testes a passar.
+- Ficheiros principais alterados: core/songs.py, core/theory_content.py, core/ear_mnemonics.py, core/intervals.py, core/technique_exercises.py, core/staff_tutor.py, core/theory_quiz.py, gui/screens/practice_technique.py, tests/test_songs_measures.py, README.md
+
 ## Correções Finais Fase 34 + Reposição das 4 Medalhas — CONCLUÍDA
 - Data: 2026-08-16T17:22:00+01:00
 - Commit: 1e1ad3c
