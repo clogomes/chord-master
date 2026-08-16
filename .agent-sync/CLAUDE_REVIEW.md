@@ -14,6 +14,264 @@ Cada entrada tem um veredito:
 
 ---
 
+## TRABALHO PEDIDO — Fases 31 a 34: CORREÇÃO DE BUGS BLOQUEANTES (prioridade máxima)
+- Pedido por: clogomes, após uma revisão multi-agente com modelos especializados
+  (revisão de código + auditoria de teoria musical). Todos os achados abaixo
+  foram **verificados empiricamente** — por mim ou pelos agentes — correndo
+  código, não por leitura. Onde há output real, está colado.
+- **REGRA DE EXECUÇÃO: uma fase de cada vez**, como no pacote anterior. Implementa
+  a fase, corre os testes, commit + push identificando a fase, atualiza o
+  `GEMINI_STATUS.md`, e **espera** o meu APROVADO escrito antes da fase seguinte.
+- Estas 4 fases vêm **antes** de qualquer funcionalidade nova (o utilizador
+  aprovou mais 4 blocos de trabalho, mas mandou corrigir os bugs primeiro).
+- **Contexto importante sobre os testes**: os 162 testes atuais passam todos e
+  **não apanham nenhum destes bugs**. Não uses "os testes passam" como prova de
+  nada aqui. Para cada correção, acrescenta um teste que **falharia** com o
+  código atual.
+
+### FASE 31 — Correções de motor (corrompem dados em toda a app)
+
+**31.1 — `core/intervals.py:130` — `% 13` deveria ser `% 12`**
+```python
+semitones = abs(target.midi - root.midi) % 13   # BUG
+```
+Como `% 13` nunca produz ≥13, o ramo de redução de intervalos compostos por
+baixo é código morto. Verificado por mim:
+```
+C4→C#5 (13 semitons) → "Uníssono Perfeito"   (devia ser 9ª menor / 2ª menor)
+C4→D5  (14 semitons) → "Segunda Menor"        (devia ser 9ª Maior / 2ª Maior)
+C4→G5  (19 semitons) → "Trítono"              (devia ser 5ª Justa)
+C4→C6  (24 semitons) → "Sétima Maior"         (devia ser Oitava / Uníssono)
+```
+`tests/test_intervals.py` só testa intervalos ≤12 semitons, por isso fica verde
+enquanto o código está errado. Corrige para `% 12`, trata explicitamente o caso
+0 (Uníssono vs Oitava), e acrescenta testes para 13, 14, 19 e 24 semitons.
+Isto alimenta o motor de quizzes e o treino auditivo.
+
+**31.2 — `core/notes.py:165-168` e `:71-76` — ortografia de tonalidades com bemóis**
+`Note.transpose()` passa por `Note.from_midi()`, que nomeia sempre a partir da
+tabela só-sustenidos `NOTE_NAMES`. Verificado por mim:
+```
+Fá maior   → F G A A♯ C D E     (devia ser: F G A B♭ C D E)
+Si♭ maior  → A♯ C D D♯ F G A    (devia ser: B♭ C D E♭ F G A)
+Dó menor   → C D♯ G             (devia ser: C E♭ G)
+Dó dim     → C D♯ F♯            (devia ser: C E♭ G♭)
+```
+Quebra a regra básica de **uma letra por grau** e contradiz o texto da própria
+app: a tabela de tríades do Capítulo 4 (`core/theory_content.py:370`) escreve
+"Cdim = C - E♭ - G♭" enquanto o laboratório interativo por baixo mostra
+C-D♯-F♯. Fá maior e Si♭ maior são as duas primeiras tonalidades com bemóis que
+um principiante encontra.
+
+Isto **não** se resolve com uma tabela de bemóis fixa — precisa de uma camada
+de ortografia consciente da tonalidade: escolher o nome a partir do
+índice de letra esperado para aquele grau + o acidente necessário. Sugestão de
+abordagem: dado um grau da escala e a tónica, determina a letra esperada
+(A-G, uma por grau) e calcula o acidente (♮/♯/♭/♯♯/♭♭) que faz essa letra
+soar no MIDI pretendido. `Scale` e `Chord` devem usar essa camada ao construir
+as notas.
+
+Nota relacionada, corrige também: `gui/screens/theory_screen.py:331` — o
+seletor de tónica do laboratório interativo só oferece nomes com sustenido, por
+isso o utilizador **não consegue sequer pedir "Si♭ maior"**. Acrescenta os
+nomes com bemol.
+
+**31.3 — `core/guitar.py:157-167` — `find_note_positions()` ignora a oitava**
+Verificado por mim — `E2`, `E4` e `E5` devolvem *exatamente* as mesmas posições:
+```
+E4 → [(0,0), (0,12), (1,7)]
+E2 → [(0,0), (0,12), (1,7)]
+E5 → [(0,0), (0,12), (1,7)]
+```
+A função compara por `normalized_pitch` (classe de altura) e ignora a oitava,
+por isso `assign_guitar_coordinates` escolhe o traste mais próximo da posição
+anterior da mão, independentemente do registo. Auditoria completa da
+biblioteca: **29 de 485** notas com coordenadas de guitarra soam uma altura
+diferente da que está escrita. Exemplos:
+```
+guitar_spanish_romance: E4 → corda 6 solta = E2   (duas oitavas abaixo)
+guitar_malaguena:       E4 → corda 4 traste 2 = E3
+piano_fur_elise:        E5 → corda 4 traste 2 = E3
+```
+As 16 músicas escritas à mão usam a convenção correta (E4 = 1ª corda solta),
+por isso as duas metades da biblioteca contradizem-se hoje.
+**Corrigir**: preferir correspondência exata de `midi`; só cair para classe de
+altura quando a nota estiver fora do âmbito da guitarra, e nesse caso fixar na
+oitava mais próxima. Acrescenta um teste que percorre `SONG_LIBRARY` e afirma
+que a nota que sai de `(corda, traste)` é igual à nota escrita.
+
+### FASE 32 — Funcionalidades que não funcionam
+
+**32.1 — `gui/screens/practice_song.py:1170` — a Análise Teórica (Fase 27) rebenta**
+`render_markdown_to_textbox` é chamada mas **nunca é importada** neste ficheiro.
+Confirmado por `grep`: a linha 1170 é a única ocorrência, não há import.
+```
+NameError: name 'render_markdown_to_textbox' is not defined
+```
+Agrava: `top.grab_set()` corre na linha 1159 e o botão "Fechar" é criado na
+1172, **depois** da linha que rebenta — por isso clicar em "🎓 Ver Análise
+Teórica" deixa uma janela modal agarrada, sem botão de fechar. A funcionalidade
+inteira da Fase 27 está morta em qualquer das 8 músicas que têm análise.
+**Corrigir**: acrescenta o import no topo do módulo; move o `grab_set()` para
+depois de o conteúdo estar construído; envolve o corpo num `try/except` que
+chama `top.destroy()` em caso de erro, para nunca deixar um modal preso.
+Nota de processo minha: eu aprovei a Fase 27 sem clicar neste botão — o ecrã
+constrói bem, só rebenta ao abrir o modal. Culpa minha, não tua.
+
+**32.2 — `gui/screens/practice_technique.py:407,434` — o ecrã de técnica é mudo**
+`AudioPlayer.play_note(note: Note, ...)` lê `note.midi`/`note.frequency`, mas
+ambas as chamadas passam uma **string**:
+```python
+self.audio_player.play_note(note.pitch_with_octave, duration=0.45, ...)   # linha 407
+self.audio_player.play_note(active_note.pitch_with_octave, ...)            # linha 434
+```
+```
+AttributeError: 'str' object has no attribute 'midi'
+```
+A exceção morre numa thread daemon, por isso **nada aparece no ecrã** — a
+demonstração e a confirmação de cada nota certa são silenciosamente mudas.
+É o único dos 14 sítios que chamam `play_note` que faz isto.
+**Corrigir**: passar `note` / `active_note` diretamente.
+
+**32.3 — `gui/screens/practice_technique.py:501` — MIDI USB rebenta neste ecrã**
+```python
+def _on_midi_note_on(self, note_name: str, velocity: int):
+    self.after(0, lambda: self._on_user_played_note(note_name))
+```
+Mas `MidiManager._poll_midi_loop` chama `self._on_note_on(note_midi, velocity)`
+com um **int**, e `_on_user_played_note` faz `Note(played_pitch)`:
+```
+Note(60) → AttributeError: 'int' object has no attribute 'strip'
+```
+`practice_song.py:127` e `practice_scales.py:573` tratam isto corretamente
+(`Note.from_midi`); só o ecrã de técnica errou a assinatura. Como o teclado
+QWERTY continua a funcionar, isto escapa em teste manual.
+**Corrigir**: `note = Note.from_midi(midi_num)` e passar a partir daí.
+
+**32.4 — `audio/metronome.py:26` vs 3 ecrãs — callbacks que nunca disparam**
+`on_beat` é invocado como `on_beat(current_beat, beat_start)` (2 argumentos),
+mas `practice_instrument.py:93`, `practice_scales.py:90` e
+`practice_technique.py:73` declaram `(self, beat_num)` (1 argumento). O
+`except Exception: pass` dentro de `_run_loop` engole o `TypeError`, por isso
+os callbacks **nunca correm**. Verificado: callback de 1 argumento → 0
+invocações; de 2 argumentos → 2 invocações na mesma janela.
+Hoje os corpos são `pass`, por isso não há efeito visível — mas qualquer
+código futuro ali fica silenciosamente inalcançável. `practice_song.py:697` tem
+a assinatura correta.
+**Corrigir**: uniformizar as 3 assinaturas para 2 argumentos. Considera também
+não engolir a exceção em silêncio no `_run_loop` (regista-a, pelo menos).
+
+### FASE 33 — Listas hardcoded dessincronizadas
+
+Este é o padrão recorrente deste projeto: dados novos acrescentados sem
+atualizar as listas fixas que os enumeram. Já aconteceu 3 vezes antes.
+**Sugestão estrutural**: em vez de só corrigir cada lista, cria um registo
+único de categorias (ex: `core/categories.py`) e faz `stats_screen`,
+`adaptive_engine` e `exporter` lerem de lá. Isso resolve a classe do problema,
+não só as instâncias.
+
+**33.1 — `core/user_manager.py:14-23` — `LESSON_IDS` desatualizado e com erro de id**
+Verificado por mim: `LESSON_IDS` tem **8** entradas, `THEORY_CHAPTERS` tem
+**16**. E a entrada 5 é `"chap5_harmonic_field"` quando o id real do capítulo é
+`"chap5_harmonic_field_tetrads"` (`core/theory_content.py:441`) —
+`core/theory_quiz.py` usa o id correto, por isso `LESSON_IDS` é o único
+desalinhado. Com um utilizador que completou os 16 capítulos:
+```
+progresso: 200.0%
+menu principal: "16/8"
+exportação: "## Progresso nas Lições Teóricas (16/8 Concluídas)"
+exportação: "- ⏳ Pendente — Cap 5: Campo Harmónico & Tétrades"   ← está concluído
+```
+O Capítulo 5 **nunca** pode aparecer como concluído em lado nenhum.
+**Corrigir**: derivar `LESSON_IDS` de `THEORY_CHAPTERS`
+(`[(c.id, c.title) for c in THEORY_CHAPTERS]`) e substituir **todos** os `8`
+fixos por `len(LESSON_IDS)` — estão em `gui/app.py:202`,
+`gui/screens/stats_screen.py:171,435`, `gui/components/user_modal.py:189`,
+`core/exporter.py:30`, e `gui/i18n.py` (`nav_theory` diz "8 Cap"/"8 Chaps").
+
+**33.2 — `core/adaptive_engine.py:73` — 2 categorias invisíveis ao motor adaptativo**
+`record_attempt` é chamado com 7 categorias; `all_standard_cats` lista só 5.
+`escalas_modos` falta também em `CATEGORY_NAMES_PT`, `CATEGORY_ROUTES` e
+`CATEGORY_TIPS` (linhas 9-36) e na lista por omissão (49-56). Com um utilizador
+com 10 respostas erradas em `escalas_modos` e 10 em `tecnica` e mais nada:
+```
+áreas fracas: [('treino_auditivo',45.0), ('leitura_pauta',45.0), ('teoria',45.0),
+               ('repertorio',45.0), ('pratica_instrumento',45.0)]
+recomendação: 'practice_ear'
+```
+Dois módulos inteiros nunca podem ser recomendados, e a rota
+`CATEGORY_ROUTES["tecnica"] = "practice_technique"` é inalcançável.
+
+**33.3 — `gui/screens/stats_screen.py:512-519` — Escalas não aparecem no gráfico**
+A lista fixa tem 6 entradas e omite `escalas_modos`. A docstring da linha 507
+ainda diz "5 main study categories" — já foi editada duas vezes sem sincronizar.
+O perfil real em `user_profiles.json` ("Carlini") tem dados de `escalas_modos`
+que são silenciosamente deitados fora.
+
+**33.4 — `core/exporter.py:42-46` — relatório exportado com números que não batem**
+Contra o perfil real "Carlini":
+```
+categorias com dados: treino_auditivo(6), leitura_pauta(19), escalas_modos(1), tecnica(1)
+tabela mostra:  6 + 19 = 25 tentativas
+linha global:   "81.5% (22 acertos em 27 exercícios)"
+```
+Faltam as linhas de `escalas_modos` e `tecnica`, e por isso a soma da tabela
+não bate com o total global. **Corrigir**: iterar `user.categories` em vez de
+uma lista fixa.
+
+**33.5 — `core/user_manager.py:194-230` — 4 de 12 medalhas são impossíveis**
+`ACHIEVEMENT_LIBRARY` tem 12 entradas, `check_achievements` implementa 8
+condições, e mais nada no código faz `unlocked_achievements.append`. Com um
+utilizador máximo (16 lições, 210/210 corretas nas 7 categorias, sequência 30):
+```
+desbloqueadas 8/12
+NUNCA desbloqueáveis: ['virtuoso_pianist', 'guitar_hero', 'pitch_perfect', 'rhythm_master']
+```
+O ecrã de estatísticas mostra "(8/12)" como teto permanente. Além disso, a
+descrição de `theory_master` diz "todos os 8 capítulos" mas dispara aos 8 de 16.
+**Corrigir**: implementar as 4 condições (os dados existem — id da música +
+precisão em `practice_song.py:1031`, modo de instrumento, cents em
+`practice_instrument.py:547`, conclusão com metrónomo ligado), **ou** remover as
+4 medalhas. Não deixes medalhas inatingíveis à vista do utilizador.
+
+**33.6 — Contagens fixas desatualizadas**
+`gui/screens/main_menu.py:220` diz "Toca **16** peças completas" (são 24);
+`:207` diz "**8** capítulos interativos" (são 16).
+
+### FASE 34 — Tradução EN a sério (hoje só a barra lateral traduz)
+
+`t()` é chamada **15 vezes em `gui/app.py` e 0 vezes** nos 10 ecrãs e 6
+componentes (~278 strings `text=` fixas em português). Verificado em runtime
+com `set_language("en")`:
+```
+main_menu (EN):       "Olá, 🎸 Carlini! 👋" / "Bem-vindo ao teu estúdio..." / "🎸 Trocar Perfil"
+practice_staff (EN):  "← Voltar ao Menu" / "🎼 Leitura de Pauta" / "Clave de Sol (𝄞)"
+lamire (EN):          "🎙️ Lamiré & Afinador Cromático" / "🎙️ Ativar Microfone"
+stats (EN):           "📊 Estatísticas & Análise de Progresso" / "📥 Exportar Progresso"
+```
+Chaves como `theory_title`, `tuner_title`, `btn_back`, `diff_beginner`,
+`clef_treble` **já existem** em `UI_STRINGS["en"]` e nunca são consultadas.
+Só `practice_technique` usa i18n ao nível do conteúdo (`get_name(lang)`).
+
+Lacunas também na camada de dados (sem campos `_en`): `Song.description` e
+`Song.difficulty`, `RhythmPattern` (só `name_pt`), **`core/theory_quiz.py` —
+as 80 perguntas de quiz ficam todas em português**, `core/staff_tutor.get_note_explanation`,
+`core/adaptive_engine.CATEGORY_*`, `core/gamification.ACHIEVEMENT_LIBRARY`,
+`core/exporter`.
+
+**Divide esta fase em duas partes e faz commits separados** (é grande):
+- **34a — camada de UI**: liga os ecrãs e componentes às chaves que já existem
+  em `gui/i18n.py`, acrescentando as que faltarem. Prioridade: títulos de ecrã,
+  botões de navegação, etiquetas de dificuldade e de clave.
+- **34b — camada de conteúdo**: campos `_en` em `Song.description`,
+  `RhythmPattern`, `theory_quiz` (as 80 perguntas), `staff_tutor`,
+  `adaptive_engine` e `gamification`.
+
+Aviso: `gui/app.py:266` volta a navegar ao trocar de idioma, destruindo o ecrã
+atual. Confirma que nenhum estado por gravar se perde nessa transição.
+
+---
+
 ## Revisão — Correção da categoria "tecnica" nas Estatísticas — fecha o pacote das Fases 27-30
 - Commit revisto: `ea351af`
 - Testes: 162/162 OK
