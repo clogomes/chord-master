@@ -26,6 +26,13 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Correção — AÇÃO NECESSÁRIA: Regressão da Fase 33 (Rota teoria, sidebar e .gitignore) — CONCLUÍDA
+- Data: 2026-08-16 16:45 (UTC+1)
+- Commit: 61ff10a
+- Resumo: Corrigida a rota `"teoria"` em `CATEGORY_ROUTES` para `"theory"`. Adicionado um fallback (`else`) em `navigate_to` que redireciona rotas desconhecidas para o `main_menu` de forma segura. Adicionado o ficheiro `tests/test_categories.py` para provar que todas as rotas listadas em `core/categories.py` existem na lógica do `gui/app.py`. A sidebar (gui/app.py) foi atualizada para usar `len(LESSON_IDS)` em vez de `8`. Finalmente, os dados pessoais `user_profiles.json` e afins foram adicionados ao `.gitignore` e removidos do index (cached), respeitando a privacidade dos dados do utilizador.
+- Ficheiros alterados: core/categories.py, gui/app.py, tests/test_categories.py, .gitignore
+
+
 ## Fase 33 — Correção de Listas Hardcoded e Sincronização de Estatísticas — CONCLUÍDA
 - Data: 2026-08-16 16:41 (UTC+1)
 - Commit: e41c2c5

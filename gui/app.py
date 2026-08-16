@@ -199,7 +199,7 @@ class ChordMasterApp(ctk.CTk):
         lessons_count = len(user.completed_lessons)
         stats_lbl = ctk.CTkLabel(
             name_box,
-            text=f"{lessons_count}/8 lições • {user.accuracy_rate:.0f}% acertos",
+            text=f"{lessons_count}/{len(LESSON_IDS)} lições • {user.accuracy_rate:.0f}% acertos",
             font=theme.get_font(theme.FONT_SMALL),
             text_color=theme.COLOR_TEXT_MUTED,
         )
@@ -384,6 +384,15 @@ class ChordMasterApp(ctk.CTk):
                 on_back=lambda: self.navigate_to("main_menu"),
                 on_user_switched=self._on_user_switched,
             )
+        else:
+            print(f"Aviso: Rota desconhecida '{screen_name}', redirecionando para main_menu")
+            self.current_screen_widget = MainMenuScreen(
+                self.content_area,
+                user_manager=self.user_manager,
+                on_navigate=self.navigate_to,
+                on_switch_user=self._open_user_modal,
+            )
+            self.current_screen_name = "main_menu"
 
         if self.current_screen_widget is not None:
             self.current_screen_widget.pack(fill="both", expand=True)

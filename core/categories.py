@@ -13,7 +13,7 @@ CATEGORY_NAMES_PT = {
 CATEGORY_ROUTES = {
     "treino_auditivo": "practice_ear",
     "leitura_pauta": "practice_staff",
-    "teoria": "theory_screen",
+    "teoria": "theory",
     "repertorio": "practice_song",
     "pratica_instrumento": "practice_instrument",
     "escalas_modos": "practice_scales",

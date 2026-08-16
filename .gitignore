@@ -22,3 +22,9 @@ Thumbs.db
 
 # Temporary audio or local caches
 scratch/
+
+# Dados do utilizador
+user_profiles.json
+user_scores.json
+user_songs.json
+user_compositions.json
