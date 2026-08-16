@@ -14,6 +14,58 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 36 APROVADA ✅ — PODES AVANÇAR PARA A FASE 37 (Revisão Espaçada)
+- Commits revistos: `a20b8ac`, `fb25e8a`
+- Testes: 177/177 OK (3 novos)
+- **Veredito: APROVADO**
+
+**Tokens corrigidos** — corri o meu próprio varrimento, independente do teu:
+```
+tokens theme.* inexistentes: 0   (eram 7)
+```
+Definiste os verdes em falta em `gui/theme.py` em vez de os referenciar sem
+existirem — foi a escolha certa.
+
+**Os dois ecrãs que estavam partidos abrem agora**, incluindo o `omr_review`,
+que estava inutilizável desde a Fase 18-19.
+
+**E — o mais importante desta fase — os testes novos apanham mesmo a classe
+de bug:**
+- `tests/test_theme_tokens_scan.py` usa exatamente a mesma lógica que eu usei
+  para encontrar os 7 (percorre `gui/`, regex `theme.NOME`, `hasattr`), com o
+  cuidado extra de saltar comentários e o próprio `theme.py`. Teria apanhado
+  os 7 — apanhou-os, quando existiam.
+- `tests/test_smoke.py` passou de 1 para 3 testes e cobre **todos** os ecrãs e
+  modais por nome, incluindo `GlossaryScreen`, `OMRReviewScreen` e
+  `GlossaryTermModal` — precisamente os que estavam partidos.
+
+Isto fecha uma classe de bug que apareceu **quatro vezes** neste projeto. Vale
+a pena registar: as duas causas eram "nome que não existe" e "ecrã que nunca é
+instanciado em teste" — agora ambas têm rede de segurança.
+
+**Lacuna do "guide tone" resolvida**, e melhor do que pedi — o mapa de aliases
+passou de 335 para **747 entradas**, com singular e plural:
+```
+"O guide tone define a cor do acorde."   -> liga: guide tone
+"Os guide tones são a 3ª e a 7ª."        -> liga: guide tones
+```
+
+### Balanço da Fase 36
+O glossário está completo e bem construído: 139 termos, definições curtas e
+longas nas duas línguas, exemplos no piano e na viola, e a auto-ligação no
+texto dos capítulos a funcionar sem falsos positivos. Era o pedido explícito do
+utilizador e está entregue.
+
+**Avança para a Fase 37 (Revisão Espaçada)** — a maior alavanca isolada na
+velocidade de aprendizagem. Lembretes: estado de domínio por **competência
+atómica** (`interval:m6:desc`, `staff:treble:ledger:C4`), não por categoria;
+ecrã "Revisão de Hoje" que serve só o que está vencido; e **cuidado com a
+persistência** — o `user_profiles.json` do utilizador tem dados reais (perfil
+"Carlini" com 1828 XP e 27 registos), por isso usa `schema_version` e `.get()`
+com defaults para não partir perfis existentes.
+
+---
+
 ## AÇÃO NECESSÁRIA (URGENTE) — Fase 36: o Glossário crasha ao abrir + descobri 2 ecrãs partidos há muito
 - Commits revistos: `5b5baa2`, `63cff71`
 - Testes: 174/174 OK — **e o ecrã principal desta fase não abre**.
