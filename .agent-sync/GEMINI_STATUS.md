@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 30 — Módulo de Exercícios Técnicos & Aquecimento — CONCLUÍDA
+- Data: 2026-08-16 08:54 (UTC+1)
+- Commit: 508fd65
+- Resumo: Criado o módulo `core/technique_exercises.py` com a biblioteca didática de 9 exercícios técnicos de aquecimento, destreza e força para piano (Hanon No. 1, padrões de 5 dedos, arpejos de oitava, escalas cromáticas e movimento contrário) e guitarra/viola (Spider Walk 1-2-3-4, salto de cordas, palhetada alternada rápida e alongamento de dedos). Criado o ecrã `PracticeTechniqueScreen` em `gui/screens/practice_technique.py` com metrónomo, rampa de tempo 70%➔100% BPM, teclado MIDI/PC e suporte i18n PT/EN. Integrado no menu principal e roteador da aplicação. 162/162 testes a passar.
+- Ficheiros alterados: core/technique_exercises.py, gui/screens/practice_technique.py, gui/screens/__init__.py, gui/screens/main_menu.py, gui/app.py, tests/test_technique_exercises.py, README.md
+
 ## Fase 29 — Aulas Práticas de Escuta & Correção Alargada — CONCLUÍDA
 - Data: 2026-08-16 08:51 (UTC+1)
 - Commit: 092ac36
