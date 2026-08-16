@@ -28,7 +28,7 @@ primeiro, antes de avançar.
 
 ## Fase 34b — Camada de Conteúdo (Tradução EN de Músicas) — CONCLUÍDA
 - Data: 2026-08-16 16:54 (UTC+1)
-- Commit: PENDENTE
+- Commit: f3d7936
 - Resumo: Adicionados campos `description_en` e `difficulty_en` à dataclass `Song`. Implementados os métodos `get_description(lang="pt")` e `get_difficulty(lang="pt")`. Todos os registos de músicas em `SONG_LIBRARY` foram atualizados com as respetivas traduções em inglês da descrição e da dificuldade.
 - Ficheiros principais alterados: core/songs.py
 
