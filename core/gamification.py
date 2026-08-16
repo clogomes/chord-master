@@ -12,6 +12,14 @@ class Achievement:
     icon: str
     xp_reward: int
     category: str  # "teoria", "repertorio", "auditivo", "pauta", "geral"
+    name_en: str = ""
+    description_en: str = ""
+
+    def get_name(self, lang: str = "pt") -> str:
+        return self.title if lang == "pt" else (self.name_en or self.title)
+
+    def get_description(self, lang: str = "pt") -> str:
+        return self.description if lang == "pt" else (self.description_en or self.description)
 
 
 ACHIEVEMENT_LIBRARY: List[Achievement] = [
@@ -22,6 +30,8 @@ ACHIEVEMENT_LIBRARY: List[Achievement] = [
         icon="🌱",
         xp_reward=100,
         category="teoria",
+        name_en="First Step",
+        description_en="Complete your first theoretical lesson."
     ),
     Achievement(
         id="theory_scholar",
@@ -30,6 +40,8 @@ ACHIEVEMENT_LIBRARY: List[Achievement] = [
         icon="📖",
         xp_reward=250,
         category="teoria",
+        name_en="Theory Scholar",
+        description_en="Complete 4 chapters of the Music Theory Academy."
     ),
     Achievement(
         id="theory_master",
@@ -38,6 +50,8 @@ ACHIEVEMENT_LIBRARY: List[Achievement] = [
         icon="🎓",
         xp_reward=500,
         category="teoria",
+        name_en="Theory Master",
+        description_en="Complete all lessons of the Music Theory Academy."
     ),
     Achievement(
         id="first_melody",
@@ -46,8 +60,9 @@ ACHIEVEMENT_LIBRARY: List[Achievement] = [
         icon="🎵",
         xp_reward=100,
         category="repertorio",
+        name_en="First Melody",
+        description_en="Play your first complete song from the repertoire."
     ),
-
     Achievement(
         id="perfect_ear",
         title="Ouvido Apurado",
@@ -55,6 +70,8 @@ ACHIEVEMENT_LIBRARY: List[Achievement] = [
         icon="🎧",
         xp_reward=150,
         category="auditivo",
+        name_en="Perfect Ear",
+        description_en="Achieve a streak of 5 correct answers in Ear Training."
     ),
     Achievement(
         id="sight_reader",
@@ -63,8 +80,9 @@ ACHIEVEMENT_LIBRARY: List[Achievement] = [
         icon="🎼",
         xp_reward=200,
         category="pauta",
+        name_en="Agile Sight Reader",
+        description_en="Hit 10 correct notes in a row in the Sight Reading exercise."
     ),
-
     Achievement(
         id="streak_fire",
         title="Em Chamas!",
@@ -72,6 +90,8 @@ ACHIEVEMENT_LIBRARY: List[Achievement] = [
         icon="🔥",
         xp_reward=200,
         category="geral",
+        name_en="On Fire!",
+        description_en="Achieve a global streak of 10 consecutive correct answers."
     ),
     Achievement(
         id="diligent_student",
@@ -80,8 +100,9 @@ ACHIEVEMENT_LIBRARY: List[Achievement] = [
         icon="⭐",
         xp_reward=300,
         category="geral",
+        name_en="Diligent Student",
+        description_en="Complete over 50 practical exercises in total."
     ),
-
 ]
 
 

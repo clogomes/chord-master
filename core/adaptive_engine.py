@@ -4,7 +4,7 @@ import time
 from typing import Any, Dict, List, Optional, Tuple
 from core.user_manager import UserProfile, ExerciseRecord
 from core.quiz_engine import QuizEngine, QuizQuestion, QuestionType
-from core.categories import CATEGORY_NAMES_PT, CATEGORY_ROUTES, CATEGORY_TIPS
+from core.categories import CATEGORY_NAMES_PT, CATEGORY_NAMES_EN, CATEGORY_ROUTES, CATEGORY_TIPS, CATEGORY_TIPS_EN
 
 def get_weak_areas(user: UserProfile, max_recent: int = 50) -> List[Tuple[str, float]]:
     """
@@ -58,26 +58,29 @@ def get_weak_areas(user: UserProfile, max_recent: int = 50) -> List[Tuple[str, f
     return results
 
 
-def get_recommendation(user: UserProfile) -> Dict[str, Any]:
+def get_recommendation(user: UserProfile, lang: str = "pt") -> Dict[str, Any]:
     """
     Returns personalized practice recommendation metadata for the main dashboard.
     """
     weak_areas = get_weak_areas(user)
     primary_cat, acc = weak_areas[0]
 
-    cat_name = CATEGORY_NAMES_PT.get(primary_cat, "Música Geral")
+    names = CATEGORY_NAMES_PT if lang == "pt" else CATEGORY_NAMES_EN
+    tips = CATEGORY_TIPS if lang == "pt" else CATEGORY_TIPS_EN
+
+    cat_name = names.get(primary_cat, "Música Geral" if lang == "pt" else "General Music")
     route = CATEGORY_ROUTES.get(primary_cat, "practice_ear")
-    tip = CATEGORY_TIPS.get(primary_cat, "Continua a praticar diariamente para evoluir!")
+    tip = tips.get(primary_cat, "Continua a praticar diariamente para evoluir!" if lang == "pt" else "Keep practicing daily to improve!")
 
     if not user.history:
-        title = "Começa o teu Treino Musical"
-        reason = "Ainda não realizaste exercícios hoje. Recomendamos iniciar com leitura de pauta e intervalos!"
+        title = "Começa o teu Treino Musical" if lang == "pt" else "Start Your Musical Training"
+        reason = "Ainda não realizaste exercícios hoje. Recomendamos iniciar com leitura de pauta e intervalos!" if lang == "pt" else "You haven't done any exercises today. We recommend starting with sight reading and intervals!"
     elif acc < 60.0:
-        title = f"Reforço Recomendado: {cat_name}"
-        reason = f"Identificámos que a tua precisão recente em {cat_name} é de {acc:.0f}%. Um treino focado vai acelerar o teu progresso!"
+        title = f"Reforço Recomendado: {cat_name}" if lang == "pt" else f"Recommended Practice: {cat_name}"
+        reason = f"Identificámos que a tua precisão recente em {cat_name} é de {acc:.0f}%. Um treino focado vai acelerar o teu progresso!" if lang == "pt" else f"We noticed your recent accuracy in {cat_name} is {acc:.0f}%. Focused practice will accelerate your progress!"
     else:
-        title = f"Excelente Desempenho em {cat_name}"
-        reason = f"Estás com {acc:.0f}% de precisão! Continua a consolidar o teu domínio nesta área."
+        title = f"Excelente Desempenho em {cat_name}" if lang == "pt" else f"Excellent Performance in {cat_name}"
+        reason = f"Estás com {acc:.0f}% de precisão! Continua a consolidar o teu domínio nesta área." if lang == "pt" else f"You have {acc:.0f}% accuracy! Keep consolidating your mastery in this area."
 
     return {
         "category": primary_cat,

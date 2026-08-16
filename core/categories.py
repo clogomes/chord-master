@@ -10,6 +10,16 @@ CATEGORY_NAMES_PT = {
     "tecnica": "Exercícios Técnicos"
 }
 
+CATEGORY_NAMES_EN = {
+    "treino_auditivo": "Ear Training",
+    "leitura_pauta": "Sight Reading",
+    "teoria": "Music Theory",
+    "repertorio": "Classical Repertoire",
+    "pratica_instrumento": "Acoustic Lessons",
+    "escalas_modos": "Scales & Modes",
+    "tecnica": "Technical Exercises"
+}
+
 CATEGORY_ROUTES = {
     "treino_auditivo": "practice_ear",
     "leitura_pauta": "practice_staff",
@@ -28,6 +38,16 @@ CATEGORY_TIPS = {
     "pratica_instrumento": "Mantém o teu instrumento afinado e a postura correta.",
     "escalas_modos": "As escalas são a base de tudo. Toca com ritmo firme.",
     "tecnica": "Aquece sempre antes de tocar e mantém as mãos relaxadas."
+}
+
+CATEGORY_TIPS_EN = {
+    "treino_auditivo": "Start by identifying simple intervals (seconds and thirds).",
+    "leitura_pauta": "Use mnemonics (e.g., Every Good Boy Does Fine) to read faster.",
+    "teoria": "Review theoretical lessons to consolidate your foundation.",
+    "repertorio": "Practice slowly (with the metronome) before increasing speed.",
+    "pratica_instrumento": "Keep your instrument in tune and maintain good posture.",
+    "escalas_modos": "Scales are the foundation of everything. Play with a steady rhythm.",
+    "tecnica": "Always warm up before playing and keep your hands relaxed."
 }
 
 CATEGORY_COLORS = {
