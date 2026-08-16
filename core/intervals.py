@@ -12,6 +12,7 @@ class Interval:
     short_code: str
     mnemonic: str
     description: str
+    songs_descending: str = ""
 
 
 INTERVALS: Dict[int, Interval] = {}
@@ -24,6 +25,7 @@ for code, em in EAR_MNEMONICS.items():
         name_en=em.name_en,
         short_code=em.interval_code,
         mnemonic=em.songs_ascending,
+        songs_descending=em.songs_descending,
         description=em.description
     )
 

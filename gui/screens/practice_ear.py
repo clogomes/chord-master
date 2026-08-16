@@ -426,7 +426,10 @@ class PracticeEarScreen(ctk.CTkFrame):
                 mnemonic = get_mnemonic_by_code(code)
                 if mnemonic:
                     self.learning_title_lbl.configure(text=f"Mnemónica: {mnemonic.name} ({code})")
-                    self.learning_songs_lbl.configure(text=f"🎵 {mnemonic.songs}")
+                    if getattr(self.current_question, "play_mode", "melodic_asc") == "melodic_desc":
+                        self.learning_songs_lbl.configure(text=f"🎵 Descendente: {mnemonic.songs_descending} | Ascendente: {mnemonic.songs_ascending}")
+                    else:
+                        self.learning_songs_lbl.configure(text=f"🎵 Ascendente: {mnemonic.songs_ascending} | Descendente: {mnemonic.songs_descending}")
                     self.learning_desc_lbl.configure(text=f"📋 {mnemonic.description}")
                     self.learning_card.pack(fill="x", pady=(4, 12))
                     self.play_card.pack_forget()

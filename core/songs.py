@@ -1010,7 +1010,7 @@ SONG_LIBRARY: List[Song] = [
     # 24. GREENSLEEVES (Arranjo para Viola) — 2 Compassos em 6/8 = 6 Tempos
     Song(
         id="guitar_greensleeves_full",
-        title="Greensleeves (Arranjo para Viola)",
+        title="Greensleeves (Estudo Dedilhado em 6/8 para Viola)",
         composer="Tradicional Inglês",
         difficulty="Iniciante",
         difficulty_en="Beginner",
@@ -1018,18 +1018,18 @@ SONG_LIBRARY: List[Song] = [
         clef="treble",
         instrument="guitar",
         time_signature="6/8",
-        description="Arranjo dedilhado renascentista para viola.",
-        description_en="Traditional Renaissance fingerstyle melody for guitar.",
+        description="Arranjo dedilhado de estudo renascentista para viola em compasso composto 6/8.",
+        description_en="Fingerstyle Renaissance study arrangement for guitar in 6/8 compound time.",
         theory_analysis="""### 🎓 Análise Harmónica & Estrutural
 
-• **Tonalidade / Modo**: Lá menor (Eólio), com 7ª elevada nas cadências.
+• **Tonalidade / Modo**: Lá menor (Modo Eólio).
 • **Estrutura de Compasso**: O ritmo 6/8 dá à melodia o seu balanço folclórico característico (dois pulsos pontuados por compasso).
 • **Conexão com a Teoria**: Aplicação perfeita do **Capítulo 9 (Fórmulas de Compasso Compostas)**.""",
         theory_analysis_en="""### 🎓 Harmonic & Structural Analysis
 
-• **Key / Mode**: A minor (Aeolian), with raised 7th at cadences.
-• **Progression**: Alternation between i (Am), ♭VII (G), and dominant V (E7).
-• **Theory Link**: Showcases minor scale flexibility (**Chapter 3**).""",
+• **Key / Mode**: A minor (Aeolian Mode).
+• **Time Signature Structure**: The 6/8 meter provides the characteristic folk sway (two dotted beats per bar).
+• **Theory Link**: Perfect showcase of **Chapter 9 (Compound Time Signatures)**.""",
         notes=[
             _sn("A3", 0.5), _sn("C4", 0.5), _sn("D4", 0.5), _sn("E4", 1.0), _sn("F4", 0.5),
             _sn("E4", 1.0), _sn("D4", 0.5), _sn("B3", 1.0), _sn("G3", 0.5),

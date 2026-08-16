@@ -91,10 +91,16 @@ class QuizEngine:
 
         direction_str = "descendente" if play_mode == "melodic_desc" else ("harmónico (simultâneo)" if play_mode == "harmonic" else "ascendente")
         prompt = f"Ouve o intervalo musical {direction_str} e identifica a sua classificação:"
+        
+        if play_mode == "melodic_desc" and target_interval.songs_descending:
+            mnemonic_msg = f"💡 Mnemónica Descendente: Lembra-te de «{target_interval.songs_descending}»."
+        else:
+            mnemonic_msg = f"💡 Mnemónica Ascendente: Lembra-te de «{target_interval.mnemonic}»."
+
         explanation = (
             f"Correto! O intervalo tocado é uma **{target_interval.name_pt}** ({target_interval.short_code}), "
             f"correspondendo a **{target_interval.semitones} semitons**.\n"
-            f"💡 Mnemónica: Lembra-te do início da canção «{target_interval.mnemonic}»."
+            f"{mnemonic_msg}"
         )
 
         return QuizQuestion(

@@ -987,7 +987,7 @@ A música usa repetição para criar familiaridade e coerência, e variação pa
 
 **Exercício**: Cria uma música em forma ABA com apenas 4 acordes:
 • A: G - D - Em - C (Sol Maior — luminoso)
-• B: Em - C - G - D (Meu menor — mais íntimo)
+• B: Em - C - G - D (Mi menor — mais íntimo)
 • A: G - D - Em - C (regresso)
 """,
         interactive_demo="chords",
