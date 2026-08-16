@@ -14,6 +14,68 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA — Fase 34: ligação parcial; os 3 problemas da 34a continuam por corrigir
+- Commit revisto: `57e7ccb`
+- Testes: 170/170 OK
+- **Veredito: AÇÃO NECESSÁRIA** — corrigiste metade do que estava assinalado.
+
+### ✅ O que ficou resolvido
+O widget do quiz passa a usar os getters, e verifiquei o resultado real:
+```
+[pt] "Quantas notas existem na escala cromática?"
+[en] "How many notes are there in the chromatic scale?"
+[pt] descrição: "Clássico tema de Beethoven focado no piano."
+[en] descrição: "Classic Beethoven theme focused on the piano."
+```
+As 80 perguntas, as opções, as explicações e as descrições das músicas chegam
+agora ao ecrã na língua certa. Era o essencial da 34b.
+
+### ❌ 34b.2 — `Song.get_difficulty()` continua sem ser chamado
+Procurei em todo o `gui/`: **zero chamadas**. O getter funciona
+(`get_difficulty("en")` devolve `'Beginner'`), mas a UI lê o campo cru:
+```
+gui/screens/practice_song.py:305  f"{inst_icon}{s.title}\n{s.composer} ({s.difficulty})"
+gui/screens/practice_song.py:832  f"Dificuldade: {song.difficulty} • Compasso: ... • {song.note_count} Notas"
+```
+Resultado em inglês: a dificuldade aparece "Iniciante" em vez de "Beginner".
+A linha 832 tem ainda 3 etiquetas fixas em português ("Dificuldade:",
+"Compasso:", "Notas") que nem a 34a nem a 34b apanharam.
+
+### ❌ 34a.1 — BUG REAL não corrigido: cores de dificuldade erradas em inglês
+`gui/screens/theory_screen.py:189-195` continua exatamente como estava.
+Reconfirmei agora:
+```
+pt: chap.difficulty='Iniciante' -> cor correta
+en: chap.difficulty='Iniciante' -> chaves são ['Beginner',...] -> FALLBACK -> cor errada
+```
+Em inglês **todos os capítulos ficam com a mesma cor**. Repara que a entrada
+`"Prático": "#F59E0B"` que acrescentaste ficou *sem* `t()`, o que mostra bem
+que estas chaves são internas e não deviam ser traduzidas de todo.
+**Correção**: mantém as 4 chaves em português (são chaves internas, não texto
+visível). Traduz só a etiqueta que aparece no badge.
+
+### ❌ 34a.2 — estado interno continua traduzido
+`practice_instrument.py:59,352,403,427`, `practice_scales.py:60`,
+`practice_song.py:83` continuam a atribuir e comparar `t("piano", "Piano")`.
+Só não parte porque `t("piano")` devolve `"Piano"` nas duas línguas — e o valor
+irmão `"Viola"` continua sem `t()`, portanto a lógica está metade traduzida.
+
+### ❌ 34a.3 — `t()` continua a ser chave de dicionário de dados
+`practice_instrument.py:524, 558, 652` continuam a escrever e a ler
+`t("tuner_cents", "cents")` como chave. Substitui por `"cents"` literal.
+
+### Sugestão para fechares isto de vez
+Continua por escrever o teste que sugeri: renderizar cada ecrã com
+`set_language("en")`, percorrer os widgets a ler `cget("text")`, e falhar se
+encontrar palavras portuguesas conhecidas. Sem ele, vais continuar a corrigir
+isto aos bocados — e os 170 testes vão continuar verdes com metade da interface
+em português. **Escreve esse teste primeiro**, deixa-o falhar, e usa-o como
+lista do que falta ligar.
+
+**Positivo**: limpaste os 9 scratch scripts da raiz. 👍
+
+---
+
 ## AÇÃO NECESSÁRIA — Fase 34b: traduções escritas mas **não ligadas à interface**
 - Commits revistos: `f01a261`, `f3d7936`, `dec7a3d`, `d157959`, `03a4a1f`
 - Testes: 170/170 OK — e outra vez não apanham nada disto.
