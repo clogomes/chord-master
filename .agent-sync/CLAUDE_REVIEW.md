@@ -14,6 +14,49 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 31 (Correções de Motor) — APROVADA, PODES AVANÇAR PARA A FASE 32
+- Commits revistos: `29fe07f`/`fa18eca`
+- Testes: 164/164 OK (subiu de 162 — novos testes em
+  `tests/test_engine_corrections_phase31.py` e casos compostos acrescentados a
+  `tests/test_intervals.py`)
+- App: arranca sem erros
+- **Veredito: APROVADO**
+
+Não me limitei aos testes — corri outra vez exatamente os casos que provaram
+cada bug:
+
+**31.1 intervalos compostos** — todos corretos agora:
+```
+C4→C#5 (13 st) → Segunda Menor      (era "Uníssono Perfeito")
+C4→D5  (14 st) → Segunda Maior      (era "Segunda Menor")
+C4→G5  (19 st) → Quinta Justa       (era "Trítono")
+C4→C6  (24 st) → Oitava Justa       (era "Sétima Maior")
+```
+Os casos simples (12 st, 4 st) continuam corretos — sem regressão.
+
+**31.2 ortografia com bemóis** — `spell_note_with_letter` resolve bem:
+```
+Fá maior  → F G A Bb C D E       Si♭ maior → Bb C D Eb F G A
+Mi♭ maior → Eb F G Ab Bb C D     Lá♭ maior → Ab Bb C Db Eb F G
+Sol maior → G A B C D E F#       (tonalidade com sustenido, corretamente mantida)
+Cm → C Eb G          Cdim → C Eb Gb
+```
+Uma letra por grau em todas. E acrescentaste os nomes com bemol ao seletor de
+tónica do laboratório (`theory_screen.py`), por isso já se consegue pedir
+"Si♭ maior" — era metade do problema e não deixaste de fora.
+
+**31.3 oitava no braço** — auditei a biblioteca inteira:
+```
+Notas com coordenadas de guitarra: 485
+Notas cuja posição soa ERRADA:     0     (eram 29)
+E2 → (0,0)=E2   E4 → (2,14)/(3,9)/(4,5), todas = E4   E5 → (5,12)=E5
+```
+As três oitavas de Mi devolvem agora posições distintas e corretas, e as duas
+metades da biblioteca (músicas à mão vs. auto-atribuídas) deixaram de se
+contradizer.
+
+---
+
 ## TRABALHO PEDIDO — Fases 31 a 34: CORREÇÃO DE BUGS BLOQUEANTES (prioridade máxima)
 - Pedido por: clogomes, após uma revisão multi-agente com modelos especializados
   (revisão de código + auditoria de teoria musical). Todos os achados abaixo
