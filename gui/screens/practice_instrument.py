@@ -18,6 +18,24 @@ from gui.scroll_utils import bind_mousewheel
 from gui import theme
 
 
+def calculate_pitch_directional_hint(target: Note, detected: Note) -> str:
+    """Calculates diatonic/semitone distance and returns a directional hint string."""
+    diff_semitones = target.midi - detected.midi
+    if diff_semitones == 0:
+        return f"Tocaste {detected.pitch_with_octave}, ajusta a afinação delicadamente"
+
+    abs_semitones = abs(diff_semitones)
+    direction = "sobe" if diff_semitones > 0 else "desce"
+
+    if abs_semitones % 2 == 0 and abs_semitones >= 2:
+        tones = abs_semitones // 2
+        tone_str = f"{tones} tom" if tones == 1 else f"{tones} tons"
+        return f"Tocaste {detected.pitch_with_octave}, o alvo é {target.pitch_with_octave} — {direction} {tone_str} ({abs_semitones} semitons)"
+    else:
+        st_str = "1 semitom" if abs_semitones == 1 else f"{abs_semitones} semitons"
+        return f"Tocaste {detected.pitch_with_octave}, o alvo é {target.pitch_with_octave} — {direction} {st_str}"
+
+
 class PracticeInstrumentScreen(ctk.CTkFrame):
     """
     Live acoustic instrument trainer. Listens to real physical piano or guitar
@@ -151,27 +169,28 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self.inst_select.set("🎹 Piano Acústico")
         self.inst_select.pack(side="left", padx=4)
 
-        # Exercise Type
+        # Exercise Type (Dynamic list with all repertoire songs)
+        exercise_values = [
+            "Escala Maior de Dó",
+            "Escala Menor de Lá",
+            "Arpejo Dó Maior (C)",
+            "Arpejo Lá Menor (Am)",
+        ]
+        user_custom = getattr(self.user_manager.current_user, "custom_songs", []) if self.user_manager.current_user else []
+        all_repertoire = SONG_LIBRARY + user_custom
+        for s in all_repertoire:
+            inst_icon = "🎸 " if getattr(s, "instrument", "piano") == "guitar" else "🎹 "
+            exercise_values.append(f"Música: {inst_icon}{s.title}")
+
         ctk.CTkLabel(cfg_bar, text="Exercício:", font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(10, 4))
         self.exercise_type_select = ctk.CTkOptionMenu(
             cfg_bar,
-            values=[
-                "Escala Maior de Dó",
-                "Escala Menor de Lá",
-                "Arpejo Dó Maior (C)",
-                "Arpejo Lá Menor (Am)",
-                "Música: Nothing Else Matters (Metallica)",
-                "Música: Stairway to Heaven (Led Zeppelin)",
-                "Música: Enter Sandman (Metallica)",
-                "Música: Smoke on the Water",
-                "Música: Hino à Alegria",
-                "Música: Für Elise",
-            ],
+            values=exercise_values,
             command=self._on_exercise_changed,
             font=theme.get_font(theme.FONT_BODY),
             height=34,
             corner_radius=theme.RADIUS_SM,
-            width=230,
+            width=260,
         )
         self.exercise_type_select.set("Escala Maior de Dó")
         self.exercise_type_select.pack(side="left", padx=4)
@@ -343,6 +362,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self.total_notes_played = 0
         self.exercise_completed = False
         self._matched_start_time = None
+        self.note_performance_history: Dict[str, List[dict]] = {}  # {pitch_with_octave: [{"detected": Note, "cents": float, "success": bool}]}
         self.score_card.pack_forget()
 
         if "Escala Maior de Dó" in choice:
@@ -361,37 +381,30 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
             chord = Chord(Note("A3"), "minor")
             self.exercise_notes = [chord.root, chord.notes[1], chord.notes[2], Note("A4")]
             self.exercise_title = "Arpejo de Lá Menor"
-        elif "Nothing Else Matters" in choice:
-            song = get_song_by_id("nothing_else_matters")
-            self.exercise_notes = [sn.note for sn in song.notes] if song else [Note("E2")]
-            self.exercise_title = "Nothing Else Matters (Metallica)"
-        elif "Stairway to Heaven" in choice:
-            song = get_song_by_id("stairway_to_heaven")
-            self.exercise_notes = [sn.note for sn in song.notes] if song else [Note("A3")]
-            self.exercise_title = "Stairway to Heaven (Led Zeppelin)"
-        elif "Enter Sandman" in choice:
-            song = get_song_by_id("enter_sandman")
-            self.exercise_notes = [sn.note for sn in song.notes] if song else [Note("E2")]
-            self.exercise_title = "Enter Sandman (Metallica)"
-        elif "Smoke on the Water" in choice:
-            song = get_song_by_id("smoke_on_the_water")
-            self.exercise_notes = [sn.note for sn in song.notes] if song else [Note("G3")]
-            self.exercise_title = "Smoke on the Water (Deep Purple)"
-        elif "Hino à Alegria" in choice:
-            song = get_song_by_id("ode_to_joy")
-            self.exercise_notes = [sn.note for sn in song.notes] if song else [Note("C4")]
-            self.exercise_title = "Hino à Alegria"
-        elif "Brilha Estrelinha" in choice:
-            song = get_song_by_id("twinkle_star")
-            self.exercise_notes = [sn.note for sn in song.notes] if song else [Note("C4")]
-            self.exercise_title = "Brilha, Brilha Estrelinha"
-        elif "Für Elise" in choice:
-            song = get_song_by_id("fur_elise")
-            self.exercise_notes = [sn.note for sn in song.notes] if song else [Note("C4")]
-            self.exercise_title = "Für Elise"
         else:
-            self.exercise_notes = [Note("C4"), Note("D4"), Note("E4"), Note("F4"), Note("G4")]
-            self.exercise_title = "Exercício Livre"
+            # Search dynamically in repertoire
+            user_custom = getattr(self.user_manager.current_user, "custom_songs", []) if self.user_manager.current_user else []
+            all_songs = SONG_LIBRARY + user_custom
+            found_song = None
+            for s in all_songs:
+                if s.title in choice:
+                    found_song = s
+                    break
+
+            if found_song:
+                self.exercise_notes = [sn.note for sn in found_song.notes]
+                self.exercise_title = f"{found_song.title} ({found_song.composer})"
+                # Auto switch active instrument to match song's primary instrument
+                song_inst = getattr(found_song, "instrument", "piano")
+                if song_inst == "guitar" and self.instrument_type != "Viola":
+                    self.inst_select.set("🎸 Viola / Guitarra")
+                    self._on_instrument_changed("🎸 Viola / Guitarra")
+                elif song_inst == "piano" and self.instrument_type != "Piano":
+                    self.inst_select.set("🎹 Piano Acústico")
+                    self._on_instrument_changed("🎹 Piano Acústico")
+            else:
+                self.exercise_notes = [Note("C4"), Note("D4"), Note("E4"), Note("F4"), Note("G4")]
+                self.exercise_title = "Exercício Livre"
 
         self._highlight_target_note()
 
@@ -492,6 +505,9 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self.cents_bar.set(meter_val)
 
         target_note = self.exercise_notes[self.current_note_idx]
+        pitch_key = target_note.pitch_with_octave
+        if pitch_key not in self.note_performance_history:
+            self.note_performance_history[pitch_key] = []
 
         # Check if detected note matches target note pitch class
         if detected_note.normalized_pitch == target_note.normalized_pitch:
@@ -502,6 +518,12 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
                 )
                 self.tuner_card.configure(border_color=theme.COLOR_SUCCESS)
 
+                self.note_performance_history[pitch_key].append({
+                    "detected": detected_note,
+                    "cents": cents,
+                    "success": True,
+                })
+
                 now = time.time()
                 if self._matched_start_time is None:
                     self._matched_start_time = now
@@ -509,25 +531,32 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
                     self._advance_to_next_target_note()
             elif cents < -25.0:
                 self.intonation_status_lbl.configure(
-                    text="▲ Toca ligeiramente mais agudo",
+                    text="▲ Mesma nota — toca ligeiramente mais agudo",
                     text_color=theme.COLOR_ACCENT_AMBER,
                 )
                 self.tuner_card.configure(border_color=theme.COLOR_ACCENT_AMBER)
                 self._matched_start_time = None
             else:
                 self.intonation_status_lbl.configure(
-                    text="▼ Toca ligeiramente mais grave",
+                    text="▼ Mesma nota — toca ligeiramente mais grave",
                     text_color=theme.COLOR_ACCENT_AMBER,
                 )
                 self.tuner_card.configure(border_color=theme.COLOR_ACCENT_AMBER)
                 self._matched_start_time = None
         else:
+            hint = calculate_pitch_directional_hint(target_note, detected_note)
             self.intonation_status_lbl.configure(
-                text=f"Nota incorreta (detetado {detected_note.pitch}, esperado {target_note.pitch})",
+                text=f"⚠️ {hint}",
                 text_color=theme.COLOR_ACCENT_CRIMSON,
             )
             self.tuner_card.configure(border_color=theme.COLOR_ACCENT_CRIMSON)
             self._matched_start_time = None
+
+            self.note_performance_history[pitch_key].append({
+                "detected": detected_note,
+                "cents": cents,
+                "success": False,
+            })
 
     def _toggle_metronome(self):
         if self.metronome.is_running:
@@ -614,6 +643,19 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
             else:
                 ramp_msg = f"\n🏆 Atingiste a velocidade alvo completa ({self.target_bpm} BPM)!"
 
+        # Compilar Relatório Detalhado de Afinação por Nota
+        failed_notes_summary = []
+        for pitch_key, attempts in self.note_performance_history.items():
+            failures = [att for att in attempts if not att["success"]]
+            if failures:
+                avg_cents = sum(f["cents"] for f in failures) / float(len(failures))
+                last_det = failures[-1]["detected"]
+                failed_notes_summary.append(f"• **{pitch_key}**: {len(failures)} tentativa(s) fora do tom (detetado {last_det.pitch_with_octave}, desvio médio: {avg_cents:+.0f}c)")
+
+        report_str = ""
+        if failed_notes_summary:
+            report_str = "\n\n📋 **Relatório da Aula (Notas para Reforçar)**:\n" + "\n".join(failed_notes_summary[:5])
+
         stats = self.user_manager.record_attempt(
             category="pratica_instrumento",
             question_type="acoustic_pitch",
@@ -630,7 +672,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
 
         self.score_card.show_feedback(
             is_correct=True,
-            explanation=f"Excelente desempenho acústico no {self.instrument_type}! Tocaste e afinaste todas as {len(self.exercise_notes)} notas com sucesso.{ramp_msg}",
+            explanation=f"Excelente desempenho acústico no {self.instrument_type}! Tocaste e afinaste todas as {len(self.exercise_notes)} notas com sucesso.{ramp_msg}{report_str}",
             stats=stats,
             can_replay=True,
         )

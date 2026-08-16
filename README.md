@@ -88,6 +88,11 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
   - Sistema de combos consecutivos ($1\times, 2\times, 3\times, 4\times$) que multiplicam a pontuação e o ganho de XP!
 - **Modo Demonstração Sonora**: Reprodução automática nota a nota para ouvir a peça antes de praticar.
 
+- **Aulas Práticas com Instrumento Acústico Real & Repertório Dinâmico (Fase 29)**:
+  - Deteção por microfone com **dicas direcionais pedagógicas** ao errar a nota (ex: *"Tocaste Ré3, o alvo é Mi3 — sobe 1 tom"*).
+  - Acesso dinâmico a **toda a biblioteca de repertório** para praticar qualquer peça com piano ou viola física real.
+  - **Relatório Detalhado da Aula** ao terminar a peça, listando que notas específicas falharam, número de tentativas fora do tom e desvio médio em cents.
+
 ---
 
 ### 5. 🎤 FASE 5 — Ditado de Solfejo Cantado com Validação Vocal por Microfone
