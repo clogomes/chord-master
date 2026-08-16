@@ -1258,4 +1258,235 @@ A **capotraste** (ou cejilha) é a ferramenta de transposição por excelência 
 • Placing a capo on fret N raises pitch by N semitones, using open chord shapes in new keys.
 """,
     ),
+
+    # ----------------------------------------------------
+    # CAPÍTULO 13 — Harmonia de Jazz Básica
+    # ----------------------------------------------------
+    TheoryChapter(
+        id="chap13_jazz_harmony",
+        number=13,
+        title="Harmonia de Jazz Básica",
+        subtitle="Progressões ii-V-I, forma de blues de 12 compassos e introdução à relação acorde-escala",
+        difficulty="Avançado",
+        category="Harmonia Avançada",
+        summary="Descobre os fundamentos da harmonia de jazz: a progressão cadencial ii-V-I, a estrutura do blues de 12 compassos e a teoria acorde-escala (chord-scale theory).",
+        content_markdown="""
+### 1. A Progressão Fundamental do Jazz: ii - V - I
+A cadência **ii - V - I** é a espinha dorsal de mais de 80% do repertório de Jazz e Bossa Nova:
+• **ii (m7)**: Função Subdominante de preparação (ex: Dm7 em Dó Maior).
+• **V (7)**: Função Dominante de máxima tensão contendo o trítono (ex: G7).
+• **I (maj7)**: Função Tónica de repouso e resolução sofisticada (ex: Cmaj7).
+
+---
+
+### 2. A Estrutura do Blues de 12 Compassos
+O Blues de 12 compassos usa apenas acordes de 7ª dominante (I7, IV7, V7):
+• **Compassos 1-4**: I7 - I7 - I7 - I7 (ex: C7)
+• **Compassos 5-6**: IV7 - IV7 (ex: F7)
+• **Compassos 7-8**: I7 - I7 (ex: C7)
+• **Compassos 9-10**: V7 - IV7 (ex: G7 - F7)
+• **Compassos 11-12**: I7 - V7 (*Turnaround*: C7 - G7)
+
+---
+
+### 3. Introdução à Teoria Acorde-Escala (Chord-Scale Theory)
+No Jazz, cada acorde da progressão é associado a uma escala ou modo específico para improvisação:
+• **Acorde m7 (grau ii)** → Modo **Dórico**
+• **Acorde 7 (grau V)** → Modo **Mixolídio** (ou escala alterada/diminuta)
+• **Acorde maj7 (grau I)** → Modo **Jónio** ou **Lídio**
+""",
+        piano_focus="""
+🎹 **No Piano**:
+• Toca *Rootless Voicings* de ii-V-I: Mão esquerda toca fundamental; mão direita troca apenas 1 nota entre Dm7 [F-A-C-E] e G7 [F-G-B-E].
+""",
+        guitar_focus="""
+🎸 **Na Viola / Guitarra**:
+• Usa formas Drop 2 nas cordas 4-3-2-1 para deslizar ii-V-I suavemente pelo braço.
+""",
+        interactive_demo="circle_of_fifths",
+        title_en="Basic Jazz Harmony",
+        subtitle_en="ii-V-I progressions, 12-bar blues form, and introduction to chord-scale theory",
+        summary_en="Discover jazz harmony foundations: the cadential ii-V-I progression, 12-bar blues structure, and introductory chord-scale theory.",
+        content_markdown_en="""
+### 1. The Core Jazz Cadence: ii - V - I
+The **ii - V - I** progression is the backbone of Jazz and Bossa Nova:
+• **ii (m7)**: Subdominant preparation (e.g. Dm7 in C Major).
+• **V (7)**: Dominant tension (e.g. G7).
+• **I (maj7)**: Tonic resolution (e.g. Cmaj7).
+
+---
+
+### 2. 12-Bar Blues Form
+Standard 12-bar blues uses dominant 7th chords: I7 (bars 1-4), IV7 (bars 5-6), I7 (7-8), V7-IV7 (9-10), I7-V7 turnaround (11-12).
+""",
+        piano_focus_en="""
+🎹 **On Piano**:
+• Play rootless ii-V-I voicings: left hand plays bass, right hand plays 3rd & 7th guide tones.
+""",
+        guitar_focus_en="""
+🎸 **On Guitar / Viola**:
+• Use Drop 2 chord shapes across the top 4 strings for smooth ii-V-I motion.
+""",
+    ),
+
+    # ----------------------------------------------------
+    # CAPÍTULO 14 — Fundamentos de Improvisação
+    # ----------------------------------------------------
+    TheoryChapter(
+        id="chap14_improvisation",
+        number=14,
+        title="Fundamentos de Improvisação",
+        subtitle="Construção de frases, uso de guide tones e conexão melódica sobre acordes",
+        difficulty="Intermédio",
+        category="Teoria Aplicada",
+        summary="Aprende a criar melodias em tempo real: escolha de escalas sobre acordes, foco em Guide Tones (3ª e 7ª), notas de aproximação e articulação de frases.",
+        content_markdown="""
+### 1. O que são Guide Tones?
+Os **Guide Tones** são a **3ª e a 7ª** de cada acorde. São as notas mais importantes da harmonia porque definem se o acorde é maior, menor ou dominante.
+
+• **Regra de Ouro**: Ao mudar de acorde numa improvisação, aterra suavemente na 3ª ou na 7ª do novo acorde!
+
+---
+
+### 2. Aproximações Cromáticas e Notas de Passagem
+• **Notas Alvo (Target Notes)**: Notas do acorde onde a frase resolve nos tempos fortes (1 e 3).
+• **Aproximação Cromática**: Tocar um semitom abaixo ou acima da nota alvo imediatamente antes de a atingir.
+""",
+        piano_focus="""
+🎹 **No Piano**:
+• Pratica a escala pentatónica menor na mão direita enquanto a mão esquerda toca acordes de base de 12-bar blues.
+""",
+        guitar_focus="""
+🎸 **Na Viola / Guitarra**:
+• Usa a Posição 1 da Pentatónica Menor com a 'Blue Note' (trítono) para criar frases de blues expressivas.
+""",
+        interactive_demo="scales",
+        title_en="Improvisation Fundamentals",
+        subtitle_en="Phrase construction, guide tones, and melodic connection over chords",
+        summary_en="Learn real-time melody creation: selecting scales over chords, targeting Guide Tones (3rd and 7th), and phrase articulation.",
+        content_markdown_en="""
+### 1. What are Guide Tones?
+**Guide Tones** are the **3rd and 7th** of each chord. They are the most crucial harmony notes defining chord quality.
+
+• **Golden Rule**: When chords change, land smoothly on the 3rd or 7th of the new chord!
+""",
+        piano_focus_en="""
+🎹 **On Piano**:
+• Practice right-hand minor pentatonic solos over left-hand blues chord comping.
+""",
+        guitar_focus_en="""
+🎸 **On Guitar / Viola**:
+• Combine Minor Pentatonic Box 1 with the Blue Note for expressive soloing.
+""",
+    ),
+
+    # ----------------------------------------------------
+    # CAPÍTULO 15 — Contraponto & Condução de Vozes
+    # ----------------------------------------------------
+    TheoryChapter(
+        id="chap15_counterpoint",
+        number=15,
+        title="Contraponto & Condução de Vozes",
+        subtitle="Movimento entre vozes, independência melódica e regras de condução coral",
+        difficulty="Avançado",
+        category="Composição",
+        summary="Aprofunda a arte da condução de vozes e contraponto: os 4 tipos de movimento entre vozes (paralelo, contrário, oblíquo, direto) e regras de polifonia.",
+        content_markdown="""
+### 1. Os 4 Tipos de Movimento entre Vozes
+Ao mover duas linhas melódicas simultâneas:
+1. **Movimento Contrário**: Uma voz sobe e a outra desce (o movimento mais independente e elegante).
+2. **Movimento Oblíquo**: Uma voz permanece fixa enquanto a outra se move.
+3. **Movimento Paralelo**: Ambas as vozes movem-se na mesma direção pelo mesmo intervalo.
+4. **Movimento Direto**: Ambas as vozes movem-se na mesma direção por intervalos diferentes.
+
+---
+
+### 2. Regras Fundamentais de Condução de Vozes
+• **Evitar 5ªs e 8ªs Paralelas**: Movimento paralelo entre quintas ou oitavas destrói a independência das vozes.
+• **Economia de Movimento**: Cada voz deve mover-se pelo menor passo possível (grau conjunto / semitom).
+""",
+        piano_focus="""
+🎹 **No Piano**:
+• Pratica conduzir duas vozes (Soprano e Baixo) em movimento contrário ao harmonizar uma escala.
+""",
+        guitar_focus="""
+🎸 **Na Viola / Guitarra**:
+• Em peças a duas vozes (como as Bourrées de Bach), mantém o baixo com o polegar e a melodia nos dedos agudos.
+""",
+        interactive_demo="fretboard",
+        title_en="Counterpoint & Voice Leading",
+        subtitle_en="Voice motion types, melodic independence, and polyphonic rules",
+        summary_en="Deepen voice leading and counterpoint: 4 types of voice motion (parallel, contrary, oblique, direct) and polyphonic rules.",
+        content_markdown_en="""
+### 1. The 4 Types of Voice Motion
+1. **Contrary Motion**: One voice moves up, the other down (most independent).
+2. **Oblique Motion**: One voice stays fixed while the other moves.
+3. **Parallel Motion**: Both voices move in the same direction by the same interval.
+4. **Direct Motion**: Both voices move in the same direction by different intervals.
+""",
+        piano_focus_en="""
+🎹 **On Piano**:
+• Practice playing contrary motion between Bass and Soprano voices when harmonizing scales.
+""",
+        guitar_focus_en="""
+🎸 **On Guitar / Viola**:
+• In two-voice classical pieces (e.g. Bach Bourrées), keep thumb bass separate from treble melody.
+""",
+    ),
+
+    # ----------------------------------------------------
+    # CAPÍTULO 16 — Técnicas de Prática Deliberada
+    # ----------------------------------------------------
+    TheoryChapter(
+        id="chap16_deliberate_practice",
+        number=16,
+        title="Técnicas de Prática Deliberada",
+        subtitle="Como estudar com eficiência: prática lenta, repetição espaçada e chunking",
+        difficulty="Prático",
+        category="Teoria Aplicada",
+        summary="Aprende a estudar como um músico profissional: os princípios da Prática Deliberada, isolamento de problemas (chunking), velocidade de rampa e gestão de sessões.",
+        content_markdown="""
+### 1. O que é a Prática Deliberada?
+Praticar não é apenas "tocar a peça do início ao fim várias vezes". A **Prática Deliberada** é um estudo altamente focado, focado em corrigir falhas específicas:
+
+1. **Prática Lenta (70% BPM)**: Tocar devagar garante precisão neuromuscular absoluta antes de acelerar.
+2. **Chunking (Segmentação)**: Isolar pequenos blocos de 1 a 2 compassos onde ocorre o erro, em vez de repetir a peça inteira.
+3. **Repetição Espaçada**: Sessões curtas de 20 minutos todos os dias funcionam muito melhor do que 3 horas num único dia.
+
+---
+
+### 2. O Método da Rampa de Tempo
+• Começa o metrónomo a **70% do BPM alvo**.
+• Toca a passagem 3 vezes seguidas sem cometer um único erro.
+• Aumenta o metrónomo em apenas **4 a 5 BPM**.
+• Se falhares, reduz 2 BPM e consolida a precisão.
+""",
+        piano_focus="""
+🎹 **No Piano**:
+• Isola a mão esquerda e a mão direita separadamente antes de tentar juntar as duas mãos num trecho complexo.
+""",
+        guitar_focus="""
+🎸 **Na Viola / Guitarra**:
+• Treina a transição entre pestanas difíceis repetindo apenas o movimento no ar entre os dois acordes durante 1 minuto.
+""",
+        interactive_demo="notes",
+        title_en="Deliberate Practice Techniques",
+        subtitle_en="How to study efficiently: slow practice, spaced repetition, and chunking",
+        summary_en="Learn to study like a professional musician: Deliberate Practice principles, isolating trouble spots (chunking), tempo ramping, and session management.",
+        content_markdown_en="""
+### 1. What is Deliberate Practice?
+Deliberate Practice is focused, goal-oriented study aimed at correcting specific errors:
+1. **Slow Practice (70% BPM)**: Build neuromuscular accuracy before speeding up.
+2. **Chunking**: Isolate 1-2 bar difficulty spots instead of replaying full pieces.
+3. **Spaced Repetition**: 20-minute daily sessions outperform 3-hour weekend binges.
+""",
+        piano_focus_en="""
+🎹 **On Piano**:
+• Practice hands separately on complex passages before combining them.
+""",
+        guitar_focus_en="""
+🎸 **On Guitar / Viola**:
+• Isolate difficult barre chord switches by practicing the hand shape transition in the air for 1 minute.
+""",
+    ),
 ]

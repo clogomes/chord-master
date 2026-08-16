@@ -35,17 +35,25 @@
 
 ---
 
-### 3. 📖 Academia Completa de Teoria Musical (8 Capítulos com Áudio & Visualizadores Sincronizados)
+### 3. 📖 Academia Completa de Teoria Musical (16 Capítulos com Áudio & Quizzes Interativos)
 Um curso completo de harmonia e teoria desde os conceitos fundamentais até técnicas avançadas, com sincronização em tempo real entre **Pauta Musical**, **Teclado de Piano** e **Braço de Viola (15 Trastes)**:
 - **Capítulo 1 — Fundamentos & Notação**: Som, altura, notação internacional (`C, D, E...`), Solfejo português (`Dó, Ré, Mi...`), acidentes (♯ / ♭), oitavas científicas e claves.
 - **Capítulo 2 — Intervalos Musicais & Física Harmónica**: Frequências em Hz, semitons, classificação de intervalos (2ªm a 8ªJ), consonâncias/dissonâncias e mnemónicas de músicas conhecidas.
-- **Capítulo 3 — Escalas, Círculo de 5ªs & Modos Gregos**: Estruturas de Escala Maior, Menores (Natural, Harmónica e Melódica), Pentatónicas e os 7 Modos Gregos (Jónio, Dórico, Frígio, Lídio, Mixolídio, Eólio e Lócrio).
-- **Capítulo 4 — Formação de Acordes & Tríades**: Como empilhar terças para construir tríades Maiores, Menores, Diminutas, Aumentadas e Suspensas ($Sus2, Sus4$), com inversões (Estado Fundamental, 1ª e 2ª Inversão).
-- **Capítulo 5 — Campo Harmónico & Tétrades**: Harmonização da escala maior, graus harmónicos ($I, ii, iii, IV, V, vi, vii^\circ$) e acordes de quatro notas ($Maj7, 7, m7, m7\flat5, dim7$).
-- **Capítulo 6 — Harmonia Avançada & Modulação**: Funções tonais (Tónica, Subdominante, Dominante), cadências harmónicas ($II\text{-}V\text{-}I, IV\text{-}V\text{-}I$), dominantes secundários, empréstimo modal e modulação.
-- **Capítulo 7 — Guia Prático de Piano**: Técnica de dedilhação (Dedos 1 a 5 para mão direita e esquerda), postura, passagem de polegar e mapas de dedilhação para escalas e acordes.
-- **Capítulo 8 — Guia Prático de Viola / Guitarra (Sistema CAGED)**: Afinação padrão das 6 cordas ($E2, A2, D3, G3, B3, E4$), sistema CAGED para mapear qualquer acorde ao longo do braço, e biblioteca interativa de formas de acordes.
-- **Acompanhamento de Lição Concluída**: Botão interativo para registar a lição como concluída/estudada no perfil ativo.
+- **Capítulo 3 — Escalas, Círculo de 5ªs & Modos Gregos**: Estruturas de Escala Maior, Menores (Natural, Harmónica e Melódica), Pentatónicas e os 7 Modos Gregos.
+- **Capítulo 4 — Formação de Acordes & Tríades**: Como empilhar terças para construir tríades Maiores, Menores, Diminutas, Aumentadas e Suspensas, com inversões.
+- **Capítulo 5 — Campo Harmónico & Tétrades**: Harmonização da escala maior, graus harmónicos e acordes de quatro notas (`maj7`, `7`, `m7`, `m7♭5`).
+- **Capítulo 6 — Harmonia Avançada & Modulação**: Funções tonais, cadências harmónicas, dominantes secundários, empréstimo modal e substituição tritónica (`SubV7`).
+- **Capítulo 7 — Guia Prático de Piano**: Técnica de dedilhação, postura, passagem de polegar e acompanhamentos.
+- **Capítulo 8 — Guia Prático de Viola / Guitarra**: Afinação padrão, Sistema CAGED e técnica de pestana.
+- **Capítulo 9 — Ritmo, Compasso & Pulsação**: Métricas (4/4, 3/4, 6/8), figuras rítmicas e síncopas.
+- **Capítulo 10 — Forma Musical & Estrutura**: Formas AB, ABA, Rondó e Sonata.
+- **Capítulo 11 — Dinâmica, Articulação & Expressão**: Volume, legato, staccato, acento e uso de pedal.
+- **Capítulo 12 — Transposição Prática & Tonalidades**: Mover peças entre tons e uso de capotraste.
+- **Capítulo 13 — Harmonia de Jazz Básica (Fase 28)**: Cadência `ii-V-I`, blues de 12 compassos e teoria acorde-escala.
+- **Capítulo 14 — Fundamentos de Improvisação (Fase 28)**: Guide tones (3ª e 7ª), aproximações cromáticas e construção de frases.
+- **Capítulo 15 — Contraponto & Condução de Vozes (Fase 28)**: Movimentos de vozes (contrário, oblíquo), regras contrapontísticas e eliminação de quintas/oitavas paralelas.
+- **Capítulo 16 — Técnicas de Prática Deliberada (Fase 28)**: Estudo eficiente a 70% BPM, chunking e repetição espaçada.
+- **Acompanhamento de Lição Concluída & Quizzes**: Quizzes interativos de 5 perguntas com recompensa de XP e badges.
 
 ---
 

@@ -434,4 +434,144 @@ CHAPTER_QUIZZES: List[ChapterQuiz] = [
             ),
         ]
     ),
+    ChapterQuiz(
+        chapter_id="chap13_jazz_harmony",
+        questions=[
+            QuizQuestion(
+                question="Qual é a progressão de acordes mais célebre no Jazz e Bossa Nova?",
+                options=["I - IV - V", "ii - V - I", "I - vi - IV - V", "iii - vi - ii - V"],
+                correct_index=1,
+                explanation="A progressão ii - V - I é o bloco harmónico mais usado no Jazz (ex: Dm7 - G7 - Cmaj7)."
+            ),
+            QuizQuestion(
+                question="Quantos compassos tem a estrutura clássica do Blues?",
+                options=["8", "12", "16", "32"],
+                correct_index=1,
+                explanation="O Blues tradicional baseia-se numa estrutura formal rígida de 12 compassos."
+            ),
+            QuizQuestion(
+                question="Segundo a teoria acorde-escala (chord-scale theory), qual o modo associado ao grau ii (m7)?",
+                options=["Jónio", "Dórico", "Frígio", "Lídio"],
+                correct_index=1,
+                explanation="O acorde de grau ii (m7) associa-se ao Modo Dórico."
+            ),
+            QuizQuestion(
+                question="O que é o 'Turnaround' nos compassos 11-12 do Blues?",
+                options=["Uma pausa completa", "A repetição da melodia", "A progressão final que conduz o regresso ao início (I7 - V7)", "Um solo de bateria"],
+                correct_index=2,
+                explanation="O turnaround prepara a repetição da forma de 12 compassos conduzindo de volta à tónica."
+            ),
+            QuizQuestion(
+                question="Em Rootless Voicings no piano, o que se omite na mão direita?",
+                options=["A terça", "A sétima", "A fundamental", "A quinta"],
+                correct_index=2,
+                explanation="No piano jazz, a fundamental é deixada para o baixo (mão esquerda), libertando a mão direita para tocar guide tones e extensões."
+            ),
+        ]
+    ),
+    ChapterQuiz(
+        chapter_id="chap14_improvisation",
+        questions=[
+            QuizQuestion(
+                question="O que são 'Guide Tones' numa harmonia de acordes?",
+                options=["A fundamental e a quinta", "A 3ª e a 7ª de cada acorde", "As notas mais agudas da escala", "As notas tocadas em staccato"],
+                correct_index=1,
+                explanation="A 3ª e a 7ª definem o carácter do acorde (maior, menor, dominante) e são os alvos melódicos principais."
+            ),
+            QuizQuestion(
+                question="Em que notas do acorde deve idealmente aterrar uma frase de improvisação nos tempos fortes?",
+                options=["Nas notas de aproximação cromática", "Nas notas alvo (Target Notes / 3ª e 7ª)", "Em pausas", "Apenas na fundamental"],
+                correct_index=1,
+                explanation="Aterrar nas notas alvo nos tempos fortes dá clareza harmónica à improvisação."
+            ),
+            QuizQuestion(
+                question="Qual a escala mais utilizada para solos de Blues e Rock?",
+                options=["Escala Maior", "Escala Pentatónica Menor (com a Blue Note)", "Escala Cromática", "Modo Lócrio"],
+                correct_index=1,
+                explanation="A Pentatónica Menor com a Blue Note (trítono) é o pilar da improvisação de Blues e Rock."
+            ),
+            QuizQuestion(
+                question="O que é uma aproximação cromática?",
+                options=["Tocar desafinado", "Tocar um semitom acima ou abaixo da nota alvo antes de a atingir", "Saltar uma oitava", "Acelerar o tempo"],
+                correct_index=1,
+                explanation="A aproximação cromática cria tensão momentânea que resolve na nota do acorde."
+            ),
+            QuizQuestion(
+                question="Como se liga uma linha melódica entre acordes com fluidez?",
+                options=["Saltando grandes oitavas", "Movendo-se por passos de semitom/tom em direção aos Guide Tones", "Parando de tocar entre acordes", "Repetindo sempre a mesma nota"],
+                correct_index=1,
+                explanation="Conduzir frases por graus conjuntos em direção aos Guide Tones cria linhas melódicas contínuas."
+            ),
+        ]
+    ),
+    ChapterQuiz(
+        chapter_id="chap15_counterpoint",
+        questions=[
+            QuizQuestion(
+                question="Qual o tipo de movimento entre vozes considerado mais independente e elegante?",
+                options=["Movimento Paralelo", "Movimento Contrário (uma voz sobe e a outra desce)", "Movimento Direto", "Movimento Nulo"],
+                correct_index=1,
+                explanation="No movimento contrário, a independência contrapontística das vozes é máxima."
+            ),
+            QuizQuestion(
+                question="Na condução de vozes tradicional, que intervalo paralelo deve ser rigorosamente evitado?",
+                options=["Terças paralelas", "Sextas paralelas", "Quintas e Oitavas paralelas", "Quartas paralelas"],
+                correct_index=2,
+                explanation="Quintas e oitavas paralelas destroem a individualidade melódica das duas vozes."
+            ),
+            QuizQuestion(
+                question="O que caracteriza o Movimento Oblíquo entre duas vozes?",
+                options=["Ambas as vozes sobem", "Uma voz permanece fixa enquanto a outra se move", "Ambas descem", "Nenhuma se move"],
+                correct_index=1,
+                explanation="No movimento oblíquo, uma linha mantém-se estática enquanto a outra progride."
+            ),
+            QuizQuestion(
+                question="Qual o princípio de 'Economia de Movimento' na condução de vozes?",
+                options=["Mover cada voz pelo menor caminho possível (passos de semitom ou tom)", "Dar grandes saltos de oitava", "Usar só uma mão", "Tocar o mais rápido possível"],
+                correct_index=0,
+                explanation="A economia de movimento garante uma transição vocal fluida e natural."
+            ),
+            QuizQuestion(
+                question="Em peças a duas vozes na viola (como as de Bach), qual o papel do polegar direito?",
+                options=["Tocar a melodia aguda", "Manter a linha de baixo independente", "Abafar as cordas", "Tocar em staccato"],
+                correct_index=1,
+                explanation="O polegar conduz a linha de baixo contrapontística."
+            ),
+        ]
+    ),
+    ChapterQuiz(
+        chapter_id="chap16_deliberate_practice",
+        questions=[
+            QuizQuestion(
+                question="O que caracteriza a Prática Deliberada por oposição a tocar apenas a peça?",
+                options=["Tocar sem metrónomo", "Estudo focado na correção consciente de falhas específicas", "Tocar 5 horas seguidas", "Tocar o mais rápido possível"],
+                correct_index=1,
+                explanation="A Prática Deliberada isola e corrige fraquezas de forma consciente e focada."
+            ),
+            QuizQuestion(
+                question="A que velocidade de rampa se deve começar a praticar uma passagem complexa?",
+                options=["A 120% do BPM alvo", "A 70% do BPM alvo (velocidade lenta e precisa)", "Sem metrónomo", "A 100% do BPM alvo"],
+                correct_index=1,
+                explanation="Estudar a 70% do BPM consolida a precisão neuromuscular antes de aumentar a velocidade."
+            ),
+            QuizQuestion(
+                question="O que significa a técnica de 'Chunking' no estudo musical?",
+                options=["Repetir a peça do início ao fim", "Isolar pequenos blocos de 1 a 2 compassos onde ocorre o erro", "Tocar com os olhos fechados", "Mudar de instrumento"],
+                correct_index=1,
+                explanation="Chunking divide o problema em segmentos pequenos e controláveis."
+            ),
+            QuizQuestion(
+                question="Para a retenção de memória muscular a longo prazo, qual o formato de estudo mais eficaz?",
+                options=["3 horas num único dia do fim de semana", "Sessões diárias curtas e focadas de 20 a 30 minutos (repetição espaçada)", "Estudar apenas antes do concerto", "Não praticar com frequência"],
+                correct_index=1,
+                explanation="A repetição espaçada diária consolida a memória a longo prazo muito melhor do que maratonas esporádicas."
+            ),
+            QuizQuestion(
+                question="Qual o procedimento correto na Rampa de Tempo se cometeres um erro ao subir 5 BPM?",
+                options=["Aumentar mais 10 BPM", "Reduzir 2 a 5 BPM e consolidar a precisão sem erros", "Desistir da passagem", "Ignorar o erro e continuar"],
+                correct_index=1,
+                explanation="Regredir ligeiramente o tempo permite fixar o padrão correto sem reforçar o erro."
+            ),
+        ]
+    ),
 ]
