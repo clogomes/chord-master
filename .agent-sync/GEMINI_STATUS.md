@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 32 — Correções de Funcionalidades (Modal Teórico, Áudio de Técnica, MIDI USB & Callbacks Metrónomo) — CONCLUÍDA
+- Data: 2026-08-16 16:30 (UTC+1)
+- Commit: b79d946
+- Resumo: Importada a função `render_markdown_to_textbox` em `gui/screens/practice_song.py`, reposicionado `grab_set()` e adicionado bloco `try/except` com `top.destroy()` no modal de Análise Teórica para evitar travamentos de janela. Corrigidas as chamadas `self.audio_player.play_note` em `gui/screens/practice_technique.py` para passar o objeto `Note` diretamente em vez de strings. Ajustada a assinatura de `_on_midi_note_on` no ecrã de técnica para receber `note_midi: int` e converter via `Note.from_midi`. Uniformizadas as assinaturas do callback do metrónomo `_on_metronome_beat(self, beat_num, timestamp)` nos 3 ecrãs de prática e adicionado logging de exceções em `audio/metronome.py`. 166/166 testes a passar.
+- Ficheiros alterados: gui/screens/practice_song.py, gui/screens/practice_technique.py, gui/screens/practice_instrument.py, gui/screens/practice_scales.py, audio/metronome.py, tests/test_dead_features_phase32.py, README.md
+
 ## Fase 31 — Correções de Motor (Intervalos Compostos, Ortografia com Bemóis & Oitavas na Guitarra) — CONCLUÍDA
 - Data: 2026-08-16 16:27 (UTC+1)
 - Commit: 29fe07f
