@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Correção — AÇÃO NECESSÁRIA (URGENTE): Regressão da Fase 31 (Duplos Acidentes) — CONCLUÍDA
+- Data: 2026-08-16 16:34 (UTC+1)
+- Commit: 5346900
+- Resumo: Corrigida regressão introduzida na Fase 31 que causava crash ao lidar com ortografias com duplos acidentes (ex: Bbb, F##). `Note._parse_string` e o construtor `Note.__init__` foram atualizados para interpretar e calcular corretamente as alturas para 0, 1 ou 2 acidentes. Adicionada a formatação "dobrado sustenido" e "dobrado bemol" em `name_pt`. Criados testes (test_double_accidentals.py) para o varrimento completo do produto cartesiano (todas as raízes × todos os tipos de acordes e escalas), garantindo que nenhuma combinação gera exceções. 169/169 testes a passar.
+- Ficheiros alterados: core/notes.py, tests/test_double_accidentals.py
+
 ## Fase 32 — Correções de Funcionalidades (Modal Teórico, Áudio de Técnica, MIDI USB & Callbacks Metrónomo) — CONCLUÍDA
 - Data: 2026-08-16 16:30 (UTC+1)
 - Commit: b79d946
