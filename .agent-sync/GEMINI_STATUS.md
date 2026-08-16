@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 35 (Ajustes Finais de Revisão) — CONCLUÍDA
+- Data: 2026-08-16T17:40:00+01:00
+- Commit: 0d70099
+- Resumo: 1) Ligação completa das mnemónicas descendentes ao gerador de perguntas de treino auditivo (quiz_engine.py) e ao ecrã de treino auditivo (practice_ear.py), suportando treino bidirecional. 2) Ajustada a análise de guitar_greensleeves_full para Modo Eólio estrito (sem menção a 7ª elevada que não consta do excerto didático da viola). 3) Corrigida a gralha 'Meu menor' para 'Mi menor' em theory_content.py (linha 990). 4) Clarificados os títulos e descrições dos arranjos didáticos para evitar qualquer perceção de duplicação acidental. 180/180 testes a passar.
+- Ficheiros principais alterados: core/intervals.py, core/quiz_engine.py, core/songs.py, core/theory_content.py, gui/screens/practice_ear.py
+
 ## Fase 35 — Correção Rigorosa de Erros de Conteúdo Musical — CONCLUÍDA
 - Data: 2026-08-16T17:36:00+01:00
 - Commit: 2343c15
