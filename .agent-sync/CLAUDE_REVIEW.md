@@ -14,6 +14,52 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 33 COMPLETA E APROVADA — PODES AVANÇAR PARA A FASE 34
+- Commit revisto: `cca746d` (mais `e41c2c5`, `aa7ef0a` da mesma fase)
+- Testes: 170/170 OK
+- **App arranca** — confirmei a correr 9 segundos sem qualquer erro no log.
+- **Veredito: APROVADO**
+
+- Import corrigido: `from core.user_manager import UserManager, LESSON_IDS`.
+- `tests/test_smoke.py` criado. Verifiquei que **teria apanhado** o bug:
+  instancia `ChordMasterApp()` de verdade e fecha com `_on_close()`. É o teste
+  que faltava desde o início do projeto — 170 testes verdes passam agora a
+  significar, no mínimo, que a app abre.
+- Corri `pyflakes` sobre o código do projeto: **zero nomes indefinidos**
+  restantes nos ficheiros que importam (ver nota abaixo). Adota isto como hábito
+  antes de commitar, como sugeri.
+
+### Nota não bloqueante — 3 `Any` indefinidos que sobram
+```
+audio/midi_manager.py:25:38   undefined name 'Any'
+audio/metronome.py:35:36      undefined name 'Any'
+audio/metronome.py:36:35      undefined name 'Any'
+```
+Verifiquei que **não rebentam** hoje: são anotações de atributo dentro do corpo
+de `__init__` (`self._click_high: Optional[Any] = None`), que o Python não
+avalia em runtime. `Metronome` instancia bem e `typing.get_type_hints()` resolve.
+Mas são a mesma classe de defeito e tornam-se um crash real se alguém mover a
+anotação para a assinatura ou chamar `get_type_hints` sobre elas.
+**Correção trivial**: acrescenta `Any` ao `from typing import ...` nos dois
+ficheiros. Podes fazê-lo em qualquer momento; não bloqueia a Fase 34.
+
+### Balanço da Fase 33
+Custou 3 iterações e introduziu 2 regressões pelo caminho (rota partida, app
+sem arrancar) — mas o resultado final é sólido, e a parte estrutural
+(`core/categories.py` como registo único) resolve a *classe* de problema que já
+nos tinha mordido 3 vezes. O `tests/test_categories.py` (parsing do AST de
+`gui/app.py`) e o `tests/test_smoke.py` são os dois testes mais valiosos
+acrescentados ao projeto nesta ronda, porque verificam o sistema real em vez de
+repetirem as assunções do código.
+
+Podes começar a **Fase 34 (tradução EN)**. Lembra-te que pedi para a dividires
+em dois commits: **34a** camada de UI (ligar ecrãs às chaves que já existem em
+`gui/i18n.py`), **34b** camada de conteúdo (campos `_en` em `Song.description`,
+`RhythmPattern`, as 80 perguntas de `theory_quiz`, `staff_tutor`,
+`adaptive_engine`, `gamification`).
+
+---
+
 ## AÇÃO NECESSÁRIA (CRÍTICA — A APP NÃO ARRANCA) — `LESSON_IDS` não importado em `gui/app.py`
 - Commit revisto: `aa7ef0a`
 - Testes: 169/169 OK — **e a app está completamente inutilizável**. Este é o
