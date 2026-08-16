@@ -24,10 +24,12 @@ class Song:
     composer: str
     difficulty: str  # "Iniciante", "Intermédio", "Avançado"
     bpm: int
+    difficulty_en: Optional[str] = None
     clef: str = "treble"  # "treble" ou "bass"
     instrument: str = "piano"  # "piano" ou "guitar" / "viola"
     time_signature: str = "4/4"
     description: str = ""
+    description_en: Optional[str] = None
     theory_analysis: Optional[str] = None
     theory_analysis_en: Optional[str] = None
     notes: List[SongNote] = field(default_factory=list)
@@ -36,6 +38,16 @@ class Song:
         if lang == "en" and self.theory_analysis_en:
             return self.theory_analysis_en
         return self.theory_analysis
+
+    def get_description(self, lang: str = "pt") -> str:
+        if lang == "en" and self.description_en:
+            return self.description_en
+        return self.description
+
+    def get_difficulty(self, lang: str = "pt") -> str:
+        if lang == "en" and self.difficulty_en:
+            return self.difficulty_en
+        return self.difficulty
 
     @property
     def note_count(self) -> int:
@@ -81,9 +93,11 @@ SONG_LIBRARY: List[Song] = [
         title="Hino à Alegria (9ª Sinfonia)",
         composer="Ludwig van Beethoven",
         difficulty="Iniciante",
+        difficulty_en="Beginner",
         bpm=108,
         clef="treble",
         description="O tema imortal da Nona Sinfonia de Beethoven na íntegra. Melodia por graus conjuntos com frase A, ponte B e conclusão solene.",
+        description_en="The immortal theme from Beethoven's Ninth Symphony in its entirety. Stepwise melody with phrase A, bridge B, and a solemn conclusion.",
         notes=[
             # Frase A
             _sn("E4", 1.0, 3, 5, 0, "A-"),
@@ -159,9 +173,11 @@ SONG_LIBRARY: List[Song] = [
         title="Brilha, Brilha Estrelinha (Completo A-B-A)",
         composer="W. A. Mozart / Tradicional",
         difficulty="Iniciante",
+        difficulty_en="Beginner",
         bpm=100,
         clef="treble",
         description="A famosa melodia infantil clássica na sua forma ternária completa (Tema A + Frase do Meio B + Reprise A).",
+        description_en="The famous classical children's melody in its complete ternary form (Theme A + Middle Phrase B + Reprise A).",
         notes=[
             # Parte A
             _sn("C4", 1.0, 1, 4, 1, "Bri-"),
@@ -217,9 +233,11 @@ SONG_LIBRARY: List[Song] = [
         title="Papagaio Loiro (Cantiga Tradicional Completa)",
         composer="Folclore Português",
         difficulty="Iniciante",
+        difficulty_en="Beginner",
         bpm=110,
         clef="treble",
         description="Cantiga tradicional portuguesa completa em dois andamentos com letra tradicional integral.",
+        description_en="Complete traditional Portuguese song in two movements with full traditional lyrics.",
         notes=[
             _sn("G4", 1.0, 5, 5, 3, "Pa-"),
             _sn("E4", 1.0, 3, 5, 0, "pa-"),
@@ -264,9 +282,11 @@ SONG_LIBRARY: List[Song] = [
         title="Pombinha Branca (Cantiga Completa)",
         composer="Folclore Português",
         difficulty="Iniciante",
+        difficulty_en="Beginner",
         bpm=96,
         clef="treble",
         description="Melodia suave e completa do cancioneiro tradicional português.",
+        description_en="Smooth and complete melody from the traditional Portuguese songbook.",
         notes=[
             _sn("G4", 1.0, 5, 5, 3, "Pom-"),
             _sn("E4", 1.0, 3, 5, 0, "bi-"),
@@ -297,10 +317,12 @@ SONG_LIBRARY: List[Song] = [
         title="Für Elise (Tema Principal Completo)",
         composer="Ludwig van Beethoven",
         difficulty="Intermédio",
+        difficulty_en="Intermediate",
         bpm=120,
         clef="treble",
         time_signature="3/4",
         description="A célebre Bagatela em Lá menor (WoO 59) de Beethoven com o motivo cromático inicial, arpejos de Lá menor e Mi Maior e cadência harmónica.",
+        description_en="Beethoven's famous Bagatelle in A minor (WoO 59) with the initial chromatic motif, A minor and E Major arpeggios, and harmonic cadence.",
         notes=[
             _sn("E5", 1.0, 5, 5, 12, "Mi"),
             _sn("D#5", 1.0, 4, 5, 11, "Ré#"),
@@ -348,10 +370,12 @@ SONG_LIBRARY: List[Song] = [
         title="Minueto em Sol Maior (Seção A Completa)",
         composer="Christian Petzold / J. S. Bach",
         difficulty="Intermédio",
+        difficulty_en="Intermediate",
         bpm=116,
         clef="treble",
         time_signature="3/4",
         description="Do Pequeno Livro de Anna Magdalena Bach. A Seção A completa de 16 compassos em Sol Maior.",
+        description_en="From the Notebook for Anna Magdalena Bach. The complete 16-measure Section A in G Major.",
         notes=[
             _sn("D5", 1.0, 5, 5, 10, "Ré"),
             _sn("G4", 0.5, 1, 5, 3, "Sol"),
@@ -395,9 +419,11 @@ SONG_LIBRARY: List[Song] = [
         title="Marcha Nupcial (Trevo Coral Completo)",
         composer="Richard Wagner (Lohengrin)",
         difficulty="Iniciante",
+        difficulty_en="Beginner",
         bpm=88,
         clef="treble",
         description="A clássica marcha nupcial tocada em cerimónias no mundo inteiro, com melodia solene integral e frase central.",
+        description_en="The classic bridal chorus played in ceremonies worldwide, with the full solemn melody and central phrase.",
         notes=[
             _sn("C4", 1.0, 1, 4, 1, "Dó"),
             _sn("F4", 1.5, 3, 5, 1, "Fá"),
@@ -433,9 +459,11 @@ SONG_LIBRARY: List[Song] = [
         title="Canon em Dó / Ré (Tema & Variação Completa)",
         composer="Johann Pachelbel",
         difficulty="Iniciante",
+        difficulty_en="Beginner",
         bpm=76,
         clef="treble",
         description="A progressão harmónica e melodia barroca mais famosa de sempre, com o tema principal e a sua variação em colcheias.",
+        description_en="The most famous baroque harmonic progression and melody of all time, with the main theme and its eighth-note variation.",
         notes=[
             # Tema Principal
             _sn("E4", 1.0, 3, 5, 0, "Mi"),
@@ -474,9 +502,11 @@ SONG_LIBRARY: List[Song] = [
         title="Eine kleine Nachtmusik (Serenata K. 525 Completa)",
         composer="Wolfgang Amadeus Mozart",
         difficulty="Intermédio",
+        difficulty_en="Intermediate",
         bpm=124,
         clef="treble",
         description="O brilhante motivo de abertura em Sol Maior da serenata mais tocada de Mozart na sua forma completa com resolução.",
+        description_en="The brilliant opening motif in G Major of Mozart's most played serenade in its complete form with resolution.",
         notes=[
             _sn("G4", 1.5, 1, 5, 3, "Sol"),
             _sn("D4", 0.5, 1, 4, 3, "Ré"),
@@ -519,9 +549,11 @@ SONG_LIBRARY: List[Song] = [
         title="Greensleeves (Verso & Refrão Completo)",
         composer="Tradicional Século XVI",
         difficulty="Intermédio",
+        difficulty_en="Intermediate",
         bpm=92,
         clef="treble",
         description="Clássico do período Tudor em modo Dórico e Menor Melódico, com verso integral e refrão tradicional.",
+        description_en="Classic from the Tudor period in Dorian and Melodic Minor modes, with full verse and traditional chorus.",
         notes=[
             # Verso
             _sn("A4", 1.0, 1, 5, 5, "A-"),
@@ -558,9 +590,11 @@ SONG_LIBRARY: List[Song] = [
         title="O Cravo e a Rosa (Cantiga Completa)",
         composer="Cancioneiro Popular",
         difficulty="Iniciante",
+        difficulty_en="Beginner",
         bpm=104,
         clef="treble",
         description="Famosa cantiga de roda da tradição lusófona na sua versão integral de 4 estrofes.",
+        description_en="Famous nursery rhyme from the Lusophone tradition in its complete 4-stanza version.",
         notes=[
             _sn("C4", 1.0, 1, 4, 1, "O"),
             _sn("C4", 1.0, 1, 4, 1, "cra-"),
@@ -593,9 +627,11 @@ SONG_LIBRARY: List[Song] = [
         title="Grândola, Vila Morena (Hino Completo)",
         composer="José Afonso (Zeca Afonso)",
         difficulty="Iniciante",
+        difficulty_en="Beginner",
         bpm=84,
         clef="treble",
         description="O hino histórico da Revolução dos Cravos de 1974 na íntegra com a estrofe completa e cadência solene.",
+        description_en="The historic anthem of the 1974 Carnation Revolution in its entirety with the complete stanza and solemn cadence.",
         notes=[
             _sn("C4", 1.0, 1, 4, 1, "Grân-"),
             _sn("D4", 1.0, 2, 4, 3, "do-"),
@@ -630,9 +666,11 @@ SONG_LIBRARY: List[Song] = [
         title="Stairway to Heaven (Intro Acústica)",
         composer="Jimmy Page & Robert Plant (Led Zeppelin)",
         difficulty="Iniciante",
+        difficulty_en="Beginner",
         bpm=76,
         clef="treble",
         description="O lendário arpejo dedilhado em Lá menor que abre uma das maiores obras do rock. Simples e memorável para tocar na viola e no piano.",
+        description_en="The legendary picked arpeggio in A minor that opens one of rock's greatest masterpieces. Simple and memorable to play on guitar and piano.",
         notes=[
             _sn("A3", 1.0, 1, 3, 2, "Lá"),
             _sn("C4", 1.0, 2, 4, 1, "Dó"),
@@ -662,10 +700,12 @@ SONG_LIBRARY: List[Song] = [
         title="Nothing Else Matters (Intro Dedilhada)",
         composer="James Hetfield & Lars Ulrich (Metallica)",
         difficulty="Iniciante",
+        difficulty_en="Beginner",
         bpm=70,
         clef="treble",
         time_signature="6/8",
         description="A introdução mais famosa do heavy metal acústico. Toca-se inteiramente em cordas soltas no Mi menor (E2, G3, B3, E4) antes do tema principal.",
+        description_en="The most famous intro in acoustic heavy metal. Played entirely on open strings in E minor (E2, G3, B3, E4) before the main theme.",
         notes=[
             # Arpejo de Cordas Soltas (Mi Menor)
             _sn("E2", 1.0, 1, 0, 0, "Mi"),
@@ -697,9 +737,11 @@ SONG_LIBRARY: List[Song] = [
         title="Enter Sandman (Riff Principal)",
         composer="Metallica",
         difficulty="Iniciante",
+        difficulty_en="Beginner",
         bpm=120,
         clef="treble",
         description="O riff de abertura mais marcante do álbum 'Black Album' em Mi menor com tritono em Fá e Sol solto.",
+        description_en="The most striking opening riff from the 'Black Album' in E minor with a tritone in F and open G.",
         notes=[
             _sn("E2", 1.0, 1, 0, 0, "Mi"),
             _sn("E3", 1.0, 2, 2, 2, "Mi"),
@@ -725,9 +767,11 @@ SONG_LIBRARY: List[Song] = [
         title="Smoke on the Water (Riff Lendário)",
         composer="Ritchie Blackmore / Deep Purple",
         difficulty="Iniciante",
+        difficulty_en="Beginner",
         bpm=112,
         clef="treble",
         description="O riff em Sol menor mais famoso do mundo. Simples, poderoso e ideal para aprender ritmo e troca de notas.",
+        description_en="The most famous G minor riff in the world. Simple, powerful, and ideal for learning rhythm and note switching.",
         notes=[
             _sn("G3", 1.0, 1, 3, 0, "Sol"),
             _sn("A#3", 1.0, 2, 3, 3, "Si♭"),
@@ -750,10 +794,12 @@ SONG_LIBRARY: List[Song] = [
         title="Pour Élise (Tema)",
         composer="Ludwig van Beethoven",
         difficulty="Iniciante",
+        difficulty_en="Beginner",
         bpm=130,
         clef="treble",
         instrument="piano",
         description="Clássico tema de Beethoven focado no piano.",
+        description_en="Classic Beethoven theme focused on the piano.",
         theory_analysis="""### 🎓 Análise Harmónica & Estrutural
 
 • **Tonalidade**: Lá Menor (Am) / Modo Eólio.
@@ -771,10 +817,12 @@ SONG_LIBRARY: List[Song] = [
         title="Sonata ao Luar (Adagio)",
         composer="Ludwig van Beethoven",
         difficulty="Intermédio",
+        difficulty_en="Intermediate",
         bpm=60,
         clef="bass",
         instrument="piano",
         description="Famoso adágio da Sonata ao Luar, focado no piano.",
+        description_en="Famous adagio from the Moonlight Sonata, focused on the piano.",
         theory_analysis="""### 🎓 Análise Harmónica & Estrutural
 
 • **Tonalidade**: Dó♯ Menor (C♯m).
@@ -792,10 +840,12 @@ SONG_LIBRARY: List[Song] = [
         title="Gymnopédie No. 1",
         composer="Erik Satie",
         difficulty="Intermédio",
+        difficulty_en="Intermediate",
         bpm=75,
         clef="treble",
         instrument="piano",
         description="Melodia etérea de Satie.",
+        description_en="Ethereal melody by Satie.",
         theory_analysis="""### 🎓 Análise Harmónica & Estrutural
 
 • **Tonalidade**: Ré Maior (D Major) com sonoridade modal Lídia.
@@ -813,10 +863,12 @@ SONG_LIBRARY: List[Song] = [
         title="Cânone em Dó Maior",
         composer="Johann Pachelbel",
         difficulty="Iniciante",
+        difficulty_en="Beginner",
         bpm=90,
         clef="treble",
         instrument="piano",
         description="Clássico cânone focado no piano.",
+        description_en="Classic canon focused on the piano.",
         theory_analysis="""### 🎓 Análise Harmónica & Estrutural
 
 • **Tonalidade**: Dó Maior.
@@ -835,10 +887,12 @@ SONG_LIBRARY: List[Song] = [
         title="Malagueña (Tema Flamenco)",
         composer="Tradicional Espanhol",
         difficulty="Iniciante",
+        difficulty_en="Beginner",
         bpm=120,
         clef="treble",
         instrument="guitar",
         description="Tradicional tema espanhol para viola.",
+        description_en="Traditional Spanish theme for guitar.",
         theory_analysis="""### 🎓 Análise Harmónica & Estrutural
 
 • **Tonalidade / Modo**: Modo Frígio de Mi (E Phrygian / Cadência Andaluza).
@@ -856,10 +910,12 @@ SONG_LIBRARY: List[Song] = [
         title="The House of the Rising Sun",
         composer="Tradicional / Folk",
         difficulty="Intermédio",
+        difficulty_en="Intermediate",
         bpm=110,
         clef="treble",
         instrument="guitar",
         description="Clássico folk americano.",
+        description_en="American folk classic.",
         theory_analysis="""### 🎓 Análise Harmónica & Estrutural
 
 • **Tonalidade**: Lá Menor (Am) em métrica de 6/8.
@@ -877,10 +933,12 @@ SONG_LIBRARY: List[Song] = [
         title="Romance Anónimo (Romance de Amor)",
         composer="Tradicional Espanhol",
         difficulty="Intermédio",
+        difficulty_en="Intermediate",
         bpm=84,
         clef="treble",
         instrument="guitar",
         description="Famosa melodia tradicional de violão.",
+        description_en="Famous traditional guitar melody.",
         theory_analysis="""### 🎓 Análise Harmónica & Estrutural
 
 • **Tonalidade**: Mi Menor (Em) transitando para Mi Maior (E).
@@ -898,10 +956,12 @@ SONG_LIBRARY: List[Song] = [
         title="Greensleeves (Arranjo para Viola)",
         composer="Tradicional Inglês",
         difficulty="Iniciante",
+        difficulty_en="Beginner",
         bpm=100,
         clef="treble",
         instrument="guitar",
         description="Melodia tradicional renascentista para viola.",
+        description_en="Traditional Renaissance melody for guitar.",
         theory_analysis="""### 🎓 Análise Harmónica & Estrutural
 
 • **Tonalidade / Modo**: Modo Dórico de Lá (A Dorian) / Escala Menor Melódica.
