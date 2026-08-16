@@ -26,6 +26,18 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 34b — Camada de Conteúdo (Tradução EN) — CONCLUÍDA
+- Data: 2026-08-16 16:55 (UTC+1)
+- Commit: d157959
+- Resumo: Adicionada internacionalização (EN) completa à camada de conteúdo. Foram traduzidas as 80 perguntas do theory_quiz, os dados das canções em songs.py, categorias e dicas do adaptive_engine, conquistas da gamification e relatórios de exporter.
+- Ficheiros alterados: core/theory_quiz.py, core/songs.py, core/staff_tutor.py, audio/backing_tracks.py, core/adaptive_engine.py, core/gamification.py, core/exporter.py
+
+## Fase 34a — Camada de UI (Tradução EN) — CONCLUÍDA
+- Data: 2026-08-16 16:51 (UTC+1)
+- Commit: 928dd43
+- Resumo: Internacionalização da camada de UI. Ligação de ecrãs e componentes às chaves em gui/i18n.py usando a função t().
+- Ficheiros alterados: gui/screens/*.py, gui/components/*.py
+
 ## Fase 34b — Camada de Conteúdo (Tradução EN de Músicas) — CONCLUÍDA
 - Data: 2026-08-16 16:54 (UTC+1)
 - Commit: f3d7936
