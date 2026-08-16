@@ -114,6 +114,12 @@ COLOR_TEXT_MUTED: Tuple[str, str] = ("#64748B", "#94A3B8")    # Slate 500 / Slat
 COLOR_TEXT_SUBTLE: Tuple[str, str] = ("#94A3B8", "#6B7280")   # Slate 400 / Slate 500
 COLOR_TEXT_INVERSE: Tuple[str, str] = ("#FFFFFF", "#FFFFFF")  # Crisp white on solid badges
 
+# Compatibility Aliases
+COLOR_CARD_SURFACE: Tuple[str, str] = COLOR_SURFACE
+COLOR_ACCENT_EMERALD: str = COLOR_SUCCESS
+COLOR_ACCENT_EMERALD_HOVER: str = COLOR_SUCCESS_HOVER
+COLOR_ACCENT_EMERALD_DARK: str = COLOR_SUCCESS_DARK
+
 
 # ============================================================================
 # 3. SPACING & GEOMETRY TOKENS

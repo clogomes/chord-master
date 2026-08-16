@@ -18,19 +18,40 @@ def get_glossary_keywords_map() -> Dict[str, str]:
     try:
         from core.glossary import GLOSSARY_DATABASE
         for term in GLOSSARY_DATABASE:
-            # Map canonical ID
-            mapping[term.id.replace("_", " ").lower()] = term.id
-            
-            # Map clean PT term (remove parentheticals)
-            clean_pt = re.sub(r"\(.*?\)", "", term.term_pt).strip().lower()
-            if len(clean_pt) >= 3:
-                mapping[clean_pt] = term.id
-            
-            # Map clean EN term
-            if term.term_en:
-                clean_en = re.sub(r"\(.*?\)", "", term.term_en).strip().lower()
-                if len(clean_en) >= 3:
-                    mapping[clean_en] = term.id
+            tid = term.id
+            mapping[tid.replace("_", " ").lower()] = tid
+
+            candidates = [term.term_pt, term.term_en]
+            # Extract parenthetical substrings as standalone alias candidates
+            for raw in [term.term_pt, term.term_en]:
+                if raw:
+                    for match in re.findall(r"\((.*?)\)", raw):
+                        candidates.append(match)
+
+            for cand in candidates:
+                if not cand:
+                    continue
+                clean = re.sub(r"\(.*?\)", "", cand).strip().lower()
+                clean = clean.replace("/", " ").replace("—", " ").replace("-", " ")
+                parts = [p.strip() for p in clean.split() if len(p.strip()) >= 3]
+                
+                # Full candidate phrase
+                if len(clean) >= 3:
+                    mapping[clean] = tid
+
+                # Add singular/plural variations
+                if clean.endswith("s") and len(clean) > 4:
+                    mapping[clean[:-1]] = tid  # guide tones -> guide tone
+                elif not clean.endswith("s") and len(clean) >= 3:
+                    mapping[clean + "s"] = tid  # tetracorde -> tetracordes
+
+                if clean.endswith("es") and len(clean) > 5:
+                    mapping[clean[:-2]] = tid
+                if clean.endswith("is") and len(clean) > 5:
+                    mapping[clean[:-2] + "el"] = tid  # sensíveis -> sensível
+                if clean.endswith("el") and len(clean) > 4:
+                    mapping[clean[:-2] + "is"] = tid  # sensível -> sensíveis
+
     except Exception:
         pass
 

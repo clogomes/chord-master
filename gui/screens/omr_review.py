@@ -1,4 +1,4 @@
-from gui.i18n import t
+from __future__ import annotations
 """
 OMR Review & Manual Correction Screen — Phase 19.
 
@@ -6,7 +6,7 @@ After the OMR pipeline detects notes from a score image, this screen lets the
 user review each detected note, correct pitch and duration, delete false positives,
 and insert missing notes before saving as a real Song in the user library.
 """
-from __future__ import annotations
+from gui.i18n import t
 
 import os
 from typing import Callable, List, Optional
@@ -169,7 +169,7 @@ class OMRReviewScreen(ctk.CTkFrame):
 
         ctk.CTkButton(
             header, text="← Cancelar", width=110, height=36,
-            fg_color="transparent", hover_color=theme.COLOR_CARD_SURFACE,
+            fg_color="transparent", hover_color=theme.COLOR_SURFACE,
             font=theme.get_font(theme.FONT_BODY_BOLD),
             text_color=theme.COLOR_TEXT_MUTED,
             command=self.on_cancel,
@@ -208,7 +208,7 @@ class OMRReviewScreen(ctk.CTkFrame):
 
         # Left: scrollable note list
         list_frame = ctk.CTkFrame(body, corner_radius=theme.RADIUS_LG,
-                                  fg_color=theme.COLOR_CARD_SURFACE,
+                                  fg_color=theme.COLOR_SURFACE,
                                   border_width=1, border_color=theme.COLOR_BORDER)
         list_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
         list_frame.rowconfigure(1, weight=1)
@@ -247,7 +247,7 @@ class OMRReviewScreen(ctk.CTkFrame):
 
         # Right: image preview
         preview_frame = ctk.CTkFrame(body, corner_radius=theme.RADIUS_LG,
-                                     fg_color=theme.COLOR_CARD_SURFACE,
+                                     fg_color=theme.COLOR_SURFACE,
                                      border_width=1, border_color=theme.COLOR_BORDER)
         preview_frame.grid(row=0, column=1, sticky="nsew")
 
