@@ -507,7 +507,7 @@ class StatsScreen(ctk.CTkFrame):
         """Draws horizontal percentage comparison bars for the 5 main study categories."""
         canvas.delete("all")
         w = canvas.winfo_width() or 440
-        h = 240
+        h = 280
 
         categories = [
             ("Treino Auditivo", "treino_auditivo", "#4F46E5"),
@@ -515,6 +515,7 @@ class StatsScreen(ctk.CTkFrame):
             ("Teoria Musical", "teoria", "#F59E0B"),
             ("Repertório & Músicas", "repertorio", "#8B5CF6"),
             ("Instrumento & Solfejo", "pratica_instrumento", "#10B981"),
+            ("Exercícios Técnicos", "tecnica", "#EF4444"),
         ]
 
         pad_l = 150

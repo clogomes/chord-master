@@ -12,6 +12,7 @@ CATEGORY_NAMES_PT = {
     "teoria": "Teoria Musical",
     "repertorio": "Repertório Musical",
     "pratica_instrumento": "Instrumento Acústico / Solfejo",
+    "tecnica": "Exercícios Técnicos",
 }
 
 CATEGORY_ROUTES = {
@@ -20,6 +21,7 @@ CATEGORY_ROUTES = {
     "teoria": "theory",
     "repertorio": "practice_song",
     "pratica_instrumento": "practice_instrument",
+    "tecnica": "practice_technique",
 }
 
 CATEGORY_TIPS = {
@@ -28,6 +30,7 @@ CATEGORY_TIPS = {
     "teoria": "Revê as fórmulas de intervalos (Tons e Semitons) e a construção de tríades.",
     "repertorio": "Experimenta tocar com o metrônomo num andamento mais lento para fixar o ritmo.",
     "pratica_instrumento": "Afina o teu instrumento com o Lamiré e sustenta as notas com som límpido.",
+    "tecnica": "Estuda os exercícios de Hanon e Spider Walk a 70% BPM com a rampa de tempo.",
 }
 
 
