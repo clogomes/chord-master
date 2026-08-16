@@ -14,6 +14,88 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA (pequena) — Fase 35: excelente no geral, 3 itens por fechar
+- Commits revistos: `2343c15`, `c09722f`
+- Testes: 172/172 OK (novo `tests/test_songs_measures.py`)
+- **Veredito: AÇÃO NECESSÁRIA — mas ligeira.** É a fase mais bem executada
+  desta ronda; só faltam 3 coisas.
+
+### ✅ O que verifiquei por execução e está correto
+**Compassos — o melhor resultado da fase:**
+```
+músicas que não fecham compasso: 0 de 24   (eram 15 de 24)
+```
+E criaste `tests/test_songs_measures.py`, que impede a regressão. Era
+exatamente o que pedi.
+
+**"O Cravo e a Rosa"** deixou de ser a melodia do Brilha Estrelinha:
+```
+antes: C4 C4 G4 G4 A4 A4 G4 F4 F4 E4 E4 D4 D4 C4   (= Twinkle)
+agora: G4 G4 E4 C4 A4 A4 G4 F4 F4 D4 B3 C4 D4 E4   (melodia própria)
+```
+
+**Greensleeves** — resolveste-o da melhor maneira possível: em vez de só mudar
+o rótulo, corrigiste a **transcrição** para incluir F, F# e G#, que é a versão
+historicamente correta ("Eólio com 7ª elevada nas cadências"). A descrição bate
+agora certo com os dados.
+
+**Capítulos** (35.2) — confirmei corrigidos: "não transpositores", "1ª Maior",
+o voicing rootless G7 (já não é `F-G-B-E`), "desliza 1 traste" na substituição
+tritónica, e "boca (ponte)".
+
+**Mnemónicas** (35.4) — unificadas: `ear_mnemonics.py` e `intervals.py` dizem
+agora ambos *"Marcha Nupcial (Wagner), Amazing Grace"* para a 4ª Justa. Fim das
+três referências a competir.
+
+**Exercícios técnicos** (35.5) — "Spider Walk" passou a trastes 1-2-3-4
+(F2-F#2-G2-G#2), o "Salto de Cordas" já salta mesmo (E2→D3→A2→G3), e o
+`recommended_bpm_range` está finalmente aplicado ao slider
+(`practice_technique.py:320-322`).
+
+**Leitura de pauta** (35.6) — `pitch_with_octave == "C4"`, ramo do Dó Central
+já não é código morto.
+
+### ❌ 1. Mnemónicas descendentes não foram acrescentadas
+```
+entradas em EAR_MNEMONICS: 13   descendentes: 0
+```
+Pedi-as explicitamente: *"os intervalos descendentes soam categoricamente
+diferentes e são a metade mais difícil do treino auditivo"*. Continua a treinar
+só metade da competência. Acrescenta as entradas descendentes (ex: 6ªm desc =
+*The Entertainer*; 8ª desc = *Willow Weep for Me*; 5ªJ desc = *Flintstones*) e
+liga-as ao gerador de perguntas, para o ecrã poder pedir intervalos nos dois
+sentidos.
+
+### ❌ 2. `guitar_greensleeves_full` afirma o que os seus dados não mostram
+A análise diz *"Lá menor (Eólio), com **7ª elevada nas cadências**"* — mas as
+notas guardadas são só `A B C D E F G`: **não há G#**, portanto a 7ª elevada
+não está lá. É a regra que estabeleci para esta fase: *uma análise só pode
+afirmar o que as notas demonstram*. Ou acrescentas o G# à transcrição (como
+fizeste bem no `greensleeves`), ou tiras essa frase.
+Nota: o meu teste automático assinalou "Dórico" nesta entrada, mas era falso
+positivo meu — a palavra que apanhou foi "**pontuados**". Não há erro de modo
+aqui.
+
+### ❌ 3. Gralha "Meu menor" continua (`core/theory_content.py:990`)
+```
+• B: Em - C - G - D (Meu menor — mais íntimo)
+```
+Devia ser "**Mi** menor".
+
+### Itens de 35.3 que não vi tratados (confirma se ficaram de fora de propósito)
+- **Duplicados**: `fur_elise`/`piano_fur_elise` e `canon_in_d`/`piano_canon_c`
+  continuam ambos na biblioteca. Se a intenção é manter os dois como arranjos
+  distintos (piano vs. original), diz isso claramente nos títulos/descrições —
+  neste momento parecem duplicação acidental.
+- `minuet_in_g` dizia "16 Compassos" com metade em falta, a letra do
+  `grandola_vila_morena`, a gralha "Trevo Coral", e a atribuição do
+  `twinkle_star` a Mozart — não confirmei se foram tratados. Verifica.
+
+Corrige estes e a Fase 35 fica aprovada; depois avanças para a **Fase 36
+(Glossário)**.
+
+---
+
 ## TRABALHO PEDIDO — Fases 35 a 39: Correção de Conteúdo + Aprendizagem Mais Rápida
 - Aprovado pelo utilizador (clogomes). Baseado numa auditoria de teoria musical
   feita por um modelo especializado; **verifiquei pessoalmente por execução**
