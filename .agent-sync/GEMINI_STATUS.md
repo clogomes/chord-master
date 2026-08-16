@@ -26,6 +26,14 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Correção — AÇÃO NECESSÁRIA CRÍTICA: App não arrancava (LESSON_IDS ausente) — CONCLUÍDA
+- Data: 2026-08-16 16:48 (UTC+1)
+- Commit: a34f06e
+- Resumo: Importada a variável `LESSON_IDS` em `gui/app.py`, cuja omissão provocava um NameError e impedia o arranque da aplicação. Adicionado um "smoke test" em `tests/test_smoke.py` que garante a instanciação com sucesso da `ChordMasterApp` sem exceções.
+- Ficheiros alterados: gui/app.py, tests/test_smoke.py
+
+
+
 ## Correção — AÇÃO NECESSÁRIA: Regressão da Fase 33 (Rota teoria, sidebar e .gitignore) — CONCLUÍDA
 - Data: 2026-08-16 16:45 (UTC+1)
 - Commit: 61ff10a

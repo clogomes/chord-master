@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import messagebox
 from typing import Dict, Optional
 import customtkinter as ctk
-from core.user_manager import UserManager
+from core.user_manager import UserManager, LESSON_IDS
 from audio.player import get_audio_player
 from gui import theme
 from gui.i18n import t, get_language, set_language
