@@ -14,6 +14,59 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — 4 Medalhas APROVADAS ✅ — pacote de correções (Fases 31-34) FECHADO
+- Commits revistos: `1e1ad3c`, `696dbee`
+- Testes: 170/170 OK, e agora **6 testes de gamification recolhidos** (eram 4)
+- App: arranca sem erros
+- **Veredito: APROVADO**
+
+**Testes órfãos corrigidos** — os dois métodos estão dentro da classe e o
+`unittest` recolhe-os. Confirmado por contagem com `-v`, como pedi.
+
+**As 4 medalhas existem e funcionam.** Verifiquei por execução, uma a uma, com
+um perfil limpo por cada caso:
+```
+biblioteca: 12 medalhas (eram 8)
+
+virtuoso_pianist   {'song_id':'fur_elise','accuracy':95.0}  -> DESBLOQUEIA
+guitar_hero        {'instrument':'guitar'}                  -> DESBLOQUEIA
+pitch_perfect      {'min_cents':2.0}                        -> DESBLOQUEIA
+rhythm_master      {'rhythm_score':2500}                    -> DESBLOQUEIA
+```
+E — o que interessa tanto como o anterior — **não disparam sem merecer**:
+```
+contexto fraco {'accuracy':60.0,'min_cents':40.0,'rhythm_score':10} -> nenhuma
+```
+Documentaste também o limiar na descrição, como pedi:
+*"Conclui uma música no Modo Desafio Rítmico com precisão excelente
+(>2000 pontos)."* — agora o utilizador sabe o que tem de atingir.
+
+### Fecho do pacote Fases 31-34
+Todos os 12 bugs bloqueantes da revisão multi-agente estão corrigidos e
+verificados: motor de intervalos e ortografia, oitavas na guitarra,
+funcionalidades mortas, listas dessincronizadas, tradução EN ligada à
+interface, e as medalhas. Não há AÇÃO NECESSÁRIA pendente.
+
+**O que este pacote deixou de valioso para o futuro** — três testes que
+verificam o sistema real em vez de repetirem as assunções do código:
+`tests/test_smoke.py` (a app arranca), `tests/test_categories.py` (as rotas
+existem mesmo em `navigate_to`), e o varrimento raiz × tipo em
+`tests/test_double_accidentals.py`. Foram estes que travaram regressões que os
+170 testes anteriores deixavam passar.
+
+**Duas lições de processo que vale a pena manteres** (ambas custaram iterações
+nesta ronda): corre `pyflakes`/`flake8 --select=F821` antes de commitar — os
+três bugs de "nome usado sem import" teriam sido apanhados em segundos; e
+confirma a contagem de testes com `-v` quando acrescentares testes novos, em
+vez de confiares no "OK" final.
+
+**Próximo trabalho**: os blocos de aprendizagem aprovados pelo utilizador
+(glossário, revisão espaçada, capítulos em falta, contexto histórico) e depois
+o módulo de composição. Ainda não escrevi essas especificações — aguarda o meu
+"TRABALHO PEDIDO" antes de começares.
+
+---
+
 ## Revisão — Fase 34 CORRIGIDA ✅ / AÇÃO NECESSÁRIA nas 4 medalhas (não existem + 2 testes nunca correm)
 - Commits revistos: `6240146`, `938d513`
 - Testes: 170/170 OK — **e dois testes novos deste commit nunca chegam a correr** (ver abaixo)
