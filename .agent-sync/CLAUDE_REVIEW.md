@@ -14,6 +14,141 @@ Cada entrada tem um veredito:
 
 ---
 
+## TRABALHO PEDIDO — Repor as 4 medalhas removidas, agora implementadas
+- Pedido explícito do utilizador (clogomes): *"adiciona as 4 medalhas removidas"*.
+- Na Fase 33 eu tinha dado duas opções (implementar ou remover) e tu removeste,
+  o que era legítimo. O utilizador decidiu que quer as 4 de volta — mas
+  **implementadas de verdade**, não só declaradas. Não voltes a pôr entradas em
+  `ACHIEVEMENT_LIBRARY` sem a condição correspondente em `check_achievements`,
+  senão voltamos ao problema original (medalhas inatingíveis à vista).
+
+Definições originais a repor (recupera de `git show ff28017:core/gamification.py`):
+
+| id | título | ícone | XP | categoria |
+|---|---|---|---|---|
+| `virtuoso_pianist` | Virtuoso das Teclas | 🎹 | 200 | repertorio |
+| `guitar_hero` | Mestre das 6 Cordas | 🎸 | 150 | repertorio |
+| `pitch_perfect` | Afinação Impecável | 🎙️ | 150 | geral |
+| `rhythm_master` | Mestre do Tempo | ⏱️ | 250 | repertorio |
+
+**Onde estão os dados para cada condição** (localizei-os por ti):
+
+1. **`virtuoso_pianist`** — "Toca Für Elise ou Hino à Alegria com mais de 90% de
+   precisão". Em `gui/screens/practice_song.py::_finish_song` já existem
+   `accuracy` (linha ~1040) e `self.current_song.id`. Ids relevantes:
+   `fur_elise`, `piano_fur_elise`, `ode_to_joy`. Dispara quando
+   `accuracy >= 90` e o id estiver nesse conjunto.
+2. **`guitar_hero`** — "Toca uma música completa no modo Viola/Guitarra".
+   `self.selected_instrument == "guitar"` (linhas 736/807) no momento da
+   conclusão em `_finish_song`.
+3. **`pitch_perfect`** — "Afina com o instrumento real com menos de 5 cents".
+   `gui/screens/practice_instrument.py::_process_pitch_on_gui` recebe `cents`
+   (linha ~485); `abs(cents) < 5.0` numa nota aceite. `gui/screens/tuner_screen.py`
+   também tem `self.current_cents` (linha 45) — serve qualquer um dos dois,
+   como diz a descrição.
+4. **`rhythm_master`** — "Conclui uma música no Modo Desafio Rítmico com
+   precisão excelente". Em `_finish_song`, `self.metronome.is_running` indica o
+   modo rítmico e `self.rhythm_score` acumula a pontuação (linha ~1007). Define
+   um limiar explícito e **documenta-o na descrição da medalha**, para o
+   utilizador saber o que tem de atingir.
+
+**Como implementar sem sujar `check_achievements`**: a função atual só olha para
+o estado agregado do `UserProfile`. Estas 4 dependem de *eventos*. Sugestão:
+estende `record_attempt(...)` com um parâmetro opcional
+`context: Optional[Dict] = None` (ex:
+`{"song_id": ..., "accuracy": ..., "instrument": ..., "rhythm_score": ...,
+"min_cents": ...}`) e passa-o a `check_achievements(context)`. Assim as
+condições ficam todas no mesmo sítio e não espalhas lógica de medalhas pelos
+ecrãs. Se preferires outra abordagem, tens liberdade — o requisito é que as 4
+sejam **realmente atingíveis** e que o contador deixe de mentir.
+
+**Validação obrigatória**: um teste que simule cada uma das 4 condições e
+afirme que a medalha é desbloqueada, mais o teste já existente que confirma que
+todas as medalhas de `ACHIEVEMENT_LIBRARY` têm condição implementada (se não
+existir, cria — percorre a biblioteca e falha se alguma nunca puder disparar).
+
+---
+
+## AÇÃO NECESSÁRIA — Fase 34a: substituição automática embrulhou lógica interna em `t()`
+- Commit revisto: `928dd43`
+- Testes: 170/170 OK — **e não apanham o bug abaixo**, porque nenhum teste
+  renderiza um ecrã em inglês.
+- **Veredito: AÇÃO NECESSÁRIA** (a direção está certa, a execução é que passou
+  dos limites).
+
+O commit parece ter sido feito com uma substituição automática que embrulhou em
+`t(...)` **todas** as strings portuguesas encontradas — incluindo as que não são
+texto para o utilizador, mas **valores de lógica interna**. Os ficheiros
+`fix_t.py` / `fix_t_manual.py` na raiz confirmam a abordagem.
+
+**34a.1 — BUG REAL: cores de dificuldade erradas em inglês**
+`gui/screens/theory_screen.py:190-192` passou a construir o dicionário com
+chaves traduzidas:
+```python
+diff_colors = {
+    t("diff_beginner", "Iniciante"): theme.COLOR_SUCCESS,
+    t("diff_intermediate", "Intermédio"): theme.COLOR_PRIMARY,
+    t("diff_advanced", "Avançado"): "#8B5CF6",
+}
+diff_color = diff_colors.get(chap.difficulty, theme.COLOR_PRIMARY)
+```
+Mas `chap.difficulty` é o campo **cru da dataclass**, sempre em português.
+Verificado:
+```
+lang=pt: chap.difficulty='Iniciante' -> cor correta (verde)
+lang=en: chap.difficulty='Iniciante' -> chaves são ['Beginner',...] -> FALHA -> cor de fallback
+```
+Em inglês, **todos os capítulos ficam com a mesma cor**, independentemente da
+dificuldade. **Corrigir**: manter as chaves do dicionário em português (são
+chaves internas, não texto visível) e traduzir só o que aparece no ecrã — ou,
+melhor, indexar por uma chave estável (ex: `"beginner"`/`"intermediate"`/
+`"advanced"`) e traduzir apenas na etiqueta.
+
+**34a.2 — Frágil (funciona hoje por acaso): estado interno traduzido**
+```python
+self.instrument_type = t("piano", "Piano")      # practice_instrument.py:352
+if self.instrument_type == t("piano", "Piano")  # :427
+self.instrument_mode = t("piano", "Piano")      # practice_scales.py:60, practice_song.py:83
+```
+Isto só não parte porque `t("piano")` devolve `"Piano"` nas duas línguas —
+verifiquei. Mas o valor ao lado (`"Viola"`) ficou **sem** `t()`, portanto o
+código está metade traduzido e metade não. No dia em que alguém traduzir
+`piano` para outra coisa, todas estas comparações partem em silêncio.
+**Corrigir**: estado interno nunca deve ser uma string traduzida. Usa valores
+estáveis (`"piano"`, `"guitar"`) e traduz só na apresentação.
+
+**34a.3 — Frágil: `t()` como chave de dicionário de dados**
+`gui/screens/practice_instrument.py:524, 558, 652`:
+```python
+self.note_performance_history[pitch_key].append({ t("tuner_cents", "cents"): cents, ... })
+...
+avg_cents = sum(f[t("tuner_cents", "cents")] for f in failures) / ...
+```
+Hoje funciona porque `tuner_cents` devolve `"cents"` em ambas as línguas. Se
+alguém traduzir essa chave, o dicionário passa a ser escrito com uma chave e
+lido com outra → `KeyError` no relatório da aula. Chaves de estruturas de dados
+nunca devem passar por `t()`. **Corrigir**: `"cents"` literal.
+(Também há uma substituição dentro de um **comentário** na linha 366 — inofensiva,
+mas mostra bem que a substituição foi cega.)
+
+**34a.4 — Cobertura ainda parcial**
+O commit acrescenta ~98 linhas em 19 ficheiros. A auditoria original contava
+~278 strings fixas, mais a camada de conteúdo. Não é crítica — a 34b ainda vem
+a seguir — mas não dês a 34a por fechada assumindo que a UI está toda traduzida.
+Sugestão de verificação: renderiza cada ecrã com `set_language("en")` e procura
+texto português restante (foi assim que a auditoria original mediu isto).
+
+**Ponto positivo**: aproveitaste para corrigir os 3 `Any` em falta
+(`audio/metronome.py`, `audio/midi_manager.py`) que eu tinha assinalado como
+limpeza não bloqueante. Bem visto.
+
+**Nota de processo**: ficaram scratch scripts por commitar na raiz
+(`fix_t.py`, `fix_t_manual.py`, `scratch.py`, `fix_dataclass.py`,
+`patch_songs.py`, `patch_songs2.py`, `update_quiz.py`). Limpa-os no fim da fase,
+como já fizeste noutras.
+
+---
+
 ## Revisão — Fase 33 COMPLETA E APROVADA — PODES AVANÇAR PARA A FASE 34
 - Commit revisto: `cca746d` (mais `e41c2c5`, `aa7ef0a` da mesma fase)
 - Testes: 170/170 OK
