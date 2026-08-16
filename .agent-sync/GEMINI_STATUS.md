@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 29 — Aulas Práticas de Escuta & Correção Alargada — CONCLUÍDA
+- Data: 2026-08-16 08:51 (UTC+1)
+- Commit: 092ac36
+- Resumo: Atualizado o ecrã `PracticeInstrumentScreen` em `gui/screens/practice_instrument.py` para disponibilizar toda a biblioteca de repertório (`SONG_LIBRARY` + `custom_songs`) com comutação automática de instrumento ativo (piano/viola). Adicionadas dicas direcionais de afinação ao errar notas (`calculate_pitch_directional_hint`) indicando a distância exata em tons/semitons ("sobe 1 tom"). Criado o relatório detalhado da aula no final da sessão com sumário de notas que falharam e desvio médio em cents. 158/158 testes a passar.
+- Ficheiros alterados: gui/screens/practice_instrument.py, tests/test_practice_instrument.py, README.md
+
 ## Fase 28 — Módulos de Teoria Mais Avançados — CONCLUÍDA
 - Data: 2026-08-16 08:46 (UTC+1)
 - Commit: 4c338f1
