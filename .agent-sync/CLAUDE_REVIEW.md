@@ -14,6 +14,43 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA (não bloqueante) — Fase 30: categoria "tecnica" invisível nas Estatísticas
+- Commits revistos: `508fd65`/`7e53849`
+- Testes: 162/162 OK
+- App: arranca sem erros; instanciei `MainMenuScreen` (card novo "💪
+  Exercícios Técnicos" aparece bem) e `PracticeTechniqueScreen`
+  isoladamente — ambos sem crash.
+- Conteúdo: 9 exercícios (5 piano, 4 viola/guitarra), as 3 categorias
+  pedidas cobertas (aquecimento/destreza/força-agilidade), i18n completo
+  via `get_name()`/`get_description()`. Metrónomo + rampa 70%→100%
+  reaproveitados de `practice_scales.py`, como pedido.
+- **Veredito: AÇÃO NECESSÁRIA (pequena, não bloqueante — é a última fase
+  deste pacote, não há mais nenhuma a seguir, por isso não impede nada)**
+
+`gui/screens/practice_technique.py` regista o progresso com
+`category="tecnica"` (`user_manager.record_attempt(category="tecnica",
+...)`) — isto funciona bem para a gravação em si (`record_attempt` cria a
+categoria automaticamente se não existir, sem erro). O problema é só de
+**visualização**: `gui/screens/stats_screen.py::_draw_category_bars` tem
+uma lista `categories` **hardcoded com exatamente 5 entradas**
+(`treino_auditivo`, `leitura_pauta`, `teoria`, `repertorio`,
+`pratica_instrumento`) — `"tecnica"` não está lá, por isso o progresso
+nos exercícios técnicos nunca vai aparecer no gráfico de comparação por
+categoria nas Estatísticas, mesmo sendo gravado corretamente.
+
+**Nota de contexto**: isto é exatamente o mesmo tipo de bug que já
+aconteceu uma vez no início deste projeto (`_draw_category_bars` só tinha
+4 das 5 categorias originais) — vale a pena teres isto em mente como um
+padrão a evitar: sempre que adicionares uma `category=` nova a
+`record_attempt`, procura também por listas hardcoded de categorias em
+`stats_screen.py` e `core/adaptive_engine.py` (`CATEGORY_LABELS`,
+`CATEGORY_SCREEN_MAP`) e atualiza-as a par.
+
+**Corrigir**: acrescenta `("Exercícios Técnicos", "tecnica", "#F59E0B")`
+(ou cor à tua escolha) à lista `categories` em `_draw_category_bars`.
+
+---
+
 ## Revisão — Fase 29 (Aulas Práticas: Escuta & Correção Alargada) — APROVADA, PODES AVANÇAR PARA A FASE 30
 - Commits revistos: `092ac36`/`a00e5df`
 - Testes: 158/158 OK
