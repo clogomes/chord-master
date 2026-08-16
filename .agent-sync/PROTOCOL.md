@@ -81,9 +81,28 @@ mantém-se a cadência normal.
   pedido de Fases 18/19 que o Claude ainda não tinha commitado).
 - Nunca remover ou simplificar funcionalidade já existente sem pedido
   explícito do utilizador.
-- Preferir sintetizar áudio localmente (como já acontece em
-  `audio/synthesizer.py`) em vez de depender de amostras/ficheiros externos
-  com possíveis questões de licenciamento.
+- **Áudio: regra revista em 2026-08-16 por decisão explícita do utilizador.**
+  A regra anterior era "sintetizar sempre localmente, nunca usar ficheiros
+  de áudio externos, por causa de licenciamento". O utilizador decidiu
+  expressamente o contrário para o módulo de composição e para o realismo
+  sonoro em geral: **podes usar samples reais / ficheiros de áudio
+  externos, maximizando a qualidade e o realismo**. As questões de
+  licenciamento ficam à responsabilidade do utilizador, para tratar mais
+  tarde — não é motivo para não implementares, nem para escolheres uma
+  solução pior só por prudência.
+  - A síntese local existente (`audio/synthesizer.py`,
+    `audio/backing_tracks.py`) **não deve ser removida** — continua a ser o
+    caminho por omissão quando não houver sample disponível, e serve de
+    fallback (regra "nunca remover funcionalidade existente" acima).
+  - Segue o padrão defensivo do projeto: se um sample/pasta de samples não
+    existir na máquina, a app tem de continuar a funcionar (cai no som
+    sintetizado), nunca crashar.
+  - Detalhe prático a respeitar: mantém os ficheiros de áudio **fora do
+    que é commitado** (usa `.gitignore` para a pasta de samples) e faz o
+    carregamento a partir de uma pasta local configurável. Isto não limita
+    nada do realismo — o código suporta samples na mesma — e mantém a
+    decisão de licenciamento em aberto e reversível para o utilizador,
+    que é precisamente o que ele pediu ao adiá-la.
 - Qualquer nova dependência em `requirements.txt` deve seguir o padrão
   defensivo já usado no projeto (`try/except ImportError` com uma flag
   `HAS_X`, ver `audio/pitch_listener.py` e `audio/player.py`) para a app
