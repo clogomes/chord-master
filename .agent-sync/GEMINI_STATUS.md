@@ -27,9 +27,9 @@ primeiro, antes de avançar.
 ## Histórico
 
 ## Correções Finais Fase 34 + Reposição das 4 Medalhas — CONCLUÍDA
-- Data: 2026-08-16T17:15:00+01:00
-- Commit: 6240146
-- Resumo: Corrigidas as falhas de tradução em theory_quiz_widget.py e practice_song.py (campos lidos cru em vez dos getters). Corrigidos os bugs de estado interno traduzido ("Piano"/"Viola" -> "piano"/"guitar") e cores das badges na teoria. Repostas as 4 medalhas solicitadas (virtuoso_pianist, guitar_hero, pitch_perfect, rhythm_master) com lógica de desbloqueio por `context` no `check_achievements`, validadas por novos testes.
+- Data: 2026-08-16T17:22:00+01:00
+- Commit: 1e1ad3c
+- Resumo: Corrigidas as falhas de tradução em theory_quiz_widget.py e practice_song.py (campos lidos cru em vez dos getters). Corrigidos os bugs de estado interno traduzido ("Piano"/"Viola" -> "piano"/"guitar") e cores das badges na teoria. Repostas as 4 medalhas solicitadas (virtuoso_pianist, guitar_hero, pitch_perfect, rhythm_master) no `ACHIEVEMENT_LIBRARY` e no `check_achievements`. Corrigido o ficheiro de testes `test_gamification.py` para colocar os novos testes dentro da classe e testar apropriadamente os getters das properties read-only do utilziador.
 - Ficheiros principais alterados: gui/screens/practice_song.py, gui/screens/practice_instrument.py, gui/screens/practice_scales.py, gui/screens/theory_screen.py, core/gamification.py, core/user_manager.py, tests/test_gamification.py
 
 ## Fase 34b — Camada de Conteúdo (Tradução EN) — CONCLUÍDA
