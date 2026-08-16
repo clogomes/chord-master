@@ -315,6 +315,19 @@ class MainMenuScreen(ctk.CTkFrame):
             target_screen="stats",
         )
 
+        # Card 10: Glossário Musical
+        self._create_nav_card(
+            cards_container,
+            row=4,
+            col=1,
+            icon="📚",
+            title="Glossário Musical",
+            subtitle="Mais de 130 termos pesquisáveis A-Z com fórmulas, exemplos práticos e áudio.",
+            button_text="Abrir Glossário",
+            color_accent="#0284C7",
+            target_screen="glossary",
+        )
+
     def _confirm_reset(self):
         user = self.user_manager.current_user
         confirm = messagebox.askyesno(

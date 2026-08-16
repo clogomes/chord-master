@@ -143,6 +143,13 @@ class TheoryScreen(ctk.CTkFrame):
             btn.pack(fill="x", padx=6, pady=3)
             self.chapter_buttons.append(btn)
 
+    def load_chapter_by_id(self, chapter_id: str):
+        """Switches directly to a specific chapter by its unique ID."""
+        for idx, chap in enumerate(THEORY_CHAPTERS):
+            if chap.id == chapter_id:
+                self._load_chapter(idx)
+                break
+
     def _load_chapter(self, chapter_idx: int):
         from gui.i18n import get_language, t
         lang = get_language()

@@ -518,3 +518,9 @@ Implementação nativa de um sistema de i18n em duas vertentes:
 - **Unificação de Mnemónicas Auditivas**: Fonte de verdade centralizada em `core/ear_mnemonics.py` para intervalos ascendentes e inclusão inédita de **mnemónicas descendentes** para todos os 12 intervalos.
 - **Precisão Teórica nos Capítulos**: Correção da transposição de oitava na viola, transposição ascendente de 2ª Maior, *rootless voicings* de Jazz (G7 = F-A-B-E), substituição tritónica e forma AAB do Blues.
 - **Exercícios Técnicos e Leitura de Pauta**: Ajuste nos padrões de Hanon No. 1, Spider Walk (trastes 1-2-3-4), salto de cordas, alcance do slider de BPM em runtime e distinção precisa entre linhas e espaços suplementares no tutor de pauta.
+
+### Fase 36 — Glossário Musical Interativo & Auto-Ligação de Termos
+- **Enciclopédia de 139 Termos (`core/glossary.py`)**: Base de dados abrangente de terminologia musical (harmonia, ritmo, notação, modos, técnica, acústica, forma e jazz), com definições curtas e aprofundadas, fórmulas, exemplos práticos para piano e viola/guitarra, áudio sintetizado e referências cruzadas.
+- **Ecrã Dedicado de Glossário (`gui/screens/glossary_screen.py`)**: Interface de pesquisa instantânea, índice alfabético A-Z, filtros por categoria e capítulos de teoria, cartões de termos e painel de detalhe rico com reprodução de áudio e atalhos diretos para os capítulos teóricos.
+- **Auto-Ligação em Markdown (`gui/markdown_renderer.py` & `gui/components/glossary_modal.py`)**: Deteção automática e interativa de termos do glossário no texto formatado dos capítulos de teoria, permitindo ao aluno clicar diretamente num conceito técnico para abrir um modal flutuante explicativo sem sair do capítulo.
+- **Internacionalização Completa**: Suporte nativo e rigoroso em Português e Inglês (PT/EN) para todos os 139 termos, definições e controlos da interface.

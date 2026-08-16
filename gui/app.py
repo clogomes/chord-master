@@ -18,6 +18,7 @@ from gui.screens.practice_instrument import PracticeInstrumentScreen
 from gui.screens.practice_technique import PracticeTechniqueScreen
 from gui.screens.tuner_screen import LamireScreen
 from gui.screens.stats_screen import StatsScreen
+from gui.screens.glossary_screen import GlossaryScreen
 
 # Appearance configuration
 ctk.set_appearance_mode("Dark")
@@ -227,6 +228,7 @@ class ChordMasterApp(ctk.CTk):
             ("practice_instrument", t("nav_practice_instrument", "🎯 Prática c/ Microfone")),
             ("practice_ear", t("nav_practice_ear", "🎧 Treino Auditivo")),
             ("practice_staff", t("nav_practice_staff", "🎼 Leitura de Pauta")),
+            ("glossary", t("nav_glossary", "📚 Glossário Musical")),
             ("stats", t("nav_stats", "📊 Estatísticas & Alunos")),
         ]
 
@@ -377,6 +379,13 @@ class ChordMasterApp(ctk.CTk):
                 user_manager=self.user_manager,
                 on_back=lambda: self.navigate_to("main_menu"),
             )
+        elif screen_name == "glossary":
+            self.current_screen_widget = GlossaryScreen(
+                self.content_area,
+                user_manager=self.user_manager,
+                on_back=lambda: self.navigate_to("main_menu"),
+                on_navigate_chapter=self._navigate_to_theory_chapter,
+            )
         elif screen_name == "stats":
             self.current_screen_widget = StatsScreen(
                 self.content_area,
@@ -396,6 +405,12 @@ class ChordMasterApp(ctk.CTk):
 
         if self.current_screen_widget is not None:
             self.current_screen_widget.pack(fill="both", expand=True)
+
+    def _navigate_to_theory_chapter(self, chapter_id: str):
+        """Switches to the theory screen and selects the requested chapter."""
+        self.navigate_to("theory")
+        if self.current_screen_widget and hasattr(self.current_screen_widget, "load_chapter_by_id"):
+            self.current_screen_widget.load_chapter_by_id(chapter_id)
 
     def _change_theme(self, choice: str):
         ctk.set_appearance_mode(choice)

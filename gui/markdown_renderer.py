@@ -1,7 +1,41 @@
-"""Markdown parser and rich-text renderer for CustomTkinter text boxes."""
+"""Markdown parser and rich-text renderer for CustomTkinter text boxes with table embedding and glossary auto-linking."""
 import re
-from typing import List, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 import customtkinter as ctk
+
+
+# Cache for glossary lookup keywords
+_GLOSSARY_KEYWORDS_CACHE: Optional[Dict[str, str]] = None
+
+
+def get_glossary_keywords_map() -> Dict[str, str]:
+    """Returns a mapping of normalized glossary terms and aliases to their term_id."""
+    global _GLOSSARY_KEYWORDS_CACHE
+    if _GLOSSARY_KEYWORDS_CACHE is not None:
+        return _GLOSSARY_KEYWORDS_CACHE
+
+    mapping = {}
+    try:
+        from core.glossary import GLOSSARY_DATABASE
+        for term in GLOSSARY_DATABASE:
+            # Map canonical ID
+            mapping[term.id.replace("_", " ").lower()] = term.id
+            
+            # Map clean PT term (remove parentheticals)
+            clean_pt = re.sub(r"\(.*?\)", "", term.term_pt).strip().lower()
+            if len(clean_pt) >= 3:
+                mapping[clean_pt] = term.id
+            
+            # Map clean EN term
+            if term.term_en:
+                clean_en = re.sub(r"\(.*?\)", "", term.term_en).strip().lower()
+                if len(clean_en) >= 3:
+                    mapping[clean_en] = term.id
+    except Exception:
+        pass
+
+    _GLOSSARY_KEYWORDS_CACHE = mapping
+    return _GLOSSARY_KEYWORDS_CACHE
 
 
 def parse_markdown_line_type(line: str) -> str:
@@ -26,12 +60,11 @@ def parse_markdown_line_type(line: str) -> str:
     return "paragraph"
 
 
-def is_table_delimiter(line: str) -> bool:
+def is_table_delimiter(line: str) -> str:
     """Checks if a table row is a delimiter/alignment row (e.g., '| :--- | :--- |')."""
     stripped = line.strip()
     if not (stripped.startswith("|") and stripped.endswith("|")):
         return False
-    # Only contains |, -, :, and spaces
     clean = re.sub(r"[|\-:\s]", "", stripped)
     return len(clean) == 0 and "-" in stripped
 
@@ -39,7 +72,6 @@ def is_table_delimiter(line: str) -> bool:
 def parse_table_cells(line: str) -> List[str]:
     """Extracts clean string cell values from a markdown table row."""
     parts = line.strip().split("|")
-    # Remove empty outer tokens from leading/trailing '|'
     if parts and parts[0] == "":
         parts = parts[1:]
     if parts and parts[-1] == "":
@@ -48,10 +80,7 @@ def parse_table_cells(line: str) -> List[str]:
 
 
 def parse_inline_bold(text: str) -> List[Tuple[str, bool]]:
-    """
-    Parses a string containing '**bold text**' into a list of tuples (chunk_text, is_bold).
-    Example: 'Hello **world**!' -> [('Hello ', False), ('world', True), ('!', False)]
-    """
+    """Parses a string containing '**bold text**' into a list of tuples (chunk_text, is_bold)."""
     if not text:
         return []
 
@@ -72,22 +101,63 @@ def parse_inline_bold(text: str) -> List[Tuple[str, bool]]:
     return chunks
 
 
+def _split_chunk_with_glossary_terms(
+    text: str,
+    keywords_map: Dict[str, str]
+) -> List[Tuple[str, Optional[str]]]:
+    """
+    Splits text into chunks of (subtext, matched_term_id_or_none).
+    Prioritizes longer keyword matches first.
+    """
+    if not text or not keywords_map:
+        return [(text, None)]
+
+    # Sort keywords by length descending to match longest phrases first
+    sorted_keywords = sorted(keywords_map.keys(), key=lambda k: len(k), reverse=True)
+    
+    # We match keywords as distinct terms / words
+    # To avoid regex performance bottlenecks, build regex for keywords with length >= 4
+    significant_keywords = [re.escape(k) for k in sorted_keywords if len(k) >= 4]
+    if not significant_keywords:
+        return [(text, None)]
+
+    pattern = r"\b(" + "|".join(significant_keywords) + r")\b"
+    result: List[Tuple[str, Optional[str]]] = []
+    last_idx = 0
+
+    for match in re.finditer(pattern, text, flags=re.IGNORECASE):
+        start, end = match.span()
+        matched_str = match.group(1).lower()
+        term_id = keywords_map.get(matched_str)
+
+        if start > last_idx:
+            result.append((text[last_idx:start], None))
+        
+        result.append((text[start:end], term_id))
+        last_idx = end
+
+    if last_idx < len(text):
+        result.append((text[last_idx:], None))
+
+    return result if result else [(text, None)]
+
+
 def render_markdown_to_textbox(
     textbox: ctk.CTkTextbox,
     markdown_text: str,
     base_font_size: int = 13,
     header_color: str = "#0F172A",
     text_color: str = "#334155",
+    enable_glossary_links: bool = True,
+    on_glossary_click: Optional[Callable[[str], None]] = None,
 ):
     """
     Renders formatted markdown into a CTkTextbox with bold spans, headings,
-    bullet lists, divider rules, and cleanly aligned table grids.
+    bullet lists, divider rules, aligned tables, and auto-linked glossary terms.
     """
-    # Enable editing to write content
     textbox.configure(state="normal")
     textbox.delete("1.0", "end")
 
-    # Configure underlying Tk Text widget tags
     tk_text = getattr(textbox, "_textbox", None)
     if tk_text:
         try:
@@ -100,6 +170,43 @@ def render_markdown_to_textbox(
             tk_text.tag_config("separator", font=("Courier", 10), foreground="#64748B", justify="center")
         except Exception:
             pass
+
+    keywords_map = get_glossary_keywords_map() if enable_glossary_links else {}
+    used_glossary_tags = set()
+
+    def handle_gloss_click(term_id: str):
+        if on_glossary_click:
+            on_glossary_click(term_id)
+        else:
+            try:
+                from gui.components.glossary_modal import show_glossary_term_modal
+                show_glossary_term_modal(textbox.winfo_toplevel(), term_id)
+            except Exception:
+                pass
+
+    def insert_text_with_links(text: str, base_tags: Tuple[str, ...]):
+        if not enable_glossary_links or not keywords_map:
+            textbox.insert("end", text, base_tags)
+            return
+
+        gloss_chunks = _split_chunk_with_glossary_terms(text, keywords_map)
+        for subtext, term_id in gloss_chunks:
+            if term_id:
+                tag_name = f"gloss_{term_id}"
+                combined_tags = base_tags + (tag_name,)
+                textbox.insert("end", subtext, combined_tags)
+                
+                if tk_text and tag_name not in used_glossary_tags:
+                    used_glossary_tags.add(tag_name)
+                    try:
+                        tk_text.tag_config(tag_name, foreground="#4F46E5", underline=True)
+                        tk_text.tag_bind(tag_name, "<Button-1>", lambda e, tid=term_id: handle_gloss_click(tid))
+                        tk_text.tag_bind(tag_name, "<Enter>", lambda e: tk_text.configure(cursor="hand2"))
+                        tk_text.tag_bind(tag_name, "<Leave>", lambda e: tk_text.configure(cursor=""))
+                    except Exception:
+                        pass
+            else:
+                textbox.insert("end", subtext, base_tags)
 
     lines = markdown_text.strip().split("\n")
     i = 0
@@ -115,7 +222,6 @@ def render_markdown_to_textbox(
             continue
 
         if line_type in ["h1", "h2", "h3"]:
-            # Strip heading hashes
             clean_heading = re.sub(r"^#{1,3}\s*", "", raw_line.strip())
             textbox.insert("end", f"\n{clean_heading}\n", (line_type,))
             i += 1
@@ -132,14 +238,13 @@ def render_markdown_to_textbox(
             textbox.insert("end", "• ", ("bullet", "bold"))
             chunks = parse_inline_bold(clean_bullet)
             for chunk_text, is_bold in chunks:
-                tag = "bold" if is_bold else "normal"
-                textbox.insert("end", chunk_text, ("bullet", tag))
+                base_tag = "bold" if is_bold else "normal"
+                insert_text_with_links(chunk_text, ("bullet", base_tag))
             textbox.insert("end", "\n")
             i += 1
             continue
 
         if line_type == "table_row":
-            # Accumulate contiguous table lines
             table_lines: List[str] = []
             while i < num_lines and parse_markdown_line_type(lines[i]) in ["table_row", "table_delimiter"]:
                 table_lines.append(lines[i])
@@ -152,8 +257,8 @@ def render_markdown_to_textbox(
         # Regular paragraph
         chunks = parse_inline_bold(raw_line)
         for chunk_text, is_bold in chunks:
-            tag = "bold" if is_bold else "normal"
-            textbox.insert("end", chunk_text, (tag,))
+            base_tag = "bold" if is_bold else "normal"
+            insert_text_with_links(chunk_text, (base_tag,))
         textbox.insert("end", "\n")
         i += 1
 
@@ -166,7 +271,6 @@ def _render_embedded_table(textbox: ctk.CTkTextbox, table_lines: List[str]):
     if not tk_text or not table_lines:
         return
 
-    # Parse header and rows
     header_cells: List[str] = []
     data_rows: List[List[str]] = []
 
@@ -182,7 +286,6 @@ def _render_embedded_table(textbox: ctk.CTkTextbox, table_lines: List[str]):
     if not header_cells:
         return
 
-    # Create embedded Table Frame
     table_frame = ctk.CTkFrame(
         textbox,
         corner_radius=8,
@@ -195,7 +298,6 @@ def _render_embedded_table(textbox: ctk.CTkTextbox, table_lines: List[str]):
     for col_idx in range(num_cols):
         table_frame.grid_columnconfigure(col_idx, weight=1)
 
-    # Header row
     for col_idx, text in enumerate(header_cells):
         clean_text = text.replace("**", "")
         hdr_lbl = ctk.CTkLabel(
@@ -210,7 +312,6 @@ def _render_embedded_table(textbox: ctk.CTkTextbox, table_lines: List[str]):
         )
         hdr_lbl.grid(row=0, column=col_idx, padx=2, pady=2, sticky="nsew")
 
-    # Data rows
     for row_idx, row_cells in enumerate(data_rows, start=1):
         row_bg = ("#F1F5F9", "#0F172A") if row_idx % 2 == 0 else ("#FFFFFF", "#1E293B")
         for col_idx in range(num_cols):
@@ -234,7 +335,6 @@ def _render_embedded_table(textbox: ctk.CTkTextbox, table_lines: List[str]):
     try:
         tk_text.window_create("end", window=table_frame)
     except Exception:
-        # Fallback to string representation if window creation fails
         for line in table_lines:
             textbox.insert("end", f"{line}\n")
     textbox.insert("end", "\n")
