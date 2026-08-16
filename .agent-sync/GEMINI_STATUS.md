@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Correção — AÇÃO NECESSÁRIA: Inclusão da Categoria "tecnica" nas Estatísticas & Motor Adaptativo — CONCLUÍDA
+- Data: 2026-08-16 08:57 (UTC+1)
+- Commit: ea351af
+- Resumo: Adicionada a categoria `"tecnica"` à lista `categories` em `gui/screens/stats_screen.py::_draw_category_bars` para que o progresso nos Exercícios Técnicos surja no gráfico de barras comparativo de categorias das Estatísticas. Atualizados também os mapeamentos `CATEGORY_NAMES_PT`, `CATEGORY_ROUTES` e `CATEGORY_TIPS` em `core/adaptive_engine.py`. 162/162 testes a passar.
+- Ficheiros alterados: gui/screens/stats_screen.py, core/adaptive_engine.py
+
 ## Fase 30 — Módulo de Exercícios Técnicos & Aquecimento — CONCLUÍDA
 - Data: 2026-08-16 08:54 (UTC+1)
 - Commit: 508fd65
