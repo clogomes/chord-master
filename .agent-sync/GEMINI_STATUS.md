@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 37 — Correção AÇÃO NECESSÁRIA (37.1 + 37.2) — CONCLUÍDA
+- Data: 2026-08-16T18:12:05+01:00
+- Commit: e6c3ff7
+- Resumo: Corrigido bug crítico 37.1: `practice_staff.py` usava `note.pitch` (ex: "C") no skill_id em vez de `note.pitch_with_octave` (ex: "C4"), causando divergência permanente com as sementes de `generate_default_atomic_skills()`. Corrigido 37.2: `due_reviews_count` retornava 10 inventado para perfis novos — agora retorna a contagem real (0). Adicionados 2 testes de regressão que garantem que os skill_ids do runtime e das sementes partilham o mesmo espaço de nomes. Total: 222/222 testes.
+- Ficheiros principais alterados: gui/screens/practice_staff.py, core/user_manager.py, tests/test_review_scheduler.py
+
 ## Fase 37 — Sistema de Revisão Espaçada SM-2 & Leitner — CONCLUÍDA
 - Data: 2026-08-16T18:07:28+01:00
 - Commit: d518756
