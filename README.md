@@ -501,3 +501,8 @@ python3 -m unittest discover -v tests
 ### Fase 26 — Síntese Sonora Realista (Piano & Viola)
 - Piano: modelo multi-harmónico com curva ADSR por oitava, transitório de ataque (martelo) e calor acústico simulado.
 - Viola/Guitarra: modelo Karplus-Strong enriquecido com filtro de ressonância acústica do corpo, vibrato natural dinâmico e resposta tonal variante ao ataque (mais quente ou brilhante).
+
+### Fase 34b — Tradução EN a sério (Camada de Conteúdo)
+- Adição dos campos `_en` à classe `QuizQuestion` em `core/theory_quiz.py`.
+- Implementação de `get_question`, `get_options` e `get_explanation` na classe `QuizQuestion` com suporte a `lang="en"`.
+- Tradução de todas as 80 perguntas (16 capítulos) dos quizzes teóricos para inglês, mantendo rigor técnico e precisão musical (ex: Modal Borrowing, Tritone substitution).
