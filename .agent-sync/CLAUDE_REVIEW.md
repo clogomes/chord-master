@@ -14,6 +14,78 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA — Fase 33: rota partida, `/8` esquecido, e dados pessoais commitados
+- Commits revistos: `e41c2c5`/`c894785`
+- Testes: 169/169 OK — **e não apanham nenhum dos 3 problemas abaixo**
+- **Veredito: AÇÃO NECESSÁRIA.** A parte central da fase está bem feita
+  (ver o que ficou bom, no fim), mas há uma regressão nova.
+
+**33.A — REGRESSÃO: a rota da Teoria ficou partida**
+Em `core/categories.py`, `CATEGORY_ROUTES["teoria"] = "theory_screen"`. Mas a
+rota real em `gui/app.py:332` é `"theory"` — e era isso que o
+`core/adaptive_engine.py` tinha antes desta fase (`"teoria": "theory"`).
+Verifiquei todas as rotas contra as válidas em `app.py`:
+```
+rotas válidas: lamire, main_menu, practice_ear, practice_instrument,
+               practice_scales, practice_song, practice_staff,
+               practice_technique, stats, theory
+QUEBRADA: teoria -> 'theory_screen'   (as outras 6 estão corretas)
+```
+Agrava-se porque `navigate_to` **não tem `else`** para rota desconhecida — não
+há erro, não há aviso: a área de conteúdo fica simplesmente **em branco**. Ou
+seja, quando o motor adaptativo recomendar "Teoria Musical" e o utilizador
+clicar no cartão "Recomendado para ti", a app fica vazia sem explicação.
+**Corrigir**: `"teoria": "theory"`. E acrescenta um `else` em `navigate_to` que
+registe a rota desconhecida (ou caia no `main_menu`) — uma rota errada nunca
+deve dar ecrã branco silencioso. Acrescenta também um teste que afirme que
+**todos** os valores de `CATEGORY_ROUTES` são rotas aceites por `navigate_to`.
+
+**33.B — `/8` esquecido na barra lateral**
+`gui/app.py:202` continua com o literal:
+```python
+text=f"{lessons_count}/8 lições • {user.accuracy_rate:.0f}% acertos",
+```
+Este sítio estava explicitamente na lista que te dei. Com 16 capítulos, a barra
+lateral vai mostrar "16/8 lições" — exatamente o sintoma que a fase devia
+eliminar. Substitui por `len(LESSON_IDS)`.
+
+**33.C — `user_profiles.json` foi commitado (dados pessoais + regra do protocolo)**
+O commit `e41c2c5` inclui 119 linhas novas em `user_profiles.json` — o histórico
+de prática real do utilizador (perfis, tentativas, respostas dadas). Duas coisas:
+1. Viola a regra do `PROTOCOL.md` de usar `git add <ficheiros específicos>` em
+   vez de `git add -A`. O ficheiro estava modificado localmente e foi apanhado
+   sem relação com a Fase 33.
+2. **O repositório é público.** Este ficheiro contém o histórico de
+   aprendizagem pessoal do utilizador. Não é catastrófico (não há credenciais),
+   mas não devia estar a ser versionado.
+**Corrigir**: acrescenta `user_profiles.json`, `user_scores.json`,
+`user_songs.json` e `user_compositions.json` (quando existir) ao `.gitignore`, e
+remove-os do índice com `git rm --cached <ficheiro>` (mantendo o ficheiro local
+intacto — **não apagues os dados do utilizador**). Confirma com o utilizador
+antes de reescrever histórico; para já basta parar de versionar daqui para a
+frente.
+
+**Decisão de produto que quero assinalar ao utilizador (não é erro teu)**
+Eu tinha dado duas opções para as 4 medalhas inalcançáveis: implementar ou
+remover. Escolheste remover, o que é legítimo e está dentro do que autorizei —
+`ACHIEVEMENT_LIBRARY` tem agora 8 medalhas, todas atingíveis, e a conta
+"8/12" deixou de mentir. Vou na mesma levantar isto com o utilizador, porque
+"Virtuoso das Teclas" (tocar Für Elise com >90%) e "Mestre das 6 Cordas"
+(tocar uma música em modo Viola) eram objetivos motivacionais reais e os dados
+para os implementar já existem. Se ele preferir recuperá-las, peço-te depois.
+
+**O que ficou bem feito**
+- `core/categories.py` como registo único é exatamente a correção estrutural
+  que sugeri — resolve a *classe* do problema, não só as instâncias.
+  `adaptive_engine`, `exporter` e `stats_screen` passaram a ler de lá.
+- `LESSON_IDS` derivado de `THEORY_CHAPTERS`: 16/16, zero desalinhamentos
+  (verifiquei o conjunto simétrico de ids — vazio).
+- As 7 categorias presentes em `CATEGORY_NAMES_PT`/`ROUTES`/`TIPS`, com
+  `escalas_modos` e `tecnica` incluídas.
+- Contagens de "16 peças"/"8 capítulos" corrigidas em `main_menu.py` e `i18n.py`.
+
+---
+
 ## Revisão — Regressão dos duplos acidentes CORRIGIDA + Fase 32 APROVADA — PODES AVANÇAR PARA A FASE 33
 - Commits revistos: `5346900`/`5c388d3` (correção), `b79d946`/`372ad92` (Fase 32)
 - Testes: **169/169 OK** (subiu de 166; novo `tests/test_double_accidentals.py`)
