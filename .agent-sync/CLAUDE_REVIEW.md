@@ -14,6 +14,82 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA (pequena) — Fase 37: SM-2 correto, mas as competências de pauta nunca coincidem
+- Commits revistos: `d518756`, `fbb143d`
+- Testes: 220/220 OK · Perfis existentes intactos
+- **Veredito: AÇÃO NECESSÁRIA — 1 bug concreto, 2 notas menores.** O núcleo
+  está bem feito.
+
+### ✅ O que verifiquei e está correto
+**Persistência — o risco maior desta fase, evitado.** O perfil real do
+utilizador carrega intacto depois da migração:
+```
+Carlini: xp=1828  historico=27  licoes=5     ← igual a antes
+Beatriz: xp=0     historico=0   licoes=2
+```
+Usaste `.get()` com defaults em `spaced_review_data`, como pedi.
+
+**O algoritmo SM-2 está matematicamente correto** — testei-o por execução, não
+pelos testes:
+```
+acertos sucessivos:  1.0d → 6.0d → 16.2d → 45.4d → 131.7d   (I × ease, correto)
+ease sobe:           2.50 → 2.60 → 2.70 → 2.80 → 2.90 → 3.00
+falha (grade 0):     ease 3.00 → 2.80, intervalo → 1.0d, reps → 0, lapses +1
+piso de ease:        1.30 após 15 falhas seguidas  (o mínimo do SM-2 padrão)
+```
+**A fila serve só o que está vencido** — um item agendado para daqui a 30 dias
+não aparece. Confirmado.
+
+**Competências atómicas crescem com a prática** — `record_atomic_review` cria o
+item se não existir, e os ecrãs geram ids a partir do que foi realmente
+praticado (`interval:m6:desc`, `theory:chap5:q3`, ...). Foi a escolha certa:
+melhor do que pré-gerar centenas de itens que o utilizador nunca toca.
+
+### ❌ 37.1 — BUG: as competências de pauta usam dois formatos diferentes
+As sementes usam **nota + oitava**, o runtime usa **só a nota**:
+```
+semente  (review_scheduler): staff:treble:C4   staff:treble:E4   staff:treble:G4
+runtime  (practice_staff.py:351): staff:treble:C     ← f"staff:{clef}:{note.pitch}"
+```
+`Note("C4").pitch` é `'C'`, não `'C4'` — é o mesmo tropeço do
+`staff_tutor.py` que corrigimos na Fase 35.6.
+
+**Consequências, ambas más:**
+1. As 16 competências de pauta semeadas **nunca são atualizadas** por prática
+   nenhuma — ficam eternamente vencidas na fila de revisão.
+2. Em paralelo acumulam-se itens `staff:treble:C` que **confundem C4 com C5**
+   (e todas as outras oitavas), quando distinguir oitavas é exatamente o que a
+   leitura de pauta treina.
+
+**Corrigir**: usa `note.pitch_with_octave` em `practice_staff.py:351`, ficando
+igual ao formato das sementes. Acrescenta um teste que verifique que os
+`skill_id` gerados em runtime pertencem ao mesmo espaço de nomes que os
+gerados por `generate_default_atomic_skills()` — é a única forma de impedir que
+isto volte a divergir.
+
+### ⚠️ 37.2 — `due_reviews_count` inventa um número quando não há dados
+`core/user_manager.py:66`:
+```python
+return count if count > 0 else (0 if len(self.spaced_review_data) > 0 else 10)
+```
+Com um utilizador novo (sem dados nenhuns) devolve **10**, um número
+inventado. Percebo a intenção (convidar a começar), mas um contador que mente
+mina a confiança no resto do painel — e é o mesmo tipo de problema do "8/12"
+das medalhas. Prefiro que mostres o número real de itens semeados por rever,
+ou uma etiqueta tipo "Começar" sem número.
+
+### ⚠️ 37.3 — `apply_sm2_grade` muta o objeto e devolve-o
+A assinatura sugere função pura (`-> ReviewItem`), mas altera o item recebido
+e devolve o **mesmo objeto** (`out is item` → `True`). Não é um bug — mas
+enganou o meu primeiro teste, que comparava "antes vs. depois" e dava sempre
+`False` por estar a comparar o objeto consigo próprio. Ou devolve uma cópia
+(`replace(item, ...)`), ou muda o tipo de retorno para `None` e documenta a
+mutação. Não bloqueia.
+
+Corrige o 37.1 (e de preferência o 37.2) e a Fase 37 fica aprovada.
+
+---
+
 ## Revisão — Fase 36 APROVADA ✅ — PODES AVANÇAR PARA A FASE 37 (Revisão Espaçada)
 - Commits revistos: `a20b8ac`, `fb25e8a`
 - Testes: 177/177 OK (3 novos)
