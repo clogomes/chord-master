@@ -131,6 +131,9 @@ CHORD_TYPES: Dict[str, ChordDefinition] = {
 }
 
 
+from .notes import Note, DIATONIC_NAMES, spell_note_with_letter
+
+
 class Chord:
     """Represents a concrete Chord built on a root note."""
 
@@ -145,8 +148,26 @@ class Chord:
         self.notes = self._generate_notes()
 
     def _generate_notes(self) -> List[Note]:
-        """Generates all Note objects in the chord accounting for inversions."""
-        base_notes = [self.root.transpose(st) for st in self.definition.intervals]
+        """Generates all Note objects in the chord accounting for inversions and harmonic spelling."""
+        degree_offsets = []
+        for deg in self.definition.formula_degrees.split("-"):
+            deg_clean = deg.strip().replace("♭", "").replace("♯", "")
+            if deg_clean.isdigit():
+                val = int(deg_clean)
+                degree_offsets.append(val - 1)
+            else:
+                degree_offsets.append(0)
+
+        if self.root.letter in DIATONIC_NAMES and len(degree_offsets) == len(self.definition.intervals):
+            start_letter_idx = DIATONIC_NAMES.index(self.root.letter)
+            base_notes = []
+            for i, st in enumerate(self.definition.intervals):
+                target_midi = self.root.midi + st
+                expected_letter = DIATONIC_NAMES[(start_letter_idx + degree_offsets[i]) % 7]
+                base_notes.append(spell_note_with_letter(target_midi, expected_letter))
+        else:
+            base_notes = [self.root.transpose(st) for st in self.definition.intervals]
+
         if self.inversion == 0:
             return base_notes
 

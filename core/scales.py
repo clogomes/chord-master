@@ -164,6 +164,9 @@ SCALE_TYPES: Dict[str, ScaleDefinition] = {
 }
 
 
+from .notes import Note, DIATONIC_NAMES, spell_note_with_letter
+
+
 class Scale:
     """Represents a concrete Scale built on a root note."""
 
@@ -177,7 +180,15 @@ class Scale:
         self.notes = self._generate_notes()
 
     def _generate_notes(self) -> List[Note]:
-        """Generates all Note objects in the scale."""
+        """Generates all Note objects in the scale using correct harmonic spelling."""
+        if self.root.letter in DIATONIC_NAMES and len(self.definition.intervals) in (7, 8):
+            start_letter_idx = DIATONIC_NAMES.index(self.root.letter)
+            notes = []
+            for i, st in enumerate(self.definition.intervals):
+                target_midi = self.root.midi + st
+                expected_letter = DIATONIC_NAMES[(start_letter_idx + (i % 7)) % 7]
+                notes.append(spell_note_with_letter(target_midi, expected_letter))
+            return notes
         return [self.root.transpose(st) for st in self.definition.intervals]
 
     @property

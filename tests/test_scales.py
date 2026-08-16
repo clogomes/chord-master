@@ -68,7 +68,7 @@ class TestScales(unittest.TestCase):
     def test_new_modes_and_exotic_scales(self):
         # 1. D Phrygian (D, Eb, F, G, A, Bb, C, D)
         d_phryg = Scale(Note("D4"), "phrygian")
-        self.assertEqual([n.pitch for n in d_phryg.notes], ["D", "D#", "F", "G", "A", "A#", "C", "D"])
+        self.assertEqual([n.pitch for n in d_phryg.notes], ["D", "Eb", "F", "G", "A", "Bb", "C", "D"])
 
         # 2. F Lydian (F, G, A, B, C, D, E, F)
         f_lyd = Scale(Note("F4"), "lydian")

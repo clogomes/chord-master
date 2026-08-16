@@ -127,11 +127,15 @@ INTERVAL_NAMES_PT = {v.short_code: v.name_pt for v in INTERVALS.values()}
 
 def get_interval(root: Note, target: Note) -> Interval:
     """Returns the Interval object between two notes."""
-    semitones = abs(target.midi - root.midi) % 13
-    if semitones in INTERVALS:
-        return INTERVALS[semitones]
-    # For intervals > 12 (compound intervals), reduce to simple interval
-    simple_semitones = semitones % 12
+    raw_semitones = abs(target.midi - root.midi)
+    if raw_semitones == 0:
+        return INTERVALS[0]
+    if raw_semitones in INTERVALS:
+        return INTERVALS[raw_semitones]
+    # For compound intervals (> 12 semitones), reduce to simple interval
+    simple_semitones = raw_semitones % 12
+    if simple_semitones == 0:
+        return INTERVALS[12]
     return INTERVALS.get(simple_semitones, INTERVALS[12])
 
 

@@ -930,10 +930,11 @@ from core.fingering import assign_piano_fingerings
 from core.guitar import assign_guitar_coordinates
 
 for song in SONG_LIBRARY:
-    if song.notes and all(sn.piano_finger is None for sn in song.notes):
+    if song.notes:
         p_fingers = assign_piano_fingerings([sn.note for sn in song.notes])
         g_coords = assign_guitar_coordinates([sn.note for sn in song.notes])
         for i, sn in enumerate(song.notes):
-            if i < len(p_fingers): sn.piano_finger = p_fingers[i]
+            if sn.piano_finger is None and i < len(p_fingers):
+                sn.piano_finger = p_fingers[i]
             if i < len(g_coords):
                 sn.guitar_string, sn.guitar_fret = g_coords[i]

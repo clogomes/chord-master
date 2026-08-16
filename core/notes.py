@@ -76,6 +76,39 @@ def midi_to_note(midi_number: int, use_sharps: bool = True) -> Tuple[str, int]:
     return pitch, octave
 
 
+def spell_note_with_letter(target_midi: int, expected_letter: str) -> "Note":
+    """
+    Spells a note with a specified expected base letter (A-G) and appropriate accidental
+    (#, b, ##, bb, or natural) so that its pitch matches target_midi.
+    """
+    letter = expected_letter.upper()
+    octave = (target_midi // 12) - 1
+    base_midi_in_octave4 = {"C": 60, "D": 62, "E": 64, "F": 65, "G": 67, "A": 69, "B": 71}[letter]
+    natural_midi = (octave + 1) * 12 + (base_midi_in_octave4 % 12)
+    diff = target_midi - natural_midi
+
+    while diff > 6:
+        diff -= 12
+    while diff < -6:
+        diff += 12
+
+    if diff == 0:
+        acc = ""
+    elif diff == 1:
+        acc = "#"
+    elif diff == -1:
+        acc = "b"
+    elif diff == 2:
+        acc = "##"
+    elif diff == -2:
+        acc = "bb"
+    else:
+        acc = ""
+
+    pitch = f"{letter}{acc}"
+    return Note(pitch, octave=octave)
+
+
 class Note:
     """Represents a specific musical note with pitch and octave."""
 

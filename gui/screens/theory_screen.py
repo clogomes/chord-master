@@ -328,9 +328,9 @@ class TheoryScreen(ctk.CTkFrame):
 
         self.root_select = ctk.CTkOptionMenu(
             ctrl_row,
-            values=["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
+            values=["C", "C#", "Db", "D", "D#", "Eb", "E", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B"],
             command=lambda e: self._on_demo_state_change(),
-            width=70,
+            width=80,
         )
         self.root_select.set("C")
         self.root_select.pack(side="left", padx=4)

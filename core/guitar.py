@@ -130,15 +130,29 @@ class GuitarFretboardModel:
 
     def find_note_positions(self, note: Note) -> List[Tuple[int, int]]:
         """
-        Finds all (string_idx, fret) positions matching a specific pitch or pitch-class.
+        Finds all (string_idx, fret) positions matching a specific note.
+        Prefers exact MIDI pitch match. If out of range, falls back to the octave closest in MIDI pitch.
         """
-        positions = []
+        exact_positions = []
+        octave_candidates = []
+
         for string_idx in range(len(self.tuning)):
             for fret in range(self.num_frets + 1):
                 fret_note = self.get_note_at(string_idx, fret)
-                if fret_note.normalized_pitch == note.normalized_pitch:
-                    positions.append((string_idx, fret))
-        return positions
+                if fret_note.midi == note.midi:
+                    exact_positions.append((string_idx, fret))
+                elif fret_note.normalized_pitch == note.normalized_pitch:
+                    diff = abs(fret_note.midi - note.midi)
+                    octave_candidates.append(((string_idx, fret), diff))
+
+        if exact_positions:
+            return exact_positions
+
+        if octave_candidates:
+            min_diff = min(c[1] for c in octave_candidates)
+            return [c[0] for c in octave_candidates if c[1] == min_diff]
+
+        return []
 
     def get_chord_shape(self, chord_symbol: str) -> Optional[GuitarChordShape]:
         """Retrieves a primary guitar chord shape for a chord symbol (e.g. 'C', 'Am', 'G7')."""

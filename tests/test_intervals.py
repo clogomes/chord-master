@@ -43,11 +43,27 @@ class TestIntervals(unittest.TestCase):
         self.assertEqual(transposed.pitch, "A")
         self.assertEqual(transposed.octave, 4)
 
-    def test_get_by_code(self):
-        p8 = get_interval_by_code("P8")
-        self.assertIsNotNone(p8)
-        self.assertEqual(p8.semitones, 12)
-        self.assertEqual(p8.name_pt, "Oitava Justa")
+    def test_compound_intervals(self):
+        c4 = Note("C4")
+        
+        # 13 semitones -> m2
+        cs5 = Note("C#5")
+        self.assertEqual(get_interval(c4, cs5).short_code, "m2")
+
+        # 14 semitones -> M2
+        d5 = Note("D5")
+        self.assertEqual(get_interval(c4, d5).short_code, "M2")
+
+        # 19 semitones -> P5
+        g5 = Note("G5")
+        self.assertEqual(get_interval(c4, g5).short_code, "P5")
+
+        # 24 semitones -> P8
+        c6 = Note("C6")
+        self.assertEqual(get_interval(c4, c6).short_code, "P8")
+
+        # 0 semitones -> P1
+        self.assertEqual(get_interval(c4, c4).short_code, "P1")
 
 
 if __name__ == "__main__":

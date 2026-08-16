@@ -98,6 +98,11 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
   - Exercícios clássicos de **Hanon No. 1**, padrões de 5 dedos, arpejos de oitavas, movimento contrário entre mãos, **Spider Walk cromático (1-2-3-4)**, saltos de corda e palhetada alternada rápida.
   - Metrónomo com **rampa de tempo automática (70% ➔ 100% BPM)** e feedback rítmico em milissegundos.
 
+- **Correções do Motor de Harmonia & Mapeamento de Guitarra (Fase 31)**:
+  - Resolução da redução de intervalos compostos (`% 12` em vez de `% 13`) em `core/intervals.py`.
+  - Ortografia harmónica precisa de escalas e acordes em tonalidades com bemóis (`F, G, A, B♭, C, D, E` e `C, E♭, G♭`).
+  - Mapeamento exato de cordas e trastes no braço da guitarra considerando o registo/oitava exato da nota MIDI.
+
 ---
 
 ### 5. 🎤 FASE 5 — Ditado de Solfejo Cantado com Validação Vocal por Microfone

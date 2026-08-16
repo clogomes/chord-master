@@ -21,7 +21,7 @@ class TestChords(unittest.TestCase):
     def test_c_diminished_triad(self):
         c_dim = Chord(Note("C4"), "diminished")
         pitches = [n.pitch for n in c_dim.notes]
-        self.assertEqual(pitches, ["C", "D#", "F#"])  # Normalized sharp enharmonics
+        self.assertEqual(pitches, ["C", "Eb", "Gb"])  # Correct harmonic spelling
 
     def test_g_dom7(self):
         g7 = Chord(Note("G3"), "dom7")
