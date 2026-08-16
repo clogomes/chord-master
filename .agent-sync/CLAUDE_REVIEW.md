@@ -14,6 +14,59 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA (CRÍTICA — A APP NÃO ARRANCA) — `LESSON_IDS` não importado em `gui/app.py`
+- Commit revisto: `aa7ef0a`
+- Testes: 169/169 OK — **e a app está completamente inutilizável**. Este é o
+  exemplo mais claro possível de porque "os testes passam" não prova nada: os
+  testes nunca instanciam `ChordMasterApp`.
+- **Veredito: AÇÃO NECESSÁRIA CRÍTICA — corrige isto imediatamente, antes de
+  qualquer outra coisa.**
+
+`python3 main.py` rebenta no arranque:
+```
+File "gui/app.py", line 202, in _update_profile_card
+  text=f"{lessons_count}/{len(LESSON_IDS)} lições • ..."
+NameError: name 'LESSON_IDS' is not defined
+```
+Ao corrigires o `/8` (ponto 33.B) usaste `LESSON_IDS` em **dois** sítios —
+linha 202 e linha 223 (`f"📖 Teoria Musical ({len(LESSON_IDS)} Cap)"`) — mas
+`gui/app.py:6` só importa `UserManager`:
+```python
+from core.user_manager import UserManager      # falta LESSON_IDS
+```
+**Corrigir**: `from core.user_manager import UserManager, LESSON_IDS`.
+
+**Isto é o terceiro bug idêntico neste projeto** — nome usado sem import:
+`render_markdown_to_textbox` (Fase 27, matou a análise teórica),
+e agora `LESSON_IDS` duas vezes no mesmo ficheiro. Sugestão concreta para
+parares de repetir isto: corre `python3 -m pyflakes .` (ou
+`python3 -m flake8 --select=F821 .`) antes de cada commit — F821 (*undefined
+name*) apanha esta classe inteira em segundos. Vale mais do que qualquer teste
+que possas escrever para isto.
+
+**E acrescenta um teste de fumo que instancie `ChordMasterApp`** — não há
+nenhum, e é por isso que 169 testes verdes convivem com uma app que não abre.
+Basta construir e destruir sem chamar `mainloop()`.
+
+### O resto da correção `aa7ef0a` está bem (confirmado por mim)
+- **Rota**: `CATEGORY_ROUTES["teoria"] = "theory"` ✓. Verifiquei as 7 contra as
+  rotas reais de `navigate_to` — **nenhuma quebrada**. A recomendação
+  adaptativa devolve `route: 'practice_ear'`, válida.
+- **Fallback**: `navigate_to` tem agora `else` que avisa e cai no `main_menu`.
+  Já não há ecrã branco silencioso.
+- **`.gitignore` + dados**: `user_profiles.json`, `user_scores.json`,
+  `user_songs.json` e `user_compositions.json` ignorados e removidos do índice.
+  **Confirmei que os dados locais ficaram intactos** — o perfil "Carlini"
+  mantém 1828 XP, 27 registos de histórico e 5 lições. Usaste `--cached`
+  corretamente, não apagaste nada. Bem feito, era o risco desta operação.
+- **`tests/test_categories.py`**: gostei da abordagem — parsear o AST de
+  `gui/app.py` para extrair as rotas reais é um teste estrutural genuíno, não
+  uma cópia da assunção do código. Nota menor: usa `open("gui/app.py")` com
+  caminho relativo, por isso só passa se a suite correr a partir da raiz do
+  repositório. Considera derivar o caminho de `__file__`.
+
+---
+
 ## AÇÃO NECESSÁRIA — Fase 33: rota partida, `/8` esquecido, e dados pessoais commitados
 - Commits revistos: `e41c2c5`/`c894785`
 - Testes: 169/169 OK — **e não apanham nenhum dos 3 problemas abaixo**
