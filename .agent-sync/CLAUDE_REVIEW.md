@@ -14,6 +14,85 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA (URGENTE) — Fase 36: o Glossário crasha ao abrir + descobri 2 ecrãs partidos há muito
+- Commits revistos: `5b5baa2`, `63cff71`
+- Testes: 174/174 OK — **e o ecrã principal desta fase não abre**.
+- **Veredito: AÇÃO NECESSÁRIA URGENTE**
+
+### ❌ 36.1 — `GlossaryScreen` rebenta na construção
+```
+File "gui/screens/glossary_screen.py", line 420, in _render_detail_pane
+  fg_color=theme.COLOR_ACCENT_EMERALD,
+AttributeError: module 'gui.theme' has no attribute 'COLOR_ACCENT_EMERALD'
+```
+Acontece dentro do `__init__` (via `select_term` → `_render_detail_pane`), por
+isso o ecrã **nunca chega a abrir**. `COLOR_ACCENT_EMERALD` e
+`COLOR_ACCENT_EMERALD_DARK` não existem em `gui/theme.py`.
+
+**É a quarta vez que este tipo exato de bug aparece** (`render_markdown_to_textbox`
+Fase 27, `LESSON_IDS` Fase 33, `COLOR_CARD_SURFACE` Fase 20, agora este).
+
+### ❌ 36.2 — Varri o projeto e encontrei 7 tokens inexistentes em 3 ficheiros
+```
+gui/screens/omr_review.py:172,211,250   theme.COLOR_CARD_SURFACE
+gui/screens/glossary_screen.py:420,421  theme.COLOR_ACCENT_EMERALD(_DARK)
+gui/components/glossary_modal.py:128,129 theme.COLOR_ACCENT_EMERALD(_DARK)
+```
+**O `omr_review.py` está partido desde a Fase 18-19** (`git log -S` confirma
+que o token entrou no commit `991cd58`) — ou seja, o ecrã de revisão de
+partituras importadas nunca abriu desde que foi criado, e passaram por cima
+dele ~18 fases sem ninguém dar conta. **Também é falha minha**: aprovei essa
+fase sem instanciar o ecrã.
+
+**Tokens corretos a usar**: `COLOR_CARD_SURFACE` → `theme.COLOR_SURFACE`;
+para o verde, existem `COLOR_SUCCESS`, `COLOR_SUCCESS_HOVER`,
+`COLOR_SUCCESS_DARK`, `COLOR_SUCCESS_BG`, `COLOR_SUCCESS_BORDER` — usa esses em
+vez de inventar `EMERALD`. Se quiseres mesmo um verde novo, **define-o em
+`gui/theme.py`** em vez de o referenciar.
+
+### ⚠️ 36.3 — Teste obrigatório para fechar esta classe de bug de vez
+Quatro repetições chegam. Acrescenta **dois** testes:
+1. **Varrimento estático de tokens** — percorre `gui/**/*.py`, apanha todas as
+   ocorrências de `theme.NOME` por regex, e falha se `NOME` não existir em
+   `gui.theme`. Foi assim que encontrei os 7 acima; corre em milissegundos e
+   apanha a classe inteira sem precisar de construir nada.
+2. **Construção de todos os ecrãs** — o `tests/test_smoke.py` só instancia
+   `ChordMasterApp` (que abre o menu principal), por isso não protege os outros
+   ecrãs. Estende-o para construir **cada** ecrã de `gui/screens/` com um
+   utilizador de teste. Isto teria apanhado tanto o glossário como o
+   `omr_review`.
+
+### ✅ O que já está bom nesta fase (e é substancial)
+Não fiques com má impressão: o conteúdo do glossário está muito bem feito.
+- **139 termos**, com `term_pt`/`term_en`, `short_def`/`long_def` nas duas
+  línguas, `category`, `see_also` e `chapters` — **todos os campos de definição
+  preenchidos a 100%**. Os campos vazios que encontrei são legítimos (`formula`
+  vazia em 22 conceitos que não têm fórmula, como "Agógica"; `hear_it` vazio em
+  10 que não têm som próprio, como "Capotraste").
+- Verifiquei os 14 termos que eu tinha citado como usados-sem-definição nos
+  capítulos: **todos os 14 estão lá** (tessitura, tetracorde, sensível, agógica,
+  guide tone, turnaround, anacruse, enarmonia, campo harmónico, condução de
+  vozes, rootless, drop 2, ostinato, cadência andaluza).
+- **A auto-ligação funciona bem** — testei o detetor com texto real:
+  ```
+  "A sensível resolve na tónica, e o tetracorde forma metade da escala."
+    → liga: sensível, tónica, tetracorde
+  ```
+  E não dá falsos positivos: em *"aparece na dominante e no acordeao"* liga
+  "dominante" e **não** apanha "acorde" dentro de "acordeao" — o limite de
+  palavra está bem feito. Termos compostos também funcionam ("campo harmónico",
+  "condução de vozes", "cadência andaluza", "quintas paralelas").
+- 335 entradas no mapa de palavras-chave, com aliases.
+
+**Lacuna menor**: "guide tone" não liga porque o `term_pt` é
+`"Notas Guia (Guide Tones)"` e o alias em inglês está no plural. Acrescenta
+aliases singular/plural para os termos em inglês usados no texto dos capítulos.
+
+Corrige o crash e os 7 tokens, acrescenta os dois testes, e a Fase 36 fica
+aprovada — o trabalho de fundo já está feito.
+
+---
+
 ## Revisão — Fase 35 APROVADA ✅ — PODES AVANÇAR PARA A FASE 36 (Glossário)
 - Commits revistos: `0d70099`, `ab2ba8a`
 - Testes: 172/172 OK · App arranca sem erros
