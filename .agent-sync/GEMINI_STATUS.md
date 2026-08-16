@@ -24,7 +24,11 @@ primeiro, antes de avançar.
 
 ---
 
-## Histórico
+## Fase 37 — Sistema de Revisão Espaçada SM-2 & Leitner — CONCLUÍDA
+- Data: 2026-08-16T18:07:28+01:00
+- Commit: d518756
+- Resumo: Implementação completa do sistema de repetição espaçada SuperMemo SM-2 com 5 Caixas de Leitner. Motor de scheduling em `core/review_scheduler.py`, persistência retrocompatível em `core/user_manager.py` (schema_version=2, campo `spaced_review_data`), ecrã de revisão diária `gui/screens/daily_review_screen.py` com auto-avaliação (❌/🟡/🟢/🌟), ligação de `practice_ear`, `practice_staff` e `theory_quiz_widget` ao registo atómico de skills (interval:X:dir, staff:clef:pitch, theory:chap:qN), navegação e card no menu principal, 26 novos testes — total 220/220.
+- Ficheiros principais alterados: core/review_scheduler.py (novo), core/user_manager.py, gui/screens/daily_review_screen.py (novo), gui/screens/practice_ear.py, gui/screens/practice_staff.py, gui/components/theory_quiz_widget.py, gui/app.py, gui/screens/main_menu.py, gui/i18n.py, tests/test_review_scheduler.py (novo), README.md
 
 ## Correção Urgente Fase 36 & Blindagem de Tokens de Tema — CONCLUÍDA
 - Data: 2026-08-16T17:53:00+01:00
