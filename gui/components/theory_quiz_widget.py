@@ -154,13 +154,16 @@ class TheoryQuizWidget(ctk.CTkFrame):
 
         q = self.chapter_quiz.questions[idx]
         total = len(self.chapter_quiz.questions)
-        
-        self.counter_lbl.configure(text=f"Pergunta {idx + 1}/{total}")
-        self.question_lbl.configure(text=q.question)
+        lang = get_language()
 
-        for i, opt_text in enumerate(q.options):
-            if i < len(self.option_radios):
-                self.option_radios[i].configure(text=opt_text)
+        self.title_lbl.configure(text=f"📝 {t('quiz_title', 'Quiz — Capítulo')} {idx + 1}/{total}")
+        self.question_lbl.configure(text=q.get_question(lang) if hasattr(q, "get_question") else (q.question_en if lang == "en" and getattr(q, "question_en", None) else q.question))
+
+        self.confirm_btn.configure(text=t("quiz_confirm", "Confirmar"))
+        
+        for i, rb in enumerate(self.option_radios):
+            opt_text = q.options_en[i] if lang == "en" and getattr(q, "options_en", None) else q.options[i]
+            rb.configure(text=opt_text)
 
     def _on_option_selected(self):
         if not self.is_answered:
@@ -176,6 +179,7 @@ class TheoryQuizWidget(ctk.CTkFrame):
         selected = self.selected_option_idx.get()
         q = self.chapter_quiz.questions[self.current_q_idx]
         is_correct = (selected == q.correct_index)
+        lang = get_language()
 
         if is_correct:
             self.correct_count += 1
@@ -190,9 +194,11 @@ class TheoryQuizWidget(ctk.CTkFrame):
             elif i == selected and not is_correct:
                 rb.configure(text_color=theme.COLOR_ACCENT_CRIMSON)
 
+        expl = q.get_explanation(lang) if hasattr(q, "get_explanation") else (q.explanation_en if lang == "en" and getattr(q, "explanation_en", None) else q.explanation)
+
         self.score_card.show_feedback(
             is_correct=is_correct,
-            explanation=q.explanation,
+            explanation=expl,
             can_replay=False
         )
         self.score_card.pack(fill="x", padx=20, pady=(10, 20), before=self.actions_frame)

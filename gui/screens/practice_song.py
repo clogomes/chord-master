@@ -830,10 +830,10 @@ class PracticeSongScreen(ctk.CTkFrame):
         # Update Info Card
         self.song_title_lbl.configure(text=f"{song.title} — {song.composer}")
         self.song_meta_lbl.configure(text=f"Dificuldade: {song.difficulty} • Compasso: {song.time_signature} • BPM: {song.bpm} • {song.note_count} Notas")
-        self.song_desc_lbl.configure(text=song.description)
-
         from gui.i18n import get_language, t
         lang = get_language()
+        
+        self.song_desc_lbl.configure(text=song.get_description(lang))
         if hasattr(self, "theory_analysis_btn"):
             if song.get_theory_analysis(lang):
                 self.theory_analysis_btn.pack(anchor="w", padx=16, pady=(0, 12))
