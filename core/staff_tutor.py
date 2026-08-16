@@ -1,20 +1,21 @@
 """Pedagogy engine for step-by-step staff sight-reading (Guided Sight-Reading)."""
-from typing import List, Dict, Tuple
+from typing import List
 from core.notes import Note
 
 LEVELS_INFO = [
     {"level": 1, "name": "Notas nas Linhas", "desc": "(E4, G4, B4, D5, F5 / Mi, Sol, Si, Ré, Fá)"},
     {"level": 2, "name": "Notas nos Espaços", "desc": "(F4, A4, C5, E5 / Fá, Lá, Dó, Mi)"},
-    {"level": 3, "name": "Linhas Suplementares", "desc": "(C4, D4, G5, A5)"},
+    {"level": 3, "name": "Notas Suplementares (Linhas e Espaços)", "desc": "(C4, D4, G5, A5)"},
     {"level": 4, "name": "Mistura Completa com Acidentes", "desc": "(♯ / ♭)"},
 ]
+
 
 def get_note_explanation(note: Note, clef: str = "treble") -> str:
     """
     Returns a step-by-step explanation on how to read the given note in the specified clef.
     """
     step = note.diatonic_step
-    
+
     if clef == "treble":
         base_line_step = 30  # E4 is the first line
         ref_note = "Sol (G4)"
@@ -34,16 +35,16 @@ def get_note_explanation(note: Note, clef: str = "treble") -> str:
 
     if is_ledger_below or is_ledger_above:
         ext_type = "inferior" if is_ledger_below else "superior"
-        if clef == "treble" and note.pitch == "C4":
+        if clef == "treble" and note.pitch_with_octave == "C4":
             return "As linhas suplementares estendem a pauta. O Dó Central (C4) fica na 1ª linha suplementar inferior."
-        elif clef == "bass" and note.pitch == "C4":
+        elif clef == "bass" and note.pitch_with_octave == "C4":
             return "As linhas suplementares estendem a pauta. O Dó Central (C4) fica na 1ª linha suplementar superior."
-        return f"Esta é uma nota suplementar {ext_type}. Conta as linhas a partir da pauta principal para a encontrar."
+        return f"Esta é uma nota suplementar {ext_type}. Conta as linhas/espaços a partir da pauta principal para a encontrar."
 
     diff = step - base_line_step
     is_line = (diff % 2 == 0)
     pos_num = (diff // 2) + 1
-    
+
     if is_line:
         pos_str = f"{pos_num}ª linha"
     else:
@@ -51,12 +52,11 @@ def get_note_explanation(note: Note, clef: str = "treble") -> str:
 
     return f"A nota **{note.pitch} ({note.name_pt})** encontra-se na/no {pos_str} a contar de baixo."
 
+
 def generate_tutor_pool(level: int, clef: str = "treble", include_accidentals: bool = False) -> List[Note]:
     """
     Generates a pool of notes suitable for the given difficulty level.
     """
-    notes = []
-    
     if clef == "treble":
         lines = ["E4", "G4", "B4", "D5", "F5"]
         spaces = ["F4", "A4", "C5", "E5"]
@@ -81,5 +81,5 @@ def generate_tutor_pool(level: int, clef: str = "treble", include_accidentals: b
             if len(n) == 2:  # e.g., 'C4'
                 valid_notes.append(Note(f"{n[0]}#{n[1]}"))
                 valid_notes.append(Note(f"{n[0]}b{n[1]}"))
-            
+
     return valid_notes

@@ -139,10 +139,10 @@ CHAPTER_QUIZZES: List[ChapterQuiz] = [
                 question="Qual a fórmula da Escala Maior Natural em tons (T) e semitons (ST)?",
                 options=["T-T-ST-T-T-T-ST", "T-ST-T-T-ST-T-T", "ST-T-T-T-T-ST-T", "T-T-T-ST-T-T-ST"],
                 correct_index=0,
-                explanation="A estrutura da Escala Maior é composta por dois tetracordes separados por um tom: T-T-ST e T-T-T-ST.",
+                explanation="A estrutura da Escala Maior é composta por dois tetracordes iguais (T-T-ST) unidos por um tom central: (T-T-ST) + T + (T-T-ST).",
                 question_en="What is the formula of the Natural Major Scale in whole steps (W) and half steps (H)?",
                 options_en=["W-W-H-W-W-W-H", "W-H-W-W-H-W-W", "H-W-W-W-W-H-W", "W-W-W-H-W-W-H"],
-                explanation_en="The structure of the Major Scale is composed of two tetrachords separated by a whole step: W-W-H and W-W-W-H."
+                explanation_en="The Major Scale is composed of two identical tetrachords (W-W-H) joined by a central whole step: (W-W-H) + W + (W-W-H)."
             ),
             QuizQuestion(
                 question="Quantas notas diferentes compõem a Escala Maior?",

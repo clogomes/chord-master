@@ -155,7 +155,7 @@ The staff consists of **5 lines and 4 spaces**, counted from bottom to top:
 Um **intervalo** é a distância de altura entre duas notas musicais. É o bloco fundamental a partir do qual se constroem todas as melodias, escalas e acordes.
 
 • **Intervalo Melódico**: As notas são tocadas sucessivamente (uma a seguir à outra). Pode ser ascendente ou descendente.
-• **Intervalo Harmónico**: As notas são tocadas em simultâneo (em uníssono).
+• **Intervalo Harmónico**: As notas são tocadas em simultâneo (ao mesmo tempo).
 
 ---
 
@@ -164,18 +164,18 @@ Um **intervalo** é a distância de altura entre duas notas musicais. É o bloco
 | Semitons | Nome em Português | Símbolo | Qualidade | Mnemónica Auditiva |
 | :--- | :--- | :--- | :--- | :--- |
 | **0** | Uníssono Justo | P1 | Consonância Perfeita | Mesma nota repetida |
-| **1** | Segunda Menor | m2 | Dissonância Forte | Tema de *Tubarão (Jaws)* |
-| **2** | Segunda Maior | M2 | Dissonância Suave | *Parabéns a Você* (1º salto) |
+| **1** | Segunda Menor | m2 | Dissonância Forte | *Tubarão (Jaws)* / *Para Elisa* |
+| **2** | Segunda Maior | M2 | Dissonância Suave | *Parabéns a Você* / *Frère Jacques* |
 | **3** | Terça Menor | m3 | Consonância Imperfeita | *Greensleeves* / *Smoke on the Water* |
-| **4** | Terça Maior | M3 | Consonância Imperfeita | *Oh When the Saints* / *Kumbaya* |
-| **5** | Quarta Justa | P4 | Consonância Perfeita | *Hino da Champions League* |
-| **6** | Trítono (4ª aum / 5ª dim) | TT | Dissonância Extrema | Tema de *Os Simpsons* / *Maria* |
-| **7** | Quinta Justa | P5 | Consonância Perfeita | Tema de *Star Wars* / *Twinkle Twinkle* |
+| **4** | Terça Maior | M3 | Consonância Imperfeita | *Oh When the Saints* / *Primavera (Vivaldi)* |
+| **5** | Quarta Justa | P4 | Consonância Perfeita | *Marcha Nupcial (Wagner)* / *Amazing Grace* |
+| **6** | Trítono (4ª aum / 5ª dim) | TT | Dissonância Extrema | *Os Simpsons* / *Maria (West Side Story)* |
+| **7** | Quinta Justa | P5 | Consonância Perfeita | *Star Wars* / *Twinkle Twinkle Little Star* |
 | **8** | Sexta Menor | m6 | Consonância Imperfeita | *Love Story* / *In My Life (Beatles)* |
 | **9** | Sexta Maior | M6 | Consonância Imperfeita | *My Bonnie Lies Over the Ocean* |
-| **10** | Sétima Menor | m7 | Dissonância Suave | *The Winner Takes It All (ABBA)* |
+| **10** | Sétima Menor | m7 | Dissonância Suave | *Somewhere (West Side Story)* / *The Winner Takes It All* |
 | **11** | Sétima Maior | M7 | Dissonância Tensa | *Take On Me* (salto do refrão) |
-| **12** | Oitava Justa | P8 | Consonância Perfeita | *Somewhere Over the Rainbow* |
+| **12** | Oitava Justa | P8 | Consonância Perfeita | *Over the Rainbow* |
 
 ---
 
@@ -217,19 +217,19 @@ An **interval** is the distance in pitch between two musical notes. It is the fu
 ---
 
 ### 2. Complete Intervals Table (0 to 12 Semitones)
-• **0 Semitones (P1)**: Perfect Unison
-• **1 Semitone (m2)**: Minor 2nd (Jaws theme)
-• **2 Semitones (M2)**: Major 2nd (Happy Birthday)
-• **3 Semitones (m3)**: Minor 3rd (Greensleeves)
-• **4 Semitones (M3)**: Major 3rd (Oh When the Saints)
-• **5 Semitones (P4)**: Perfect 4th (Amazing Grace)
-• **6 Semitones (TT)**: Tritone (The Simpsons)
-• **7 Semitones (P5)**: Perfect 5th (Star Wars)
-• **8 Semitones (m6)**: Minor 6th (Love Story)
-• **9 Semitones (M6)**: Major 6th (My Bonnie)
-• **10 Semitones (m7)**: Minor 7th (The Winner Takes It All)
+• **0 Semitones (P1)**: Perfect Unison (Same note)
+• **1 Semitone (m2)**: Minor 2nd (Jaws theme / Für Elise)
+• **2 Semitones (M2)**: Major 2nd (Happy Birthday / Frère Jacques)
+• **3 Semitones (m3)**: Minor 3rd (Greensleeves / Smoke on the Water)
+• **4 Semitones (M3)**: Major 3rd (Oh When the Saints / Vivaldi's Spring)
+• **5 Semitones (P4)**: Perfect 4th (Bridal Chorus / Amazing Grace)
+• **6 Semitones (TT)**: Tritone (The Simpsons / Maria)
+• **7 Semitones (P5)**: Perfect 5th (Star Wars / Twinkle Twinkle)
+• **8 Semitones (m6)**: Minor 6th (Love Story / In My Life)
+• **9 Semitones (M6)**: Major 6th (My Bonnie Lies Over the Ocean)
+• **10 Semitones (m7)**: Minor 7th (Somewhere / The Winner Takes It All)
 • **11 Semitones (M7)**: Major 7th (Take On Me)
-• **12 Semitones (P8)**: Perfect Octave (Somewhere Over the Rainbow)
+• **12 Semitones (P8)**: Perfect Octave (Over the Rainbow)
 """,
         piano_focus_en="""
 🎹 **On Piano**:
@@ -502,7 +502,7 @@ Ao adicionar uma quarta nota a 1 terça de distância da quinta, criamos as **T�
   - Dm7: [X-5-7-5-6-X]
   - G7: [3-X-3-4-3-X] ou [3-5-3-4-6-X]
 • **Abafamento Intencional de Cordas (String Muting)**: Usa a lateral do polegar esquerdo ou a ponta do dedo que faz a tónica para tocar suavemente na corda 6 ou 5 e calá-la, garantindo que cordas indesejadas nunca soam.
-• **Sincronismo Polegar + Dedos (PIMA)**: O polegar toca o baixo no tempo forte e os dedos I-M-A puxam as 3 cordas agudas em uníssono como uma pinça coordenada.
+• **Sincronismo Polegar + Dedos (PIMA)**: O polegar toca o baixo no tempo forte e os dedos I-M-A puxam as 3 cordas agudas em simultâneo como uma pinça coordenada.
 """,
         interactive_demo="fretboard",
         title_en="Harmonic Field, Tonal Functions & Seventh Chords",
@@ -592,7 +592,7 @@ Todo o acorde dominante com 7ª pode ser substituído por outro dominante locali
 """,
         guitar_focus="""
 🎸 **Na Viola / Guitarra**:
-• A substituição tritónica na viola é extremamente confortável porque a digitação do acorde dominante simplesmente desliza 1 traste para trás:
+• A substituição tritónica (SubV7) troca o acorde dominante (V7) por outro a distância de um trítono (6 semitons / 6 trastes), ficando a apenas 1 semitom acima do acorde alvo (ex: D♭7 a substituir G7 para resolver em Cmaj7):
   - Dm7 no 5º traste [X-5-7-5-6-X]
   - D♭7 no 4º traste [X-4-3-4-2-X]
   - Cmaj7 no 3º traste [X-3-5-4-5-X]
@@ -606,7 +606,7 @@ Todo o acorde dominante com 7ª pode ser substituído por outro dominante locali
         summary_en="Master secondary dominants (V7/V), modal borrowing (like minor iv and bVI), tritone substitution (SubV7), and smooth modulations.",
         content_markdown_en="""
 ### 1. Secondary Dominants (V7 / X)
-Any diatonic chord can be preceded by its own dominant chord (a Major 7th chord 1 fifth above):
+Any diatonic chord can be preceded by its own dominant chord (a Dominant 7th chord 1 fifth above):
 • **V7 / V**: Dominant of the Dominant (e.g. D7 → G7 in C Major).
 • **V7 / ii**: Dominant of the ii chord (e.g. A7 → Dm in C Major).
 
@@ -1084,7 +1084,7 @@ O fraseado é a arte de organizar as notas em **frases musicais** com início, d
 """,
         guitar_focus="""
 🎸 **Expressão na Viola/Guitarra**:
-• **Dinâmica de mão direita**: Toca mais perto da boca (ponte) para som mais brilhante e forte; mais perto do braço (escala) para som mais suave e aveludado.
+• **Dinâmica e Timbre de mão direita**: Toca mais perto da ponte para um som metálico, brilhante e penetrante (*sul ponticello*); toca sobre a boca ou perto do braço para um som aveludado, suave e doce (*sul tasto*).
 • **Vibrato**: Oscila ligeiramente o dedo da mão esquerda no traste para criar vibração de tom — acrescenta emoção e sustain à nota.
   - Vibrato de pulso: o pulso esquerdo oscila para cima e para baixo.
   - Vibrato de braço: todo o antebraço gira ligeiramente.
@@ -1193,7 +1193,8 @@ Alguns instrumentos soam numa tonalidade diferente da escrita:
 • **Clarinete em Si♭**: Soa 1 Tom abaixo — escreve-se 1 Tom acima do som desejado
 • **Trompa em Fá**: Soa uma 5ª abaixo
 • **Saxofone Alto em Mi♭**: Soa uma 6ª maior abaixo
-• **Piano e Viola**: Não transpositores — o que está escrito é o que soa.
+• **Piano**: Não transpositor — o que está escrito em som real é o que soa.
+• **Viola / Guitarra**: Transpositora de oitava — soa uma oitava abaixo (8vb) do que está escrito na pauta.
 """,
         piano_focus="""
 🎹 **Transposição ao Piano**:
@@ -1206,7 +1207,7 @@ Alguns instrumentos soam numa tonalidade diferente da escrita:
 
 **Padrão das Escalas Maiores**: Sempre T-T-ST-T-T-T-ST (Tom-Tom-Semitom-Tom-Tom-Tom-Semitom). Aplica este padrão a qualquer nota de início e obtens a escala maior correspondente.
 
-**Transpor acordes**: Para transpor uma progressão Am-F-C-G para Lá Maior (transposição ascendente de 1ª Maior):
+**Transpor acordes**: Para transpor uma progressão Am-F-C-G um tom acima (transposição ascendente de 2ª Maior / +2 semitons), para a tonalidade de Si menor / Ré Maior:
 - Am → Bm
 - F → G
 - C → D
@@ -1297,7 +1298,7 @@ No Jazz, cada acorde da progressão é associado a uma escala ou modo específic
 """,
         piano_focus="""
 🎹 **No Piano**:
-• Toca *Rootless Voicings* de ii-V-I: Mão esquerda toca fundamental; mão direita troca apenas 1 nota entre Dm7 [F-A-C-E] e G7 [F-G-B-E].
+• Toca *Rootless Voicings* de ii-V-I: Mão esquerda toca a fundamental no baixo; mão direita troca apenas 1 nota entre Dm7 [F-A-C-E] (♭3-5-♭7-9) e G7 [F-A-B-E] (♭7-9-3-13), mudando apenas C para B.
 """,
         guitar_focus="""
 🎸 **Na Viola / Guitarra**:

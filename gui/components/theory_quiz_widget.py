@@ -1,4 +1,4 @@
-from gui.i18n import t
+from gui.i18n import t, get_language
 from typing import Callable, Optional
 import customtkinter as ctk
 from core.theory_quiz import ChapterQuiz, QuizQuestion

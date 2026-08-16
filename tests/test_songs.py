@@ -63,8 +63,8 @@ class TestSongs(unittest.TestCase):
     def test_time_signature_and_beats_per_measure(self):
         fur_elise = get_song_by_id("fur_elise")
         self.assertIsNotNone(fur_elise)
-        self.assertEqual(fur_elise.time_signature, "3/4")
-        self.assertEqual(fur_elise.beats_per_measure, 3.0)
+        self.assertEqual(fur_elise.time_signature, "3/8")
+        self.assertEqual(fur_elise.beats_per_measure, 1.5)
 
         ode = get_song_by_id("ode_to_joy")
         self.assertIsNotNone(ode)

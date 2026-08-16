@@ -1,4 +1,4 @@
-from gui.i18n import t
+from gui.i18n import t, get_language
 """Interactive Song Performance & Play-Along Studio for Piano and Viola/Guitar with physical keyboard, metronome challenge, and USB MIDI."""
 import time
 from tkinter import filedialog, messagebox

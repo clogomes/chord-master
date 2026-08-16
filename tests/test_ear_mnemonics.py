@@ -8,8 +8,10 @@ class TestEarMnemonics(unittest.TestCase):
         for code in expected_codes:
             self.assertIn(code, EAR_MNEMONICS)
             mnemonic = EAR_MNEMONICS[code]
-            self.assertTrue(len(mnemonic.songs) > 0, f"Mnemonic songs for {code} is empty")
+            self.assertTrue(len(mnemonic.songs_ascending) > 0, f"Mnemonic songs_ascending for {code} is empty")
+            self.assertTrue(len(mnemonic.songs_descending) > 0, f"Mnemonic songs_descending for {code} is empty")
             self.assertTrue(len(mnemonic.description) > 0, f"Mnemonic description for {code} is empty")
+            self.assertTrue(len(mnemonic.description_en) > 0, f"Mnemonic description_en for {code} is empty")
 
 if __name__ == "__main__":
     unittest.main()

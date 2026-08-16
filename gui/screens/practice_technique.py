@@ -317,6 +317,16 @@ class PracticeTechniqueScreen(ctk.CTkFrame):
         self.ex_meta_lbl.configure(text=f"Categoria: {exercise.category.capitalize()} • Dificuldade: {exercise.difficulty} • {len(exercise.notes)} Notas")
         self.ex_desc_lbl.configure(text=exercise.get_description(lang))
 
+        # Update BPM slider from recommended_bpm_range
+        if hasattr(exercise, "recommended_bpm_range") and exercise.recommended_bpm_range:
+            min_bpm, max_bpm = exercise.recommended_bpm_range
+            default_bpm = int((min_bpm + max_bpm) / 2)
+            self.bpm_slider.configure(from_=min_bpm, to=max_bpm, number_of_steps=max(1, max_bpm - min_bpm))
+            self.bpm_slider.set(default_bpm)
+            self.bpm_lbl.configure(text=str(default_bpm))
+            self.target_bpm = default_bpm
+            self.metronome.set_bpm(default_bpm)
+
         # Adjust visualizer visibility
         if exercise.instrument == "guitar":
             self.piano_view.pack_forget()

@@ -511,3 +511,10 @@ python3 -m unittest discover -v tests
 Implementação nativa de um sistema de i18n em duas vertentes:
 - **Camada de UI (Fase 34a)**: Tradução completa dos textos de botões, barras de navegação, painéis e etiquetas estáticas utilizando a função `t()` do sistema de localização.
 - **Camada de Conteúdo (Fase 34b)**: Tradução idiomática e rigorosa (EN) das 80 perguntas e explicações dos quizzes de teoria, metadados das canções, relatórios formatados em Markdown e etiquetas gamificadas dinâmicas (medalhas).
+
+### Fase 35 — Correção Rigorosa de Erros de Conteúdo Musical & Alinhamento Pedagógico
+- **Correção de Análises Harmónicas**: Correção do modo em *Greensleeves* (Lá menor Eólio com 7ª elevada nas cadências), *Für Elise* (Lá menor harmónica), *Gymnopédie* (Ré Maior Jónico), *House of the Rising Sun* (métrica 6/8 e arpejos) e *Malagueña* (Frígio Dominante).
+- **Métricas e Compassos Exatos**: Regularização rítmica de todas as 24 peças da biblioteca (`SONG_LIBRARY`) para fecharem compassos inteiros de acordo com as fórmulas de compasso (4/4, 3/4, 2/4, 6/8, 3/8).
+- **Unificação de Mnemónicas Auditivas**: Fonte de verdade centralizada em `core/ear_mnemonics.py` para intervalos ascendentes e inclusão inédita de **mnemónicas descendentes** para todos os 12 intervalos.
+- **Precisão Teórica nos Capítulos**: Correção da transposição de oitava na viola, transposição ascendente de 2ª Maior, *rootless voicings* de Jazz (G7 = F-A-B-E), substituição tritónica e forma AAB do Blues.
+- **Exercícios Técnicos e Leitura de Pauta**: Ajuste nos padrões de Hanon No. 1, Spider Walk (trastes 1-2-3-4), salto de cordas, alcance do slider de BPM em runtime e distinção precisa entre linhas e espaços suplementares no tutor de pauta.
