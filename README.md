@@ -506,3 +506,8 @@ python3 -m unittest discover -v tests
 - Adição dos campos `_en` à classe `QuizQuestion` em `core/theory_quiz.py`.
 - Implementação de `get_question`, `get_options` e `get_explanation` na classe `QuizQuestion` com suporte a `lang="en"`.
 - Tradução de todas as 80 perguntas (16 capítulos) dos quizzes teóricos para inglês, mantendo rigor técnico e precisão musical (ex: Modal Borrowing, Tritone substitution).
+
+### Fase 34 — Internacionalização e Tradução EN Completa
+Implementação nativa de um sistema de i18n em duas vertentes:
+- **Camada de UI (Fase 34a)**: Tradução completa dos textos de botões, barras de navegação, painéis e etiquetas estáticas utilizando a função `t()` do sistema de localização.
+- **Camada de Conteúdo (Fase 34b)**: Tradução idiomática e rigorosa (EN) das 80 perguntas e explicações dos quizzes de teoria, metadados das canções, relatórios formatados em Markdown e etiquetas gamificadas dinâmicas (medalhas).
