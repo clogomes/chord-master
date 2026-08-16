@@ -34,7 +34,7 @@ primeiro, antes de avançar.
 
 ## Fase 34b — Tradução EN de Conteúdo (Adaptive, Gamification, Exporter) — CONCLUÍDA
 - Data: 2026-08-16 16:55 (UTC+1)
-- Commit: pending
+- Commit: f3d7936
 - Resumo: Adicionado suporte à tradução EN para a camada de conteúdo. Em `core/categories.py`, introduzidas constantes em inglês `CATEGORY_NAMES_EN` e `CATEGORY_TIPS_EN`. O motor `get_recommendation` em `core/adaptive_engine.py` utiliza agora o idioma para gerar títulos e dicas dinâmicas. Em `core/gamification.py`, os achievements receberam `name_en` e `description_en`. O relatório gerado por `core/exporter.py` produz markdown traduzido (tabelas, secções e métricas) se `lang="en"`. Testes a passar a 100%.
 - Ficheiros principais alterados: core/categories.py, core/adaptive_engine.py, core/gamification.py, core/exporter.py
 
