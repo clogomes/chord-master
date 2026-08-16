@@ -14,6 +14,93 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA (URGENTE) — Regressão da Fase 31: `Note` não aceita duplos acidentes
+- Descoberto ao validar a Fase 32. **A Fase 32 em si está toda correta** (ver
+  secção a seguir) — o problema veio da Fase 31, que eu aprovei sem apanhar isto.
+- Testes: **165/166, 1 erro** — `test_adaptive_question_distribution_tends_to_weak_area`
+  rebenta. É um teste *intermitente* (a raiz do acorde é aleatória), o mesmo
+  padrão que já nos enganou uma vez neste projeto com o `KeyError` do
+  `pentatonic_major`. Não o descartes como "flaky" — é um bug real.
+
+**Causa raiz**: `spell_note_with_letter` (`core/notes.py:109`), introduzida na
+Fase 31, gera corretamente ortografias com **duplo acidente** (`Bbb`, `F##`,
+`Abb`, `Ebb`, `D##`, `G##`), mas `Note._parse_string` (`core/notes.py:159`) só
+sabe interpretar um acidente simples e levanta:
+```
+ValueError: Não foi possível interpretar a nota: 'Bbb'
+```
+Verificado:
+```
+Note("C##") → FALHA        Note("Cbb") → FALHA
+Note("C#")  → OK           Note("Cb")  → OK
+```
+
+**Alcance — isto atinge o utilizador, não é teórico:**
+```
+Acordes:  30 de 187 combinações (raiz × tipo) rebentam
+Escalas:  55 de 272 combinações rebentam
+
+Cdim7  → CRASH: 'Bbb'     ← o acorde de sétima diminuta mais standard que existe
+Db dim → CRASH: 'Abb'
+D# maj → CRASH: 'F##'
+Db menor natural → CRASH: 'Bbb'
+C# lídio / C# blues / D tons inteiros → CRASH: 'F##' / 'D##' / 'C##'
+```
+Agrava-se porque a própria Fase 31 acrescentou `Db`, `Eb`, `Ab`, `Gb` ao seletor
+de tónica do laboratório de teoria — ou seja, **abriste ao utilizador
+exatamente as combinações que agora rebentam**. Escolher "Db" + "diminuto" no
+laboratório do Capítulo 4 mata o ecrã.
+
+Nota irónica e importante: a ortografia que geras está **musicalmente certa** —
+Cdim7 é mesmo C-E♭-G♭-B𝄫, com dobrado bemol, e a auditoria de teoria que
+encomendei tinha assinalado precisamente isso como o correto. O problema não é
+a ortografia, é o parser que não a acompanha.
+
+**Corrigir**:
+1. `Note._parse_string` deve aceitar 0, 1 ou 2 acidentes (`##`, `bb`, e também
+   os símbolos `♯♯`/`♭♭` se já suportares `♯`/`♭`), e `Note` deve calcular o
+   MIDI correspondente (dobrado sustenido = +2, dobrado bemol = −2).
+2. Confirma que `name_pt` e o resto da app mostram algo sensato para estas
+   notas (ex: "Si dobrado bemol" ou "Si♭♭") — não deixes cair no fallback que
+   mostra o nome da nota enarmónica errada.
+3. Decide e documenta o comportamento de `pitch_with_octave`, `normalized_pitch`
+   e comparação de igualdade com duplos acidentes (B𝄫 e A soam igual mas
+   escrevem-se diferente — a comparação por `midi` deve continuar a funcionar).
+4. **Teste obrigatório**: um teste que percorra **todas** as raízes × todos os
+   `CHORD_TYPES` e todas as raízes × todos os `SCALE_TYPES` e afirme que
+   nenhuma combinação levanta exceção. Isso teria apanhado isto de imediato, e
+   é o teste que faltava na Fase 31.
+
+**Nota minha, para registo**: a Fase 31 foi aprovada por mim depois de eu
+verificar tríades maiores/menores e escalas maiores em várias tonalidades — mas
+não testei `dim7`, nem escalas exóticas, nem varri o produto cartesiano
+raiz × tipo. Foi exatamente essa a lacuna. Daqui para a frente, em qualquer
+alteração ao motor de notas/escalas/acordes, o varrimento completo é
+obrigatório na minha validação.
+
+---
+
+## Revisão — Fase 32 (Funcionalidades que não funcionam) — correções corretas, aprovação retida pela regressão acima
+- Commits revistos: `b79d946`/`372ad92`
+- **Veredito: as 4 correções estão certas**, mas não dou APROVADO à fase
+  enquanto a suite não estiver verde (regressão da Fase 31, acima). Corrige
+  essa e considero a 32 aprovada sem precisares de refazer nada aqui.
+
+Verifiquei uma a uma:
+- **32.1** — `from gui.markdown_renderer import render_markdown_to_textbox` está
+  no topo do módulo (linha 19). E foste além do pedido: envolveste o corpo do
+  modal em `try/except` com `top.destroy()` no erro, e moveste o `grab_set()`
+  para **depois** de o botão "Fechar" existir. Já não é possível ficar com um
+  modal preso — era o pior sintoma deste bug.
+- **32.2** — `play_note(note, ...)` e `play_note(active_note, ...)` passam agora
+  o objeto `Note`. O ecrã de técnica deixa de ser mudo.
+- **32.3** — `_on_midi_note_on(self, note_midi: int, ...)` com
+  `Note.from_midi(note_midi)`, alinhado com `practice_song`/`practice_scales`.
+- **32.4** — as 3 assinaturas passaram a 2 argumentos
+  (`beat_num, timestamp=0.0`), consistentes com `practice_song.py:698`.
+
+---
+
 ## Revisão — Fase 31 (Correções de Motor) — APROVADA, PODES AVANÇAR PARA A FASE 32
 - Commits revistos: `29fe07f`/`fa18eca`
 - Testes: 164/164 OK (subiu de 162 — novos testes em
