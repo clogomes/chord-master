@@ -14,6 +14,72 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA — Fase 34b: traduções escritas mas **não ligadas à interface**
+- Commits revistos: `f01a261`, `f3d7936`, `dec7a3d`, `d157959`, `03a4a1f`
+- Testes: 170/170 OK — e outra vez não apanham nada disto.
+- **Veredito: AÇÃO NECESSÁRIA**
+
+**O conteúdo traduzido está lá e está completo** — verifiquei:
+```
+músicas: 24   sem description_en: 0   sem difficulty_en: 0
+perguntas de quiz: 80   sem versão EN: 0
+```
+Os getters no modelo também funcionam:
+```
+pt: "Quantas notas existem na escala cromática?"
+en: "How many notes are there in the chromatic scale?"
+```
+
+**O problema é que quase nada disto chega ao ecrã.** É exatamente o padrão que
+já apanhámos 4 vezes neste projeto (campo `Song.instrument`, controlos de
+volume/timbre, switch adaptativo, categoria `tecnica`): os dados são
+adicionados, os getters são escritos, e depois ninguém os chama.
+
+**34b.1 — O widget do quiz ignora os 3 getters**
+`gui/components/theory_quiz_widget.py` acede aos campos crus:
+```python
+159:  self.question_lbl.configure(text=q.question)      # devia ser q.get_question(lang)
+161:  for i, opt_text in enumerate(q.options):          # devia ser q.get_options(lang)
+195:  explanation=q.explanation,                        # devia ser q.get_explanation(lang)
+```
+Resultado: traduziste as 80 perguntas, as opções e as explicações — e em inglês
+o utilizador continua a ver **tudo em português**. O trabalho está feito, só
+falta ligá-lo.
+
+**34b.2 — `Song.get_description()` e `get_difficulty()` nunca são chamados**
+Procurei em todo o `gui/`: **zero** chamadas. `gui/screens/practice_song.py`
+continua a ler os campos crus:
+```python
+305:  text=f"{inst_icon}{s.title}\n{s.composer} ({s.difficulty})"
+832:  text=f"Dificuldade: {song.difficulty} • Compasso: ... • {song.note_count} Notas"
+833:  text=song.description
+```
+Nota que a linha 832 tem ainda texto fixo em português ("Dificuldade:",
+"Compasso:", "Notas") que a 34a também não apanhou.
+
+**Corrigir**: liga os getters em todos os pontos de apresentação, passando o
+idioma atual (`from gui.i18n import get_language`). Depois **verifica tu
+próprio** renderizando os ecrãs com `set_language("en")` e procurando texto
+português restante — não confies nos testes, que continuam verdes com a
+interface toda em português.
+
+**Sugestão para fechares esta classe de problema de vez**: escreve um teste que
+renderize cada ecrã com `set_language("en")`, percorra a árvore de widgets a
+ler `cget("text")`, e falhe se encontrar palavras portuguesas de uma lista
+conhecida (Voltar, Ouvir, Dificuldade, Iniciante, Praticar, Concluída...). Foi
+assim que a auditoria original mediu isto, e é o único teste que impede a
+tradução de regredir.
+
+**Lembrete**: as 3 correções da Fase 34a (secção abaixo) continuam por fazer —
+nomeadamente o bug real das cores de dificuldade em inglês.
+
+**Limpeza**: continuam 9 scratch scripts por commitar na raiz (`fix_t.py`,
+`fix_t_manual.py`, `fix_dataclass.py`, `patch_songs.py`, `patch_songs2.py`,
+`scratch.py`, `update_quiz.py`, `update_quiz_final.py`,
+`update_gemini_status.py`).
+
+---
+
 ## TRABALHO PEDIDO — Repor as 4 medalhas removidas, agora implementadas
 - Pedido explícito do utilizador (clogomes): *"adiciona as 4 medalhas removidas"*.
 - Na Fase 33 eu tinha dado duas opções (implementar ou remover) e tu removeste,
