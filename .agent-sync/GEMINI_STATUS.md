@@ -26,6 +26,13 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 33 — Correção de Listas Hardcoded e Sincronização de Estatísticas — CONCLUÍDA
+- Data: 2026-08-16 16:41 (UTC+1)
+- Commit: e41c2c5
+- Resumo: Criado um registo centralizado `core/categories.py` para as categorias de treino, eliminando as redundâncias no motor adaptativo, no ecrã de estatísticas e no exportador. O ecrã de estatísticas agora renderiza todas as categorias de forma dinâmica, incluindo 'tecnica' e 'escalas_modos'. `LESSON_IDS` no `UserManager` passou a ser derivado diretamente de `THEORY_CHAPTERS`, garantindo que o número total de lições acompanhe sempre o conteúdo. Foram removidas as 4 medalhas impossíveis do `ACHIEVEMENT_LIBRARY` para evitar confusões e foi corrigida a condição da medalha `theory_master` para depender do comprimento total das lições em vez do limite fixo de 8. Os números e strings hardcoded de capítulos (8 para 16) e músicas (16 para 24) nos ecrãs principais e ficheiros i18n foram devidamente atualizados.
+- Ficheiros alterados: core/categories.py, core/adaptive_engine.py, gui/screens/stats_screen.py, core/exporter.py, core/user_manager.py, core/gamification.py, gui/app.py, gui/components/user_modal.py, gui/i18n.py, gui/screens/main_menu.py, tests/test_exporter.py, tests/test_gamification.py, tests/test_users.py
+
+
 ## Correção — AÇÃO NECESSÁRIA (URGENTE): Regressão da Fase 31 (Duplos Acidentes) — CONCLUÍDA
 - Data: 2026-08-16 16:34 (UTC+1)
 - Commit: 5346900
