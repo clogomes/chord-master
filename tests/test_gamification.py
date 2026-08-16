@@ -72,3 +72,73 @@ class TestGamification(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_new_context_achievements(self):
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tf:
+            temp_path = tf.name
+
+        try:
+            um = UserManager(filepath=temp_path)
+            user = um.current_user
+            
+            # test virtuoso_pianist
+            unlocked = um.check_achievements({"song_id": "fur_elise", "accuracy": 95.0})
+            self.assertTrue(any(a.id == "virtuoso_pianist" for a in unlocked))
+            
+            # test guitar_hero
+            unlocked = um.check_achievements({"instrument": "guitar"})
+            self.assertTrue(any(a.id == "guitar_hero" for a in unlocked))
+            
+            # test pitch_perfect
+            unlocked = um.check_achievements({"min_cents": 2.0})
+            self.assertTrue(any(a.id == "pitch_perfect" for a in unlocked))
+            
+            # test rhythm_master
+            unlocked = um.check_achievements({"rhythm_score": 2500})
+            self.assertTrue(any(a.id == "rhythm_master" for a in unlocked))
+            
+            # test that they are now in unlocked_achievements
+            self.assertIn("virtuoso_pianist", user.unlocked_achievements)
+            self.assertIn("guitar_hero", user.unlocked_achievements)
+            self.assertIn("pitch_perfect", user.unlocked_achievements)
+            self.assertIn("rhythm_master", user.unlocked_achievements)
+
+        finally:
+            import os
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+
+    def test_all_achievements_have_conditions(self):
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tf:
+            temp_path = tf.name
+        
+        try:
+            um = UserManager(filepath=temp_path)
+            # simulate every possible condition
+            um.current_user.completed_lessons = [str(i) for i in range(20)]
+            um.current_user.categories["repertorio"].correct_count = 10
+            um.current_user.categories["treino_auditivo"].best_streak = 10
+            um.current_user.categories["leitura_pauta"].best_streak = 10
+            um.current_user.best_streak = 20
+            um.current_user.total_attempts = 100
+            
+            context = {
+                "song_id": "fur_elise",
+                "accuracy": 100.0,
+                "instrument": "guitar",
+                "min_cents": 0.0,
+                "rhythm_score": 5000,
+            }
+            
+            unlocked = um.check_achievements(context)
+            unlocked_ids = set(user.unlocked_achievements)
+            
+            for ach in ACHIEVEMENT_LIBRARY:
+                self.assertIn(ach.id, unlocked_ids, f"Achievement {ach.id} could not be unlocked")
+
+        finally:
+            import os
+            if os.path.exists(temp_path):
+                os.remove(temp_path)

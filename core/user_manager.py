@@ -185,7 +185,7 @@ class UserManager:
         self.save()
         return user.xp, (new_level > old_level)
 
-    def check_achievements(self) -> List[Achievement]:
+    def check_achievements(self, context: Optional[Dict] = None) -> List[Achievement]:
         """Evaluates achievement requirements for active user and unlocks any newly earned."""
         user = self.current_user
         newly_unlocked = []
@@ -212,6 +212,19 @@ class UserManager:
                 unlocked = True
             elif ach.id == "diligent_student" and user.total_attempts >= 50:
                 unlocked = True
+            elif ach.id == "virtuoso_pianist" and context:
+                if context.get("accuracy", 0) >= 90.0 and context.get("song_id") in ["fur_elise", "piano_fur_elise", "ode_to_joy"]:
+                    unlocked = True
+            elif ach.id == "guitar_hero" and context:
+                if context.get("instrument") == "guitar":
+                    unlocked = True
+            elif ach.id == "pitch_perfect" and context:
+                cents = context.get("min_cents")
+                if cents is not None and abs(cents) < 5.0:
+                    unlocked = True
+            elif ach.id == "rhythm_master" and context:
+                if context.get("rhythm_score", 0) > 2000:
+                    unlocked = True
 
             if unlocked:
                 user.unlocked_achievements.append(ach.id)

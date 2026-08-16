@@ -80,7 +80,7 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.current_song: Song = (self.user_songs[0] if self.user_songs else SONG_LIBRARY[0])
         self.current_note_idx: int = 0
         self.is_playing_demo: bool = False
-        self.instrument_mode: str = t("piano", "Piano")  # t("piano", "Piano"), "Viola", "Ambos"
+        self.instrument_mode: str = "piano"  # "Piano", "Viola", "Ambos"
         self._demo_timer_id: Optional[str] = None
 
         # Rhythm, Metronome & Backing Tracks
@@ -186,7 +186,7 @@ class PracticeSongScreen(ctk.CTkFrame):
 
         self.inst_segmented = ctk.CTkSegmentedButton(
             inst_box,
-            values=["🎹 Piano", "🎸 Viola", "🎹 + 🎸 Ambos"],
+            values=[t("lbl_piano_only", "🎹 Piano"), t("lbl_guitar_only", "🎸 Viola"), t("lbl_both", "🎹 + 🎸 Ambos")],
             command=self._on_instrument_mode_changed,
             selected_color=theme.COLOR_PRIMARY,
             selected_hover_color=theme.COLOR_PRIMARY_HOVER,
@@ -288,7 +288,7 @@ class PracticeSongScreen(ctk.CTkFrame):
         filter_val = self.song_filter_seg.get() if hasattr(self, "song_filter_seg") else "Todos"
         all_songs = SONG_LIBRARY + self.user_songs
 
-        if t("piano", "Piano") in filter_val:
+        if "Piano" in filter_val:
             filtered_songs = [s for s in all_songs if getattr(s, "instrument", "piano") == "piano"]
         elif "Viola" in filter_val:
             filtered_songs = [s for s in all_songs if getattr(s, "instrument", "piano") == "guitar"]
@@ -302,7 +302,7 @@ class PracticeSongScreen(ctk.CTkFrame):
             inst_icon = "🎸 " if getattr(s, "instrument", "piano") == "guitar" else "🎹 "
             btn = ctk.CTkButton(
                 self.songs_btn_container,
-                text=f"{inst_icon}{s.title}\n{s.composer} ({s.difficulty})",
+                text=f"{inst_icon}{s.title}\n{s.composer} ({s.get_difficulty(get_language())})",
                 font=theme.get_font(theme.FONT_BODY),
                 anchor="w",
                 height=52,
@@ -744,7 +744,7 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.backing_player.set_bpm(val)
 
     def _update_legend_text(self):
-        if self.instrument_mode == t("piano", "Piano"):
+        if self.instrument_mode == "piano":
             text = (
                 "⌨️ **Atalhos de Teclado no Piano** (ou Teclado MIDI USB conectado):\n"
                 "• Teclas Brancas: [A] = Dó4, [S] = Ré4, [D] = Mi4, [F] = Fá4, [G] = Sol4, [H] = Lá4, [J] = Si4, [K] = Dó5, [L] = Ré5, [;] = Mi5\n"
@@ -761,16 +761,17 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.legend_lbl.configure(text=text)
 
     def _on_instrument_mode_changed(self, mode: str):
-        if t("piano", "Piano") in mode and "Viola" not in mode:
-            self.instrument_mode = t("piano", "Piano")
+        from gui.i18n import t
+        if mode == t("lbl_piano_only", "🎹 Piano"):
+            self.instrument_mode = "piano"
             self.piano_view.pack(pady=4)
             self.guitar_view.pack_forget()
-        elif "Viola" in mode and t("piano", "Piano") not in mode:
-            self.instrument_mode = "Viola"
+        elif mode == t("lbl_guitar_only", "🎸 Viola"):
+            self.instrument_mode = "guitar"
             self.piano_view.pack_forget()
             self.guitar_view.pack(pady=4)
         else:
-            self.instrument_mode = "Ambos"
+            self.instrument_mode = "both"
             self.piano_view.pack(pady=4)
             self.guitar_view.pack(pady=4)
         self._update_legend_text()
@@ -829,9 +830,9 @@ class PracticeSongScreen(ctk.CTkFrame):
 
         # Update Info Card
         self.song_title_lbl.configure(text=f"{song.title} — {song.composer}")
-        self.song_meta_lbl.configure(text=f"Dificuldade: {song.difficulty} • Compasso: {song.time_signature} • BPM: {song.bpm} • {song.note_count} Notas")
         from gui.i18n import get_language, t
         lang = get_language()
+        self.song_meta_lbl.configure(text=f"{t('song_difficulty', 'Dificuldade')}: {song.get_difficulty(lang)} • {t('song_time', 'Compasso')}: {song.time_signature} • BPM: {song.bpm} • {song.note_count} {t('song_notes', 'Notas')}")
         
         self.song_desc_lbl.configure(text=song.get_description(lang))
         if hasattr(self, "theory_analysis_btn"):
@@ -951,13 +952,13 @@ class PracticeSongScreen(ctk.CTkFrame):
 
         is_match = False
 
-        if self.instrument_mode in [t("piano", "Piano"), "Ambos"] and char in PIANO_KEY_MAPPINGS:
+        if self.instrument_mode in ["piano", "both"] and char in PIANO_KEY_MAPPINGS:
             played_pitch_oct = PIANO_KEY_MAPPINGS[char]
             played_note = Note(played_pitch_oct)
             if played_note.normalized_pitch == expected_note.normalized_pitch:
                 is_match = True
 
-        elif self.instrument_mode in ["Viola", "Ambos"] and char in GUITAR_KEY_MAPPINGS:
+        elif self.instrument_mode in ["guitar", "both"] and char in GUITAR_KEY_MAPPINGS:
             played_string_idx = GUITAR_KEY_MAPPINGS[char]
             if expected_sn.guitar_string is not None:
                 if played_string_idx == expected_sn.guitar_string:
@@ -1051,7 +1052,14 @@ class PracticeSongScreen(ctk.CTkFrame):
         )
 
         # Check for newly unlocked achievements
-        unlocked = self.user_manager.check_achievements()
+        rhythm_score = getattr(self, "rhythm_score", 0) if getattr(self.metronome, "is_running", False) else 0
+        context = {
+            "accuracy": accuracy,
+            "song_id": self.current_song.id,
+            "instrument": self.instrument_mode,
+            "rhythm_score": rhythm_score
+        }
+        unlocked = self.user_manager.check_achievements(context)
         ach_msg = f"\n🏆 Desbloqueaste a medalha «{unlocked[0].title}» (+{unlocked[0].xp_reward} XP)!" if unlocked else ""
 
         ramp_msg = ""

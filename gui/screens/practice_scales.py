@@ -57,7 +57,7 @@ class PracticeScalesScreen(ctk.CTkFrame):
         self.current_root = "C"
         self.current_scale_key = "major"
         self.direction_mode = t("dir_asc_desc", "Ascendente & Descendente")
-        self.instrument_mode = t("piano", "Piano")  # t("piano", "Piano"), "Viola", "Ambos"
+        self.instrument_mode = "piano"  # "Piano", "Viola", "Ambos"
 
         # Note sequence & performance tracking
         self.scale_notes: List[Note] = []
@@ -377,16 +377,17 @@ class PracticeScalesScreen(ctk.CTkFrame):
         self.score_card = ScoreCard(self.container, on_next=self._restart_practice)
 
     def _on_instrument_changed(self, mode: str):
-        if t("piano", "Piano") in mode and "Viola" not in mode:
-            self.instrument_mode = t("piano", "Piano")
+        from gui.i18n import t
+        if mode == t("lbl_piano_only", "🎹 Piano"):
+            self.instrument_mode = "piano"
             self.piano_view.pack(pady=4)
             self.guitar_view.pack_forget()
-        elif "Viola" in mode and t("piano", "Piano") not in mode:
-            self.instrument_mode = "Viola"
+        elif mode == t("lbl_guitar_only", "🎸 Viola"):
+            self.instrument_mode = "guitar"
             self.piano_view.pack_forget()
             self.guitar_view.pack(pady=4)
         else:
-            self.instrument_mode = "Ambos"
+            self.instrument_mode = "both"
             self.piano_view.pack(pady=4)
             self.guitar_view.pack(pady=4)
         self._highlight_active_note()

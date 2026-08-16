@@ -56,7 +56,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self.audio_player = get_audio_player()
         self.pitch_listener = PitchListener(max_fps=15.0)
 
-        self.instrument_type: str = t("piano", "Piano")  # t("piano", "Piano") ou "Viola"
+        self.instrument_type: str = "piano"  # "Piano" ou "Viola"
         self.exercise_type: str = "Escalas"
 
         self.exercise_notes: List[Note] = []
@@ -160,9 +160,9 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         ctk.CTkLabel(cfg_bar, text=t("instrument_label", "Instrumento:"), font=theme.get_font(theme.FONT_BODY_BOLD), text_color=theme.COLOR_TEXT_PRIMARY).pack(side="left", padx=(14, 4), pady=12)
         self.inst_select = ctk.CTkOptionMenu(
             cfg_bar,
-            values=["🎹 Piano Acústico", "🎸 Viola / Guitarra"],
+            values=[t("lbl_piano_acoustic", "🎹 Piano Acústico"), t("lbl_guitar", "🎸 Viola / Guitarra")],
             command=self._on_instrument_changed,
-            font=theme.get_font(theme.FONT_BODY),
+            font=theme.get_font(theme.FONT_BODY_BOLD),
             height=34,
             corner_radius=theme.RADIUS_SM,
             width=160,
@@ -344,12 +344,13 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self.score_card = ScoreCard(self.container, on_next=self._restart_exercise)
 
     def _on_instrument_changed(self, choice: str):
-        if "Viola" in choice:
-            self.instrument_type = "Viola"
+        from gui.i18n import t
+        if choice == t("lbl_guitar", "🎸 Viola / Guitarra"):
+            self.instrument_type = "guitar"
             self.piano_view.pack_forget()
             self.guitar_view.pack(pady=4)
         else:
-            self.instrument_type = t("piano", "Piano")
+            self.instrument_type = "piano"
             self.piano_view.pack(pady=4)
             self.guitar_view.pack_forget()
         self._highlight_target_note()
@@ -363,7 +364,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self.total_notes_played = 0
         self.exercise_completed = False
         self._matched_start_time = None
-        self.note_performance_history: Dict[str, List[dict]] = {}  # {pitch_with_octave: [{"detected": Note, t("tuner_cents", "cents"): float, "success": bool}]}
+        self.note_performance_history: Dict[str, List[dict]] = {}  # {pitch_with_octave: [{"detected": Note, "cents": float, "success": bool}]}
         self.score_card.pack_forget()
 
         if "Escala Maior de Dó" in choice:
@@ -397,10 +398,10 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
                 self.exercise_title = f"{found_song.title} ({found_song.composer})"
                 # Auto switch active instrument to match song's primary instrument
                 song_inst = getattr(found_song, "instrument", "piano")
-                if song_inst == "guitar" and self.instrument_type != "Viola":
+                if song_inst == "guitar" and self.instrument_type != "guitar":
                     self.inst_select.set("🎸 Viola / Guitarra")
                     self._on_instrument_changed("🎸 Viola / Guitarra")
-                elif song_inst == "piano" and self.instrument_type != t("piano", "Piano"):
+                elif song_inst == "piano" and self.instrument_type != "piano":
                     self.inst_select.set("🎹 Piano Acústico")
                     self._on_instrument_changed("🎹 Piano Acústico")
             else:
@@ -424,12 +425,12 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self.staff_view.set_single_note(target, color="#3B82F6")
 
         # 2. Piano
-        if self.instrument_type == t("piano", "Piano"):
+        if self.instrument_type == "piano":
             self.piano_view.highlight_notes([target], color="#3B82F6")
             self.piano_view.set_fingering({target.midi: 1})
 
         # 3. Guitar
-        if self.instrument_type == "Viola":
+        if self.instrument_type == "guitar":
             self.guitar_view.highlight_scale([target])
 
     def _toggle_microphone(self):
@@ -521,7 +522,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
 
                 self.note_performance_history[pitch_key].append({
                     "detected": detected_note,
-                    t("tuner_cents", "cents"): cents,
+                    "cents": cents,
                     "success": True,
                 })
 
@@ -555,7 +556,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
 
             self.note_performance_history[pitch_key].append({
                 "detected": detected_note,
-                t("tuner_cents", "cents"): cents,
+                "cents": cents,
                 "success": False,
             })
 
@@ -649,7 +650,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         for pitch_key, attempts in self.note_performance_history.items():
             failures = [att for att in attempts if not att["success"]]
             if failures:
-                avg_cents = sum(f[t("tuner_cents", "cents")] for f in failures) / float(len(failures))
+                avg_cents = sum(f["cents"] for f in failures) / float(len(failures))
                 last_det = failures[-1]["detected"]
                 failed_notes_summary.append(f"• **{pitch_key}**: {len(failures)} tentativa(s) fora do tom (detetado {last_det.pitch_with_octave}, desvio médio: {avg_cents:+.0f}c)")
 
@@ -665,6 +666,11 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
             user_answer=f"{self.correct_notes_count}/{len(self.exercise_notes)} notas afinadas",
             correct_answer=self.exercise_title,
         )
+
+        min_cents = min([abs(f["cents"]) for hist in self.note_performance_history.values() for f in hist if "cents" in f], default=100.0)
+        unlocked = self.user_manager.check_achievements({"min_cents": min_cents})
+        ach_msg = f"\n🏆 Desbloqueaste a medalha «{unlocked[0].title}» (+{unlocked[0].xp_reward} XP)!" if unlocked else ""
+        ramp_msg += ach_msg
 
         self.intonation_status_lbl.configure(
             text=f"🎉 Parabéns! Completaste «{self.exercise_title}» com o teu instrumento real!{ramp_msg}",

@@ -426,6 +426,9 @@ class LamireScreen(ctk.CTkFrame):
         self.status_hint_lbl.configure(text=status_text, text_color=status_color)
         self._draw_gauge(cents, is_active=True)
 
+        if abs(cents) < 5.0 and "pitch_perfect" not in self.user_manager.current_user.unlocked_achievements:
+            self.user_manager.check_achievements({"min_cents": cents})
+
         # Highlight nearest guitar string if in Viola mode
         if self.tuner_mode == "Viola":
             for i, (_, snote, _, _) in enumerate(GUITAR_STRINGS):

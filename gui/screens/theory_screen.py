@@ -187,16 +187,22 @@ class TheoryScreen(ctk.CTkFrame):
         top_info.pack(fill="x", padx=16, pady=(12, 4))
 
         diff_colors = {
-            t("diff_beginner", "Iniciante"): theme.COLOR_SUCCESS,
-            t("diff_intermediate", "Intermédio"): theme.COLOR_PRIMARY,
-            t("diff_advanced", "Avançado"): "#8B5CF6",
+            "Iniciante": theme.COLOR_SUCCESS,
+            "Intermédio": theme.COLOR_PRIMARY,
+            "Avançado": "#8B5CF6",
             "Prático": "#F59E0B",
         }
         diff_color = diff_colors.get(chap.difficulty, theme.COLOR_PRIMARY)
+        
+        diff_key = {
+            "Iniciante": "diff_beginner",
+            "Intermédio": "diff_intermediate",
+            "Avançado": "diff_advanced"
+        }.get(chap.difficulty, "")
 
         badge = ctk.CTkLabel(
             top_info,
-            text=f"  {chap.difficulty.upper()}  ",
+            text=f"  {t(diff_key, chap.difficulty).upper()}  ",
             font=theme.get_font(theme.FONT_BADGE),
             text_color="#FFFFFF",
             fg_color=diff_color,
