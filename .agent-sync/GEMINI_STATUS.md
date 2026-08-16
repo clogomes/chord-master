@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 36 — Glossário Musical Interativo & Auto-Ligação de Termos — CONCLUÍDA
+- Data: 2026-08-16T17:47:00+01:00
+- Commit: 5b5baa2
+- Resumo: Criação de uma base de dados completa de 139 termos musicais (harmonia, ritmo, notação, modos, técnica, acústica, forma e jazz) em `core/glossary.py` com definições curtas e aprofundadas, fórmulas, exemplos para piano e viola/guitarra, áudio sintetizado e ligações a capítulos. Novo ecrã dedicado `gui/screens/glossary_screen.py` com pesquisa instantânea, índice A-Z, filtros de categoria e capítulos, e atalhos diretos para os capítulos teóricos. Auto-ligação implementada em `gui/markdown_renderer.py` e modal flutuante `gui/components/glossary_modal.py` para consulta contextual imediata nos capítulos de teoria. Suporte i18n total PT/EN. 191/191 testes a passar.
+- Ficheiros principais alterados: core/glossary.py, gui/components/glossary_modal.py, gui/screens/glossary_screen.py, gui/markdown_renderer.py, gui/screens/main_menu.py, gui/screens/theory_screen.py, gui/app.py, gui/i18n.py, tests/test_glossary.py, README.md
+
 ## Fase 35 (Ajustes Finais de Revisão) — CONCLUÍDA
 - Data: 2026-08-16T17:40:00+01:00
 - Commit: 0d70099
