@@ -126,7 +126,7 @@ class Note:
         self.octave = parsed_octave
 
         # Extract base letter and accidental
-        match = re.match(r"^([A-Ga-g])([#b]?)$", self.raw_name)
+        match = re.match(r"^([A-G])([#b]{0,2})$", self.raw_name)
         if not match:
             raise ValueError(f"Formato de nota inválido: '{name}'")
 
@@ -134,16 +134,20 @@ class Note:
         self.accidental = match.group(2)
         self.pitch = f"{self.letter}{self.accidental}"
 
-        # Standardized pitch (sharp-based)
-        if self.pitch in ENHARMONIC_FLATS:
-            self.normalized_pitch = ENHARMONIC_FLATS[self.pitch]
-        elif self.pitch in ENHARMONIC_SHARPS:
-            self.normalized_pitch = ENHARMONIC_SHARPS[self.pitch]
-        else:
-            self.normalized_pitch = self.pitch
+        # Calculate MIDI based on natural letter + accidental offset
+        base_midi_oct4 = {"C": 60, "D": 62, "E": 64, "F": 65, "G": 67, "A": 69, "B": 71}[self.letter]
+        acc_offset = 0
+        if self.accidental == "#": acc_offset = 1
+        elif self.accidental == "##": acc_offset = 2
+        elif self.accidental == "b": acc_offset = -1
+        elif self.accidental == "bb": acc_offset = -2
 
-        self.midi: int = note_to_midi(self.normalized_pitch, self.octave)
-        self.frequency: float = midi_to_freq(self.midi)
+        natural_midi = (self.octave + 1) * 12 + (base_midi_oct4 % 12)
+        self.midi = natural_midi + acc_offset
+        self.frequency = midi_to_freq(self.midi)
+        
+        # Standardized pitch (sharp-based)
+        self.normalized_pitch, _ = midi_to_note(self.midi)
 
     @classmethod
     def from_midi(cls, midi_number: int, display_name: Optional[str] = None) -> "Note":
@@ -154,22 +158,31 @@ class Note:
     @staticmethod
     def _parse_string(name: str, default_octave: int) -> Tuple[str, int]:
         name = name.strip()
-        match = re.match(r"^([A-Ga-g][#b]?)(-?\d+)?$", name)
+        match = re.match(r"^([A-Ga-g])([#b♯♭]{1,2})?(-?\d+)?$", name)
         if not match:
             raise ValueError(f"Não foi possível interpretar a nota: '{name}'")
-        pitch = match.group(1).capitalize()
-        if len(pitch) > 1 and pitch[1] in ["#", "b"]:
-            pitch = pitch[0].upper() + pitch[1]
-        else:
-            pitch = pitch.upper()
+            
+        pitch_letter = match.group(1).upper()
+        acc = match.group(2) or ""
+        acc = acc.replace("♯", "#").replace("♭", "b")
+        pitch = pitch_letter + acc
 
-        octave = int(match.group(2)) if match.group(2) is not None else default_octave
+        octave = int(match.group(3)) if match.group(3) is not None else default_octave
         return pitch, octave
 
     @property
     def name_pt(self) -> str:
         """Returns the Portuguese solfège name (e.g. 'Dó#', 'Lá')."""
-        return NOTE_NAMES_PT.get(self.raw_name, NOTE_NAMES_PT.get(self.normalized_pitch, self.raw_name))
+        if self.raw_name in NOTE_NAMES_PT:
+            return NOTE_NAMES_PT[self.raw_name]
+            
+        base_name_pt = NOTE_NAMES_PT.get(self.letter, self.letter)
+        if self.accidental == "##":
+            return f"{base_name_pt} dobrado sustenido"
+        elif self.accidental == "bb":
+            return f"{base_name_pt} dobrado bemol"
+            
+        return NOTE_NAMES_PT.get(self.normalized_pitch, self.raw_name)
 
     @property
     def pitch_with_octave(self) -> str:
