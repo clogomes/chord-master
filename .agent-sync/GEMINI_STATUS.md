@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 28 — Módulos de Teoria Mais Avançados — CONCLUÍDA
+- Data: 2026-08-16 08:46 (UTC+1)
+- Commit: 4c338f1
+- Resumo: Adicionados os Capítulos 13 a 16 a `THEORY_CHAPTERS` em `core/theory_content.py` (Harmonia de Jazz Básica, Fundamentos de Improvisação, Contraponto & Condução de Vozes, Técnicas de Prática Deliberada) com suporte i18n completo (PT/EN) e exercícios para piano e viola. Criados 4 novos quizzes em `core/theory_quiz.py` (5 perguntas de escolha múltipla por capítulo com explicações pedagógicas). 156/156 testes a passar.
+- Ficheiros alterados: core/theory_content.py, core/theory_quiz.py, tests/test_theory_i18n.py, README.md
+
 ## Fase 27 — Análise Harmónica de Músicas Conhecidas — CONCLUÍDA
 - Data: 2026-08-15 20:10 (UTC+1)
 - Commit: a74cc6f
