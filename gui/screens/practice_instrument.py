@@ -90,7 +90,7 @@ class PracticeInstrumentScreen(ctk.CTkFrame):
         self._build_ui()
         self._setup_default_exercise()
 
-    def _on_metronome_beat(self, beat_num: int):
+    def _on_metronome_beat(self, beat_num: int, timestamp: float = 0.0):
         pass
 
     def _build_ui(self):

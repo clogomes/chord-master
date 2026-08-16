@@ -87,7 +87,7 @@ class PracticeScalesScreen(ctk.CTkFrame):
         self._start_midi_listener()
         self._generate_and_load_scale()
 
-    def _on_metronome_beat(self, beat_num: int):
+    def _on_metronome_beat(self, beat_num: int, timestamp: float = 0.0):
         pass
 
     def _bind_keyboard_events(self):

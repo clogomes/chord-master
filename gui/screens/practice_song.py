@@ -16,6 +16,7 @@ from gui.components.staff_canvas import StaffCanvas
 from gui.components.guitar_fretboard import GuitarFretboard
 from gui.components.score_card import ScoreCard
 from gui.scroll_utils import bind_mousewheel
+from gui.markdown_renderer import render_markdown_to_textbox
 from gui import theme
 
 
@@ -1154,23 +1155,27 @@ class PracticeSongScreen(ctk.CTkFrame):
         top.geometry("640x480")
         top.configure(fg_color=theme.COLOR_BG)
 
-        # Ensure top window receives focus
-        top.transient(self.winfo_toplevel())
-        top.grab_set()
+        try:
+            card = ctk.CTkFrame(top, corner_radius=theme.RADIUS_LG, fg_color=theme.COLOR_SURFACE, border_width=1, border_color=theme.COLOR_BORDER)
+            card.pack(fill="both", expand=True, padx=16, pady=16)
 
-        card = ctk.CTkFrame(top, corner_radius=theme.RADIUS_LG, fg_color=theme.COLOR_SURFACE, border_width=1, border_color=theme.COLOR_BORDER)
-        card.pack(fill="both", expand=True, padx=16, pady=16)
+            header_lbl = ctk.CTkLabel(card, text=f"{self.current_song.title} ({self.current_song.composer})", font=theme.get_font(theme.FONT_TITLE), text_color=theme.COLOR_TEXT_PRIMARY)
+            header_lbl.pack(anchor="w", padx=16, pady=(16, 8))
 
-        header_lbl = ctk.CTkLabel(card, text=f"{self.current_song.title} ({self.current_song.composer})", font=theme.get_font(theme.FONT_TITLE), text_color=theme.COLOR_TEXT_PRIMARY)
-        header_lbl.pack(anchor="w", padx=16, pady=(16, 8))
+            textbox = ctk.CTkTextbox(card, corner_radius=theme.RADIUS_MD, fg_color=theme.COLOR_SURFACE_SECONDARY, text_color=theme.COLOR_TEXT_PRIMARY, font=theme.get_font(theme.FONT_BODY), wrap="word")
+            textbox.pack(fill="both", expand=True, padx=16, pady=(0, 12))
 
-        textbox = ctk.CTkTextbox(card, corner_radius=theme.RADIUS_MD, fg_color=theme.COLOR_SURFACE_SECONDARY, text_color=theme.COLOR_TEXT_PRIMARY, font=theme.get_font(theme.FONT_BODY), wrap="word")
-        textbox.pack(fill="both", expand=True, padx=16, pady=(0, 12))
+            render_markdown_to_textbox(textbox, analysis_text, base_font_size=13)
 
-        render_markdown_to_textbox(textbox, analysis_text, base_font_size=13)
+            close_btn = ctk.CTkButton(card, text="Fechar", font=theme.get_font(theme.FONT_BODY_BOLD), fg_color=theme.COLOR_PRIMARY, hover_color=theme.COLOR_PRIMARY_HOVER, command=top.destroy)
+            close_btn.pack(anchor="e", padx=16, pady=(0, 16))
 
-        close_btn = ctk.CTkButton(card, text="Fechar", font=theme.get_font(theme.FONT_BODY_BOLD), fg_color=theme.COLOR_PRIMARY, hover_color=theme.COLOR_PRIMARY_HOVER, command=top.destroy)
-        close_btn.pack(anchor="e", padx=16, pady=(0, 16))
+            # Ensure top window receives focus after complete build
+            top.transient(self.winfo_toplevel())
+            top.grab_set()
+        except Exception:
+            top.destroy()
+            raise
 
     def destroy(self):
         self._unbind_keyboard_events()

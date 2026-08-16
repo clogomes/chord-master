@@ -111,8 +111,9 @@ class Metronome:
             if self.on_beat is not None:
                 try:
                     self.on_beat(current_beat, beat_start)
-                except Exception:
-                    pass
+                except Exception as exc:
+                    import logging
+                    logging.warning(f"Erro no callback do metrónomo: {exc}")
 
             # Advance beat
             current_beat = (current_beat % self.beats_per_measure) + 1

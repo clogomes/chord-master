@@ -70,7 +70,7 @@ class PracticeTechniqueScreen(ctk.CTkFrame):
         self._start_midi_listener()
         self._load_exercise(self.current_exercise)
 
-    def _on_metronome_beat(self, beat_num: int):
+    def _on_metronome_beat(self, beat_num: int, timestamp: float = 0.0):
         pass
 
     def _build_ui(self):
@@ -404,7 +404,7 @@ class PracticeTechniqueScreen(ctk.CTkFrame):
 
         note = self.current_exercise.notes[self.current_note_idx]
         self._highlight_active_note()
-        self.audio_player.play_note(note.pitch_with_octave, duration=0.45, instrument=self.current_exercise.instrument)
+        self.audio_player.play_note(note, duration=0.45, instrument=self.current_exercise.instrument)
 
         self.current_note_idx += 1
         self._demo_timer_id = self.after(500, self._schedule_next_demo_note)
@@ -431,7 +431,7 @@ class PracticeTechniqueScreen(ctk.CTkFrame):
                 text=f"✓ Nota {active_note.pitch_with_octave} correta! (Combo {self.current_combo}x){rhythm_feedback}",
                 text_color=theme.COLOR_SUCCESS,
             )
-            self.audio_player.play_note(active_note.pitch_with_octave, duration=0.45, instrument=self.current_exercise.instrument)
+            self.audio_player.play_note(active_note, duration=0.45, instrument=self.current_exercise.instrument)
 
             if self.current_note_idx < len(self.current_exercise.notes) - 1:
                 self.current_note_idx += 1
@@ -498,8 +498,9 @@ class PracticeTechniqueScreen(ctk.CTkFrame):
     def _start_midi_listener(self):
         self.midi_manager.start_listening(self._on_midi_note_on)
 
-    def _on_midi_note_on(self, note_name: str, velocity: int):
-        self.after(0, lambda: self._on_user_played_note(note_name))
+    def _on_midi_note_on(self, note_midi: int, velocity: int):
+        note = Note.from_midi(note_midi)
+        self.after(0, lambda: self._on_user_played_note(note.pitch_with_octave))
 
     def _handle_back(self):
         self._unbind_keyboard_events()

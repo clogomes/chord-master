@@ -103,6 +103,12 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
   - Ortografia harmónica precisa de escalas e acordes em tonalidades com bemóis (`F, G, A, B♭, C, D, E` e `C, E♭, G♭`).
   - Mapeamento exato de cordas e trastes no braço da guitarra considerando o registo/oitava exato da nota MIDI.
 
+- **Correções de Funcionalidades & Estabilidade da Interface (Fase 32)**:
+  - Resolução do import em falta `render_markdown_to_textbox` e proteção com `try/except` na janela modal de Análise Teórica do Repertório.
+  - Correção das chamadas `AudioPlayer.play_note` no ecrã de técnica para passar objetos `Note` diretamente em vez de strings.
+  - Correção da assinatura do evento MIDI USB (`_on_midi_note_on`) no ecrã de exercícios técnicos para aceitar números inteiros de MIDI.
+  - Uniformização dos callbacks do metrónomo (`(beat_num, timestamp)`) em todos os ecrãs de prática.
+
 ---
 
 ### 5. 🎤 FASE 5 — Ditado de Solfejo Cantado com Validação Vocal por Microfone
