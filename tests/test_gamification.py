@@ -70,9 +70,6 @@ class TestGamification(unittest.TestCase):
                 os.remove(temp_path)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
     def test_new_context_achievements(self):
         import tempfile
         with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tf:
@@ -121,8 +118,8 @@ if __name__ == "__main__":
             um.current_user.categories["repertorio"].correct_count = 10
             um.current_user.categories["treino_auditivo"].best_streak = 10
             um.current_user.categories["leitura_pauta"].best_streak = 10
-            um.current_user.best_streak = 20
-            um.current_user.total_attempts = 100
+            um.current_user.categories["teoria"].best_streak = 20
+            um.current_user.categories["teoria"].total_attempts = 100
             
             context = {
                 "song_id": "fur_elise",
@@ -133,7 +130,7 @@ if __name__ == "__main__":
             }
             
             unlocked = um.check_achievements(context)
-            unlocked_ids = set(user.unlocked_achievements)
+            unlocked_ids = set(um.current_user.unlocked_achievements)
             
             for ach in ACHIEVEMENT_LIBRARY:
                 self.assertIn(ach.id, unlocked_ids, f"Achievement {ach.id} could not be unlocked")
@@ -142,3 +139,6 @@ if __name__ == "__main__":
             import os
             if os.path.exists(temp_path):
                 os.remove(temp_path)
+
+if __name__ == "__main__":
+    unittest.main()

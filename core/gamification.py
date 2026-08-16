@@ -103,6 +103,46 @@ ACHIEVEMENT_LIBRARY: List[Achievement] = [
         name_en="Diligent Student",
         description_en="Complete over 50 practical exercises in total."
     ),
+    Achievement(
+        id="virtuoso_pianist",
+        title="Virtuoso das Teclas",
+        description="Toca Für Elise ou Hino à Alegria com mais de 90% de precisão.",
+        icon="🎹",
+        xp_reward=200,
+        category="repertorio",
+        name_en="Keyboard Virtuoso",
+        description_en="Play Für Elise or Ode to Joy with over 90% accuracy."
+    ),
+    Achievement(
+        id="guitar_hero",
+        title="Mestre das 6 Cordas",
+        description="Toca uma música completa no modo Viola/Guitarra.",
+        icon="🎸",
+        xp_reward=150,
+        category="repertorio",
+        name_en="6-String Master",
+        description_en="Play a full song in Guitar mode."
+    ),
+    Achievement(
+        id="pitch_perfect",
+        title="Afinação Impecável",
+        description="Afina com o instrumento real com menos de 5 cents.",
+        icon="🎙️",
+        xp_reward=150,
+        category="geral",
+        name_en="Pitch Perfect",
+        description_en="Tune with the real instrument with less than 5 cents offset."
+    ),
+    Achievement(
+        id="rhythm_master",
+        title="Mestre do Tempo",
+        description="Conclui uma música no Modo Desafio Rítmico com precisão excelente (>2000 pontos).",
+        icon="⏱️",
+        xp_reward=250,
+        category="repertorio",
+        name_en="Time Master",
+        description_en="Finish a song in Rhythm Challenge Mode with excellent accuracy (>2000 points)."
+    ),
 ]
 
 
