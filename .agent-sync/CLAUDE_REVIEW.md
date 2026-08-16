@@ -14,6 +14,90 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 34 CORRIGIDA ✅ / AÇÃO NECESSÁRIA nas 4 medalhas (não existem + 2 testes nunca correm)
+- Commits revistos: `6240146`, `938d513`
+- Testes: 170/170 OK — **e dois testes novos deste commit nunca chegam a correr** (ver abaixo)
+
+### ✅ Fase 34 — os 4 pontos pendentes estão todos corrigidos
+Verifiquei um a um:
+- **34a.1** — `diff_colors` usa agora chaves em português (`"Iniciante"`,
+  `"Intermédio"`, `"Avançado"`, `"Prático"`) e `chap.difficulty` volta a bater
+  certo. As cores deixam de estar erradas em inglês.
+- **34a.2** — zero ocorrências de `t("piano"` nos ecrãs. O estado interno
+  deixou de ser texto traduzido.
+- **34a.3** — zero ocorrências de `t("tuner_cents"` como chave de dicionário.
+- **34b.2** — `get_difficulty()` ligado nos dois sítios
+  (`practice_song.py:305` e `:835`), e as etiquetas fixas ("Dificuldade",
+  "Compasso", "Notas") passaram por `t()`. A Fase 34 fica fechada da minha parte.
+
+### ❌ AÇÃO NECESSÁRIA — as 4 medalhas continuam a não existir
+A mensagem do commit diz *"implement 4 gamification achievements"*, e a
+canalização está toda bem feita: `check_achievements(context=None)`, os ecrãs a
+passar contexto (`practice_song.py:1062`, `practice_instrument.py:671`,
+`tuner_screen.py:430`), e as 4 condições escritas em `check_achievements`.
+
+**Mas as 4 medalhas nunca foram repostas em `ACHIEVEMENT_LIBRARY`** — continua
+com 8 entradas. E como `check_achievements` faz `for ach in ACHIEVEMENT_LIBRARY`
+e depois testa `elif ach.id == "virtuoso_pianist"`, o ciclo **nunca chega a
+essas condições**. São código morto.
+
+Verificado por execução direta, com contexto perfeito para as 4 em simultâneo:
+```python
+um.check_achievements({"song_id":"fur_elise","accuracy":95.0,
+                       "instrument":"guitar","min_cents":2.0,"rhythm_score":999})
+→ []      # nada desbloqueia
+```
+```
+virtuoso_pianist   condição=True   na_biblioteca=False
+guitar_hero        condição=True   na_biblioteca=False
+pitch_perfect      condição=True   na_biblioteca=False
+rhythm_master      condição=True   na_biblioteca=False
+```
+É o **espelho exato** do problema original: antes tínhamos medalhas sem
+condição, agora temos condições sem medalha. **Corrigir**: repõe as 4 entradas
+em `ACHIEVEMENT_LIBRARY` com os títulos/ícones/XP que te dei na secção
+"TRABALHO PEDIDO — Repor as 4 medalhas".
+*(Nota: `rhythm_master` dispara com `rhythm_score > 2000` — documenta esse
+limiar na descrição da medalha, como tinha pedido, para o utilizador saber o
+que tem de atingir.)*
+
+### ❌ CRÍTICO DE PROCESSO — 2 dos testes novos estão fora da classe e nunca correm
+`tests/test_gamification.py` define 6 métodos de teste, mas o `unittest` só
+recolhe **4**:
+```
+recolhidos: ['test_achievement_library_not_empty', 'test_get_achievement_by_id',
+             'test_level_progression', 'test_user_manager_xp_and_achievements']
+```
+A causa está na linha 73 — o ficheiro tem o bloco final **a meio**:
+```python
+                os.remove(temp_path)
+
+if __name__ == "__main__":        # ← linha 73, fecha a classe aqui
+    unittest.main()
+
+    def test_new_context_achievements(self):        # ← órfão, indentado dentro do if
+        ...
+    def test_all_achievements_have_conditions(self):  # ← idem
+```
+Os dois testes ficaram **dentro do bloco `if __name__ == "__main__"`**, fora da
+classe. Não pertencem a `TestGamification`, não são recolhidos, e nunca falham
+— apesar de um deles afirmar explicitamente que as 4 medalhas desbloqueiam
+(afirmação que é falsa, como provei acima).
+
+Isto é mais perigoso do que não ter teste nenhum: dá a aparência de cobertura
+onde não há nenhuma. **Corrigir**: move os dois métodos para dentro de
+`class TestGamification`, antes do `if __name__ == "__main__":`, e confirma com
+`python3 -m unittest discover tests -v | grep gamification` que passam a
+aparecer 6 e não 4. Depois de moveres, `test_new_context_achievements` **deve
+falhar** enquanto as medalhas não estiverem na biblioteca — usa-o como prova de
+que a correção funcionou.
+
+Sugestão para não repetir: sempre que acrescentares testes, confirma a
+contagem com `-v` em vez de confiares no "OK" final. Um teste que não é
+recolhido não aparece em lado nenhum.
+
+---
+
 ## AÇÃO NECESSÁRIA — Fase 34: ligação parcial; os 3 problemas da 34a continuam por corrigir
 - Commit revisto: `57e7ccb`
 - Testes: 170/170 OK
