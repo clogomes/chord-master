@@ -14,6 +14,282 @@ Cada entrada tem um veredito:
 
 ---
 
+## TRABALHO PEDIDO — Fases 35 a 39: Correção de Conteúdo + Aprendizagem Mais Rápida
+- Aprovado pelo utilizador (clogomes). Baseado numa auditoria de teoria musical
+  feita por um modelo especializado; **verifiquei pessoalmente por execução**
+  todos os erros marcados com ✅ abaixo — os restantes vêm da auditoria e devem
+  ser confirmados por ti antes de corrigires.
+- **REGRA: uma fase de cada vez.** Implementa, testa, commit + push
+  identificando a fase, atualiza o `GEMINI_STATUS.md`, e **espera o meu
+  APROVADO** antes da seguinte.
+- Lembretes de processo desta ronda: corre `pyflakes`/`flake8 --select=F821`
+  antes de commitar, e confirma a contagem de testes com `-v` quando
+  acrescentares testes.
+
+### FASE 35 — Correção de Erros de Conteúdo Musical
+Estes erros ensinam coisas erradas a quem está a aprender, por isso vêm
+primeiro.
+
+**35.1 — Análises harmónicas com o modo errado (`core/songs.py`)** — 5 das 8.
+✅ **Verificado por mim**: `greensleeves` e `guitar_greensleeves_full` têm
+**Fá natural** nas notas guardadas e **não têm F#** — logo são **Lá menor
+(Eólio)**, não "Modo Dórico de Lá" como a análise afirma (Dórico exige F#).
+Corrige para algo como *"Lá menor (Eólio), com 7ª elevada nas cadências"*, que
+é historicamente o mais correto para esta melodia.
+Outros a rever (confirma tu as notas antes de reescrever):
+- `piano_fur_elise` — rotulada "Eólio", mas a peça resolve num acorde de **Mi
+  maior** (com G# — ver as notas em `core/songs.py:321`). Isso é **Lá menor
+  harmónica**, não Eólio (Eólio tem ♭7 e não tem dominante).
+- `piano_gymnopedie` — rotulada "sonoridade Lídia", mas Ré Lídio exige **G#** e
+  o fragmento guardado tem **G natural**. É Ré maior/Jónico.
+- `guitar_house_rising_sun` — a análise diz "Dórico **e** Eólio" em simultâneo
+  (impossível) e "Eólio com Dominante" (contradição — o G# do Mi maior é
+  precisamente o que o torna *não* Eólio). As notas guardadas são um arpejo de
+  Am sem F# nem G#, portanto nada disto é demonstrável a partir dos dados.
+- `guitar_malaguena` — os graus `iv-♭III-♭II-I` estão certos, mas o modo é
+  **Frígio Dominante** (o I é maior, com G#), não Frígio simples. É essa
+  diferença que produz o som flamenco. A referência cruzada aponta para o
+  Cap. 3 (Frígio simples), que não tem G#.
+- `enter_sandman` — a descrição diz "trítono em Fá", mas Mi→Fá é uma **2ª
+  menor** (1 semitom). O trítono real do riff é Mi contra **Si♭**, que nem
+  sequer aparece na transcrição guardada.
+
+**Regra geral para esta subfase**: cada análise só pode afirmar o que as notas
+guardadas em `SONG_LIBRARY` demonstram. Se a análise exigir uma nota que a
+transcrição não tem, ou corriges a transcrição ou corriges a análise — não
+deixes as duas em desacordo. Acrescenta um teste que, para cada música com
+`theory_analysis`, verifique a coerência mínima que conseguires automatizar
+(ex: se a análise menciona um modo com nota característica, essa nota existe).
+
+**35.2 — Erros de teoria nos capítulos (`core/theory_content.py`)**
+- `:1196` diz *"Piano e Viola: Não transpositores"* — falso para guitarra, e
+  **contradiz o Capítulo 1** (`:96`), que diz corretamente que a guitarra soa
+  uma oitava abaixo do escrito. Corrige a linha 1196.
+- `:1209-1213` tem 3 erros em 4 linhas: *"transposição ascendente de 1ª Maior"*
+  (não existe "1ª Maior"; o exemplo mostra +2 semitons = **2ª Maior**), e o
+  resultado `Bm-G-D-A` está em **Ré maior/Si menor**, não em "Lá Maior" como o
+  texto afirma.
+- `:1300` — o voicing rootless ii-V está errado **e contradiz-se**: diz "muda
+  apenas 1 nota" entre Dm7 [F-A-C-E] e G7 [F-G-B-E], mas esse G7 muda duas
+  notas e contém a própria fundamental (deixando de ser *rootless*). O correto
+  é **G7 = F-A-B-E** (♭7-9-3-13), que muda só C→B. É o voicing mais copiado do
+  piano jazz — vale a pena acertar.
+- `:595-598` — a substituição tritónica não é "deslizar 1 traste": o SubV7 fica
+  a um **trítono (6 trastes)** do V7 que substitui, e um **semitom acima** do
+  alvo. Os voicings em si estão corretos; corrige só a explicação.
+- `:939` — o blues de 12 compassos é dado como exemplo de forma **ternária
+  (ABA)**. É forma AAB (bar-form), não ABA. Troca o exemplo.
+- `:1087` — *"Toca mais perto da boca (ponte) para som mais brilhante"* — a
+  boca e a ponte são sítios diferentes; só a ponte dá som brilhante, e a boca
+  dá o som doce que a frase a seguir atribui a "perto do braço". A frase
+  anula-se a si própria.
+- `:609` (versão EN) — traduz "acorde maior com 7ª" (dominante) como
+  *"Major 7th chord"*, que é um acorde diferente. A versão PT (`:558`) está
+  correta.
+- `:158` e `:505` — usam *"em uníssono"* com o sentido de "em simultâneo", num
+  capítulo cujo tema é precisamente que o uníssono é o intervalo de 0 semitons.
+- `:990` — gralha "Meu menor" → "Mi menor".
+- `:94` (`core/theory_quiz.py`) — a explicação dos tetracordes diz
+  *"T-T-ST e T-T-T-ST"*. Um tetracorde são 4 notas = **3** intervalos. A escala
+  maior são **dois tetracordes iguais** `T-T-ST`, unidos por um `T`. Como está,
+  destrói a simetria que a explicação quer ensinar.
+
+**35.3 — Erros nos dados das músicas (`core/songs.py`)**
+- ✅ **Verificado**: `cravo_e_rosa` tem as **primeiras 14 notas idênticas** ao
+  `twinkle_star` (`C4 C4 G4 G4 A4 A4 G4 F4 F4 E4 E4 D4 D4 C4`) — é a melodia do
+  Brilha Estrelinha, não a de "O Cravo e a Rosa", que é uma canção diferente.
+  Ou transcreves a melodia correta, ou removes a entrada. A descrição também
+  promete "4 estrofes" para ~2 linhas de dados.
+- ✅ **Verificado**: **15 de 24 músicas não fecham compasso**. Contei
+  `soma(duration_beats) ÷ tempos_por_compasso` e dá fração em:
+  ```
+  ode_to_joy 15.5 | papagaio_loiro 8.75 | pombinha_branca 5.5
+  minuet_in_g 7.67 | bridal_chorus 6.25 | canon_in_d 5.5
+  greensleeves 6.25 | cravo_e_rosa 6.25 | smoke_on_the_water 3.75  (+6)
+  ```
+  Compassos fracionários impossibilitam mostrar barras de compasso e ensinam
+  comprimentos de frase errados. No `ode_to_joy` em concreto, a ponte tem 14
+  tempos em vez de 16 — faltam 2 tempos da melodia real. **Acrescenta um teste**
+  que percorra `SONG_LIBRARY` e falhe se alguma música não fechar compasso; usa
+  a lista de falhas como lista de trabalho.
+- `minuet_in_g` diz "Secção A Completa (16 Compassos)" mas tem ~7,7 — falta
+  metade da secção.
+- `fur_elise` está declarada em 3/4; a peça é em **3/8**.
+- Três pares duplicados: `fur_elise`/`piano_fur_elise`,
+  `canon_in_d`/`piano_canon_c`, `greensleeves`/`guitar_greensleeves_full` — 6
+  das 24 entradas, com BPMs e títulos diferentes e `theory_analysis` só numa de
+  cada par. Funde ou diferencia claramente (ex: "arranjo para piano" vs
+  "arranjo para viola") — não deixes duplicados acidentais.
+- `grandola_vila_morena` — a letra salta a estrofe mais conhecida
+  (*"O povo é quem mais ordena / dentro de ti, ó cidade"*) e junta duas
+  estrofes diferentes, chamando-lhe "a estrofe completa".
+- `:395` gralha no título: "Marcha Nupcial (**Trevo** Coral Completo)" →
+  "Tema Coral Completo".
+- `twinkle_star` atribuído a "W. A. Mozart" — Mozart escreveu **variações**
+  (K.265) sobre a melodia francesa preexistente *"Ah! vous dirai-je, maman"*.
+
+**35.4 — Mnemónicas divergentes (3 ficheiros dizem coisas diferentes)**
+Para a 4ª Justa: `core/intervals.py:64` diz "Hino da Champions League / Marcha
+Nupcial", `core/ear_mnemonics.py:17` diz "Hino Nacional, Ó Ramos Ó Ramos", e a
+tabela do Cap. 2 (`theory_content.py:225`) diz "Amazing Grace". O mesmo acontece
+com a 7ª menor e a 3ª Maior. **Um aluno não consegue fixar uma âncora auditiva
+com três referências a competir.** Consolida numa só fonte de verdade (sugiro
+`core/ear_mnemonics.py`) e faz os outros dois lerem de lá.
+Referências recomendadas por serem inequívocas: 4ªJ = Marcha Nupcial;
+6ªm = Love Story; 6ªM = My Bonnie; 7ªM = Take On Me; 7ªm = *Somewhere* (West
+Side Story). Substitui as que não são verificáveis ("Hino da Champions League",
+"Ó Ramos Ó Ramos", "Superman tema").
+**Acrescenta também mnemónicas descendentes** — as 13 entradas atuais são todas
+ascendentes, e os intervalos descendentes soam categoricamente diferentes. O
+treino auditivo está a treinar metade da competência.
+
+**35.5 — Exercícios técnicos que não fazem o que o nome diz
+(`core/technique_exercises.py`)**
+- `:95-107` "Movimento Contrário das Mãos" é uma escala de Dó ascendente e
+  descendente **numa só voz** — não há movimento contrário nenhum. O
+  `TechniqueExercise` só tem uma `List[Note]` plana, por isso um exercício a
+  duas mãos **não é representável**. Ou estendes o modelo (ex: `notes_lh` /
+  `notes_rh`), ou renomeias o exercício para o que ele realmente é.
+- `:137-139` "Salto de Cordas" tem `D3→G3` (cordas adjacentes) e `G3→G3` (nota
+  repetida) — metade do exercício não salta cordas.
+- `:123-125` "Spider Walk" usa trastes 0-1-2-3, mas o Capítulo 8
+  (`theory_content.py:777`) especifica **1-2-3-4**; com 0, o dedo 1 não toca na
+  primeira nota.
+- `:167` "Alongamento (Trastes 1-3-5)" só respeita 1-3-5 no primeiro terço;
+  depois vai para 3-5-7 e 5-7-9.
+- `:56-61` "Hanon No. 1" salta a sequência ascendente pela oitava que *é* o
+  Hanon No. 1.
+- `recommended_bpm_range` está definido nos 9 exercícios e **nunca é aplicado**
+  ao slider de BPM em `practice_technique._load_exercise` — liga-o.
+
+**35.6 — Leitura de pauta (`core/staff_tutor.py`)**
+- `:35,38` — o ramo pedagógico do Dó Central é **código morto**:
+  `note.pitch == "C4"` nunca é verdade porque `Note("C4").pitch == "C"`. Usa
+  `pitch_with_octave`. (A matemática de linhas/espaços está correta — verifiquei.)
+- `:8,61-67` — o nível "Linhas Suplementares" inclui D4 e G5, que ficam em
+  **espaços** suplementares, não em linhas.
+- `:80-83` — gera F♭ e B♯ e depois mostra-os mal (`Note("Fb4").name_pt` cai no
+  fallback e aparece como "Mi"). Depois da Fase 31 já há ortografia correta —
+  usa-a aqui.
+
+### FASE 36 — Glossário Musical (pedido explícito do utilizador)
+Hoje **não existe nenhum glossário** (zero ocorrências de "gloss" no
+repositório), e os capítulos usam ~120 termos técnicos sem definição —
+*tetracorde, sensível, tessitura, agógica, rootless voicing, drop 2, guide
+tone, turnaround, ostinato, anacruse, cadência andaluza, enarmonia, homónima vs
+relativa, condução de vozes, campo harmónico*. Alguns são usados antes de
+serem definidos e outros nunca são definidos ("tessitura" aparece em
+`theory_content.py:1141` sem definição em lado nenhum).
+
+1. Cria `core/glossary.py` com
+   `GlossaryTerm(id, term_pt, term_en, short_def_pt/en, long_def_pt/en,
+   formula, example_piano, example_guitar, hear_it, see_also: List[str],
+   chapters: List[str])`. Alvo: ~150 termos, extraídos dos 16 capítulos.
+   - `hear_it` deve permitir tocar o conceito (notas/acorde a sintetizar) —
+     uma definição de "guide tone" que não mostra as duas teclas a premir não
+     serve a quem está a aprender.
+   - `example_piano` / `example_guitar`: a realização concreta no instrumento.
+2. Novo ecrã `gui/screens/glossary_screen.py` — lista A-Z pesquisável, com
+   filtro por capítulo, entrada de navegação no menu principal e barra lateral.
+3. **A parte que faz isto acelerar a aprendizagem**: auto-ligação em
+   `gui/markdown_renderer.py` — cada termo do glossário que apareça no texto de
+   um capítulo fica clicável e abre a definição (usa uma tag Tk com binding,
+   como já fazes para as tabelas). É isto que remove o custo da interrupção; um
+   glossário que obriga a sair do capítulo não é consultado.
+4. i18n completo desde o início (`_pt`/`_en`), como nas fases anteriores.
+
+### FASE 37 — Revisão Espaçada (a maior alavanca na velocidade de aprendizagem)
+Hoje `user_manager.is_lesson_completed()` é um **booleano** — um capítulo fica
+"concluído" para sempre — e `adaptive_engine.get_weak_areas()` agrega em 7
+categorias grosseiras. Um aluno que não consegue ouvir uma 6ª menor descendente
+só é informado de que "treino_auditivo: 55%".
+
+Ironia a corrigir: o **Capítulo 16 ensina repetição espaçada**
+(`theory_content.py:1454`) e a app não a implementa. (Esse capítulo também
+confunde *repetição espaçada* com *prática distribuída* — descreve a segunda e
+chama-lhe a primeira; corrige isso na Fase 35.2 se for mais cómodo.)
+
+1. Cria `core/review_scheduler.py` com estado de domínio **por competência
+   atómica**, não por categoria:
+   `interval:m6:desc`, `chord:m7b5:build`, `staff:treble:ledger:C4`,
+   `chapter:chap5:q3`, `song:minuet_in_g:bars5-8`.
+   Algoritmo: SM-2 ou Leitner de 5 caixas — usa o teu critério, mas guarda
+   `ease`, `interval_days`, `due_at`, `lapses`.
+2. Persiste no `UserProfile` (com `schema_version` e `.get()` com defaults, para
+   não partir perfis existentes — o `user_profiles.json` do utilizador tem
+   dados reais, **não os percas**).
+3. Novo ecrã "🔄 Revisão de Hoje" no menu principal, que serve **apenas o que
+   está vencido**, misturando itens de quiz, ouvido e pauta numa só sessão.
+4. Liga os ecrãs existentes para registarem resultado por competência atómica
+   além da categoria atual (não removas o registo por categoria — as
+   estatísticas dependem dele).
+
+### FASE 38 — Os Dois Capítulos em Falta
+1. **Campo Harmónico Menor** — o resumo do Capítulo 5 (`:447`) promete
+   *"extrair o Campo Harmónico Maior **e Menor**"* e só entrega o maior. Nove
+   músicas da biblioteca estão em tonalidade menor, e **os 5 erros de modo da
+   Fase 35.1 são exatamente o que este capítulo evitaria**. Deve cobrir: os
+   campos harmónicos das três escalas menores lado a lado; porque é que o V é
+   maior em tonalidade menor (sensível elevada) e o que isso faz ao ♭7;
+   i-iv-V-i vs i-♭VII-♭VI-V; o m7♭5 como ii em menor; e uma caixa explícita
+   **"Eólio vs. menor harmónica: como distinguir de ouvido e pelo acorde"**.
+   Depois **re-deriva** as análises de "House of the Rising Sun" e "Für Elise"
+   a partir dele.
+2. **Cadências** — "cadência" só aparece como prosa de passagem; não há
+   tratamento de cadência **autêntica (perfeita/imperfeita), plagal, suspensiva
+   e de engano**. É o conceito que permite *ouvir onde acaba uma frase*, o que
+   converte a escuta de um fluxo de acordes em frases compreensíveis e acelera
+   muito a memorização de repertório. O exemplo já está nos dados: no
+   `ode_to_joy`, a frase A acaba em Ré (suspensiva) e a A' acaba em Dó
+   (autêntica) — a app guarda esse contraste e nunca o aponta. Usa essas duas
+   frases como exemplo trabalhado, mais o "Amen" plagal e o V-vi de engano.
+
+Ambos com quiz (padrão da Fase 22) e campos `_en` completos.
+
+### FASE 39 — Contexto Histórico, Vocabulário e Laboratório por Capítulo
+1. **Contexto histórico** (pedido do utilizador). Acrescenta
+   `historical_context` / `historical_context_en` a `Song` (150-250 palavras) e
+   um campo `period` (Renascença/Barroco/Clássico/Romântico/Popular). A
+   biblioteca está cheia de material por contar: Grândola como sinal das 00:20
+   na Rádio Renascença que lançou o 25 de Abril; a reatribuição do Minueto em
+   Sol de Bach para Petzold em 1970; Für Elise só publicada em 1867 e a
+   identidade nunca resolvida de "Elise"; Greensleeves e a falsa atribuição a
+   Henrique VIII; e a lenda do *diabolus in musica*, que `intervals.py:73`
+   afirma sem notar que é uma invenção muito posterior. Mostra no ecrã de
+   repertório, ao lado da análise teórica.
+2. **Vocabulário em falta** — `CHORD_TYPES` tem 11 entradas e faltam as que um
+   principiante de pop/rock/folk precisa primeiro: **power chord (5)** (a
+   própria descrição de intervalos em `intervals.py:81` invoca power chords sem
+   haver o tipo de acorde), `6`, `m6`, `add9`, `9`, `7sus4`, `mMaj7` e os
+   dominantes alterados (`7♭9`, `7♯9`, `7♯11`, `7♭13`) que o Cap. 13 menciona.
+   `GUITAR_CHORD_LIBRARY` não tem **sus, add9, power chords nem raízes com
+   bemol** (B♭, E♭, A♭, F♯) — Cadd9, Dsus4, Asus2 e Em7 são a espinha dorsal da
+   guitarra acústica para principiantes e não se conseguem consultar.
+3. **Laboratório interativo por capítulo** — `TheoryChapter.interactive_demo`
+   existe nos 16 capítulos com 8 valores distintos (`"circle_of_fifths"`,
+   `"fretboard"`, `"piano_interactive"`, ...) e
+   `theory_screen._build_interactive_demo_area()` **ignora o argumento `chap`**
+   por completo: todos os capítulos mostram o mesmo seletor de acordes/escalas.
+   Honra o campo e constrói os três que estão prometidos e não existem:
+   (a) **círculo de quintas clicável** (mostra armação de clave, relativa menor
+   e acordes diatónicos); (b) **visualizador de condução de vozes** para os
+   Caps. 4/6/15 (que notas se mantêm e quais se movem por semitom entre dois
+   acordes); (c) **construtor de campo harmónico** que harmoniza a escala
+   selecionada.
+4. **Pré-requisitos entre capítulos** — o Cap. 9 (Ritmo, "Iniciante") vem
+   *depois* das tétrades do Cap. 5 ("Avançado") e da substituição tritónica do
+   Cap. 6. Quem ler por ordem encontra intercâmbio modal antes de figuras
+   rítmicas. Acrescenta `prerequisites: List[str]` ao `TheoryChapter`, mostra
+   "Requer: Cap. 3, Cap. 4" no cartão, e oferece um percurso recomendado
+   distinto da numeração.
+
+### O que vem depois (ainda NÃO especificado — não comeces)
+O módulo de composição (sequenciador multi-pista com samples reais) fica para
+as Fases 40+. Já tenho o desenho técnico feito, incluindo o motor de samples;
+escrevo a especificação quando estas cinco fases estiverem fechadas.
+
+---
+
 ## Revisão — 4 Medalhas APROVADAS ✅ — pacote de correções (Fases 31-34) FECHADO
 - Commits revistos: `1e1ad3c`, `696dbee`
 - Testes: 170/170 OK, e agora **6 testes de gamification recolhidos** (eram 4)
