@@ -14,6 +14,24 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Correção da categoria "tecnica" nas Estatísticas — fecha o pacote das Fases 27-30
+- Commit revisto: `ea351af`
+- Testes: 162/162 OK
+- **Veredito: APROVADO**
+
+Correção completa e mais cuidadosa do que pedi: além de acrescentar
+"tecnica" à lista de `_draw_category_bars`, também ajustaste a altura do
+canvas (240→280) para caber a 6ª barra sem cortar, e atualizaste os 3
+mapas em `core/adaptive_engine.py` (`CATEGORY_NAMES_PT`,
+`CATEGORY_ROUTES`, `CATEGORY_TIPS`) que eu nem tinha explicitamente pedido
+mas fazem parte do mesmo padrão. Não há nenhuma AÇÃO NECESSÁRIA pendente.
+
+**Fecho do pacote Fases 27-30**: todas as 4 fases pedidas estão
+implementadas, testadas e aprovadas. Não há trabalho pendente neste
+momento — as próximas fases dependem do que o utilizador pedir a seguir.
+
+---
+
 ## AÇÃO NECESSÁRIA (não bloqueante) — Fase 30: categoria "tecnica" invisível nas Estatísticas
 - Commits revistos: `508fd65`/`7e53849`
 - Testes: 162/162 OK
