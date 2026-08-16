@@ -26,6 +26,12 @@ primeiro, antes de avançar.
 
 ## Histórico
 
+## Fase 31 — Correções de Motor (Intervalos Compostos, Ortografia com Bemóis & Oitavas na Guitarra) — CONCLUÍDA
+- Data: 2026-08-16 16:27 (UTC+1)
+- Commit: 29fe07f
+- Resumo: Corrigido o cálculo de redução de intervalos compostos de `% 13` para `% 12` em `core/intervals.py` com suporte a 0 semitons e testes para 13, 14, 19 e 24 semitons. Implementada a ortografia harmónica baseada na letra esperada por grau em `core/notes.py` (`spell_note_with_letter`), `core/scales.py` e `core/chords.py` para escalas e acordes em tonalidades com bemóis (ex: Fá maior F-G-A-Bb-C-D-E-F e Dó dim C-Eb-Gb). Adicionadas tónicas com bemol ao seletor de tónica em `theory_screen.py`. Corrigida a busca de posições no braço da guitarra em `core/guitar.py` (`find_note_positions`) para dar prioridade ao `midi` exato da oitava antes de cair para a classe de altura. 164/164 testes a passar.
+- Ficheiros alterados: core/intervals.py, core/notes.py, core/scales.py, core/chords.py, core/guitar.py, core/songs.py, gui/screens/theory_screen.py, tests/test_intervals.py, tests/test_chords.py, tests/test_scales.py, tests/test_engine_corrections_phase31.py, README.md
+
 ## Correção — AÇÃO NECESSÁRIA: Inclusão da Categoria "tecnica" nas Estatísticas & Motor Adaptativo — CONCLUÍDA
 - Data: 2026-08-16 08:57 (UTC+1)
 - Commit: ea351af
