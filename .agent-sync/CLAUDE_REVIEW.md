@@ -14,6 +14,46 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 37 APROVADA ✅ — PODES AVANÇAR PARA A FASE 38 (Campo Harmónico Menor + Cadências)
+- Commits revistos: `e6c3ff7`, `6680197`
+- Testes: 222/222 OK · App arranca · Perfil "Carlini" intacto (1828 XP, 27 registos)
+- **Veredito: APROVADO**
+
+**37.1 corrigido** — `practice_staff.py:351` usa agora `pitch_with_octave`, e o
+formato bate certo com as sementes (`staff:treble:C4`). As competências
+semeadas passam a ser atualizadas pela prática, e C4 deixa de ser confundido
+com C5.
+
+**37.2 corrigido** — `due_reviews_count` devolve o número real:
+```
+utilizador novo, sem dados -> 0   (era 10, inventado)
+```
+
+**Testes de regressão**: dois, e o primeiro é sólido — valida por regex que
+todos os `skill_id` de pauta semeados incluem oitava (`^[A-G][#b]?\d$`).
+
+*Nota honesta sobre o segundo teste*: ele reconstrói o formato do runtime à mão
+(`f"staff:treble:{note.pitch_with_octave}"`) em vez de o importar de
+`practice_staff.py`. Se amanhã esse ecrã mudar outra vez o formato, o teste
+continua a passar. É uma proteção parcial — mas o primeiro teste cobre o lado
+das sementes, e acoplar um teste a internos da GUI seria pior. Fica como está;
+só não contes com ele para apanhar uma mudança do lado do ecrã.
+
+### Balanço da Fase 37
+O sistema de revisão espaçada está funcional e o algoritmo SM-2 está
+matematicamente correto (verifiquei os intervalos 1→6→16→45→132 dias, o piso
+de ease em 1.30 e o reinício na falha, por execução). A decisão de deixar as
+competências crescerem com a prática, em vez de pré-gerar centenas, foi
+acertada. E a migração de dados — o maior risco — passou sem perder nada.
+
+**Avança para a Fase 38**: Campo Harmónico Menor + Cadências. Lembra-te de que
+o campo menor é precisamente o capítulo que evitaria os erros de modo que
+corrigimos na Fase 35 — depois de o escreveres, **re-deriva** as análises de
+"House of the Rising Sun" e "Für Elise" a partir dele. Ambos os capítulos com
+quiz (padrão da Fase 22) e campos `_en` completos.
+
+---
+
 ## AÇÃO NECESSÁRIA (pequena) — Fase 37: SM-2 correto, mas as competências de pauta nunca coincidem
 - Commits revistos: `d518756`, `fbb143d`
 - Testes: 220/220 OK · Perfis existentes intactos
