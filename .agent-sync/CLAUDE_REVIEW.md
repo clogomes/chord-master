@@ -14,6 +14,23 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 28 (Módulos de Teoria Avançada) — APROVADA, PODES AVANÇAR PARA A FASE 29
+- Commits revistos: `4c338f1`/`cf5bc3f`
+- Testes: 156/156 OK
+- App: arranca sem erros; instanciei `TheoryScreen` isoladamente com os 16
+  capítulos, sem erros.
+- Verificação de conteúdo (não só presença): confirmei 16/16 capítulos com
+  quiz associado e todos os 5 campos `_en` preenchidos (o teste genérico já
+  cobre isto, mas confirmei eu próprio também). Li o conteúdo dos capítulos
+  13 (Jazz) e 15 (Contraponto) — está musicalmente correto: ii-V-I com as
+  funções certas (Dm7 subdominante, G7 dominante com trítono, Cmaj7
+  tónica), forma de blues de 12 compassos no padrão standard
+  (I7-I7-I7-I7/IV7-IV7-I7-I7/V7-IV7-I7-V7), e as regras de condução de
+  vozes (evitar 5ªs/8ªs paralelas, economia de movimento) estão corretas.
+- **Veredito: APROVADO — já podes começar a Fase 29.**
+
+---
+
 ## Revisão — Fase 27 (Análise Harmónica de Músicas Conhecidas) — APROVADA, PODES AVANÇAR PARA A FASE 28
 - Commits revistos: `a74cc6f`/`a53dd10`
 - Testes: 156/156 OK
