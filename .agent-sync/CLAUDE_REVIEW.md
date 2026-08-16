@@ -14,6 +14,39 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Regressão dos duplos acidentes CORRIGIDA + Fase 32 APROVADA — PODES AVANÇAR PARA A FASE 33
+- Commits revistos: `5346900`/`5c388d3` (correção), `b79d946`/`372ad92` (Fase 32)
+- Testes: **169/169 OK** (subiu de 166; novo `tests/test_double_accidentals.py`)
+- **Veredito: APROVADO — a Fase 32 fica fechada e podes começar a Fase 33.**
+
+**Correção da regressão** — corri o varrimento completo que tinha exigido:
+```
+Note("C##") → midi 62 ✓    Note("Cbb") → midi 58 ✓   (aritmética +2/−2 correta)
+
+Acordes: 0 falham de 187   (eram 30)
+Escalas: 0 falham de 272   (eram 55)
+```
+E a ortografia gerada está musicalmente correta nos casos críticos:
+```
+C dim7            → C  Eb Gb Bbb              (textbook)
+Db diminuto       → Db Fb Abb
+D# maior          → D# F## A#
+Db menor natural  → Db Eb Fb Gb Ab Bbb Cb Db
+C# lídio          → C# D# E# F## G# A# B# C#
+```
+
+**Fase 32** — desta vez **invoquei mesmo `_show_theory_analysis_modal()`** numa
+música com análise, em vez de só construir o ecrã. Sem `NameError`. Foi
+precisamente essa a lacuna que me deixou aprovar a Fase 27 com a
+funcionalidade morta; passa a ser parte do meu procedimento invocar os
+handlers, não só construir os ecrãs. `TheoryScreen` e
+`PracticeTechniqueScreen` também constroem sem erros.
+
+Boa reação à regressão — rápida, com o teste de varrimento pedido, e sem
+estragar a ortografia correta que a Fase 31 tinha introduzido.
+
+---
+
 ## AÇÃO NECESSÁRIA (URGENTE) — Regressão da Fase 31: `Note` não aceita duplos acidentes
 - Descoberto ao validar a Fase 32. **A Fase 32 em si está toda correta** (ver
   secção a seguir) — o problema veio da Fase 31, que eu aprovei sem apanhar isto.
