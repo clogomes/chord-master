@@ -14,6 +14,76 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Acentos CORRIGIDOS ✅ / AÇÃO NECESSÁRIA — Glossário lento ("pendurado")
+- Commits revistos: `3a964a0`, `9e4e942`
+- Testes: 228/228 OK
+
+### ✅ Normalização de acentos — confirmada
+Todos os pares com/sem acento devolvem agora o mesmo número de resultados:
+```
+tónica=17 tonica=17 · trítono=7 tritono=7 · cadência=5 cadencia=5
+harmónico=8 harmonico=8 · sensível=2 sensivel=2
+```
+Aplicaste também à auto-ligação do markdown, como sugeri.
+
+### ❌ AÇÃO NECESSÁRIA — o utilizador reporta o glossário "pendurado"
+Depois da correção dos acentos, o utilizador voltou a dizer que o glossário
+fica **pendurado**. Investiguei com medições dentro da app real (`navigate_to`
++ `update_idletasks`), não em testes isolados:
+
+**O ecrã do glossário é 5× mais lento que qualquer outro:**
+```
+navegar para theory    : 106 ms
+navegar para glossary  : 548 ms   ← 5×
+navegar para stats     : 102 ms
+navegar para main_menu :  23 ms
+```
+
+**E cada tecla escrita na pesquisa re-renderiza a lista inteira:**
+```
+tecla 1 't' : 173 ms -> 139 termos
+tecla 2 'o' : 124 ms -> 101 termos
+tecla 3 'n' :  62 ms ->  48 termos
+tecla 4 'i' :  32 ms ->  24 termos
+tecla 5 'c' :  29 ms ->  24 termos
+tecla 6 'a' :  17 ms ->   9 termos
+TOTAL para escrever "tonica": 436 ms de UI bloqueada
+```
+
+**Causa**: `_render_terms_list` (linha ~267) destrói **todos** os widgets e
+reconstrói um cartão CTk por termo — 139 cartões no arranque, e outra vez a
+cada `<KeyRelease>` (o binding está em `glossary_screen.py:137`). O Tkinter é
+síncrono, por isso a interface fica congelada durante esse tempo.
+
+**Porque é que na máquina dele é pior do que estes números**: medi numa
+máquina com folga. O utilizador tem ~37 GB ocupados (Teams, Chrome, etc.) e
+swap em uso — nessas condições estes 548 ms e 173 ms/tecla facilmente
+triplicam, e aí "pendurado" é uma descrição literal.
+
+**Corrigir, por ordem de retorno:**
+1. **Debounce na pesquisa** — a correção mais importante e mais simples. Em vez
+   de filtrar a cada `<KeyRelease>`, agenda com `self.after(250, ...)` e
+   cancela o agendamento anterior (`after_cancel`). Quem escreve "tonica" passa
+   de 6 re-renderizações para 1.
+2. **Limitar os cartões renderizados** — não construas 139 widgets de uma vez.
+   Mostra os primeiros ~40 e acrescenta o resto conforme o scroll, ou exige
+   pelo menos 2 caracteres antes de listar. O arranque do ecrã cai para
+   dezenas de ms.
+3. **Reutilizar widgets em vez de destruir e recriar** — mais trabalho, faz só
+   se 1 e 2 não chegarem.
+
+**Como validar**: repete a minha medição — `navigate_to("glossary")` com
+`update_idletasks()` deve ficar abaixo de ~150 ms (a par dos outros ecrãs), e
+escrever uma palavra de 6 letras deve custar **uma** re-renderização, não seis.
+
+**Nota de método**: os meus testes anteriores só construíam o ecrã sem o
+desenhar, e por isso não apanharam isto — 88 ms parecia aceitável. Foi preciso
+medir dentro da app a correr. Vale a pena teres isto em conta: para queixas de
+desempenho, medir com `update_idletasks()` na app real, não em construção
+isolada.
+
+---
+
 ## AÇÃO NECESSÁRIA — Glossário: pesquisa é sensível a acentos (reportado pelo utilizador)
 - Reportado por: clogomes — *"o glossário musical não parece estar a funcionar"*.
 - Investiguei todos os caminhos possíveis; **a causa é uma só**: a pesquisa
