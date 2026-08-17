@@ -372,7 +372,7 @@ class UserManager:
         user.spaced_review_data[skill_id] = item.to_dict()
 
         # Also update normal category stats
-        self.record_attempt(
+        stats = self.record_attempt(
             category=category,
             question_type=question_type,
             is_correct=is_correct,
@@ -381,7 +381,7 @@ class UserManager:
             correct_answer=correct_answer,
         )
 
-        return item
+        return stats
 
     def get_daily_review_queue(self, max_items: int = 15):
         """Constructs the daily spaced repetition review queue for the active user."""

@@ -680,3 +680,9 @@ Implementação nativa de um sistema de i18n em duas vertentes:
   - `gui/screens/practice_ear.py`: Adicionado `import re` para extração de IDs de revisão espaçada ao responder a perguntas.
 - **Nova Suite Automatizada de Análise Estática (`tests/test_no_undefined_names.py`)**:
   - Scanner automatizado que corre pyflakes programaticamente sobre todas as pastas do projeto (`audio/`, `core/`, `gui/`, `tests/` e `main.py`) e falha imediatamente caso detete qualquer variável, import ou símbolo indefinido (`UndefinedName` / F821). Total de **246/246 testes a passar**.
+
+### Correção — Retorno de `CategoryStats` em `record_atomic_review()` & Testes de Integração de UI
+- **Uniformização do Retorno em `core/user_manager.py`**:
+  - O método `record_atomic_review()` passa a devolver o objeto `CategoryStats` gerado por `record_attempt()`, permitindo que os ecrãs de treino (`PracticeEarScreen`, `PracticeStaffScreen`, `TheoryQuizWidget`) leiam imediatamente as sequências `current_streak` e `best_streak` e atualizem os respetivos `ScoreCard` e cartões de feedback sem exceções.
+- **Suite de Testes de Integração de UI (`tests/test_record_atomic_review_ui_integration.py`)**:
+  - Simulação completa do fluxo de resposta em múltiplos tipos de exercício em `PracticeEarScreen`, `PracticeStaffScreen` e `TheoryQuizWidget` validando a ausência de exceções e a atualização das estatísticas na interface. Total de **250/250 testes a passar**.
