@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 43 — Estúdio de Composição: Faixa de Acordes & Visualização nos Instrumentos — CONCLUÍDA
+- Data: 2026-08-17T18:01:59+01:00
+- Commit: aa22edb
+- Resumo: Concluída a Fase 43 no ecrã `gui/screens/compose_studio.py` (`ComposeStudioScreen`). Implementado o sequenciador harmónico com barra de criação de acordes (`ChordEvent`), suporte a 17 tónicas (naturais, sustenidos e bemóis), todos os 22 tipos de acorde de `CHORD_TYPES`, escolha de instrumento (Piano / Viola), tempo métrico (`start_beat`) e duração (`duration_beats`). Adicionados cartões interativos de acordes com eliminação individual e ordenação cronológica. Integrada a sincronização bidirecional em tempo real com `PianoKeyboard` (destaque de teclas e notas) e `GuitarFretboard` (formas CAGED de `GUITAR_CHORD_LIBRARY` e posições de trastes) com seletor de visualização (Piano / Viola / Ambos). 243/243 testes a passar (novos testes em `tests/test_compose_studio_chords.py`).
+- Ficheiros principais alterados: gui/screens/compose_studio.py, tests/test_compose_studio_chords.py, README.md
+
 ## Fase 42 — Estúdio de Composição: Ecrã & Grelha de Ritmo Interativa — CONCLUÍDA
 - Data: 2026-08-17T17:55:28+01:00
 - Commit: 04c7641
