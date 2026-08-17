@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Correção — Retorno de CategoryStats em record_atomic_review() & Testes de Integração de UI — CONCLUÍDA
+- Data: 2026-08-17T21:58:06+01:00
+- Commit: 6b60bbc
+- Resumo: Corrigido o retorno do método `record_atomic_review()` em `core/user_manager.py` para devolver o objeto `CategoryStats` gerado por `record_attempt()`. Isto resolve a exceção `AttributeError: 'ReviewItem' object has no attribute 'current_streak'` reportada no ecrã de treino auditivo e assegura compatibilidade uniforme em todos os ecrãs (`PracticeEarScreen`, `PracticeStaffScreen`, `TheoryQuizWidget`). Criado novo ficheiro de testes de integração `tests/test_record_atomic_review_ui_integration.py` que simula o fluxo completo de respostas e atualizações dos cartões `ScoreCard`/feedback em todos os ecrãs. 250/250 testes a passar.
+- Ficheiros principais alterados: core/user_manager.py, tests/test_record_atomic_review_ui_integration.py, README.md
+
 ## Correção Crítica — Resolução de 5 Nomes Indefinidos & Teste Estático Automatizado — CONCLUÍDA
 - Data: 2026-08-17T21:52:17+01:00
 - Commit: 253ae5f
