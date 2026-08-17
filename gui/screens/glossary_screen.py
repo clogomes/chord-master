@@ -53,6 +53,11 @@ class GlossaryScreen(ctk.CTkFrame):
         self.selected_term: Optional[GlossaryTerm] = None
         self.filtered_terms: List[GlossaryTerm] = []
 
+        self._search_job = None
+        self._displayed_count = 35
+        self._term_card_widgets = {}  # term_id -> (card_frame, title_lbl, snippet_lbl, cat_pill)
+        self._load_more_btn = None
+
         self._term_buttons: List[ctk.CTkButton] = []
 
         self._build_ui()
@@ -199,7 +204,7 @@ class GlossaryScreen(ctk.CTkFrame):
             fg_color="transparent",
         )
         alpha_frame.pack(fill="x", padx=8, pady=(8, 4))
-        bind_mousewheel(alpha_frame)
+        bind_mousewheel(alpha_frame, recursive=False)
 
         self._alpha_btns = {}
         for letter in ALPHABET:
@@ -225,7 +230,7 @@ class GlossaryScreen(ctk.CTkFrame):
             fg_color="transparent",
         )
         self.terms_list_frame.pack(fill="both", expand=True, padx=8, pady=(4, 8))
-        bind_mousewheel(self.terms_list_frame)
+        bind_mousewheel(self.terms_list_frame, recursive=False)
 
         # Right Column: Term Detail Card
         self.detail_card = ctk.CTkScrollableFrame(
@@ -236,7 +241,7 @@ class GlossaryScreen(ctk.CTkFrame):
             border_color=theme.COLOR_BORDER,
         )
         self.detail_card.grid(row=0, column=1, sticky="nsew", padx=(8, 0))
-        bind_mousewheel(self.detail_card)
+        bind_mousewheel(self.detail_card, recursive=False)
 
     def _filter_terms(self):
         query = self.search_entry.get().strip()
@@ -262,6 +267,7 @@ class GlossaryScreen(ctk.CTkFrame):
 
         self.filtered_terms = results
         self.term_count_lbl.configure(text=f"{len(results)} Termos")
+        self._displayed_count = 35
         self._render_terms_list()
 
     def _render_terms_list(self):
@@ -269,7 +275,8 @@ class GlossaryScreen(ctk.CTkFrame):
         for widget in self.terms_list_frame.winfo_children():
             widget.destroy()
 
-        self._term_buttons.clear()
+        self._term_card_widgets.clear()
+        self._load_more_btn = None
 
         if not self.filtered_terms:
             empty_lbl = ctk.CTkLabel(
@@ -281,65 +288,113 @@ class GlossaryScreen(ctk.CTkFrame):
             empty_lbl.pack(pady=40)
             return
 
-        for term in self.filtered_terms:
-            is_active = (self.selected_term and self.selected_term.id == term.id)
-            
-            card = ctk.CTkFrame(
+        visible_terms = self.filtered_terms[:self._displayed_count]
+
+        for term in visible_terms:
+            self._create_term_card(term)
+
+        if len(self.filtered_terms) > self._displayed_count:
+            remaining = len(self.filtered_terms) - self._displayed_count
+            self._load_more_btn = ctk.CTkButton(
                 self.terms_list_frame,
-                corner_radius=theme.RADIUS_MD,
-                fg_color=theme.COLOR_PRIMARY if is_active else theme.COLOR_SURFACE_SECONDARY,
-                border_width=1,
-                border_color=theme.COLOR_PRIMARY if is_active else theme.COLOR_BORDER,
-                cursor="hand2",
-            )
-            card.pack(fill="x", pady=4, padx=2)
-
-            # Click binding on card and children
-            def make_click_handler(t_obj=term):
-                return lambda e: self.select_term(t_obj)
-
-            card.bind("<Button-1>", make_click_handler())
-
-            # Top row: Term name + Category tag
-            top_row = ctk.CTkFrame(card, fg_color="transparent")
-            top_row.pack(fill="x", padx=10, pady=(8, 2))
-            top_row.bind("<Button-1>", make_click_handler())
-
-            title_lbl = ctk.CTkLabel(
-                top_row,
-                text=term.get_term(self.lang),
+                text=f"Carregar Mais (+{min(remaining, 35)} de {remaining} restantes)...",
                 font=theme.get_font(theme.FONT_BODY_BOLD),
-                text_color="#FFFFFF" if is_active else theme.COLOR_TEXT_PRIMARY,
-                anchor="w",
+                fg_color=theme.COLOR_SURFACE_SECONDARY,
+                hover_color=theme.COLOR_BORDER,
+                text_color=theme.COLOR_TEXT_PRIMARY,
+                height=36,
+                corner_radius=theme.RADIUS_MD,
+                command=self._load_more_terms,
             )
-            title_lbl.pack(side="left", fill="x", expand=True)
-            title_lbl.bind("<Button-1>", make_click_handler())
+            self._load_more_btn.pack(fill="x", pady=(6, 12), padx=4)
 
-            cat_pill = ctk.CTkLabel(
-                top_row,
-                text=term.category.upper(),
-                font=theme.get_font(theme.FONT_SMALL),
-                text_color="#FFFFFF" if is_active else theme.COLOR_TEXT_MUTED,
-                fg_color=theme.COLOR_PRIMARY_HOVER if is_active else theme.COLOR_SURFACE,
-                corner_radius=theme.RADIUS_SM,
-                padx=6,
-                pady=1,
-            )
-            cat_pill.pack(side="right")
-            cat_pill.bind("<Button-1>", make_click_handler())
+    def _create_term_card(self, term: GlossaryTerm):
+        is_active = (self.selected_term and self.selected_term.id == term.id)
+        
+        card = ctk.CTkFrame(
+            self.terms_list_frame,
+            corner_radius=theme.RADIUS_MD,
+            fg_color=theme.COLOR_PRIMARY if is_active else theme.COLOR_SURFACE_SECONDARY,
+            border_width=1,
+            border_color=theme.COLOR_PRIMARY if is_active else theme.COLOR_BORDER,
+            cursor="hand2",
+        )
+        card.pack(fill="x", pady=3, padx=2)
 
-            # Preview snippet
-            snippet_lbl = ctk.CTkLabel(
-                card,
-                text=term.get_short_def(self.lang),
-                font=theme.get_font(theme.FONT_SMALL),
-                text_color="#E0E7FF" if is_active else theme.COLOR_TEXT_MUTED,
-                anchor="w",
-                justify="left",
-                wraplength=340,
+        def make_click_handler(t_obj=term):
+            return lambda e: self.select_term(t_obj)
+
+        card.bind("<Button-1>", make_click_handler())
+
+        # Top row: Term name + Category tag
+        top_row = ctk.CTkFrame(card, fg_color="transparent")
+        top_row.pack(fill="x", padx=10, pady=(6, 2))
+        top_row.bind("<Button-1>", make_click_handler())
+
+        title_lbl = ctk.CTkLabel(
+            top_row,
+            text=term.get_term(self.lang),
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            text_color="#FFFFFF" if is_active else theme.COLOR_TEXT_PRIMARY,
+            anchor="w",
+        )
+        title_lbl.pack(side="left", fill="x", expand=True)
+        title_lbl.bind("<Button-1>", make_click_handler())
+
+        cat_pill = ctk.CTkLabel(
+            top_row,
+            text=term.category.upper(),
+            font=theme.get_font(theme.FONT_SMALL),
+            text_color="#FFFFFF" if is_active else theme.COLOR_TEXT_MUTED,
+            fg_color=theme.COLOR_PRIMARY_HOVER if is_active else theme.COLOR_SURFACE,
+            corner_radius=theme.RADIUS_SM,
+            padx=6,
+            pady=1,
+        )
+        cat_pill.pack(side="right")
+        cat_pill.bind("<Button-1>", make_click_handler())
+
+        # Preview snippet
+        snippet_lbl = ctk.CTkLabel(
+            card,
+            text=term.get_short_def(self.lang),
+            font=theme.get_font(theme.FONT_SMALL),
+            text_color="#E0E7FF" if is_active else theme.COLOR_TEXT_MUTED,
+            anchor="w",
+            justify="left",
+            wraplength=340,
+        )
+        snippet_lbl.pack(fill="x", padx=10, pady=(0, 6))
+        snippet_lbl.bind("<Button-1>", make_click_handler())
+
+        self._term_card_widgets[term.id] = (card, title_lbl, snippet_lbl, cat_pill)
+
+    def _load_more_terms(self):
+        if self._load_more_btn:
+            self._load_more_btn.destroy()
+            self._load_more_btn = None
+
+        start_idx = self._displayed_count
+        self._displayed_count += 35
+        next_batch = self.filtered_terms[start_idx:self._displayed_count]
+
+        for term in next_batch:
+            self._create_term_card(term)
+
+        if len(self.filtered_terms) > self._displayed_count:
+            remaining = len(self.filtered_terms) - self._displayed_count
+            self._load_more_btn = ctk.CTkButton(
+                self.terms_list_frame,
+                text=f"Carregar Mais (+{min(remaining, 35)} de {remaining} restantes)...",
+                font=theme.get_font(theme.FONT_BODY_BOLD),
+                fg_color=theme.COLOR_SURFACE_SECONDARY,
+                hover_color=theme.COLOR_BORDER,
+                text_color=theme.COLOR_TEXT_PRIMARY,
+                height=36,
+                corner_radius=theme.RADIUS_MD,
+                command=self._load_more_terms,
             )
-            snippet_lbl.pack(fill="x", padx=10, pady=(0, 8))
-            snippet_lbl.bind("<Button-1>", make_click_handler())
+            self._load_more_btn.pack(fill="x", pady=(6, 12), padx=4)
 
     def select_term_by_id(self, term_id: str):
         term = get_term_by_id(term_id)
@@ -347,8 +402,31 @@ class GlossaryScreen(ctk.CTkFrame):
             self.select_term(term)
 
     def select_term(self, term: GlossaryTerm):
+        prev_term = self.selected_term
         self.selected_term = term
-        self._render_terms_list()
+
+        # Update previous card styling without re-rendering entire list
+        if prev_term and prev_term.id in self._term_card_widgets:
+            card, title_lbl, snippet_lbl, cat_pill = self._term_card_widgets[prev_term.id]
+            try:
+                card.configure(fg_color=theme.COLOR_SURFACE_SECONDARY, border_color=theme.COLOR_BORDER)
+                title_lbl.configure(text_color=theme.COLOR_TEXT_PRIMARY)
+                snippet_lbl.configure(text_color=theme.COLOR_TEXT_MUTED)
+                cat_pill.configure(fg_color=theme.COLOR_SURFACE, text_color=theme.COLOR_TEXT_MUTED)
+            except Exception:
+                pass
+
+        # Update newly selected card styling
+        if term.id in self._term_card_widgets:
+            card, title_lbl, snippet_lbl, cat_pill = self._term_card_widgets[term.id]
+            try:
+                card.configure(fg_color=theme.COLOR_PRIMARY, border_color=theme.COLOR_PRIMARY)
+                title_lbl.configure(text_color="#FFFFFF")
+                snippet_lbl.configure(text_color="#E0E7FF")
+                cat_pill.configure(fg_color=theme.COLOR_PRIMARY_HOVER, text_color="#FFFFFF")
+            except Exception:
+                pass
+
         self._render_detail_pane()
 
     def _render_detail_pane(self):
@@ -588,9 +666,15 @@ class GlossaryScreen(ctk.CTkFrame):
             self.after(i * 320, lambda p=pitch: self.audio_player.play_note(p, duration_ms=650))
 
     def _on_search_changed(self):
-        self._filter_terms()
+        if self._search_job is not None:
+            self.after_cancel(self._search_job)
+            self._search_job = None
+        self._search_job = self.after(220, self._filter_terms)
 
     def _clear_search(self):
+        if self._search_job is not None:
+            self.after_cancel(self._search_job)
+            self._search_job = None
         self.search_entry.delete(0, "end")
         self._filter_terms()
 

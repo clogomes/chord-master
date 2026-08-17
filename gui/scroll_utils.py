@@ -3,10 +3,11 @@ import sys
 import customtkinter as ctk
 
 
-def bind_mousewheel(scrollable_frame: ctk.CTkScrollableFrame):
+def bind_mousewheel(scrollable_frame: ctk.CTkScrollableFrame, recursive: bool = True):
     """
-    Recursively attaches cross-platform mousewheel events (<MouseWheel>, <Button-4>, <Button-5>)
-    to a CTkScrollableFrame, its internal canvas, and all its children widgets.
+    Attaches cross-platform mousewheel events (<MouseWheel>, <Button-4>, <Button-5>)
+    to a CTkScrollableFrame and its internal canvas.
+    If recursive=True, also attaches to child widgets.
     """
     if not isinstance(scrollable_frame, ctk.CTkScrollableFrame):
         return
@@ -85,6 +86,18 @@ def bind_mousewheel(scrollable_frame: ctk.CTkScrollableFrame):
             pass
 
     # Initial binding pass
-    _bind_widget_recursively(scrollable_frame)
-    if canvas:
-        _bind_widget_recursively(canvas)
+    if recursive:
+        _bind_widget_recursively(scrollable_frame)
+        if canvas:
+            _bind_widget_recursively(canvas)
+    else:
+        try:
+            scrollable_frame.bind("<MouseWheel>", _on_mousewheel, add="+")
+            scrollable_frame.bind("<Button-4>", _on_linux_scroll_up, add="+")
+            scrollable_frame.bind("<Button-5>", _on_linux_scroll_down, add="+")
+            if canvas:
+                canvas.bind("<MouseWheel>", _on_mousewheel, add="+")
+                canvas.bind("<Button-4>", _on_linux_scroll_up, add="+")
+                canvas.bind("<Button-5>", _on_linux_scroll_down, add="+")
+        except Exception:
+            pass
