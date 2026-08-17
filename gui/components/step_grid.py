@@ -1,10 +1,11 @@
 """Interactive Multi-Bar Step Sequencer Rhythm & Chord Grid Canvas widget with horizontal scrolling.
 
 Draws a unified multi-bar (e.g. 16, 32, 64, 128, 256 steps) timeline matrix:
-1. Upper Section: Percussion instruments (Kick, Snare, Hi-Hats, Ride) with step toggle cells.
+1. Upper Section: 12 Percussion instruments with step toggle cells.
 2. Distinct Visual Divider.
 3. Lower Section: Harmonic chord lanes (Piano & Viola) showing ChordEvents as horizontal blocks.
-4. Fixed instrument label column on the left and smooth horizontal scrolling.
+4. Fixed instrument label column on the left, smooth horizontal scrolling, mouse wheel scrolling,
+   and clock-based playback cursor (playhead).
 """
 from typing import Callable, Dict, List, Optional, Tuple
 import tkinter as tk
@@ -36,7 +37,7 @@ CHORD_LANES = [
 
 class StepGrid(ctk.CTkFrame):
     """
-    Unified canvas-based multi-bar step sequencer and chord lane editor.
+    Unified canvas-based multi-bar step sequencer, chord lane editor, and playback cursor display.
     """
 
     def __init__(
@@ -80,8 +81,8 @@ class StepGrid(ctk.CTkFrame):
         self._chord_block_regions: List[Tuple[int, int, int, int, int]] = []      # (chord_idx, x1, y1, x2, y2)
         self._chord_lane_regions: List[Tuple[str, int, int, int, int]] = []       # (instrument, x1, y1, x2, y2)
 
-        self.row_height = 34.0
-        self.chord_row_height = 38.0
+        self.row_height = 32.0
+        self.chord_row_height = 36.0
         self.header_height = 28.0
         self.divider_height = 16.0
         self.step_width = 24.0
@@ -91,6 +92,8 @@ class StepGrid(ctk.CTkFrame):
         self.chords_height = len(CHORD_LANES) * self.chord_row_height
         self.canvas_height = int(self.header_height + self.drums_height + self.divider_height + self.chords_height + 10)
 
+        self.cursor_line_id: Optional[int] = None
+
         self._build_ui()
 
     def _build_ui(self):
@@ -98,7 +101,7 @@ class StepGrid(ctk.CTkFrame):
         self.grid_container = ctk.CTkFrame(self, fg_color="transparent")
         self.grid_container.pack(fill="both", expand=True, padx=10, pady=(8, 0))
 
-        # Left Fixed Canvas for Track Labels
+        # Left Fixed Canvas for Track Labels (no horizontal scroll)
         bg_col = theme.COLOR_SURFACE[1] if isinstance(theme.COLOR_SURFACE, tuple) else theme.COLOR_SURFACE
         self.label_canvas = tk.Canvas(
             self.grid_container,
@@ -130,6 +133,29 @@ class StepGrid(ctk.CTkFrame):
 
         self.step_canvas.bind("<Configure>", lambda e: self.redraw())
         self.step_canvas.bind("<Button-1>", self._on_step_canvas_click)
+
+        # Mouse wheel horizontal scroll bindings on step canvas
+        self.step_canvas.bind("<MouseWheel>", self._on_mousewheel)
+        self.step_canvas.bind("<Shift-MouseWheel>", self._on_mousewheel)
+        self.step_canvas.bind("<Button-4>", lambda e: self.step_canvas.xview_scroll(-2, "units"))
+        self.step_canvas.bind("<Button-5>", lambda e: self.step_canvas.xview_scroll(2, "units"))
+
+    def _on_mousewheel(self, event):
+        """Scrolls the step canvas horizontally with mouse wheel or trackpad."""
+        delta = 0
+        if hasattr(event, "delta") and event.delta != 0:
+            # macOS uses smaller deltas; Windows uses multiples of 120
+            delta = -1 if event.delta > 0 else 1
+            if abs(event.delta) >= 120:
+                delta = -int(event.delta / 40)
+        elif hasattr(event, "num"):
+            if event.num == 4:
+                delta = -2
+            elif event.num == 5:
+                delta = 2
+
+        if delta != 0:
+            self.step_canvas.xview_scroll(delta, "units")
 
     def _get_beats_per_bar(self) -> int:
         if "/" in self.time_signature:
@@ -184,6 +210,46 @@ class StepGrid(ctk.CTkFrame):
         if self.on_grid_change:
             self.on_grid_change(self.grid_data)
 
+    def update_playback_cursor(self, elapsed_seconds: float, bpm: int):
+        """Updates the vertical playhead line position based on elapsed time without calling redraw()."""
+        if elapsed_seconds < 0:
+            self.hide_playback_cursor()
+            return
+
+        beats_per_bar = self._get_beats_per_bar()
+        seconds_per_beat = 60.0 / bpm
+        seconds_per_step = (beats_per_bar * seconds_per_beat) / self.steps_per_bar
+        step_pos = elapsed_seconds / seconds_per_step
+
+        pixel_x = 4 + step_pos * self.step_width
+
+        total_grid_width = max(self.step_canvas.winfo_width(), int(self.total_steps * self.step_width + 20))
+
+        # Ensure cursor line exists on canvas
+        if self.cursor_line_id is None:
+            self.cursor_line_id = self.step_canvas.create_line(
+                pixel_x, 0, pixel_x, self.canvas_height,
+                fill="#38BDF8", width=2.5, stipple="gray50", tag="playhead"
+            )
+        else:
+            self.step_canvas.coords(self.cursor_line_id, pixel_x, 0, pixel_x, self.canvas_height)
+            self.step_canvas.tag_raise(self.cursor_line_id)
+
+        # Auto-scroll view if cursor moves past visible viewport
+        if self.step_canvas.winfo_width() > 0 and total_grid_width > 0:
+            xview_left, xview_right = self.step_canvas.xview()
+            visible_start_px = xview_left * total_grid_width
+            visible_end_px = xview_right * total_grid_width
+
+            if pixel_x > (visible_end_px - 40) and pixel_x < total_grid_width:
+                new_view_start = (pixel_x - 40) / float(total_grid_width)
+                self.step_canvas.xview_moveto(max(0.0, min(1.0, new_view_start)))
+
+    def hide_playback_cursor(self):
+        """Hides and resets the playhead line."""
+        if self.cursor_line_id is not None:
+            self.step_canvas.coords(self.cursor_line_id, -10, 0, -10, self.canvas_height)
+
     def redraw(self):
         """Redraws the fixed labels and multi-bar step matrix including chord lanes."""
         # 1. Redraw Left Labels Canvas
@@ -198,7 +264,7 @@ class StepGrid(ctk.CTkFrame):
             y1 = self.header_height + r_idx * self.row_height
             y2 = y1 + self.row_height - 5
             self.label_canvas.create_text(
-                8, (y1 + y2) / 2, text=inst_label, anchor="w", fill="#F1F5F9", font=("Helvetica", 11, "bold")
+                8, (y1 + y2) / 2, text=inst_label, anchor="w", fill="#F1F5F9", font=("Helvetica", 10, "bold")
             )
 
         # Section Divider
@@ -213,11 +279,12 @@ class StepGrid(ctk.CTkFrame):
             y1 = chord_start_y + l_idx * self.chord_row_height
             y2 = y1 + self.chord_row_height - 5
             self.label_canvas.create_text(
-                8, (y1 + y2) / 2, text=inst_label, anchor="w", fill="#F1F5F9", font=("Helvetica", 11, "bold")
+                8, (y1 + y2) / 2, text=inst_label, anchor="w", fill="#F1F5F9", font=("Helvetica", 10, "bold")
             )
 
         # 2. Redraw Right Scrollable Steps Canvas
         self.step_canvas.delete("all")
+        self.cursor_line_id = None
         self._cell_regions.clear()
         self._chord_block_regions.clear()
         self._chord_lane_regions.clear()
@@ -304,9 +371,8 @@ class StepGrid(ctk.CTkFrame):
         for c_idx, chord in enumerate(self.chords_data):
             lane_idx = 0 if chord.instrument == "piano" else 1
             y1 = chord_start_y + lane_idx * self.chord_row_height + 2
-            y2 = y1 + self.chord_row_height - 9
+            y2 = y1 + self.chord_row_height - 7
 
-            # Calculate horizontal start & end in canvas coordinates
             start_step = chord.start_beat * steps_per_beat
             end_step = (chord.start_beat + chord.duration_beats) * steps_per_beat
 
@@ -320,12 +386,11 @@ class StepGrid(ctk.CTkFrame):
             )
             outline_col = "#FFFFFF" if is_selected else "#CBD5E1"
 
-            rect_id = self.step_canvas.create_rectangle(
+            self.step_canvas.create_rectangle(
                 x1, y1, x2, y2, fill=fill_color, outline=outline_col, width=2 if is_selected else 1
             )
             self._chord_block_regions.append((c_idx, int(x1), int(y1), int(x2), int(y2)))
 
-            # Draw Chord Name inside block
             sym = CHORD_TYPES.get(chord.chord_type, CHORD_TYPES["major"]).symbol or chord.chord_type
             chord_name = f"{chord.root}{sym}"
             block_width = x2 - x1

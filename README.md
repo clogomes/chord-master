@@ -649,3 +649,15 @@ Implementação nativa de um sistema de i18n em duas vertentes:
   - Extensão da cauda acústica para **3.0 segundos**, garantindo o decaimento suave e natural do prato Crash sem qualquer corte mesmo no último passo da composição.
   - Espacialização estéreo alargada (Crash levemente à esquerda, Tom Agudo à esquerda, Tom Grave à direita, Cowbell à direita, Toms Médios ao centro).
 - **Suite de Testes Unitários (`tests/test_composition_renderer.py`)**: Validação da síntese individual de todos os instrumentos novos e teste de decaimento do Crash no último passo sem truncagem. Total de **245/245 testes a passar**.
+
+### Fase 47 — Estúdio de Composição: Cursor de Reprodução (Playhead) & Scroll Horizontal do Rato
+- **Cursor de Reprodução Baseado no Relógio (`update_playback_cursor`)**:
+  - Implementação de um ciclo de animação a ~30 fps (`self.after(33, ...)`) sincronizado via `time.perf_counter()` com o playback de áudio.
+  - Linha vertical semi-transparente (`stipple="gray50"`, cor `#38BDF8`) atravessando toda a altura do sequenciador (percussão e carris harmónicos).
+  - Atualização por coordenadas diretas `canvas.coords()` sem recriação de objetos ou custo de `redraw()`.
+  - **Acompanhamento Automático do Viewport**: A visão faz scroll horizontal automático (`xview_moveto`) para acompanhar o cursor quando este avança além do ecrã visível.
+  - Limpeza segura de temporizadores e reset do cursor ao parar, terminar a reprodução ou sair do ecrã (`destroy`).
+- **Scroll Horizontal com Roda do Rato / Trackpad (`gui/components/step_grid.py`)**:
+  - Eventos de roda do rato (`<MouseWheel>`, `<Shift-MouseWheel>`, `<Button-4>` e `<Button-5>`) vinculados ao `step_canvas` com tratamento adaptativo para macOS, Windows e Linux.
+  - O painel de rótulos (`label_canvas`) permanece perfeitamente fixo.
+- **Suite de Testes Unitários (`tests/test_compose_studio_ui.py`)**: Validação da inicialização/ocultação do cursor e dos eventos de scroll horizontal do rato. Total de **245/245 testes a passar**.

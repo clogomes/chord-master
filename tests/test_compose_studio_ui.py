@@ -97,6 +97,17 @@ class TestComposeStudioUI(unittest.TestCase):
         self.assertEqual(screen.composition.bars, 8)
         self.assertEqual(len(screen.composition.rhythm.grid), 8 * 16)
 
+        # Test Playhead Cursor
+        screen.step_grid.update_playback_cursor(0.5, bpm=120)
+        self.assertIsNotNone(screen.step_grid.cursor_line_id)
+        screen.step_grid.hide_playback_cursor()
+
+        # Test Mousewheel Scroll
+        class FakeEvent:
+            def __init__(self, delta):
+                self.delta = delta
+        screen.step_grid._on_mousewheel(FakeEvent(-120))
+
         screen.destroy()
 
 

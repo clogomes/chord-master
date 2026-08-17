@@ -65,6 +65,9 @@ class ComposeStudioScreen(ctk.CTkFrame):
         self.is_playing = False
         self._current_sound = None
         self._render_thread: Optional[threading.Thread] = None
+        self._playback_start_time: Optional[float] = None
+        self._total_playback_sec: float = 0.0
+        self._cursor_timer_id: Optional[str] = None
 
         self._build_ui()
 
@@ -792,11 +795,27 @@ class ComposeStudioScreen(ctk.CTkFrame):
             self._current_sound.play()
             self.play_btn.configure(text="⏹ Parar Reprodução", fg_color=theme.COLOR_ACCENT_CRIMSON)
 
+            # Start clock-based playhead cursor tracking loop (~30 fps / 33ms)
+            self._playback_start_time = time.perf_counter()
+            self._total_playback_sec = len(buffer_float32) / 44100.0
+            self._schedule_cursor_tick()
+
             # Auto-reset button after audio finish
-            duration_ms = int(len(buffer_float32) / 44100.0 * 1000.0)
+            duration_ms = int(self._total_playback_sec * 1000.0)
             self.after(duration_ms, self._on_playback_finished)
         except Exception as e:
             self._handle_playback_error(e)
+
+    def _schedule_cursor_tick(self):
+        if not self.is_playing or self._playback_start_time is None:
+            return
+
+        elapsed = time.perf_counter() - self._playback_start_time
+        if elapsed <= self._total_playback_sec:
+            self.step_grid.update_playback_cursor(elapsed, self.composition.bpm)
+            self._cursor_timer_id = self.after(33, self._schedule_cursor_tick)
+        else:
+            self.step_grid.hide_playback_cursor()
 
     def _handle_playback_error(self, error: Exception):
         self._stop_playback()
@@ -808,6 +827,17 @@ class ComposeStudioScreen(ctk.CTkFrame):
 
     def _stop_playback(self):
         self.is_playing = False
+        self._playback_start_time = None
+        if self._cursor_timer_id is not None:
+            try:
+                self.after_cancel(self._cursor_timer_id)
+            except Exception:
+                pass
+            self._cursor_timer_id = None
+
+        if hasattr(self, "step_grid"):
+            self.step_grid.hide_playback_cursor()
+
         if self._current_sound:
             try:
                 self._current_sound.stop()
@@ -819,3 +849,7 @@ class ComposeStudioScreen(ctk.CTkFrame):
     def _on_back_clicked(self):
         self._stop_playback()
         self.on_back()
+
+    def destroy(self):
+        self._stop_playback()
+        super().destroy()
