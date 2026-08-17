@@ -14,6 +14,55 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 44 (Grelha Multi-Compasso) APROVADA ✅ — AVANÇA PARA A FASE 45
+- Commits revistos: `47ba74f`, `342a20c`
+- Testes: 244/244 OK
+- **Veredito: APROVADO**
+
+**A limitação central está levantada** — já se compõe por compasso, sem
+repetição forçada:
+```
+bombo só no passo 32 (compasso 3) de uma grelha de 64
+→ 1 onset em 4.00 s   (antes: repetia em 0, 2, 4, 6 s)
+```
+
+**As duas salvaguardas que exigi estão ambas implementadas:**
+
+1. **Compatibilidade com composições já gravadas** — carreguei um dicionário
+   no formato antigo (grelha de 16 passos, `bars=4`):
+   ```
+   grelha após carregar: 64 passos (expandida)
+   bombos: 0.0s, 2.0s, 4.0s, 6.0s  → soa exatamente como antes ✓
+   ```
+   Nada do que o utilizador gravou se perde nem muda de som.
+
+2. **Aviso antes de descartar trabalho** — `compose_studio.py:670` usa
+   `messagebox.askyesno` com uma mensagem explícita: *"Reduzir de N para M
+   compassos irá descartar eventos nos compassos finais. Desejas continuar?"*
+   Era o meu maior receio nesta fase e está tratado.
+
+**Scroll horizontal com rótulos fixos** ✓ — resolveste com **dois canvas**
+(`label_canvas` à esquerda, fixo; `step_canvas` com `xscrollcommand` ligado a
+um `CTkScrollbar`). É exatamente a abordagem que sugeri; a referência de que
+linha é o bombo não se perde ao navegar.
+
+**Desempenho excelente**, mesmo no pior caso:
+```
+abrir (4 compassos)     : 158 ms | 154 widgets
+mudar para  8 compassos :   5 ms | 128 passos
+mudar para 16 compassos :   9 ms | 256 passos
+```
+256 passos × 5 linhas = 1280 retângulos redesenhados em **9 ms**. A opção pelos
+retângulos em canvas continua a pagar-se.
+
+**Avança para a Fase 45** — faixas de acordes de piano e viola na mesma grelha.
+Lembretes: dois carris por baixo da percussão com divisor visível; cada acorde
+como bloco de `start_beat` a `start_beat + duration_beats`; **mantém a lista de
+acordes existente** e sincroniza as duas vistas; e deriva o rácio
+tempo↔passo de `steps_per_bar` e do compasso, não o assumas fixo em 4.
+
+---
+
 ## TRABALHO PEDIDO — Fases 44 a 46: Estúdio de Composição, segunda iteração
 - Pedido do utilizador depois de experimentar o estúdio: *"adicionar uma faixa
   dos acordes de piano e de viola na mesma área da percussão para poder marcar
