@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 44 — Estúdio de Composição: Grelha Multi-Compasso com Scroll Horizontal — CONCLUÍDA
+- Data: 2026-08-17T18:33:31+01:00
+- Commit: 47ba74f
+- Resumo: Implementada a Fase 44 com suporte a grelha de ritmo multi-compasso cobrindo a composição completa (`bars × steps_per_bar` passos, ex: 128 passos para 8 compassos). O componente `StepGrid` foi reestruturado com dois canvas coordenados (coluna esquerda fixa para os rótulos de instrumentos e canvas direito rolável) ligados a um `CTkScrollbar` horizontal com divisores verticais de compasso e numeração. `Composition.from_dict` e `RhythmTrack.from_pattern` expandem composições legadas de 16 passos via `% len(grid)` mantendo a sonoridade idêntica. Implementada gestão defensiva em `_on_bars_changed` com diálogo de confirmação se houver redução de compassos. 244/244 testes a passar.
+- Ficheiros principais alterados: gui/components/step_grid.py, gui/screens/compose_studio.py, core/composition.py, core/compositions.py, tests/test_compose_studio_ui.py, tests/test_composition_models.py, README.md
+
 ## Fase 43 — Estúdio de Composição: Faixa de Acordes & Visualização nos Instrumentos — CONCLUÍDA
 - Data: 2026-08-17T18:01:59+01:00
 - Commit: aa22edb
