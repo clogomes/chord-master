@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 46 — Estúdio de Composição: Expansão do Kit de Percussão — CONCLUÍDA
+- Data: 2026-08-17T18:43:56+01:00
+- Commit: b222f7e
+- Resumo: Concluída a Fase 46 com a expansão completa do motor de percussão sintética (`audio/backing_tracks.py`). Implementados 7 novos sintetizadores físicos/espectrais: `synthesize_tom` (pitch low, mid, high), `synthesize_clap` (3 micro-rajadas + reverb), `synthesize_crash` (5 parciais metálicos densos + decaimento de 2.5s), `synthesize_rimshot` e `synthesize_cowbell` (estilo 808). Expandida a lista `DRUM_ROWS` em `gui/components/step_grid.py` para 12 linhas com identificação visual. Integrados todos os novos instrumentos na cache `_SAMPLE_CACHE` e estendida a cauda acústica do renderizador `audio/composition_renderer.py` para 3.0s, garantindo decaimento contínuo sem corte do prato Crash no último passo. 245/245 testes a passar.
+- Ficheiros principais alterados: audio/backing_tracks.py, audio/composition_renderer.py, gui/components/step_grid.py, tests/test_composition_renderer.py, README.md
+
 ## Fase 45 — Estúdio de Composição: Faixa de Acordes na Mesma Grelha Temporal — CONCLUÍDA
 - Data: 2026-08-17T18:37:42+01:00
 - Commit: 1c9e6c0
