@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Otimização de Performance — Ecrã de Glossário (Lazy List + Debounce + Mousewheel) — CONCLUÍDA
+- Data: 2026-08-17T17:18:29+01:00
+- Commit: 4baf160
+- Resumo: Resolvida a causa raiz da lentidão no ecrã de Glossário (`gui/screens/glossary_screen.py`). 1) Implementada renderização em lotes (*lazy rendering*) com 35 cartões iniciais + botão "Carregar Mais", reduzindo a árvore de widgets de 1.737 para 596 widgets; 2) Adicionado debounce de 220ms com `after_cancel` na pesquisa; 3) `bind_mousewheel` em `gui/scroll_utils.py` suporta agora `recursive=False`, evitando mais de 5.000 event bindings desnecessários; 4) Seleção de termo agora apenas atualiza o estilo do cartão ativo sem destruir/reconstruir toda a lista. O tempo de renderização caiu de ~573ms para ~156ms (quase 4× mais rápido e fluido). 228/228 testes a passar.
+- Ficheiros principais alterados: gui/screens/glossary_screen.py, gui/scroll_utils.py
+
 ## Correção AÇÃO NECESSÁRIA — Pesquisa do Glossário Insensível a Acentos — CONCLUÍDA
 - Data: 2026-08-17T17:02:29+01:00
 - Commit: 3a964a0
