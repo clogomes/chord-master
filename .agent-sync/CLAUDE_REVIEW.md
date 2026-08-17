@@ -14,6 +14,54 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 47 (Cursor + Scroll) APROVADA ✅ — AVANÇA PARA A FASE 48 (última)
+- Commits revistos: `0c79905`, `da1da87`
+- Testes: 245/245 OK
+- **Veredito: APROVADO**
+
+**O cursor está matematicamente exato.** Medi a posição em píxeis ao longo do
+tempo (100 BPM, 4 compassos = 9,6 s):
+```
+t=0.0s → x=   4.0    (origem)
+t=1.2s → x= 196.0
+t=2.4s → x= 388.0    = 4 + (16 passos × 24 px) → fim exato do compasso 1 ✓
+t=4.8s → x= 772.0
+t=9.6s → x=1540.0    = 4 + (64 passos × 24 px) → fim exato da composição ✓
+linearidade: rácio d(9,6s)/d(2,4s) = 4.00 (esperado 4.00)
+```
+Não desliza nem acumula erro.
+
+**Os quatro cuidados que pedi estão todos implementados:**
+- **Move com `coords()`**, sem `redraw()` (linha 235) — e o custo prova-o:
+  **100 atualizações em 0,8 ms**, ou seja **0,01 ms por frame**. A 30 fps é
+  literalmente irrelevante.
+- **Efeito translúcido** com `stipple="gray50"` sobre `#38BDF8`, o mesmo truque
+  do `staff_canvas`. O Tk não suporta alpha real, e esta é a solução correta.
+- **Scroll automático** para acompanhar o cursor (`xview_moveto`, linha 246).
+- **Temporizador cancelado** (`after_cancel`, `compose_studio.py:833`) e
+  `destroy()` presente.
+- **Esconder repõe fora do ecrã** (x=-10), não deixa a linha presa no fim.
+
+**Scroll do rato** ligado ao `step_canvas` com os três casos tratados
+(`<MouseWheel>`, `<Shift-MouseWheel>`, `<Button-4>/<Button-5>` para Linux). E
+o **`label_canvas` não tem qualquer binding de scroll** — fica fixo, como
+exigi, para não se perder a referência de que linha é o bombo.
+
+**Desempenho estável**: 193 ms a abrir (era 169 ms), mesmos 154 widgets.
+
+*Nota de método minha*: dois dos meus testes falharam por eu ter adivinhado os
+nomes (`update_cursor`/`reset_cursor` em vez de
+`update_playback_cursor`/`hide_playback_cursor`) e por não ter reparado que a
+assinatura pede o `bpm`. Erros meus, corrigidos antes de tirar conclusões.
+
+**Avança para a Fase 48** — a última: arrastar blocos de acorde. Lembretes:
+largar noutro carril tem de **mudar o `instrument` no modelo**, não só a
+posição visual; alinha `start_beat` ao passo derivado de `_get_steps_per_beat()`;
+sincroniza a lista de acordes depois de mover; e distingue clique de arrasto
+por um limiar, para não perder a seleção que já funciona.
+
+---
+
 ## TRABALHO PEDIDO — Fases 47 e 48: Cursor de reprodução, scroll do rato e arrastar blocos
 - Pedido do utilizador depois de experimentar: *"uma linha translúcida a correr
   a zona temporal enquanto toca; scroll do rato nessa zona; poder pegar nos
