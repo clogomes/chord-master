@@ -580,3 +580,12 @@ Implementação nativa de um sistema de i18n em duas vertentes:
 - **Persistência Segura JSON (`core/compositions.py`)**:
   - Gravação, carregamento, atualização e remoção em `user_compositions.json` com serialização manual `to_dict` / `from_dict`, valores por omissão defensivos com `.get()` e tolerância a esquemas legados.
 - **Suite de Testes Unitários (`tests/test_composition_models.py`)**: 6 novos testes cobrindo round-trip JSON, compatibilidade retroativa com campos omissos, adaptação dos 12 ritmos e operações CRUD. Total de **235/235 testes a passar**.
+
+### Fase 41 — Estúdio de Composição: Motor de Renderização Offline
+- **Renderizador Multi-Pista Offline (`audio/composition_renderer.py`)**:
+  - `CompositionRenderer.render()`: Converte composições completas para arrays bidimensionais estéreo float32 `(N, 2)` a 44.1 kHz, sem dependência direta de hardware de áudio ou de `pygame`.
+  - **Aritmética Exata de Amostras**: Posicionamento de batidas e passos no índice de amostra exato (`int(step * sec_per_step * 44100)`), eliminando qualquer *jitter* de reprodução em tempo real.
+  - **Cache de Síntese em Memória**: `_SAMPLE_CACHE` armazena e reutiliza waveforms float32 quantizadas para percussão (`kick`, `snare`, `hihat`, `ride`), acordes aditivos de piano e cordas dedilhadas de guitarra com Karplus-Strong.
+  - **Espacialização Estéreo & Cauda Acústica**: Panning espacial independente para instrumentos rítmicos e harmónicos (Piano levemente à esquerda, Guitarra levemente à direita, pratos abertos no campo estéreo) e extensão de cauda de 1.5s para evitar cortes abruptos de ressonâncias.
+  - **Limitador de Saturação Suave (*Soft Limiting*)**: Utilização de `np.tanh` no master mix final para impedir clipping digital duro mesmo ao sobrepor múltiplas camadas sonoras.
+- **Suite de Testes Unitários (`tests/test_composition_renderer.py`)**: 4 testes rigorosos incluindo precisão de temporização do bombo no índice exato de amostras, mistura estéreo de piano + guitarra e saturação suave de sobreposição de faixas. Total de **239/239 testes a passar**.

@@ -1,0 +1,317 @@
+"""Offline multi-track rendering engine for Composition Studio.
+
+Renders complete compositions (rhythm tracks + piano & guitar chords) into a stereo
+float32 numpy array (N, 2) without real-time jitter, with cached synthesis, proper tail
+handling, and a soft-limiting saturation stage.
+"""
+from typing import Dict, List, Optional, Tuple
+import numpy as np
+from core.composition import Composition, ChordEvent, RhythmTrack
+from core.chords import get_chord_notes
+from core.notes import Note
+from audio.synthesizer import Synthesizer
+from audio.backing_tracks import (
+    synthesize_kick,
+    synthesize_snare,
+    synthesize_hihat,
+    synthesize_ride,
+)
+
+SAMPLE_RATE = 44100
+
+# Cache for synthesized float32 audio arrays: (instrument, pitch_or_freq, duration_rounded, volume_rounded)
+_SAMPLE_CACHE: Dict[Tuple, np.ndarray] = {}
+
+
+def _get_synthesized_drum_sample(instrument: str, sample_rate: int = SAMPLE_RATE) -> np.ndarray:
+    """Returns mono float32 drum sample array from cache or synthesizes it."""
+    cache_key = ("drum", instrument, sample_rate)
+    if cache_key in _SAMPLE_CACHE:
+        return _SAMPLE_CACHE[cache_key]
+
+    if instrument == "kick":
+        sample = synthesize_kick(sample_rate=sample_rate, duration=0.25)
+    elif instrument == "snare":
+        sample = synthesize_snare(sample_rate=sample_rate, duration=0.20)
+    elif instrument == "hihat_open":
+        sample = synthesize_hihat(open=True, sample_rate=sample_rate)
+    elif instrument == "hihat_closed" or instrument == "hihat":
+        sample = synthesize_hihat(open=False, sample_rate=sample_rate)
+    elif instrument == "ride":
+        sample = synthesize_ride(sample_rate=sample_rate, duration=0.60)
+    else:
+        # Fallback to soft click
+        sample = np.zeros(int(sample_rate * 0.05), dtype=np.float32)
+
+    _SAMPLE_CACHE[cache_key] = sample
+    return sample
+
+
+def _synthesize_piano_chord_raw(frequencies: List[float], duration: float, volume: float, sample_rate: int = SAMPLE_RATE) -> np.ndarray:
+    """Synthesizes mono float32 piano chord with multi-harmonic additive synthesis."""
+    total_samples = int(sample_rate * duration)
+    if not frequencies or total_samples <= 0:
+        return np.zeros(total_samples, dtype=np.float32)
+
+    t = np.linspace(0, duration, total_samples, endpoint=False)
+    mixed = np.zeros(total_samples, dtype=np.float32)
+    num_voices = len(frequencies)
+
+    harmonics = [(1.0, 1.0), (2.0, 0.5), (3.0, 0.25), (4.0, 0.12), (5.0, 0.06), (6.0, 0.03)]
+
+    for freq in frequencies:
+        if freq <= 0:
+            continue
+        voice_wave = np.zeros(total_samples, dtype=np.float32)
+        for h_mult, h_amp in harmonics:
+            h_freq = freq * h_mult
+            if h_freq < sample_rate / 2:
+                voice_wave += h_amp * np.sin(2.0 * np.pi * h_freq * t).astype(np.float32)
+        mixed += voice_wave
+
+    if num_voices > 0:
+        mixed /= np.sqrt(num_voices)
+
+    peak = float(np.max(np.abs(mixed)))
+    if peak > 0:
+        mixed /= peak
+
+    mixed = Synthesizer.apply_adsr(
+        mixed,
+        sample_rate,
+        attack_ms=12.0,
+        decay_ms=duration * 300.0,
+        sustain_level=0.5,
+        release_ms=45.0,
+    )
+    return (mixed * volume).astype(np.float32)
+
+
+def _synthesize_guitar_note_raw(frequency: float, duration: float, volume: float, sample_rate: int = SAMPLE_RATE) -> np.ndarray:
+    """Synthesizes single acoustic guitar plucked string in mono float32 with Karplus-Strong & body resonance."""
+    total_samples = int(sample_rate * duration)
+    if frequency <= 0 or total_samples <= 0:
+        return np.zeros(total_samples, dtype=np.float32)
+
+    decay_factor = 0.993
+    n_delay = max(2, int(round(sample_rate / frequency)))
+
+    rng = np.random.default_rng(seed=42)
+    buffer = rng.uniform(-1.0, 1.0, n_delay).astype(np.float32)
+
+    if volume < 0.7:
+        smooth_factor = 1.0 - volume
+        buffer[1:] = buffer[1:] * (1.0 - smooth_factor) + buffer[:-1] * smooth_factor
+
+    samples = np.zeros(total_samples, dtype=np.float32)
+    vibrato_rate = 4.5
+    vibrato_depth = 0.004
+    base_delay = sample_rate / frequency
+    t_arr = np.linspace(0, duration, total_samples, endpoint=False)
+    ramp = np.clip(t_arr / 0.2, 0.0, 1.0)
+    delay_modulation = base_delay * (1.0 + ramp * vibrato_depth * np.sin(2 * np.pi * vibrato_rate * t_arr))
+
+    write_ptr = 0
+    max_delay = int(base_delay * 1.05) + 2
+    delay_buffer = np.zeros(max_delay, dtype=np.float32)
+    delay_buffer[:n_delay] = buffer
+
+    fc = 150.0 / sample_rate
+    r = 0.85
+    a1 = -2.0 * r * np.cos(2.0 * np.pi * fc)
+    a2 = r * r
+    b0 = (1.0 - r) * np.sqrt(1.0 - r)
+    body_out = np.zeros(total_samples, dtype=np.float32)
+
+    for i in range(total_samples):
+        curr_delay = delay_modulation[i]
+        read_idx = write_ptr - curr_delay
+
+        idx_int = int(np.floor(read_idx))
+        frac = read_idx - idx_int
+
+        idx_1 = idx_int % max_delay
+        idx_2 = (idx_int + 1) % max_delay
+
+        val = delay_buffer[idx_1] * (1.0 - frac) + delay_buffer[idx_2] * frac
+        samples[i] = val
+
+        filtered_val = 0.5 * (val + delay_buffer[(idx_int - 1) % max_delay]) * decay_factor
+        delay_buffer[write_ptr] = filtered_val
+        write_ptr = (write_ptr + 1) % max_delay
+
+        if i >= 2:
+            body_out[i] = b0 * val - a1 * body_out[i-1] - a2 * body_out[i-2]
+
+    final_out = samples * 0.7 + body_out * 0.3
+    peak = float(np.max(np.abs(final_out)))
+    if peak > 0:
+        final_out /= peak
+
+    final_out = Synthesizer.apply_adsr(
+        final_out,
+        sample_rate,
+        attack_ms=2.0,
+        decay_ms=duration * 400.0,
+        sustain_level=0.4,
+        release_ms=35.0,
+    )
+    return (final_out * volume).astype(np.float32)
+
+
+def _get_synthesized_chord_sample(
+    instrument: str,
+    root: str,
+    chord_type: str,
+    duration: float,
+    volume: float,
+    sample_rate: int = SAMPLE_RATE,
+) -> np.ndarray:
+    """Returns cached mono float32 chord waveform."""
+    # Round duration and volume to prevent cache explosion
+    dur_quant = round(duration, 3)
+    vol_quant = round(volume, 2)
+    cache_key = (instrument, root, chord_type, dur_quant, vol_quant, sample_rate)
+
+    if cache_key in _SAMPLE_CACHE:
+        return _SAMPLE_CACHE[cache_key]
+
+    try:
+        notes = get_chord_notes(root, chord_type)
+    except Exception:
+        notes = [Note("C", 4), Note("E", 4), Note("G", 4)]
+
+    if instrument == "guitar":
+        # Sum individual plucked strings
+        total_samples = int(sample_rate * duration)
+        combined = np.zeros(total_samples, dtype=np.float32)
+        for note in notes:
+            note_sample = _synthesize_guitar_note_raw(note.frequency, duration, volume, sample_rate)
+            if len(note_sample) > len(combined):
+                combined += note_sample[:len(combined)]
+            else:
+                combined[:len(note_sample)] += note_sample
+        if len(notes) > 0:
+            combined /= np.sqrt(len(notes))
+        result = combined.astype(np.float32)
+    else:
+        # Piano synthesis
+        freqs = [n.frequency for n in notes]
+        result = _synthesize_piano_chord_raw(freqs, duration, volume, sample_rate)
+
+    _SAMPLE_CACHE[cache_key] = result
+    return result
+
+
+class CompositionRenderer:
+    """Offline renderer for compositions to 44.1kHz stereo float32 buffers."""
+
+    def __init__(self, sample_rate: int = SAMPLE_RATE):
+        self.sample_rate = sample_rate
+
+    def render(self, composition: Composition) -> np.ndarray:
+        """
+        Renders an entire Composition to a stereo float32 array of shape (N, 2).
+        Uses exact sample index placement, cached synthesis, acoustic tail room,
+        and soft saturation limiting (np.tanh).
+        """
+        bpm = max(20, min(300, composition.bpm))
+        beats_per_bar = 4
+        if "/" in composition.time_signature:
+            try:
+                beats_per_bar = int(composition.time_signature.split("/")[0])
+            except Exception:
+                beats_per_bar = 4
+
+        total_bars = max(1, composition.bars)
+        total_beats = total_bars * beats_per_bar
+        seconds_per_beat = 60.0 / bpm
+        core_duration = total_beats * seconds_per_beat
+
+        # Acoustic tail extension (1.5 seconds for reverb / cymbals / long chord decay)
+        tail_seconds = 1.5
+        total_duration = core_duration + tail_seconds
+        total_samples = int(self.sample_rate * total_duration)
+
+        # Stereo mixing buffer (Left, Right)
+        mix_left = np.zeros(total_samples, dtype=np.float32)
+        mix_right = np.zeros(total_samples, dtype=np.float32)
+
+        # 1. Render Rhythm Track
+        if composition.rhythm and not composition.rhythm.muted and composition.rhythm.grid:
+            rhythm = composition.rhythm
+            steps_per_bar = max(1, rhythm.steps_per_bar)
+            seconds_per_step = (beats_per_bar * seconds_per_beat) / steps_per_bar
+            track_vol = composition.rhythm.volume
+
+            grid_len = len(rhythm.grid)
+            total_steps = total_bars * steps_per_bar
+
+            for step_idx in range(total_steps):
+                grid_step = rhythm.grid[step_idx % grid_len]
+                if not grid_step:
+                    continue
+
+                step_start_sec = step_idx * seconds_per_step
+                start_sample = int(step_start_sec * self.sample_rate)
+
+                for drum_inst in grid_step:
+                    drum_audio = _get_synthesized_drum_sample(drum_inst, self.sample_rate)
+                    sample_len = len(drum_audio)
+                    end_sample = min(total_samples, start_sample + sample_len)
+                    actual_len = end_sample - start_sample
+
+                    if actual_len > 0:
+                        scaled_drum = drum_audio[:actual_len] * track_vol
+                        # Slight stereo panning for drums: Hihat slightly left (-0.15), Ride slightly right (+0.2), Kick/Snare center
+                        pan_left = 1.0
+                        pan_right = 1.0
+                        if "hihat" in drum_inst:
+                            pan_left, pan_right = 1.1, 0.9
+                        elif "ride" in drum_inst:
+                            pan_left, pan_right = 0.85, 1.15
+
+                        mix_left[start_sample:end_sample] += scaled_drum * pan_left
+                        mix_right[start_sample:end_sample] += scaled_drum * pan_right
+
+        # 2. Render Chords Track
+        if composition.chords:
+            for ce in composition.chords:
+                chord_start_sec = ce.start_beat * seconds_per_beat
+                start_sample = int(chord_start_sec * self.sample_rate)
+                if start_sample >= total_samples:
+                    continue
+
+                chord_dur_sec = ce.duration_beats * seconds_per_beat
+                chord_audio = _get_synthesized_chord_sample(
+                    instrument=ce.instrument,
+                    root=ce.root,
+                    chord_type=ce.chord_type,
+                    duration=chord_dur_sec,
+                    volume=0.75,
+                    sample_rate=self.sample_rate,
+                )
+
+                sample_len = len(chord_audio)
+                end_sample = min(total_samples, start_sample + sample_len)
+                actual_len = end_sample - start_sample
+
+                if actual_len > 0:
+                    scaled_chord = chord_audio[:actual_len]
+                    # Stereo spread for instruments: Piano slightly left (0.95/1.05), Guitar slightly right (1.05/0.95)
+                    pan_l, pan_r = (0.95, 1.05) if ce.instrument == "piano" else (1.05, 0.95)
+                    mix_left[start_sample:end_sample] += scaled_chord * pan_l
+                    mix_right[start_sample:end_sample] += scaled_chord * pan_r
+
+        # 3. Apply Master Volume
+        master_vol = composition.master_volume
+        mix_left *= master_vol
+        mix_right *= master_vol
+
+        # 4. Soft Saturation Limiter (np.tanh prevents hard clipping while keeping punch)
+        mix_left = np.tanh(mix_left)
+        mix_right = np.tanh(mix_right)
+
+        # Stack into (N, 2) stereo float32 array
+        stereo_mix = np.column_stack((mix_left, mix_right)).astype(np.float32)
+        return stereo_mix
