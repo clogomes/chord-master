@@ -14,6 +14,70 @@ Cada entrada tem um veredito:
 
 ---
 
+## Nomes indefinidos CORRIGIDOS ✅ / AÇÃO NECESSÁRIA — treino auditivo rebenta a registar a resposta
+- Commits revistos: `253ae5f`, `b087921`
+- Testes: 246/246 OK
+
+### ✅ Os 5 nomes indefinidos estão corrigidos
+Corri o `pyflakes` eu próprio: **zero** ocorrências de *undefined name* em todo
+o projeto.
+
+**E desta vez validei da forma certa** — o meu erro anterior foi chamar a
+função e ver que não levantava exceção, quando o problema estava dentro do
+`after()`. Agora instalei um `report_callback_exception` no Tk, **deixei os
+temporizadores dispararem** e contei as exceções:
+```
+áudio do glossário : 0 erros nos temporizadores  ✓
+ouvir composição   : 0 erros                     ✓  cursor a mover-se (x=396)
+```
+Ambos funcionam agora de verdade.
+
+**O teste novo apanha mesmo o bug.** Não me limitei a ver que passa —
+removi temporariamente o `import time` e confirmei que **falha**:
+```
+FAILED (failures=1)
+  compose_studio.py:825: undefined name 'time'
+```
+Restaurei o ficheiro logo a seguir (`pyflakes` a zero outra vez). É um teste
+com valor real, não mais um que acompanha o código.
+
+### ❌ AÇÃO NECESSÁRIA — bug diferente, no treino auditivo
+Ao testar o caminho de resposta (que era um dos afetados pelo `import re`),
+apanhei outro problema — **não é da classe dos nomes indefinidos**:
+```
+responder a perguntas de treino auditivo: 2 erros em 4 tentativas
+AttributeError: 'ReviewItem' object has no attribute 'current_streak'
+```
+**Causa**: `practice_ear.py:629` faz
+```python
+stats = self.user_manager.record_atomic_review(...)
+```
+mas `record_atomic_review` **devolve um `ReviewItem`** (`user_manager.py:384`),
+não um `CategoryStats`. O ecrã usa depois `stats.current_streak`, que só existe
+no `CategoryStats`. Repara que o próprio método já chama `record_attempt`
+internamente (linhas 375-383) — é essa chamada que produz as estatísticas de
+categoria, e o seu resultado está a ser deitado fora.
+
+É intermitente (2 em 4) porque só afeta os tipos de pergunta que seguem este
+caminho.
+
+**Corrigir**: ou `record_atomic_review` passa a devolver o `CategoryStats` do
+`record_attempt` interno (mais simples, e é o que o chamador espera), ou
+devolve ambos (`Tuple[ReviewItem, CategoryStats]`) e o ecrã usa o segundo.
+Escolhe uma e verifica **todos** os chamadores de `record_atomic_review`
+(`practice_ear.py`, `practice_staff.py`, `theory_quiz_widget.py`), não só este.
+
+**Teste obrigatório**: responder a uma pergunta de cada tipo em cada um dos 3
+ecrãs que chamam `record_atomic_review`, e afirmar que não há exceção **e** que
+o `ScoreCard` recebe estatísticas válidas.
+
+**Nota**: este bug existe desde a Fase 37 e passou-me despercebido porque
+validei o `record_atomic_review` isoladamente (SM-2, filas, persistência) sem
+exercitar o caminho completo de resposta na interface. Mais uma vez, o padrão
+é o mesmo — testar a peça, não o percurso do utilizador.
+
+---
+
 ## AÇÃO NECESSÁRIA (CRÍTICA) — 5 nomes indefinidos em 3 ecrãs; o `pyflakes` apanha-os todos em 1 segundo
 - Reportado pelo utilizador: *"carrego em ouvir composição e não aparece nada.
   No stdio aparece: Playback error: name 'time' is not defined."*
