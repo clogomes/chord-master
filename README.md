@@ -634,3 +634,18 @@ Implementação nativa de um sistema de i18n em duas vertentes:
     - Clicar numa área vazia de um carril harmónico insere imediatamente um novo acorde nesse tempo (quantizado a 0.5 tempos), com a tónica e tipo atualmente selecionados nos controlos.
   - **Sincronização Bidirecional**: A lista de cartões de acordes e a linha temporal gráfica mantêm-se 100% sincronizadas em todas as operações de criação, seleção e eliminação.
 - **Suite de Testes Unitários (`tests/test_compose_studio_chords.py`)**: Testes de sincronização gráfica de blocos de acordes na grelha temporal, inserção por clique no carril e ordenação cronológica. Total de **244/244 testes a passar**.
+
+### Fase 46 — Estúdio de Composição: Expansão do Kit de Percussão (Toms, Clap, Crash, Rim Shot & Cowbell)
+- **7 Novos Sintetizadores de Percussão em Síntese Física e Espectral (`audio/backing_tracks.py`)**:
+  - `synthesize_tom(pitch="low"|"mid"|"high")`: Toms acústicos com varredura exponencial descendente de frequência, ressonância harmónica da membrana e clique de ataque.
+  - `synthesize_clap`: Palmas com grupo de 3 micro-rajadas transientes desfasadas (~11ms) e cauda difusa de reverberação.
+  - `synthesize_crash`: Prato de ataque explosivo com espectro denso inarmónico de 5 parciais metálicos e ressonância natural estendida (2.5s).
+  - `synthesize_rimshot`: Golpe de aro de tarola de clique agudo e ressonância de madeira a 2100 Hz.
+  - `synthesize_cowbell`: Campânula metálica clássica (estilo 808) com ondas quadradas/senoidais desafinadas (587 Hz e 845 Hz).
+- **Expansão da Grelha do Sequenciador (`gui/components/step_grid.py`)**:
+  - A matriz de percussão expande-se para **12 linhas** com ícones, nomes bilingues e esquemas de cor temáticos distintos.
+- **Renderizador Offline & Espacialização Estéreo (`audio/composition_renderer.py`)**:
+  - Integração dos 7 novos instrumentos na cache de waveforms `_SAMPLE_CACHE`.
+  - Extensão da cauda acústica para **3.0 segundos**, garantindo o decaimento suave e natural do prato Crash sem qualquer corte mesmo no último passo da composição.
+  - Espacialização estéreo alargada (Crash levemente à esquerda, Tom Agudo à esquerda, Tom Grave à direita, Cowbell à direita, Toms Médios ao centro).
+- **Suite de Testes Unitários (`tests/test_composition_renderer.py`)**: Validação da síntese individual de todos os instrumentos novos e teste de decaimento do Crash no último passo sem truncagem. Total de **245/245 testes a passar**.

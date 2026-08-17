@@ -15,6 +15,11 @@ from audio.backing_tracks import (
     synthesize_snare,
     synthesize_hihat,
     synthesize_ride,
+    synthesize_tom,
+    synthesize_clap,
+    synthesize_crash,
+    synthesize_rimshot,
+    synthesize_cowbell,
 )
 
 SAMPLE_RATE = 44100
@@ -39,6 +44,20 @@ def _get_synthesized_drum_sample(instrument: str, sample_rate: int = SAMPLE_RATE
         sample = synthesize_hihat(open=False, sample_rate=sample_rate)
     elif instrument == "ride":
         sample = synthesize_ride(sample_rate=sample_rate, duration=0.60)
+    elif instrument == "tom_low":
+        sample = synthesize_tom(pitch="low", sample_rate=sample_rate, duration=0.35)
+    elif instrument == "tom_mid":
+        sample = synthesize_tom(pitch="mid", sample_rate=sample_rate, duration=0.35)
+    elif instrument == "tom_high":
+        sample = synthesize_tom(pitch="high", sample_rate=sample_rate, duration=0.35)
+    elif instrument == "clap":
+        sample = synthesize_clap(sample_rate=sample_rate, duration=0.25)
+    elif instrument == "crash":
+        sample = synthesize_crash(sample_rate=sample_rate, duration=2.50)
+    elif instrument == "rimshot":
+        sample = synthesize_rimshot(sample_rate=sample_rate, duration=0.08)
+    elif instrument == "cowbell":
+        sample = synthesize_cowbell(sample_rate=sample_rate, duration=0.25)
     else:
         # Fallback to soft click
         sample = np.zeros(int(sample_rate * 0.05), dtype=np.float32)
@@ -228,8 +247,8 @@ class CompositionRenderer:
         seconds_per_beat = 60.0 / bpm
         core_duration = total_beats * seconds_per_beat
 
-        # Acoustic tail extension (1.5 seconds for reverb / cymbals / long chord decay)
-        tail_seconds = 1.5
+        # Acoustic tail extension (3.0 seconds for natural crash cymbal ring and reverb decay)
+        tail_seconds = 3.0
         total_duration = core_duration + tail_seconds
         total_samples = int(self.sample_rate * total_duration)
 
@@ -263,13 +282,23 @@ class CompositionRenderer:
 
                     if actual_len > 0:
                         scaled_drum = drum_audio[:actual_len] * track_vol
-                        # Slight stereo panning for drums: Hihat slightly left (-0.15), Ride slightly right (+0.2), Kick/Snare center
+                        # Stereo panning for drum kit:
+                        # Kick/Snare: center; Hi-hat: left (-0.15); Ride: right (+0.2); Crash: left (+0.25);
+                        # Tom Low: right (+0.3); Tom Mid: center; Tom High: left (-0.3); Cowbell: right (+0.15)
                         pan_left = 1.0
                         pan_right = 1.0
                         if "hihat" in drum_inst:
-                            pan_left, pan_right = 1.1, 0.9
+                            pan_left, pan_right = 1.15, 0.85
                         elif "ride" in drum_inst:
                             pan_left, pan_right = 0.85, 1.15
+                        elif "crash" in drum_inst:
+                            pan_left, pan_right = 1.25, 0.75
+                        elif "tom_high" in drum_inst:
+                            pan_left, pan_right = 1.2, 0.8
+                        elif "tom_low" in drum_inst:
+                            pan_left, pan_right = 0.8, 1.2
+                        elif "cowbell" in drum_inst:
+                            pan_left, pan_right = 0.9, 1.1
 
                         mix_left[start_sample:end_sample] += scaled_drum * pan_left
                         mix_right[start_sample:end_sample] += scaled_drum * pan_right

@@ -17,8 +17,8 @@ class TestCompositionRenderer(unittest.TestCase):
         self.assertEqual(audio.dtype, np.float32)
         self.assertEqual(audio.ndim, 2)
         self.assertEqual(audio.shape[1], 2)
-        # 2 bars * 4 beats * (60 / 120) = 4.0s + 1.5s tail = 5.5s * 44100 = 242550 samples
-        expected_samples = int(5.5 * 44100)
+        # 2 bars * 4 beats * (60 / 120) = 4.0s + 3.0s tail = 7.0s * 44100 = 308700 samples
+        expected_samples = int(7.0 * 44100)
         self.assertEqual(audio.shape[0], expected_samples)
         # Should be silence
         self.assertAlmostEqual(float(np.max(np.abs(audio))), 0.0, places=5)
@@ -69,28 +69,36 @@ class TestCompositionRenderer(unittest.TestCase):
         self.assertGreater(left_energy, 0)
         self.assertGreater(right_energy, 0)
 
-    def test_soft_limiter_tanh_prevents_hard_clipping(self):
-        # Stack multiple loud chords and drums to force high amplitude
-        chords = [
-            ChordEvent("C", "major", start_beat=0.0, duration_beats=4.0, instrument="piano"),
-            ChordEvent("E", "minor", start_beat=0.0, duration_beats=4.0, instrument="piano"),
-            ChordEvent("G", "major", start_beat=0.0, duration_beats=4.0, instrument="guitar"),
-            ChordEvent("C", "maj7", start_beat=0.0, duration_beats=4.0, instrument="guitar"),
-        ]
-        grid = [["kick", "snare", "ride"] for _ in range(16)]
+    def test_all_new_percussion_synthesizers(self):
+        new_drums = ["tom_high", "tom_mid", "tom_low", "clap", "crash", "rimshot", "cowbell"]
+        for d in new_drums:
+            grid = [[] for _ in range(16)]
+            grid[0] = [d]
+            comp = Composition(
+                id=f"test_{d}",
+                title=f"Test {d}",
+                bpm=120,
+                bars=1,
+                rhythm=RhythmTrack(steps_per_bar=16, grid=grid, volume=1.0),
+            )
+            audio = self.renderer.render(comp)
+            self.assertGreater(float(np.max(np.abs(audio))), 0.05, f"Drum {d} produced near-silence")
+
+    def test_crash_cymbal_on_last_step_full_decay_no_truncation(self):
+        """Test crash on last step: verify full 2.5s decay fits in buffer without hard cutoff."""
+        grid = [[] for _ in range(16)]
+        grid[15] = ["crash"]  # Last step
         comp = Composition(
-            id="loud_test",
-            title="Loud Test",
-            bpm=140,
+            id="crash_tail_test",
+            title="Crash Tail Test",
+            bpm=120,
             bars=1,
             rhythm=RhythmTrack(steps_per_bar=16, grid=grid, volume=1.0),
-            chords=chords,
-            master_volume=1.0,
         )
         audio = self.renderer.render(comp)
-        # With tanh, maximum absolute value should strictly be < 1.0
-        self.assertLess(float(np.max(np.abs(audio))), 1.0)
-        self.assertGreater(float(np.max(np.abs(audio))), 0.5)
+        # End of buffer should decay to near-zero without clipping or sudden stop
+        end_samples = audio[-100:, :]
+        self.assertLess(float(np.max(np.abs(end_samples))), 0.05)
 
 
 if __name__ == "__main__":

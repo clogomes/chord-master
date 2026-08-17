@@ -16,9 +16,16 @@ from gui import theme
 DRUM_ROWS = [
     ("kick", "🥁 Bombo (Kick)", "#EF4444"),
     ("snare", "🪘 Tarola (Snare)", "#F59E0B"),
+    ("rimshot", "🥢 Aro / Side Stick", "#FB923C"),
+    ("clap", "👏 Palmas (Clap)", "#EC4899"),
+    ("tom_high", "🪘 Tom Agudo (High)", "#E11D48"),
+    ("tom_mid", "🪘 Tom Médio (Mid)", "#EA580C"),
+    ("tom_low", "🪘 Tom Grave (Low)", "#B45309"),
     ("hihat_closed", "🥢 Hi-Hat Fechado", "#10B981"),
     ("hihat_open", "🔔 Hi-Hat Aberto", "#06B6D4"),
+    ("crash", "💥 Prato Crash", "#3B82F6"),
     ("ride", "✨ Prato Ride", "#8B5CF6"),
+    ("cowbell", "🔔 Cowbell / Sino", "#A855F7"),
 ]
 
 CHORD_LANES = [
