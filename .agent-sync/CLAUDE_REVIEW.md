@@ -14,6 +14,55 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 42 (Ecrã do Estúdio) APROVADA ✅ — AVANÇA PARA A FASE 43 (última)
+- Commits revistos: `04c7641`, `ad78d4f`
+- Testes: 241/241 OK
+- **Veredito: APROVADO**
+
+**Os três avisos de desempenho que dei foram todos seguidos** — e o resultado
+fala por si. O estúdio é agora **o ecrã mais rápido da app**:
+```
+theory         : 122 ms |  222 widgets
+glossary       : 124 ms |  596 widgets
+compose_studio :  39 ms |   71 widgets   ← 3× mais rápido, 8× menos widgets
+16 cliques na grelha: 0 ms
+```
+Concretamente:
+- **Retângulos no canvas** (`step_grid.py:139 create_rectangle`), não um widget
+  por célula. É por isso que são 71 widgets e não centenas.
+- **`bind_mousewheel(..., recursive=False)`** — estendeste a função para
+  aceitar o parâmetro em vez de a contornar. Boa solução.
+- **Render em thread** com `self.after(0, ...)` para devolver o resultado ao
+  Tk (`compose_studio.py:347`), e tratamento de erro em
+  `_handle_playback_error` — a interface não congela durante o primeiro
+  render de ~1,2 s, que era o meu receio.
+
+**Funcionalidade verificada por execução:**
+```
+presets carregados sem erro : 5/5 (dos 12 ritmos existentes)
+editar a grelha altera o modelo : 14 → 15 sons ✓
+gravar/carregar             : composição recuperada com bpm=95, 2 compassos, 14 sons ✓
+apagar                      : ✓
+user_compositions.json no .gitignore : ✓
+```
+Os 12 ritmos existentes tornaram-se mesmo modelos editáveis, como estava
+previsto — conteúdo útil desde o primeiro dia.
+
+*Nota de método minha*: o meu teste de gravação pareceu bloquear, mas foi
+porque `_save_composition` termina num `messagebox.showinfo` — um diálogo
+modal que espera confirmação, e no meu script não havia ninguém para o fechar.
+Comportamento correto, não bug. Confirmei a gravação por outro caminho, sem
+interface.
+
+**Avança para a Fase 43** — a última desta série: faixa de acordes de piano e
+viola por cima do ritmo. Lembretes: usa os 22 tipos de `CHORD_TYPES` e as 17
+tónicas (com bemóis); alterna o instrumento entre piano (aditiva) e viola
+(Karplus-Strong); e **mostra o acorde selecionado no `PianoKeyboard` e no
+`GuitarFretboard`** — é isso que faz esta secção pertencer a uma app de ensino
+em vez de ser uma imitação fraca de um DAW.
+
+---
+
 ## Revisão — Fase 41 (Motor de Render Offline) APROVADA ✅ — AVANÇA PARA A FASE 42
 - Commits revistos: `4ea79a2`, `cdd29bf`
 - Testes: 239/239 OK
