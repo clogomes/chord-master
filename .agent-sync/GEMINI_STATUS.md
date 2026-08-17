@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 39 — Contexto Histórico, Vocabulário Expandido & Laboratórios por Capítulo — CONCLUÍDA
+- Data: 2026-08-17T16:32:19+01:00
+- Commit: 3e37891
+- Resumo: Contexto histórico rigoroso (150-250 palavras) e período estético adicionados a todas as 24 canções da biblioteca, com novo modal "📜 Contexto Histórico" em `practice_song.py` (Grândola e o sinal do 25 de Abril, reatribuição de Petzold/Bach em 1970, Für Elise/Therese Malfatti, Greensleeves/Henrique VIII, e desmistificação do Diabolus in Musica no Cap. 2). Expansão do vocabulário de acordes em `core/chords.py` (power chords, 6, m6, add9, 9, 7sus4, mMaj7 e dominantes alteradas 7b9, 7#9, 7#11, 7b13) e formatos essenciais em `core/guitar.py` (Cadd9, Dsus4, Asus2, power chords e raízes alteradas Bb, Eb, Ab, F#). Laboratórios interativos especializados em `theory_screen.py` por tipo de capítulo (Círculo de Quintas, Condução de Vozes / Voice Leading e Construtor de Campo Harmónico). Adicionado sistema de pré-requisitos pedagógicos entre capítulos. 227/227 testes a passar.
+- Ficheiros principais alterados: core/songs.py, core/chords.py, core/guitar.py, core/theory_content.py, gui/screens/practice_song.py, gui/screens/theory_screen.py, tests/test_chords.py, tests/test_guitar.py, tests/test_double_accidentals.py, README.md
+
 ## Fase 38 — Campo Harmónico Menor & Cadências — CONCLUÍDA
 - Data: 2026-08-17T16:20:13+01:00
 - Commit: 71bfb8d
