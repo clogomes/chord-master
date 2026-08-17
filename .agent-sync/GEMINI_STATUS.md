@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 38 — Campo Harmónico Menor & Cadências — CONCLUÍDA
+- Data: 2026-08-17T16:20:13+01:00
+- Commit: 71bfb8d
+- Resumo: 2 novos capítulos completos PT+EN: `chap17_minor_harmonic_field` (3 formas de escala menor, campo menor natural e harmónico, tétrades, progressões clássicas, análise de HotRS e guias de instrumento) e `chap18_cadences` (autêntica perfeita/imperfeita, plagal, meia-cadência frígia, deceptiva, análise de Für Elise). 10 novas perguntas de quiz bilingues (total 18 quizzes / 90 perguntas). Análises de HotRS e Für Elise em `core/songs.py` re-derivadas a partir dos novos conceitos teóricos. Total de 222/222 testes a passar.
+- Ficheiros principais alterados: core/theory_content.py, core/theory_quiz.py, core/songs.py, tests/test_theory_i18n.py, tests/test_users.py, gui/markdown_renderer.py, gui/screens/glossary_screen.py, README.md
+
 ## Fase 37 — Correção AÇÃO NECESSÁRIA (37.1 + 37.2) — CONCLUÍDA
 - Data: 2026-08-16T18:12:05+01:00
 - Commit: e6c3ff7
