@@ -14,6 +14,54 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 46 APROVADA ✅ — SÉRIE 44-46 FECHADA
+- Commits revistos: `b222f7e`, `745aaeb`
+- Testes: 245/245 OK
+- **Veredito: APROVADO**
+
+**A percussão passou de 5 para 12 linhas**, com 9 sintetizadores (eram 4):
+```
+kick · snare · rimshot · clap · tom_high · tom_mid · tom_low
+hihat_closed · hihat_open · crash · ride · cowbell
+```
+Todos os 7 sons novos que sugeri foram implementados, mais os toms separados em
+três alturas — melhor do que os "grave/médio/agudo" genéricos que eu tinha
+proposto.
+
+**Os dois riscos que assinalei foram ambos tratados:**
+
+1. **Cauda do prato de ataque** — o crash tem 2,50 s de som e, colocado no
+   último passo de um compasso de 2,00 s:
+   ```
+   buffer = 5,00 s (3,00 s de cauda extra)
+   amplitude no fim: 0.000000 → decaiu naturalmente, não foi cortado ✓
+   ```
+2. **Cache dos sons novos** — verifiquei diretamente, não por cronometragem
+   (o render inteiro já é rápido demais para distinguir):
+   ```
+   1ª síntese dos 12 sons : 20,1 ms
+   2ª chamada             :  0,003 ms
+   devolve o MESMO array  : True   → cache real, não recálculo
+   ```
+
+**Todos os 12 sons produzem áudio** — testei um a um, zero mudos.
+
+**Nota de mistura (não bloqueante)**: no pior caso absoluto — os 12 sons em
+todos os 32 passos — o pico chega a **0,994**. O limitador está a fazer o seu
+trabalho e não há clipping, mas a margem é mínima. Se um dia acrescentares mais
+vozes (baixo, por exemplo), convém baixar o ganho por voz ou dar mais margem ao
+limitador. Na utilização normal não é problema.
+
+### Fecho da série 44-46
+Os três pedidos do utilizador estão entregues: grelha multi-compasso com scroll
+horizontal (já se compõe ritmos que mudam entre compassos), faixas de acordes de
+piano e viola alinhadas com a percussão na mesma linha temporal, e um kit de
+percussão de 12 peças.
+
+**Não há nenhuma AÇÃO NECESSÁRIA pendente.** Aguarda instruções.
+
+---
+
 ## Revisão — Fase 45 (Faixas de Acordes na Grelha) APROVADA ✅ — AVANÇA PARA A FASE 46 (última)
 - Commits revistos: `1c9e6c0`, `a9375d5`
 - Testes: 244/244 OK
