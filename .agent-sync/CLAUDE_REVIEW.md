@@ -14,6 +14,57 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 43 APROVADA ✅ — SÉRIE 40-43 FECHADA (Estúdio de Composição completo)
+- Commits revistos: `aa22edb`, `c1b8a36`
+- Testes: 243/243 OK
+- **Veredito: APROVADO**
+
+**Funcionalidade verificada por execução:**
+```
+adicionar acordes : 16/16 combinações OK (C, Bb, F#, Eb × major, min7, 7sus4, add9)
+selecionar acorde :  4/4 OK
+guitarra          : 25 posições destacadas ao selecionar um acorde ✓
+apagar acorde     : 4 → 3 ✓
+render ritmo+acordes: buffer (489510, 2), pico 0.765 (sem clipping) ✓
+```
+As raízes com bemol e sustenido funcionam todas — inclui `Bb` e `Eb`, que só
+passaram a existir depois da correção de ortografia da Fase 31.
+
+**A ligação pedagógica está lá**: ao selecionar um acorde, ele aparece
+destacado no `PianoKeyboard` e no `GuitarFretboard` (25 posições CAGED na
+guitarra). É isto que faz esta secção pertencer a uma app de ensino em vez de
+ser uma imitação fraca de um DAW.
+
+**Desempenho manteve-se bom** apesar de acrescentar a faixa de acordes e dois
+visualizadores de instrumento:
+```
+39 ms /  71 widgets  (Fase 42)
+98 ms / 150 widgets  (Fase 43)   ← ainda mais rápido que o ecrã de teoria (122 ms)
+```
+
+*Nota de método minha*: o meu primeiro teste acusou
+`TypeError: '<=' not supported between int and ChordEvent` em `_select_chord`.
+**Era erro meu** — o método recebe um índice (`_select_chord(index: int)`,
+linha 599) e eu passei o objeto. Repeti corretamente e passa 4/4. O código
+estava certo.
+
+### Fecho da série 40-43 — Estúdio de Composição
+O utilizador já pode: escolher um dos 12 ritmos como ponto de partida, editar a
+grelha de percussão passo a passo, acrescentar uma progressão de acordes com 22
+tipos e 17 tónicas, escolher piano ou viola para cada acorde, ver as posições no
+teclado e no braço, ouvir tudo junto com tempo exato, e gravar/carregar
+composições.
+
+**O que fica de fora, por decisão de âmbito do utilizador** (versão útil
+primeiro): piano roll, gravação ao vivo, samples externos reais, exportação
+WAV. Tenho o desenho técnico completo dessas partes — incluindo o motor de
+samples com números medidos de latência, memória e limites de pitch-shifting —
+e escrevo a especificação se ele quiser continuar depois de experimentar isto.
+
+**Não há nenhuma AÇÃO NECESSÁRIA pendente.** Aguarda instruções.
+
+---
+
 ## Revisão — Fase 42 (Ecrã do Estúdio) APROVADA ✅ — AVANÇA PARA A FASE 43 (última)
 - Commits revistos: `04c7641`, `ad78d4f`
 - Testes: 241/241 OK
