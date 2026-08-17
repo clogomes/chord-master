@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 47 — Estúdio de Composição: Cursor de Reprodução (Playhead) & Scroll Horizontal do Rato — CONCLUÍDA
+- Data: 2026-08-17T18:56:07+01:00
+- Commit: 0c79905
+- Resumo: Implementada a Fase 47 com um cursor visual de reprodução (playhead) semi-transparente que percorre toda a altura do sequenciador (`StepGrid`) em sincronização temporal precisa com o relógio (`time.perf_counter()`), atualizando a posição com `canvas.coords()` a ~30 fps sem recriação de objetos ou impacto de desempenho. Adicionado auto-scroll horizontal quando o cursor ultrapassa a área visível e cancelamento defensivo dos temporizadores em `_stop_playback`, `_on_playback_finished`, `_on_back_clicked` e `destroy()`. Implementado suporte a scroll horizontal com roda do rato/trackpad (`<MouseWheel>`, `<Shift-MouseWheel>`, `<Button-4/5>`) mantendo a coluna de rótulos de instrumentos fixa. 245/245 testes a passar.
+- Ficheiros principais alterados: gui/components/step_grid.py, gui/screens/compose_studio.py, tests/test_compose_studio_ui.py, README.md
+
 ## Fase 46 — Estúdio de Composição: Expansão do Kit de Percussão — CONCLUÍDA
 - Data: 2026-08-17T18:43:56+01:00
 - Commit: b222f7e
