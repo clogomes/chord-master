@@ -14,6 +14,60 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 39 APROVADA ✅ — SÉRIE 35-39 FECHADA
+- Commits revistos: `3e37891`, `efc8227`
+- Testes: 227/227 OK
+- **Veredito: APROVADO**
+
+**39.1 Contexto histórico** — 24/24 músicas com `historical_context` **e**
+`historical_context_en`, mais o campo `period` nas 24. Cobertura total.
+
+**39.2 Vocabulário** — `CHORD_TYPES` passou de **11 para 22**. Todos os que
+pedi estão lá: `6`, `m6`, `add9`, `9`, `7sus4`, `mMaj7`, `7b9`, `7#9`, `7#11`,
+`7b13` — e o power chord, sob a chave `"power"` (o meu teste procurava a chave
+`"5"`; a tua nomenclatura é mais legível, fica assim).
+`GUITAR_CHORD_LIBRARY` passou de 25 para **45 raízes**, agora com bemóis
+(`Ab`, `Bb`, `Bbm`, `Eb`, `Ebm`) — os principiantes de guitarra acústica já
+conseguem consultar as posições que faltavam.
+
+**39.3 Laboratório por capítulo** — `_build_interactive_demo_area` **honra
+agora o campo `chap.interactive_demo`**, que estava a ser ignorado desde
+sempre. Os três laboratórios que pedi estão implementados:
+```
+circle_of_fifths      → _build_circle_of_fifths_lab   (Caps. 3, 12)
+voice_leading         → _build_voice_leading_lab      (Caps. 4, 6, 15, 18)
+harmonic_field_builder→ _build_harmonic_field_lab     (Caps. 5, 13, 17)
+outros                → _build_standard_theory_lab
+```
+E — o teste que interessa, dada a história deste projeto — **carreguei os 18
+capítulos um a um e nenhum rebenta**:
+```
+18 capítulos testados | rebentam: 0
+```
+
+**39.4 Pré-requisitos** — 16 dos 18 capítulos têm `prerequisites`. Os dois sem
+são o Cap. 1 (Fundamentos) e o Cap. 16 (Prática Deliberada) — ambos pontos de
+entrada legítimos, não é lacuna.
+
+### Fecho da série 35-39
+As cinco fases estão implementadas e aprovadas: correção de conteúdo musical,
+glossário de 139 termos com auto-ligação, revisão espaçada SM-2, campo
+harmónico menor e cadências, e agora contexto histórico, vocabulário expandido
+e laboratórios por capítulo. Não há AÇÃO NECESSÁRIA pendente.
+
+**O que ficou de mais valioso em testes** ao longo desta série — todos
+verificam o sistema real em vez de repetirem as assunções do código:
+`test_smoke.py` (todos os ecrãs constroem), `test_theme_tokens_scan.py`
+(nenhum `theme.X` inexistente), `test_songs_measures.py` (nenhuma música com
+compasso partido), `test_categories.py` (rotas existem mesmo) e o varrimento
+raiz × tipo em `test_double_accidentals.py`.
+
+**Próximo**: o módulo de composição (Fases 40+). Já tenho o desenho técnico
+completo, incluindo o motor de samples reais — escrevo a especificação quando
+o utilizador quiser avançar. **Não comeces sem essa especificação.**
+
+---
+
 ## Revisão — Fase 38 APROVADA ✅ — PODES AVANÇAR PARA A FASE 39 (última desta série)
 - Commits revistos: `71bfb8d`, `690a066`
 - Testes: 222/222 OK · App arranca sem erros
