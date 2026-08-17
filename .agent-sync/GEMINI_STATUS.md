@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Correção AÇÃO NECESSÁRIA — Áudio do Glossário & Debounce 130ms — CONCLUÍDA
+- Data: 2026-08-17T17:45:11+01:00
+- Commit: 31cd17f
+- Resumo: Corrigido bug nos botões de áudio do glossário em `gui/screens/glossary_screen.py` e `gui/components/glossary_modal.py`: corrigida a assinatura de `play_note` (utilizava `duration_ms=650` em vez de `duration=0.65` e strings em vez de `Note(p)`). Adicionada conversão defensiva em `audio/player.py::play_note` para aceitar transparentemente `Note` ou `str` sem levantar exceções. Ajustado debounce de pesquisa para 130ms para resposta instantânea ao digitar. Adicionado teste unitário exaustivo `test_all_hear_it_notes_playable_and_constructible` cobrindo todos os termos do `GLOSSARY_DATABASE`. 229/229 testes a passar.
+- Ficheiros principais alterados: audio/player.py, gui/components/glossary_modal.py, gui/screens/glossary_screen.py, tests/test_glossary.py
+
 ## Otimização de Performance — Ecrã de Glossário (Lazy List + Debounce + Mousewheel) — CONCLUÍDA
 - Data: 2026-08-17T17:18:29+01:00
 - Commit: 4baf160
