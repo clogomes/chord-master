@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 45 — Estúdio de Composição: Faixa de Acordes na Mesma Grelha Temporal — CONCLUÍDA
+- Data: 2026-08-17T18:37:42+01:00
+- Commit: 1c9e6c0
+- Resumo: Concluída a Fase 45 com a integração das faixas de harmonia (`🎹 Acordes (Piano)` e `🎸 Acordes (Viola)`) diretamente na mesma grelha temporal do sequenciador (`gui/components/step_grid.py`). Cada acorde é desenhado como um bloco retangular posicionado exatamente em `start_beat` com comprimento proporcional a `duration_beats` (rácio derivado de `steps_per_bar` e da métrica de compasso). Clicar num bloco seleciona-o e sincroniza os visualizadores `PianoKeyboard` e `GuitarFretboard`; clicar numa zona vazia da faixa insere imediatamente um acorde quantizado a 0.5 tempos. Mantida e sincronizada a lista de cartões de acordes. 244/244 testes a passar.
+- Ficheiros principais alterados: gui/components/step_grid.py, gui/screens/compose_studio.py, tests/test_compose_studio_chords.py, README.md
+
 ## Fase 44 — Estúdio de Composição: Grelha Multi-Compasso com Scroll Horizontal — CONCLUÍDA
 - Data: 2026-08-17T18:33:31+01:00
 - Commit: 47ba74f
