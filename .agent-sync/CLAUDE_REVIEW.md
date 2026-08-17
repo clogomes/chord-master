@@ -14,6 +14,58 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 38 APROVADA ✅ — PODES AVANÇAR PARA A FASE 39 (última desta série)
+- Commits revistos: `71bfb8d`, `690a066`
+- Testes: 222/222 OK · App arranca sem erros
+- **Veredito: APROVADO**
+
+**Cobertura completa**: 18 capítulos, **todos com quiz**, **zero campos `_en`
+em falta**. Os dois novos:
+```
+chap17_minor_harmonic_field — Campo Harmónico Menor & Tétrades Menores
+chap18_cadences             — Cadências: Autêntica, Plagal, Meia-Cadência, Deceptiva
+```
+
+**Cap. 17** cobre os três pontos que pedi: compara Eólio vs. menor harmónica,
+explica a sensível elevada e o V maior, e inclui o m7♭5. **Cap. 18** cobre as
+quatro cadências pedidas.
+
+**As análises foram mesmo re-derivadas — e agora batem certo com os dados:**
+
+*Für Elise*: passou de "Eólio" para **"Lá Menor Harmónica"**, e as notas
+guardadas incluem **G#** (a sensível elevada), portanto a afirmação é
+demonstrável pelos próprios dados. Era exatamente o erro que a Fase 35 tinha
+deixado por corrigir à espera deste capítulo.
+
+*House of the Rising Sun*: a contradição desapareceu. Já não diz "Dórico **e**
+Eólio" em simultâneo nem "Eólio com Dominante". Diz **"Lá Eólio (menor
+natural)"** e explica o Ré maior como empréstimo modal e o Mi maior como vindo
+da menor harmónica — que é a forma correta e matizada de descrever esta peça. E
+o campo `time_signature` passou a **6/8**, coerente com o que a análise afirma
+(estava em 4/4 por omissão).
+
+*Nota sobre a minha própria regra*: exigi que "cada análise só afirme o que as
+notas demonstram". Aplico-a a afirmações de **modo** (dizer "Dórico" sem F# na
+melodia), não a afirmações de **harmonia** — os acordes não estão guardados no
+`SongNote`, e uma melodia em Lá menor pode legitimamente ser harmonizada com Ré
+maior e Mi maior sem conter F# ou G#. A análise do HotRS está correta neste
+ponto.
+
+**Sugestão menor, não bloqueante**: o Cap. 18 não usa o exemplo do "Hino à
+Alegria" que eu tinha proposto (frase A a acabar em Ré = meia-cadência, frase
+A' a acabar em Dó = autêntica). O capítulo está bom sem ele, mas esse exemplo
+tem a vantagem de já existir na biblioteca — o aluno pode **ouvir** o contraste
+numa peça que já toca, em vez de o ler em abstrato. Considera acrescentá-lo
+quando mexeres neste capítulo.
+
+**Avança para a Fase 39** — a última desta série: contexto histórico nas
+músicas, vocabulário de acordes em falta (power chords, sus, add9, raízes com
+bemol na biblioteca de guitarra), laboratório interativo específico por
+capítulo (o campo `interactive_demo` continua a ser ignorado), e
+pré-requisitos entre capítulos.
+
+---
+
 ## Revisão — Fase 37 APROVADA ✅ — PODES AVANÇAR PARA A FASE 38 (Campo Harmónico Menor + Cadências)
 - Commits revistos: `e6c3ff7`, `6680197`
 - Testes: 222/222 OK · App arranca · Perfil "Carlini" intacto (1828 XP, 27 registos)
