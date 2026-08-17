@@ -601,3 +601,14 @@ Implementação nativa de um sistema de i18n em duas vertentes:
 - **Integração na Navegação & Suporte Bilingue**:
   - Nova rota `"compose_studio"` registada na barra lateral e cartão dedicado no menu principal, com suporte integral a português e inglês (`gui/i18n.py`).
 - **Suite de Testes Unitários (`tests/test_compose_studio_ui.py`, `tests/test_smoke.py`, `tests/test_theme_tokens_scan.py`)**: Validação de alternância de passos na grelha, limpeza, instanciação do ecrã e varrimento estático de tokens visuais. Total de **241/241 testes a passar**.
+
+### Fase 43 — Estúdio de Composição: Faixa de Acordes & Visualização nos Instrumentos
+- **Sequenciador Harmónico de Acordes (`gui/screens/compose_studio.py`)**:
+  - Adição e edição de eventos `ChordEvent` com suporte integral às 17 tónicas fundamentais (`C`, `Db`, `D#`, `Eb`, `F#`, `Gb`, `Ab`, `Bb`, etc.) e aos 22 tipos de acorde de `CHORD_TYPES` (maiores, menores, diminutos, aumentados, tétrades com sétima, nonas, acordes suspensos, power chords e dominantes alteradas).
+  - Seleção de instrumento por acorde (Piano com síntese harmónica aditiva ou Viola com síntese física Karplus-Strong).
+  - Posicionamento métrico no tempo inicial (`start_beat`) e duração em tempos (`duration_beats`).
+  - Lista horizontal dinâmica com cartões interativos de acordes, ordenação cronológica e botão individual de eliminação.
+- **Visualização Sincronizada nos Instrumentos (`PianoKeyboard` & `GuitarFretboard`)**:
+  - Seleção de qualquer acorde da composição atualiza instantaneamente a visualização no teclado de piano (destaque de notas e cálculo de teclas) e no braço da viola (formas CAGED completas e dedilhação acústica de `GUITAR_CHORD_LIBRARY`).
+  - Seletor de visualização (🎹 Piano / 🎸 Viola / 👥 Ambos) para adaptação a qualquer contexto pedagógico.
+- **Suite de Testes Unitários (`tests/test_compose_studio_chords.py`)**: Validação da cobertura das 17 tónicas e 22 tipos de acorde, adição/seleção/eliminação de eventos harmónicos e sincronização com `PianoKeyboard` e `GuitarFretboard`. Total de **243/243 testes a passar**.
