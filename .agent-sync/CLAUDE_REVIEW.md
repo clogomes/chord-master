@@ -14,6 +14,132 @@ Cada entrada tem um veredito:
 
 ---
 
+## TRABALHO PEDIDO — Fases 40 a 43: Estúdio de Composição (versão útil)
+- Pedido por clogomes há já algum tempo; a especificação atrasou-se do meu
+  lado. Âmbito escolhido pelo utilizador: **versão útil primeiro** — grelha de
+  ritmo editável + progressões de acordes para piano e viola. O sequenciador
+  completo (piano roll, samples reais, exportação) fica para depois, se ele
+  quiser continuar.
+- **Corrige primeiro a AÇÃO NECESSÁRIA acima** (botões de som do glossário).
+- **REGRA: uma fase de cada vez**, com o meu APROVADO escrito entre cada uma.
+
+### Contexto técnico — o que já existe e deves reutilizar
+Não construas nada disto de raiz:
+- `audio/backing_tracks.py` — `RhythmPattern` com `grid: List[List[str]]` de 16
+  passos e os sons `synthesize_kick/snare/hihat/ride`. **Os 12 padrões de
+  `BACKING_TRACK_LIBRARY` devem tornar-se modelos iniciais editáveis** — é
+  conteúdo grátis no primeiro dia.
+- `audio/synthesizer.py` — `generate_single_frequency` (piano),
+  `generate_plucked_string` (viola), `generate_polyphonic` (acordes,
+  vetorizado e rápido: 1,3 ms), `apply_adsr` reutilizável.
+- `core/chords.py` — 22 tipos de acorde, `get_chord_notes`.
+- `core/guitar.py` — 45 raízes com posições no braço.
+- `core/midi_importer.py` — `save_user_song`/`load_user_songs` como modelo de
+  persistência JSON.
+- `gui/components/` — `PianoKeyboard`, `GuitarFretboard`, `StaffCanvas`.
+
+**Decisão de arquitetura importante (não a contornes)**: renderiza a composição
+**offline** para um único buffer numpy e só depois toca. Não construas um
+agendador em tempo real. Razões medidas: misturar 4 pistas de 64s custa ~47 ms,
+enquanto o `BackingTrackPlayer` atual usa um relógio próprio com jitter de
+~23 ms (o buffer do pygame) — inaceitável para várias pistas em conjunto. Com
+renderização offline o tempo passa a ser aritmética de índices, **exato por
+construção**. Deixa o `BackingTrackPlayer` e o `Metronome` intocados; os ecrãs
+de prática continuam a usá-los.
+
+### FASE 40 — Modelo de dados e persistência (sem UI, sem áudio)
+Cria `core/composition.py` e `core/compositions.py`. Totalmente testável sem
+interface.
+```python
+@dataclass
+class ChordEvent:
+    root: str            # "C", "Bb", ...
+    chord_type: str      # chave de CHORD_TYPES
+    start_beat: float
+    duration_beats: float
+    instrument: str      # "piano" | "guitar"
+
+@dataclass
+class RhythmTrack:
+    steps_per_bar: int = 16
+    grid: List[List[str]] = field(default_factory=list)   # MESMA forma que RhythmPattern.grid
+    volume: float = 0.8
+    muted: bool = False
+
+@dataclass
+class Composition:
+    id: str
+    title: str
+    bpm: int = 100
+    time_signature: str = "4/4"
+    bars: int = 4
+    rhythm: RhythmTrack = field(default_factory=RhythmTrack)
+    chords: List[ChordEvent] = field(default_factory=list)
+    master_volume: float = 0.8
+    schema_version: int = 1
+```
+- Persistência em `user_compositions.json` (**já está no `.gitignore`**),
+  seguindo o padrão de `save_user_song`/`load_user_songs`: `to_dict`/`from_dict`
+  manuais, `.get()` com defaults em tudo, nunca rebentar com chaves
+  desconhecidas.
+- `schema_version` desde o primeiro dia.
+- Adaptador `RhythmPattern → RhythmTrack` para os 12 padrões existentes.
+- Testes: ida-e-volta em JSON, carregamento de ficheiro sem campos novos
+  (compatibilidade), e o adaptador dos 12 padrões.
+
+### FASE 41 — Motor de render offline
+Cria `audio/composition_renderer.py`. **Sem importar pygame** — assim é
+testável sem placa de som (a suite atual corre sem dispositivo de áudio).
+- `render(comp) -> np.ndarray` float32 estéreo `(n, 2)`.
+- Percussão: para cada passo com som, soma a amostra sintetizada no índice
+  `int(passo * seg_por_passo * 44100)`.
+- Acordes: usa `generate_polyphonic` (já vetorizado) para piano e
+  `generate_plucked_string` por nota para viola — mas **com cache**
+  `Dict[chave, np.ndarray]` de arrays float32, porque
+  `generate_plucked_string` custa ~35 ms por segundo de áudio (é o único ponto
+  lento do stack). Chave: `(instrumento, midi, duração_quantizada, volume)`.
+- **Cauda**: dimensiona o buffer para `último_evento + cauda_mais_longa`, senão
+  os pratos e as notas longas ficam cortados.
+- Limitador suave no fim (`np.tanh`), **não** `np.clip` — com 2-3 pistas a
+  somar, o clipping é audível.
+- Reprodução numa classe fina à parte que converte para int16 e usa
+  `pygame.sndarray.make_sound`, como `backing_tracks._to_sound` já faz.
+- Testes com asserções fortes e verificáveis: *"um bombo no tempo 2 a 120 BPM
+  tem pico dentro de ±64 amostras do índice 44100"*.
+
+### FASE 42 — Ecrã: grelha de ritmo
+Cria `gui/screens/compose_studio.py` e `gui/components/step_grid.py`.
+- **Grelha de passos** num `tk.Canvas`: linhas = instrumentos de percussão,
+  colunas = 16 passos. Clicar liga/desliga. Usa o mesmo padrão de
+  `PianoKeyboard._key_regions` / `_find_note_at_pos` (lista de regiões +
+  teste de acerto em `<Button-1>`) — está provado neste projeto.
+- Barra de transporte: tocar/parar, BPM, compassos, volume.
+- Escolher um dos 12 padrões existentes como ponto de partida, e editar por cima.
+- Gravar/carregar composições.
+- **Atenção ao desempenho** (lição do glossário, que custou 3 iterações):
+  não crias um widget por célula. Desenha **retângulos no canvas**, que são
+  baratos. E **não uses `bind_mousewheel` recursivo** neste ecrã.
+- Navegação: entrada no menu principal e na barra lateral, com `t()` para PT/EN.
+
+### FASE 43 — Acordes de piano e viola por cima do ritmo
+- Faixa de acordes por baixo da grelha: escolher raiz (17 opções, incluindo
+  bemóis) + tipo (os 22 de `CHORD_TYPES`) + duração em tempos.
+- Alternar o instrumento do acorde entre **piano** e **viola** — cada um usa a
+  sua síntese (aditiva vs. Karplus-Strong).
+- Ao selecionar um acorde, mostra-o no `PianoKeyboard` e no `GuitarFretboard`
+  já existentes. **É isto que faz esta secção pertencer a esta app** e não ser
+  uma imitação fraca de um DAW: compões e vês onde pôr os dedos.
+- Sugestão pedagógica (opcional, se encaixar bem): botão para preencher uma
+  progressão a partir do campo harmónico da tonalidade escolhida, reutilizando
+  o construtor de campo harmónico da Fase 39.
+
+### Fora de âmbito nesta série — não implementes
+Piano roll, gravação ao vivo por microfone ou MIDI, samples externos,
+exportação WAV/MP3, automação de mistura, efeitos. Ficam para uma série
+posterior, se o utilizador quiser continuar depois de experimentar isto.
+
+---
+
 ## AÇÃO NECESSÁRIA — Botões de som do glossário não tocam nada (+ debounce a 220 ms parece lento)
 - Reportado pelo utilizador: *"o glossário já aparece mas reage ainda lento.
   Quando clico nos botões de conceito sonoro não toca nada."*
