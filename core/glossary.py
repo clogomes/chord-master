@@ -1,4 +1,5 @@
 """Musical Glossary module providing definitions, formulas, instrument examples, and audio playback notes."""
+import unicodedata
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 from core.notes import Note
@@ -2273,6 +2274,12 @@ def get_term_by_id(term_id: str) -> Optional[GlossaryTerm]:
     return GLOSSARY_BY_ID.get(term_id)
 
 
+def _fold(s: str) -> str:
+    """Normalize string by removing accents and lowercasing."""
+    return "".join(c for c in unicodedata.normalize("NFD", s.lower())
+                   if unicodedata.category(c) != "Mn")
+
+
 def search_terms(
     query: str = "",
     category: Optional[str] = None,
@@ -2281,6 +2288,7 @@ def search_terms(
 ) -> List[GlossaryTerm]:
     """
     Search glossary terms by keyword, category, or associated theory chapter.
+    Accent-insensitive and case-insensitive.
     """
     results = GLOSSARY_DATABASE
     if category and category != "todos":
@@ -2291,13 +2299,16 @@ def search_terms(
     if not query.strip():
         return sorted(results, key=lambda t: t.get_term(lang).lower())
 
-    q = query.lower().strip()
+    q = _fold(query.strip())
     filtered = []
     for t in results:
-        term_text = t.get_term(lang).lower()
-        short_def = t.get_short_def(lang).lower()
-        long_def = t.get_long_def(lang).lower()
-        if q in term_text or q in short_def or q in long_def or (t.formula and q in t.formula.lower()):
+        term_text = _fold(t.get_term(lang))
+        term_pt = _fold(t.term_pt)
+        term_en = _fold(t.term_en)
+        short_def = _fold(t.get_short_def(lang))
+        long_def = _fold(t.get_long_def(lang))
+        formula = _fold(t.formula) if t.formula else ""
+        if q in term_text or q in term_pt or q in term_en or q in short_def or q in long_def or (formula and q in formula):
             filtered.append(t)
 
     return sorted(filtered, key=lambda t: t.get_term(lang).lower())

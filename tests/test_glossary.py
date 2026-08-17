@@ -104,6 +104,27 @@ class TestGlossary(unittest.TestCase):
         self.assertIn("trítono", kw_map)
         self.assertEqual(kw_map["trítono"], "tritono")
 
+    def test_accent_insensitive_search(self):
+        """Verifies that searching with or without accents returns the exact same number of results."""
+        pairs = [
+            ("tónica", "tonica"),
+            ("trítono", "tritono"),
+            ("cadência", "cadencia"),
+            ("harmónico", "harmonico"),
+            ("sensível", "sensivel"),
+            ("Dó", "do"),
+            ("inversão", "inversao"),
+        ]
+        for with_acc, without_acc in pairs:
+            r_acc = search_terms(with_acc, lang="pt")
+            r_noacc = search_terms(without_acc, lang="pt")
+            self.assertGreater(len(r_acc), 0, f"Query '{with_acc}' returned 0 results")
+            self.assertEqual(
+                len(r_acc),
+                len(r_noacc),
+                f"Accent mismatch: '{with_acc}' ({len(r_acc)}) vs '{without_acc}' ({len(r_noacc)})"
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

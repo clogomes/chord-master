@@ -8,6 +8,15 @@ import customtkinter as ctk
 _GLOSSARY_KEYWORDS_CACHE: Optional[Dict[str, str]] = None
 
 
+import unicodedata
+
+
+def _fold(s: str) -> str:
+    """Normalize string by removing accents and lowercasing."""
+    return "".join(c for c in unicodedata.normalize("NFD", s.lower())
+                   if unicodedata.category(c) != "Mn")
+
+
 def get_glossary_keywords_map() -> Dict[str, str]:
     """Returns a mapping of normalized glossary terms and aliases to their term_id."""
     global _GLOSSARY_KEYWORDS_CACHE
@@ -20,6 +29,7 @@ def get_glossary_keywords_map() -> Dict[str, str]:
         for term in GLOSSARY_DATABASE:
             tid = term.id
             mapping[tid.replace("_", " ").lower()] = tid
+            mapping[_fold(tid.replace("_", " "))] = tid
 
             candidates = [term.term_pt, term.term_en]
             # Extract parenthetical substrings as standalone alias candidates
@@ -37,19 +47,25 @@ def get_glossary_keywords_map() -> Dict[str, str]:
                 # Full candidate phrase
                 if len(clean) >= 3:
                     mapping[clean] = tid
+                    mapping[_fold(clean)] = tid
 
                 # Add singular/plural variations
                 if clean.endswith("s") and len(clean) > 4:
                     mapping[clean[:-1]] = tid  # guide tones -> guide tone
+                    mapping[_fold(clean[:-1])] = tid
                 elif not clean.endswith("s") and len(clean) >= 3:
                     mapping[clean + "s"] = tid  # tetracorde -> tetracordes
+                    mapping[_fold(clean + "s")] = tid
 
                 if clean.endswith("es") and len(clean) > 5:
                     mapping[clean[:-2]] = tid
+                    mapping[_fold(clean[:-2])] = tid
                 if clean.endswith("is") and len(clean) > 5:
                     mapping[clean[:-2] + "el"] = tid  # sensíveis -> sensível
+                    mapping[_fold(clean[:-2] + "el")] = tid
                 if clean.endswith("el") and len(clean) > 4:
                     mapping[clean[:-2] + "is"] = tid  # sensível -> sensíveis
+                    mapping[_fold(clean[:-2] + "is")] = tid
 
     except Exception:
         pass
@@ -201,8 +217,9 @@ def render_markdown_to_textbox(
             try:
                 from gui.components.glossary_modal import show_glossary_term_modal
                 show_glossary_term_modal(textbox.winfo_toplevel(), term_id)
-            except Exception:
-                pass
+            except Exception as e:
+                import sys
+                print(f"[WARN] Failed to open glossary modal for {term_id}: {e}", file=sys.stderr)
 
     def insert_text_with_links(text: str, base_tags: Tuple[str, ...]):
         if not enable_glossary_links or not keywords_map:
