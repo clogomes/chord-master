@@ -2,6 +2,7 @@
 from typing import Optional
 import customtkinter as ctk
 from core.glossary import get_term_by_id, GlossaryTerm
+from core.notes import Note
 from gui.i18n import t, get_language
 from gui import theme
 from audio.player import get_audio_player
@@ -226,7 +227,7 @@ class GlossaryTermModal(ctk.CTkToplevel):
             return
         # If multiple notes, play sequentially as arpeggio or chord
         for i, pitch in enumerate(self.term.hear_it):
-            self.after(i * 300, lambda p=pitch: self.audio_player.play_note(p, duration_ms=650))
+            self.after(i * 300, lambda p=pitch: self.audio_player.play_note(Note(p), duration=0.65))
 
 
 def show_glossary_term_modal(master, term_id: str):

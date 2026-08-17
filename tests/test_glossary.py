@@ -125,6 +125,22 @@ class TestGlossary(unittest.TestCase):
                 f"Accent mismatch: '{with_acc}' ({len(r_acc)}) vs '{without_acc}' ({len(r_noacc)})"
             )
 
+    def test_all_hear_it_notes_playable_and_constructible(self):
+        """Verifies that all hear_it pitch strings across all terms construct valid Note instances and work in play_note."""
+        from audio.player import get_audio_player
+        player = get_audio_player()
+        for t in GLOSSARY_DATABASE:
+            for pitch_str in t.hear_it:
+                note = Note(pitch_str)
+                self.assertIsNotNone(note.frequency)
+                # Verify that play_note accepts Note and string without raising exception
+                try:
+                    # Test with Note object and str parameter
+                    player.play_note(note, duration=0.1, volume=0.0)
+                    player.play_note(pitch_str, duration=0.1, volume=0.0)
+                except Exception as e:
+                    self.fail(f"AudioPlayer.play_note failed for term {t.id} note {pitch_str}: {e}")
+
 
 if __name__ == "__main__":
     unittest.main()

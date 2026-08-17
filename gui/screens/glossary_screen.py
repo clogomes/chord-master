@@ -663,13 +663,13 @@ class GlossaryScreen(ctk.CTkFrame):
         if not self.selected_term or not self.selected_term.hear_it:
             return
         for i, pitch in enumerate(self.selected_term.hear_it):
-            self.after(i * 320, lambda p=pitch: self.audio_player.play_note(p, duration_ms=650))
+            self.after(i * 320, lambda p=pitch: self.audio_player.play_note(Note(p), duration=0.65))
 
     def _on_search_changed(self):
         if self._search_job is not None:
             self.after_cancel(self._search_job)
             self._search_job = None
-        self._search_job = self.after(220, self._filter_terms)
+        self._search_job = self.after(130, self._filter_terms)
 
     def _clear_search(self):
         if self._search_job is not None:
