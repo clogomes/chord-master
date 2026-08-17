@@ -14,6 +14,64 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 41 (Motor de Render Offline) APROVADA ✅ — AVANÇA PARA A FASE 42
+- Commits revistos: `4ea79a2`, `cdd29bf`
+- Testes: 239/239 OK
+- **Veredito: APROVADO** — e é a fase tecnicamente mais bem executada até agora.
+
+**Sem pygame no módulo** ✓ — `audio/composition_renderer.py` não importa
+pygame, portanto continua testável sem placa de som, como pedi.
+
+**A precisão temporal é EXATA — o objetivo central desta fase.** Medi o
+*onset* (início real do som) em vários andamentos e posições de grelha:
+```
+120 bpm passo  4 : onset=22050  esperado=22050  erro=0 amostras
+120 bpm passo  8 : onset=44100  esperado=44100  erro=0 amostras
+ 60 bpm passo  4 : onset=44100  esperado=44100  erro=0 amostras
+ 90 bpm passo 12 : onset=88200  esperado=88200  erro=0 amostras
+```
+Zero amostras de desvio. Era exatamente para isto que valia a pena abandonar o
+agendador em tempo real — o `BackingTrackPlayer` tem ~23 ms de jitter, isto
+tem **0**.
+
+**A cauda é respeitada** — um prato no último passo de um compasso de 2,00 s
+gera um buffer de 3,50 s e decai a zero (amplitude 0.00000 nas últimas
+amostras). Nada é cortado.
+
+**O limitador funciona.** Testei o pior caso — 4 percussões em todos os 16
+passos mais 8 acordes sobrepostos:
+```
+pico do buffer: 0.9036   (≤1.0, sem clipping)
+amostras em ±1.0 (clip duro): 0
+```
+Usaste `tanh` como pedi; com `np.clip` isto teria distorcido audivelmente.
+
+**A cache é o ganho decisivo:**
+```
+1º render (4 acordes de viola): 1247 ms
+2º render (mesma composição)  :    1 ms
+```
+Mil vezes mais rápido. Sem ela, o Karplus-Strong (~35 ms por segundo de áudio)
+tornaria o ciclo editar→ouvir insuportável. **Nota para a Fase 42**: 1247 ms no
+primeiro render é tempo a mais para bloquear a interface — quando ligares o
+botão de tocar, faz o render numa thread e marshalla o resultado com
+`self.after(0, ...)`, como já fazes noutros ecrãs. Não deixes o Tk congelado.
+
+**Piano e viola usam sínteses distintas** ✓ (perfis de RMS e pico diferentes,
+consistentes com aditiva vs. Karplus-Strong).
+
+### Correção a um alarme meu
+O meu primeiro teste de precisão deu "FORA DO ALVO, 83 amostras". **Estava
+errado**: eu media o *pico* de amplitude, e o pico de um bombo acontece ~2 ms
+depois do início por causa da varredura de frequência. Ao medir o *onset*, o
+erro é 0. O teu código estava certo; o meu método é que não estava.
+
+**Avança para a Fase 42** (ecrã com grelha de ritmo). Lembretes: desenha
+**retângulos no canvas**, não um widget por célula; **não** uses
+`bind_mousewheel` recursivo; e faz o render em thread (ver nota acima).
+
+---
+
 ## Revisão — Áudio do Glossário CORRIGIDO ✅ + Fase 40 APROVADA ✅ — AVANÇA PARA A FASE 41
 - Commits revistos: `31cd17f`, `f68ca6e` (áudio), `c1935bf`, `37d43a2` (Fase 40)
 - Testes: 235/235 OK
