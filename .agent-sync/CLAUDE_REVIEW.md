@@ -14,6 +14,102 @@ Cada entrada tem um veredito:
 
 ---
 
+## TRABALHO PEDIDO — Fases 47 e 48: Cursor de reprodução, scroll do rato e arrastar blocos
+- Pedido do utilizador depois de experimentar: *"uma linha translúcida a correr
+  a zona temporal enquanto toca; scroll do rato nessa zona; poder pegar nos
+  blocos com o rato e movê-los nas faixas."*
+- **REGRA: uma fase de cada vez**, com o meu APROVADO escrito entre elas.
+
+### FASE 47 — Cursor de reprodução + scroll do rato
+
+**47.1 — Cursor (playhead)**
+
+Nota técnica importante, já verifiquei: a reprodução usa
+`pygame.sndarray.make_sound(...).play()` (`compose_studio.py:791`), e um
+objeto `Sound` **não expõe a posição atual** — ao contrário de
+`pygame.mixer.music`, não há `get_pos()`. Portanto:
+
+- **Baseia o cursor no relógio**: guarda `time.perf_counter()` no instante em
+  que chamas `.play()`, e num ciclo `self.after(33, ...)` (~30 fps) calcula
+  `decorrido = agora - inicio` e converte para posição em píxeis.
+  `posição_x = origem + (decorrido / segundos_por_passo) * largura_célula`.
+- **Não troques para `mixer.music` só por causa disto.** Obrigaria a escrever
+  o buffer para ficheiro/BytesIO e não traz vantagem real: o desvio do relógio
+  ao longo de 30 segundos é de milissegundos e é **apenas visual** — o áudio já
+  está renderizado e não é afetado.
+- **Desenho**: uma linha vertical semi-transparente ao longo de toda a altura
+  da grelha (percussão **e** carris de acorde). O Tk não suporta alpha em
+  `create_line`; para dar o efeito translúcido usa uma cor clara com
+  `stipple="gray50"` (o mesmo truque que já usaste em
+  `staff_canvas.set_position_hint`), ou uma linha fina de cor viva.
+- **Desempenho**: cria a linha **uma vez** e move-a com `canvas.coords(id, ...)`
+  a cada tick. **Nunca** apagues e recries, nem chames `redraw()` — a 30 fps
+  isso destruiria o desempenho que ganhámos nas fases anteriores.
+- **Seguir automaticamente**: quando o cursor sair da zona visível, faz scroll
+  horizontal para o acompanhar (`canvas.xview_moveto`). Sem isto, o cursor
+  desaparece logo no 2º compasso quando há 16.
+- **Parar/terminar**: cancela o `after` em `_stop_playback` e
+  `_on_playback_finished`, e esconde ou repõe o cursor no início. Cancela
+  também em `destroy()`, senão fica um temporizador a correr depois de sair do
+  ecrã.
+
+**47.2 — Scroll do rato na zona da grelha**
+- **Roda normal** → scroll **horizontal** (é o eixo que interessa nesta zona;
+  a grelha cabe toda em altura).
+- **Shift + roda** → também horizontal, por convenção.
+- Cuidado com macOS: `<MouseWheel>` traz `event.delta` com sinal e escala
+  diferentes de Linux/Windows (onde são `<Button-4>`/`<Button-5>`). Trata os
+  três casos, como já fazes em `gui/scroll_utils.py`.
+- **Liga o evento ao canvas da grelha, não recursivamente** — foi a lição do
+  glossário. Se `bind_mousewheel` servir com `recursive=False`, reutiliza-a;
+  caso contrário liga diretamente `step_canvas.bind("<MouseWheel>", ...)` com
+  `xview_scroll`.
+- O canvas dos rótulos (`label_canvas`) **não** deve fazer scroll horizontal —
+  tem de continuar fixo.
+
+### FASE 48 — Arrastar blocos de acorde com o rato
+Hoje o canvas só trata `<Button-1>` (`step_grid.py:132`). É preciso o ciclo
+completo de arrasto.
+
+1. **`<ButtonPress-1>`** — testa se o clique caiu num bloco de acorde
+   (`_chord_block_regions` já tem as áreas). Se sim, guarda o índice do acorde,
+   o deslocamento do rato dentro do bloco, e marca `_dragging = True`.
+   Se caiu numa zona vazia, mantém o comportamento atual (inserir acorde).
+2. **`<B1-Motion>`** — enquanto arrasta, move **apenas o retângulo** com
+   `canvas.coords(...)` (não redesenhes a grelha toda). Dá retorno visual: por
+   exemplo, contorno mais grosso ou cor mais clara no bloco em movimento.
+3. **`<ButtonRelease-1>`** — calcula a posição final e **atualiza o modelo**:
+   - **Alinha ao passo** (snap): `start_beat` arredondado ao passo mais próximo
+     — nada de tempos fracionários arbitrários. Deriva o passo de
+     `_get_steps_per_beat()`, não assumas 4.
+   - **Mudar de carril muda o instrumento**: largar na faixa da viola põe
+     `instrument="guitar"`, e vice-versa. É o comportamento natural e útil.
+   - **Limites**: `start_beat` nunca negativo; se o bloco ultrapassar o fim da
+     composição, ou limitas ao último tempo ou recusas e repões a posição
+     original (escolhe uma e sê consistente).
+   - Depois de atualizar, **sincroniza a lista de acordes** (`_refresh_chords_list`)
+     — as duas vistas não podem divergir.
+4. **Cancelar**: `<Escape>` durante o arrasto repõe a posição original. Não é
+   essencial mas evita movimentos acidentais irreversíveis.
+5. **Não quebrar o que já funciona**: clicar sem arrastar deve continuar a
+   selecionar o acorde (e atualizar o `PianoKeyboard`/`GuitarFretboard`).
+   Distingue clique de arrasto por um limiar de alguns píxeis.
+
+**Redimensionar** (arrastar a borda para mudar a duração) fica **fora de
+âmbito** — o utilizador não o pediu e a lista já permite editar a duração.
+Se implementares o arrasto de forma a permitir acrescentar isso depois, melhor;
+mas não o faças agora.
+
+### Validação que vou fazer
+- Cursor: medir que o ciclo de atualização não degrada o desempenho do ecrã
+  (está em ~169 ms a abrir) e que o temporizador é cancelado ao sair.
+- Scroll: confirmar que o `label_canvas` fica fixo.
+- Arrasto: mover um bloco entre carris e confirmar que `instrument` muda no
+  **modelo**, que o `start_beat` fica alinhado ao passo, e que a lista reflete
+  a alteração.
+
+---
+
 ## Revisão — Fase 46 APROVADA ✅ — SÉRIE 44-46 FECHADA
 - Commits revistos: `b222f7e`, `745aaeb`
 - Testes: 245/245 OK
