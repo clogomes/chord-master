@@ -661,3 +661,14 @@ Implementação nativa de um sistema de i18n em duas vertentes:
   - Eventos de roda do rato (`<MouseWheel>`, `<Shift-MouseWheel>`, `<Button-4>` e `<Button-5>`) vinculados ao `step_canvas` com tratamento adaptativo para macOS, Windows e Linux.
   - O painel de rótulos (`label_canvas`) permanece perfeitamente fixo.
 - **Suite de Testes Unitários (`tests/test_compose_studio_ui.py`)**: Validação da inicialização/ocultação do cursor e dos eventos de scroll horizontal do rato. Total de **245/245 testes a passar**.
+
+### Fase 48 — Estúdio de Composição: Arrastar e Largar Blocos de Acorde (Drag-and-Drop)
+- **Manipulação Direta por Arraste no Canvas (`gui/components/step_grid.py`)**:
+  - Implementação completa do ciclo `<ButtonPress-1>`, `<B1-Motion>`, `<ButtonRelease-1>` e `<Escape>` para blocos de acorde.
+  - Distinção por limiar de 5 píxeis entre clique simples (seleção de acorde / inspeção) e início de arrasto.
+  - **Retângulo Fantasma Translúcido (Ghost Block)**: Feedback visual em tempo real com retângulo semi-transparente e rótulo do acorde que acompanha o cursor do rato via `canvas.coords()` sem acionar `redraw()`.
+  - **Alinhamento Magnético por Passo (Snap-to-Grid)**: O tempo final `start_beat` é ajustado matematicamente ao passo mais próximo de forma proporcional à métrica de compasso (`_get_steps_per_beat()`), respeitando os limites da composição.
+  - **Transição de Faixa & Mudança de Instrumento**: Arrastar e largar um bloco na faixa de Piano ou Viola atualiza instantaneamente o campo `instrument="piano"` ou `instrument="guitar"` no modelo `ChordEvent`.
+  - **Sincronização em Tempo Real**: A lista de acordes, os destaques no `PianoKeyboard` e no `GuitarFretboard` e o renderizador são sincronizados de imediato.
+  - Possibilidade de cancelamento imediato do arrasto via tecla `<Escape>`.
+- **Suite de Testes Unitários (`tests/test_compose_studio_chords.py`)**: Validação do callback `_on_chord_moved`, persistência do novo `start_beat` e transição de instrumento. Total de **245/245 testes a passar**.

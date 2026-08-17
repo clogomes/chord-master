@@ -1,11 +1,11 @@
-"""Interactive Multi-Bar Step Sequencer Rhythm & Chord Grid Canvas widget with horizontal scrolling.
+"""Interactive Multi-Bar Step Sequencer Rhythm & Chord Grid Canvas widget with drag-and-drop.
 
 Draws a unified multi-bar (e.g. 16, 32, 64, 128, 256 steps) timeline matrix:
 1. Upper Section: 12 Percussion instruments with step toggle cells.
 2. Distinct Visual Divider.
 3. Lower Section: Harmonic chord lanes (Piano & Viola) showing ChordEvents as horizontal blocks.
 4. Fixed instrument label column on the left, smooth horizontal scrolling, mouse wheel scrolling,
-   and clock-based playback cursor (playhead).
+   clock-based playback cursor (playhead), and full drag-and-drop chord block repositioning/lane switching.
 """
 from typing import Callable, Dict, List, Optional, Tuple
 import tkinter as tk
@@ -37,7 +37,8 @@ CHORD_LANES = [
 
 class StepGrid(ctk.CTkFrame):
     """
-    Unified canvas-based multi-bar step sequencer, chord lane editor, and playback cursor display.
+    Unified canvas-based multi-bar step sequencer, chord lane editor, and playback cursor display
+    with interactive drag-and-drop chord repositioning.
     """
 
     def __init__(
@@ -52,6 +53,7 @@ class StepGrid(ctk.CTkFrame):
         on_grid_change: Optional[Callable[[List[List[str]]], None]] = None,
         on_chord_click: Optional[Callable[[int], None]] = None,
         on_chord_lane_click: Optional[Callable[[str, float], None]] = None,
+        on_chord_moved: Optional[Callable[[int, float, str], None]] = None,
         **kwargs,
     ):
         super().__init__(master, fg_color=theme.COLOR_SURFACE, corner_radius=theme.RADIUS_MD, **kwargs)
@@ -63,6 +65,7 @@ class StepGrid(ctk.CTkFrame):
         self.on_grid_change = on_grid_change
         self.on_chord_click = on_chord_click
         self.on_chord_lane_click = on_chord_lane_click
+        self.on_chord_moved = on_chord_moved
 
         # Initialize grid copy with total_steps length
         if grid:
@@ -93,6 +96,15 @@ class StepGrid(ctk.CTkFrame):
         self.canvas_height = int(self.header_height + self.drums_height + self.divider_height + self.chords_height + 10)
 
         self.cursor_line_id: Optional[int] = None
+
+        # Drag state tracking
+        self._drag_chord_idx: Optional[int] = None
+        self._drag_start_x: float = 0.0
+        self._drag_start_y: float = 0.0
+        self._drag_offset_x: float = 0.0
+        self._drag_rect_id: Optional[int] = None
+        self._drag_text_id: Optional[int] = None
+        self._is_dragging: bool = False
 
         self._build_ui()
 
@@ -132,7 +144,12 @@ class StepGrid(ctk.CTkFrame):
         self.step_canvas.configure(xscrollcommand=self.h_scrollbar.set)
 
         self.step_canvas.bind("<Configure>", lambda e: self.redraw())
-        self.step_canvas.bind("<Button-1>", self._on_step_canvas_click)
+
+        # Mouse button press, drag motion, release, and cancel bindings
+        self.step_canvas.bind("<ButtonPress-1>", self._on_canvas_press)
+        self.step_canvas.bind("<B1-Motion>", self._on_canvas_drag)
+        self.step_canvas.bind("<ButtonRelease-1>", self._on_canvas_release)
+        self.step_canvas.bind("<Escape>", self._on_cancel_drag)
 
         # Mouse wheel horizontal scroll bindings on step canvas
         self.step_canvas.bind("<MouseWheel>", self._on_mousewheel)
@@ -144,7 +161,6 @@ class StepGrid(ctk.CTkFrame):
         """Scrolls the step canvas horizontally with mouse wheel or trackpad."""
         delta = 0
         if hasattr(event, "delta") and event.delta != 0:
-            # macOS uses smaller deltas; Windows uses multiples of 120
             delta = -1 if event.delta > 0 else 1
             if abs(event.delta) >= 120:
                 delta = -int(event.delta / 40)
@@ -387,7 +403,7 @@ class StepGrid(ctk.CTkFrame):
             outline_col = "#FFFFFF" if is_selected else "#CBD5E1"
 
             self.step_canvas.create_rectangle(
-                x1, y1, x2, y2, fill=fill_color, outline=outline_col, width=2 if is_selected else 1
+                x1, y1, x2, y2, fill=fill_color, outline=outline_col, width=2 if is_selected else 1, tag=f"chord_{c_idx}"
             )
             self._chord_block_regions.append((c_idx, int(x1), int(y1), int(x2), int(y2)))
 
@@ -396,13 +412,123 @@ class StepGrid(ctk.CTkFrame):
             block_width = x2 - x1
             if block_width >= 28:
                 self.step_canvas.create_text(
-                    (x1 + x2) / 2, (y1 + y2) / 2, text=chord_name, fill="#FFFFFF", font=("Helvetica", 10, "bold")
+                    (x1 + x2) / 2, (y1 + y2) / 2, text=chord_name, fill="#FFFFFF", font=("Helvetica", 10, "bold"), tag=f"chord_txt_{c_idx}"
                 )
 
-    def _on_step_canvas_click(self, event):
+    def _on_canvas_press(self, event):
         canvas_x = self.step_canvas.canvasx(event.x)
         canvas_y = self.step_canvas.canvasy(event.y)
 
+        self._drag_start_x = canvas_x
+        self._drag_start_y = canvas_y
+        self._is_dragging = False
+
+        # 1. Check if click landed on a Chord Block (candidate for dragging or selection)
+        for c_idx, x1, y1, x2, y2 in self._chord_block_regions:
+            if x1 <= canvas_x <= x2 and y1 <= canvas_y <= y2:
+                self._drag_chord_idx = c_idx
+                self._drag_offset_x = canvas_x - x1
+                return
+
+        self._drag_chord_idx = None
+
+    def _on_canvas_drag(self, event):
+        canvas_x = self.step_canvas.canvasx(event.x)
+        canvas_y = self.step_canvas.canvasy(event.y)
+
+        if self._drag_chord_idx is None:
+            return
+
+        # Check drag threshold (5 pixels)
+        dx = abs(canvas_x - self._drag_start_x)
+        dy = abs(canvas_y - self._drag_start_y)
+        if not self._is_dragging and (dx > 5 or dy > 5):
+            self._is_dragging = True
+            # Create floating drag ghost rectangle
+            c_idx = self._drag_chord_idx
+            chord = self.chords_data[c_idx]
+            steps_per_beat = self._get_steps_per_beat()
+            block_width = chord.duration_beats * steps_per_beat * self.step_width
+
+            self._drag_rect_id = self.step_canvas.create_rectangle(
+                canvas_x - self._drag_offset_x, canvas_y - 15,
+                canvas_x - self._drag_offset_x + block_width, canvas_y + 15,
+                fill="#818CF8", outline="#FFFFFF", width=2, stipple="gray50", tag="drag_ghost"
+            )
+            sym = CHORD_TYPES.get(chord.chord_type, CHORD_TYPES["major"]).symbol or chord.chord_type
+            self._drag_text_id = self.step_canvas.create_text(
+                canvas_x - self._drag_offset_x + block_width / 2, canvas_y,
+                text=f"{chord.root}{sym}", fill="#FFFFFF", font=("Helvetica", 10, "bold"), tag="drag_ghost_txt"
+            )
+
+        if self._is_dragging and self._drag_rect_id is not None:
+            c_idx = self._drag_chord_idx
+            chord = self.chords_data[c_idx]
+            steps_per_beat = self._get_steps_per_beat()
+            block_width = chord.duration_beats * steps_per_beat * self.step_width
+            bx1 = canvas_x - self._drag_offset_x
+            bx2 = bx1 + block_width
+            self.step_canvas.coords(self._drag_rect_id, bx1, canvas_y - 15, bx2, canvas_y + 15)
+            if self._drag_text_id is not None:
+                self.step_canvas.coords(self._drag_text_id, (bx1 + bx2) / 2, canvas_y)
+            self.step_canvas.tag_raise(self._drag_rect_id)
+            if self._drag_text_id:
+                self.step_canvas.tag_raise(self._drag_text_id)
+
+    def _on_canvas_release(self, event):
+        canvas_x = self.step_canvas.canvasx(event.x)
+        canvas_y = self.step_canvas.canvasy(event.y)
+
+        # Clear drag ghost
+        if self._drag_rect_id:
+            self.step_canvas.delete(self._drag_rect_id)
+            self._drag_rect_id = None
+        if self._drag_text_id:
+            self.step_canvas.delete(self._drag_text_id)
+            self._drag_text_id = None
+
+        if self._is_dragging and self._drag_chord_idx is not None:
+            c_idx = self._drag_chord_idx
+            chord = self.chords_data[c_idx]
+            steps_per_beat = self._get_steps_per_beat()
+            total_beats = self.bars * self._get_beats_per_bar()
+
+            # Calculate dropped beat snapped to nearest step
+            dropped_pixel_x = max(4.0, canvas_x - self._drag_offset_x)
+            dropped_step = round((dropped_pixel_x - 4.0) / self.step_width)
+            snapped_beat = max(0.0, min(float(total_beats - chord.duration_beats), dropped_step / steps_per_beat))
+
+            # Determine target instrument lane based on Y coordinate
+            chord_start_y = self.header_height + self.drums_height + self.divider_height + 4
+            mid_y = chord_start_y + self.chord_row_height
+            target_instrument = "piano" if canvas_y < mid_y else "guitar"
+
+            # Reset drag state
+            self._is_dragging = False
+            self._drag_chord_idx = None
+
+            if self.on_chord_moved:
+                self.on_chord_moved(c_idx, snapped_beat, target_instrument)
+            return
+
+        # If it was a clean click without drag:
+        self._is_dragging = False
+        self._drag_chord_idx = None
+        self._handle_clean_click(canvas_x, canvas_y)
+
+    def _on_cancel_drag(self, event=None):
+        """Cancels current dragging operation and resets ghost elements."""
+        if self._drag_rect_id:
+            self.step_canvas.delete(self._drag_rect_id)
+            self._drag_rect_id = None
+        if self._drag_text_id:
+            self.step_canvas.delete(self._drag_text_id)
+            self._drag_text_id = None
+        self._is_dragging = False
+        self._drag_chord_idx = None
+        self.redraw()
+
+    def _handle_clean_click(self, canvas_x: float, canvas_y: float):
         # 1. Check if click was on a Drum Step Cell
         for (r_idx, s_idx), (x1, y1, x2, y2) in self._cell_regions.items():
             if x1 <= canvas_x <= x2 and y1 <= canvas_y <= y2:

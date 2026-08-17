@@ -275,7 +275,7 @@ class ComposeStudioScreen(ctk.CTkFrame):
             text_color=theme.COLOR_TEXT_MUTED,
         ).pack(side="right")
 
-        # Step Grid Canvas Component (Unified Multi-bar Rhythm & Chord Timeline)
+        # Step Grid Canvas Component (Unified Multi-bar Rhythm & Chord Timeline with Drag-and-Drop)
         steps = self.composition.rhythm.steps_per_bar if self.composition.rhythm else 16
         bars = self.composition.bars
         grid_data = self.composition.rhythm.grid if self.composition.rhythm else []
@@ -290,6 +290,7 @@ class ComposeStudioScreen(ctk.CTkFrame):
             on_grid_change=self._on_grid_updated,
             on_chord_click=self._select_chord,
             on_chord_lane_click=self._on_chord_lane_clicked,
+            on_chord_moved=self._on_chord_moved,
         )
         self.step_grid.pack(fill="both", expand=True, padx=14, pady=(4, 12))
 
@@ -614,6 +615,17 @@ class ComposeStudioScreen(ctk.CTkFrame):
         self.selected_chord_idx = self.composition.chords.index(event) if event in self.composition.chords else 0
         self.step_grid.set_chords(self.composition.chords, self.selected_chord_idx)
         self._update_visualizers_for_chord(event)
+
+    def _on_chord_moved(self, index: int, new_start_beat: float, new_instrument: str):
+        """Called when a chord block is dragged and dropped onto a new position or lane."""
+        if 0 <= index < len(self.composition.chords):
+            chord = self.composition.chords[index]
+            chord.start_beat = new_start_beat
+            chord.instrument = new_instrument
+            self._refresh_chords_list()
+            self.selected_chord_idx = self.composition.chords.index(chord) if chord in self.composition.chords else 0
+            self.step_grid.set_chords(self.composition.chords, self.selected_chord_idx)
+            self._update_visualizers_for_chord(chord)
 
     def _delete_chord(self, index: int):
         if 0 <= index < len(self.composition.chords):

@@ -95,6 +95,13 @@ class TestComposeStudioChords(unittest.TestCase):
         self.assertEqual(inserted_chord.instrument, "piano")
         self.assertEqual(screen.composition.chords[1].start_beat, 6.0)
 
+        # Test moving a chord via drag-and-drop: move chord index 1 to beat 2.0 and switch instrument to guitar
+        screen._on_chord_moved(1, new_start_beat=2.0, new_instrument="guitar")
+        moved_chord = next(c for c in screen.composition.chords if c.start_beat == 2.0)
+        self.assertEqual(moved_chord.instrument, "guitar")
+        self.assertEqual(moved_chord.start_beat, 2.0)
+        self.assertEqual(screen.step_grid.chords_data[1].instrument, "guitar")
+
         # Toggle visualizer modes
         screen._on_vis_mode_changed("🎹 Piano")
         screen._on_vis_mode_changed("🎸 Viola")
