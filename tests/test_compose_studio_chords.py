@@ -85,6 +85,15 @@ class TestComposeStudioChords(unittest.TestCase):
         screen._delete_chord(1)
         self.assertEqual(len(screen.composition.chords), 2)
         self.assertEqual(screen.composition.chords[1].root, "A")
+        self.assertEqual(len(screen.step_grid.chords_data), 2)
+
+        # Test clicking directly on a chord lane to insert a chord at beat 6.0
+        screen._on_chord_lane_clicked("piano", 6.0)
+        self.assertEqual(len(screen.composition.chords), 3)
+        # Because chords are sorted [beat 0.0, beat 6.0, beat 8.0], index 1 has start_beat 6.0
+        inserted_chord = next(c for c in screen.composition.chords if c.start_beat == 6.0)
+        self.assertEqual(inserted_chord.instrument, "piano")
+        self.assertEqual(screen.composition.chords[1].start_beat, 6.0)
 
         # Toggle visualizer modes
         screen._on_vis_mode_changed("🎹 Piano")

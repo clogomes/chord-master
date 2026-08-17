@@ -624,3 +624,13 @@ Implementação nativa de um sistema de i18n em duas vertentes:
   - Ao diminuir o número de compassos, é exibida confirmação modal (`messagebox.askyesno`) caso existam batidas ou acordes nos compassos a descartar.
   - **Retrocompatibilidade com Composições Legadas**: `Composition.from_dict` expande automaticamente matrizes curtas de 16 passos para a duração completa de `bars × steps_per_bar` via `% len(grid)` mantendo a sonoridade idêntica.
 - **Suite de Testes Unitários (`tests/test_compose_studio_ui.py`, `tests/test_composition_models.py`)**: Validação de expansão multi-compasso, scroll e compatibilidade de carregamento de composições legadas. Total de **244/244 testes a passar**.
+
+### Fase 45 — Estúdio de Composição: Faixa de Acordes na Mesma Grelha Temporal
+- **Faixa de Acordes Unificada na Linha Temporal (`gui/components/step_grid.py`)**:
+  - Integração de dois carris harmónicos (`🎹 Acordes (Piano)` e `🎸 Acordes (Viola)`) diretamente na mesma grelha temporal do sequenciador, por baixo da percussão e separados por um divisor visual horizontal.
+  - **Representação Visual em Blocos**: Cada `ChordEvent` é renderizado como um bloco retangular que se inicia no tempo exato `start_beat` e se estende proporcionalmente à sua duração `duration_beats`, com cálculo dinâmico da relação passos/tempo derivado do compasso e de `steps_per_bar`.
+  - **Interação Rápida por Clique na Linha Temporal**:
+    - Clicar num bloco seleciona o acorde e atualiza instantaneamente a digitação no `PianoKeyboard` e no `GuitarFretboard`.
+    - Clicar numa área vazia de um carril harmónico insere imediatamente um novo acorde nesse tempo (quantizado a 0.5 tempos), com a tónica e tipo atualmente selecionados nos controlos.
+  - **Sincronização Bidirecional**: A lista de cartões de acordes e a linha temporal gráfica mantêm-se 100% sincronizadas em todas as operações de criação, seleção e eliminação.
+- **Suite de Testes Unitários (`tests/test_compose_studio_chords.py`)**: Testes de sincronização gráfica de blocos de acordes na grelha temporal, inserção por clique no carril e ordenação cronológica. Total de **244/244 testes a passar**.

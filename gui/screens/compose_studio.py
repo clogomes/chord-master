@@ -272,16 +272,21 @@ class ComposeStudioScreen(ctk.CTkFrame):
             text_color=theme.COLOR_TEXT_MUTED,
         ).pack(side="right")
 
-        # Step Grid Canvas Component (Multi-bar with horizontal scroll)
+        # Step Grid Canvas Component (Unified Multi-bar Rhythm & Chord Timeline)
         steps = self.composition.rhythm.steps_per_bar if self.composition.rhythm else 16
         bars = self.composition.bars
         grid_data = self.composition.rhythm.grid if self.composition.rhythm else []
         self.step_grid = StepGrid(
             grid_card,
             grid=grid_data,
+            chords=self.composition.chords,
             steps_per_bar=steps,
             bars=bars,
+            time_signature=self.composition.time_signature,
+            selected_chord_idx=self.selected_chord_idx,
             on_grid_change=self._on_grid_updated,
+            on_chord_click=self._select_chord,
+            on_chord_lane_click=self._on_chord_lane_clicked,
         )
         self.step_grid.pack(fill="both", expand=True, padx=14, pady=(4, 12))
 
@@ -578,14 +583,34 @@ class ComposeStudioScreen(ctk.CTkFrame):
             instrument=instrument,
         )
         self.composition.chords.append(event)
-        self.selected_chord_idx = len(self.composition.chords) - 1
         self._refresh_chords_list()
+        self.selected_chord_idx = self.composition.chords.index(event) if event in self.composition.chords else 0
+        self.step_grid.set_chords(self.composition.chords, self.selected_chord_idx)
         self._update_visualizers_for_chord(event)
 
         # Advance start beat suggestion by duration
         next_beat = start_beat + duration_beats
         if str(next_beat) in self.start_beat_menu._values:
             self.start_beat_menu.set(str(next_beat))
+
+    def _on_chord_lane_clicked(self, instrument: str, beat: float):
+        """Called when clicking on an empty area of the chord timeline canvas."""
+        root = self.root_menu.get()
+        raw_type = self.chord_type_menu.get().split()[0]
+        duration_beats = float(self.dur_menu.get())
+
+        event = ChordEvent(
+            root=root,
+            chord_type=raw_type,
+            start_beat=beat,
+            duration_beats=duration_beats,
+            instrument=instrument,
+        )
+        self.composition.chords.append(event)
+        self._refresh_chords_list()
+        self.selected_chord_idx = self.composition.chords.index(event) if event in self.composition.chords else 0
+        self.step_grid.set_chords(self.composition.chords, self.selected_chord_idx)
+        self._update_visualizers_for_chord(event)
 
     def _delete_chord(self, index: int):
         if 0 <= index < len(self.composition.chords):
@@ -597,10 +622,12 @@ class ComposeStudioScreen(ctk.CTkFrame):
             elif self.selected_chord_idx is not None and self.selected_chord_idx > index:
                 self.selected_chord_idx -= 1
             self._refresh_chords_list()
+            self.step_grid.set_chords(self.composition.chords, self.selected_chord_idx)
 
     def _select_chord(self, index: int):
         self.selected_chord_idx = index
         self._refresh_chords_list()
+        self.step_grid.set_chords(self.composition.chords, self.selected_chord_idx)
         if 0 <= index < len(self.composition.chords):
             chord = self.composition.chords[index]
             self._update_visualizers_for_chord(chord)
