@@ -4,6 +4,7 @@ from typing import Callable, List, Optional
 import customtkinter as ctk
 from core.glossary import GLOSSARY_DATABASE, GlossaryTerm, search_terms, get_term_by_id
 from core.user_manager import UserManager
+from core.notes import Note
 from gui.i18n import t, get_language
 from gui import theme
 from audio.player import get_audio_player

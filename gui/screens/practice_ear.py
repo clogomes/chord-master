@@ -1,5 +1,6 @@
 from gui.i18n import t
 """Interactive Ear Training & Vocal Solfège Practice Screen with PitchListener real-time validation."""
+import re
 import time
 from typing import Callable, List, Optional
 import customtkinter as ctk

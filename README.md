@@ -672,3 +672,11 @@ Implementação nativa de um sistema de i18n em duas vertentes:
   - **Sincronização em Tempo Real**: A lista de acordes, os destaques no `PianoKeyboard` e no `GuitarFretboard` e o renderizador são sincronizados de imediato.
   - Possibilidade de cancelamento imediato do arrasto via tecla `<Escape>`.
 - **Suite de Testes Unitários (`tests/test_compose_studio_chords.py`)**: Validação do callback `_on_chord_moved`, persistência do novo `start_beat` e transição de instrumento. Total de **245/245 testes a passar**.
+
+### Correção Crítica & Análise Estática Automatizada (Pyflakes F821)
+- **Correção de 4 Regressões de Nomes Indefinidos**:
+  - `gui/screens/compose_studio.py`: Adicionado `import time` para cálculo temporal do cursor e captura de erro por valor `err=e` em lambdas assíncronas do worker thread.
+  - `gui/screens/glossary_screen.py`: Adicionado `from core.notes import Note` para reprodução áudio de termos.
+  - `gui/screens/practice_ear.py`: Adicionado `import re` para extração de IDs de revisão espaçada ao responder a perguntas.
+- **Nova Suite Automatizada de Análise Estática (`tests/test_no_undefined_names.py`)**:
+  - Scanner automatizado que corre pyflakes programaticamente sobre todas as pastas do projeto (`audio/`, `core/`, `gui/`, `tests/` e `main.py`) e falha imediatamente caso detete qualquer variável, import ou símbolo indefinido (`UndefinedName` / F821). Total de **246/246 testes a passar**.

@@ -1,5 +1,6 @@
 """Composition Studio Screen (Phase 43) with interactive step sequencer, chord track, and dual piano/guitar visualizers."""
 import threading
+import time
 from tkinter import messagebox
 from typing import Callable, Dict, List, Optional
 import customtkinter as ctk
@@ -787,7 +788,7 @@ class ComposeStudioScreen(ctk.CTkFrame):
                 # 2. Marshal sound creation and playback back to UI
                 self.after(0, lambda: self._play_rendered_buffer(stereo_float32))
             except Exception as e:
-                self.after(0, lambda: self._handle_playback_error(e))
+                self.after(0, lambda err=e: self._handle_playback_error(err))
 
         self._render_thread = threading.Thread(target=_render_and_play, daemon=True)
         self._render_thread.start()
