@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Correção Crítica — Resolução de 5 Nomes Indefinidos & Teste Estático Automatizado — CONCLUÍDA
+- Data: 2026-08-17T21:52:17+01:00
+- Commit: 253ae5f
+- Resumo: Corrigidas as 5 ocorrências de símbolos indefinidos detetados pelo supervisor: adicionado `import time` e captura de exceção por valor `err=e` em `gui/screens/compose_studio.py`, adicionado `from core.notes import Note` em `gui/screens/glossary_screen.py`, e adicionado `import re` em `gui/screens/practice_ear.py`. Criado novo teste automatizado `tests/test_no_undefined_names.py` que corre pyflakes programaticamente sobre todas as pastas do projeto (`audio`, `core`, `gui`, `tests`, `main.py`) para impedir regressões desta classe de erro. 246/246 testes a passar.
+- Ficheiros principais alterados: gui/screens/compose_studio.py, gui/screens/glossary_screen.py, gui/screens/practice_ear.py, tests/test_no_undefined_names.py, README.md
+
 ## Fase 48 — Estúdio de Composição: Arrastar e Largar Blocos de Acorde — CONCLUÍDA
 - Data: 2026-08-17T19:02:01+01:00
 - Commit: 7d45832
