@@ -570,3 +570,13 @@ Implementação nativa de um sistema de i18n em duas vertentes:
 - **Pré-requisitos e Percurso de Aprendizagem Recomendado (`core/theory_content.py`)**:
   - Novo campo `prerequisites: List[str]` em cada `TheoryChapter` com mapeamento pedagógico estrito e apresentação destacada de pré-requisitos recomendados no cabeçalho de cada capítulo.
 - **Suite de Testes Unitários**: 227/227 testes a passar (`tests/test_chords.py`, `tests/test_guitar.py`, `tests/test_double_accidentals.py`, etc.).
+
+### Fase 40 — Estúdio de Composição: Modelo de Dados & Persistência
+- **Modelo de Dados do Estúdio de Composição (`core/composition.py`)**:
+  - `ChordEvent`: Evento de acorde com raiz (`C`, `Bb`, `F#`), tipo de acorde (22 tipos de `CHORD_TYPES`), tempo inicial fracionário (`start_beat`), duração em tempos (`duration_beats`) e instrumento (`piano` ou `guitar`).
+  - `RhythmTrack`: Pista de percussão configurável com `steps_per_bar` (16 passos para 4/4 ou 12 passos para 3/4 / blues), matriz `grid: List[List[str]]` (kick, snare, hihats, ride), controlo de volume e mute.
+  - `Composition`: Entidade principal contendo identificador, título, BPM, métrica de compasso, número de compassos (`bars`), pista rítmica, lista de eventos de acordes, volume master e versionamento de schema (`schema_version=1`).
+- **Adaptador de Padrões Rítmicos**: Método `RhythmTrack.from_pattern()` que converte instantaneamente qualquer um dos 12 padrões da `BACKING_TRACK_LIBRARY` em matrizes de edição ativas.
+- **Persistência Segura JSON (`core/compositions.py`)**:
+  - Gravação, carregamento, atualização e remoção em `user_compositions.json` com serialização manual `to_dict` / `from_dict`, valores por omissão defensivos com `.get()` e tolerância a esquemas legados.
+- **Suite de Testes Unitários (`tests/test_composition_models.py`)**: 6 novos testes cobrindo round-trip JSON, compatibilidade retroativa com campos omissos, adaptação dos 12 ritmos e operações CRUD. Total de **235/235 testes a passar**.
