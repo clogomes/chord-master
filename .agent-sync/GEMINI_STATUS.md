@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 40 — Estúdio de Composição: Modelo de Dados & Persistência — CONCLUÍDA
+- Data: 2026-08-17T17:46:04+01:00
+- Commit: c1935bf
+- Resumo: Implementado o modelo de dados para o Estúdio de Composição em `core/composition.py` (`ChordEvent`, `RhythmTrack`, `Composition`) com suporte a 22 tipos de acorde, instrumentos (piano/viola), grelha de passos de percussão e controlo de volume/mute. Criado o adaptador `RhythmTrack.from_pattern` para importar qualquer um dos 12 ritmos de `BACKING_TRACK_LIBRARY`. Implementado motor de persistência JSON em `core/compositions.py` com `to_dict` / `from_dict`, `schema_version=1` e tolerância a esquemas legados. 235/235 testes a passar (6 novos testes unitários em `tests/test_composition_models.py`).
+- Ficheiros principais alterados: core/composition.py, core/compositions.py, tests/test_composition_models.py, README.md
+
 ## Correção AÇÃO NECESSÁRIA — Áudio do Glossário & Debounce 130ms — CONCLUÍDA
 - Data: 2026-08-17T17:45:11+01:00
 - Commit: 31cd17f
