@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 42 — Estúdio de Composição: Ecrã & Grelha de Ritmo Interativa — CONCLUÍDA
+- Data: 2026-08-17T17:55:28+01:00
+- Commit: 04c7641
+- Resumo: Criado o ecrã do Estúdio de Composição (`gui/screens/compose_studio.py`) e o componente de sequenciador `StepGrid` (`gui/components/step_grid.py`). A grelha de 16 passos é desenhada inteiramente em `tk.Canvas` com retângulos leves e mapa de regiões (zero sobrecarga de widgets por célula). O ecrã inclui barra de transporte (título, BPM 40-220, compassos 2-16), seletor de modelos com os 12 ritmos pré-definidos da biblioteca, carregamento/gravação de composições em disco, e renderização assíncrona em thread em segundo plano com envio do buffer para reprodução via pygame sem bloquear a UI. Integrada rota `"compose_studio"` na barra lateral, no menu principal e em `gui/i18n.py`. 241/241 testes a passar.
+- Ficheiros principais alterados: gui/components/step_grid.py, gui/screens/compose_studio.py, gui/app.py, gui/screens/main_menu.py, gui/i18n.py, tests/test_compose_studio_ui.py, tests/test_smoke.py, README.md
+
 ## Fase 41 — Estúdio de Composição: Motor de Renderização Offline — CONCLUÍDA
 - Data: 2026-08-17T17:50:32+01:00
 - Commit: 4ea79a2
