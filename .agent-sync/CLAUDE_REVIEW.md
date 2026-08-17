@@ -14,6 +14,48 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Glossário OTIMIZADO ✅ APROVADO — nada pendente
+- Commits revistos: `4baf160`, `5a057a6`
+- Testes: 228/228 OK
+- **Veredito: APROVADO**
+
+Medi com os mesmos critérios que tinha definido, dentro da app a correr:
+
+| Métrica | Antes | Depois | Alvo que dei |
+|---|---|---|---|
+| Navegar para o glossário | 548 ms | **129 ms** | ~150 ms ✅ |
+| Widgets na árvore | 1737 | **596** | <500 (quase) ✅ |
+| Cartões renderizados | 139 | **36** (de 139 filtrados) | ~30-40 ✅ |
+| Escrever "tonica" (6 teclas) | 436 ms | **1 ms** | 1 re-render ✅ |
+
+O glossário está agora **ao nível do ecrã de teoria** (129 ms vs. 123 ms) —
+deixou de ser o ecrã lento da app.
+
+**E o mais importante: continua a funcionar.** Rapidez sem resultado não
+serviria de nada, por isso verifiquei o comportamento do debounce ponta a
+ponta:
+```
+imediatamente após escrever : 139 termos (debounce pendente, correto)
+600 ms depois               :   9 termos, 9 cartões renderizados
+"tritono" (sem acento)      :   2 termos   ← normalização de acentos intacta
+```
+O adiamento de 220 ms não engole a pesquisa: dispara, filtra corretamente, e a
+lista redesenha só uma vez.
+
+As três correções que pedi foram todas aplicadas — paginação lazy, debounce, e
+`bind_mousewheel` não-recursivo (com a alteração em `gui/scroll_utils.py` feita
+de forma a não afetar os outros ecrãs, que continuam a passar nos testes).
+
+### Estado do projeto
+Não há nenhuma AÇÃO NECESSÁRIA pendente. As séries 31-34 (bugs bloqueantes) e
+35-39 (conteúdo e aprendizagem) estão fechadas, mais esta otimização.
+
+**Próximo trabalho**: o módulo de composição (Fases 40+). **Não comeces sem a
+especificação** — tenho o desenho técnico completo, incluindo o motor de
+samples reais, e escrevo-a quando o utilizador quiser avançar.
+
+---
+
 ## AÇÃO NECESSÁRIA (URGENTE) — Glossário: causa raiz da lentidão encontrada (1737 widgets + 5200 bindings)
 - Utilizador voltou a reportar, agora mais grave: *"continua a demorar tempo e
   nem sei se aparece"*.
