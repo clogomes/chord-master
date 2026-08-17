@@ -14,6 +14,113 @@ Cada entrada tem um veredito:
 
 ---
 
+## TRABALHO PEDIDO — Fases 44 a 46: Estúdio de Composição, segunda iteração
+- Pedido do utilizador depois de experimentar o estúdio: *"adicionar uma faixa
+  dos acordes de piano e de viola na mesma área da percussão para poder marcar
+  os tempos melhor; mais compassos, com scroll horizontal se for preciso; e
+  mais tipos de percussão."*
+- **REGRA: uma fase de cada vez**, com o meu APROVADO escrito entre cada uma.
+- Ordem deliberada: a grelha multi-compasso vem primeiro porque a faixa de
+  acordes precisa de se alinhar a essa mesma linha temporal. Não troques.
+
+### Descoberta importante — os "compassos" hoje não fazem o que parecem
+Verifiquei por execução: o seletor oferece 2/4/8/16 compassos e o motor
+respeita-os, **mas a grelha só guarda 16 passos (1 compasso) e o renderer
+repete-o**:
+```python
+grid_step = rhythm.grid[step_idx % grid_len]     # composition_renderer.py:250
+```
+```
+4 compassos com bombo no passo 0 → bombos em 0.0s, 2.0s, 4.0s, 6.0s
+grelha guardada: 16 passos (não 64)
+```
+Ou seja, hoje só se compõe **um** compasso, repetido. É precisamente esta
+limitação que a Fase 44 tem de levantar.
+
+### FASE 44 — Grelha multi-compasso com scroll horizontal
+1. **A grelha passa a cobrir a composição inteira**: `bars × steps_per_bar`
+   passos (ex: 8 compassos × 16 = 128 passos), em vez de 16 fixos.
+   - `RhythmTrack.grid` passa a ter esse comprimento.
+   - Ao mudar o número de compassos: **aumentar preserva o que já existe** e
+     acrescenta passos vazios; **diminuir** deve avisar antes de descartar
+     conteúdo (não apagues trabalho do utilizador em silêncio).
+   - **Compatibilidade**: composições já gravadas têm grelhas de 16 passos.
+     Ao carregar, expande com `% len(grid)` (mantendo o comportamento atual de
+     repetição) para que nada do que o utilizador já gravou se perca ou soe
+     diferente. Testa isto explicitamente.
+2. **Scroll horizontal no canvas** (`gui/components/step_grid.py`):
+   - `canvas.config(scrollregion=...)` + `xscrollcommand` ligado a um
+     `CTkScrollbar` horizontal.
+   - **A coluna de rótulos dos instrumentos tem de ficar fixa** à esquerda
+     (não deve deslizar com o conteúdo) — senão perde-se a referência de que
+     linha é o bombo. Usa um segundo canvas estreito à esquerda, ou desenha os
+     rótulos com coordenadas fixas ao viewport.
+   - Marcações de compasso visíveis: linha vertical mais forte no início de
+     cada compasso e um número ("1", "2", "3"…) por cima. Sem isso, 128 passos
+     são indistinguíveis.
+3. **Desempenho** — 128 passos × 5+ linhas = 640+ retângulos. Continua a usar
+   `create_rectangle` (nunca widgets), e **desenha só o que está visível** se
+   passar de ~1000 retângulos. Mede antes e depois: o ecrã está em 98 ms /
+   150 widgets e não deve degradar-se muito.
+4. O renderer já suporta multi-compasso (`total_steps = total_bars *
+   steps_per_bar`); com a grelha do tamanho certo, o `%` deixa de ter efeito
+   prático. Confirma que continua a funcionar para grelhas curtas e longas.
+
+### FASE 45 — Faixa de acordes na mesma grelha temporal
+Hoje os acordes vivem numa lista separada, sem relação visual com os tempos.
+O utilizador quer vê-los **alinhados com a percussão**.
+1. Acrescenta **duas linhas** ao mesmo canvas da grelha, por baixo da
+   percussão e separadas por um divisor visível:
+   - `🎹 Acordes (Piano)`
+   - `🎸 Acordes (Viola)`
+2. Cada `ChordEvent` desenha-se como um **bloco horizontal** que começa em
+   `start_beat` e se estende por `duration_beats`, na linha do seu
+   `instrument`. Mostra o nome do acorde dentro do bloco (ex: "Cmaj7") quando
+   houver largura para isso.
+3. **Interação mínima**: clicar num bloco seleciona o acorde (e atualiza o
+   `PianoKeyboard`/`GuitarFretboard`, como já faz); clicar numa zona vazia da
+   linha insere um acorde nesse tempo com a raiz/tipo atualmente escolhidos
+   nos menus. Arrastar para mover/redimensionar é desejável mas **opcional** —
+   se ficar complicado, deixa para depois e mantém a edição pelos menus.
+4. Mantém a lista de acordes existente (é útil para editar duração e apagar) —
+   **não a substituas**, sincroniza as duas vistas.
+5. Alinhamento: `start_beat` é em tempos, a grelha é em passos. Com
+   `steps_per_bar=16` em 4/4, 1 tempo = 4 passos. Não assumas esse rácio como
+   fixo — deriva-o de `steps_per_bar` e do compasso.
+
+### FASE 46 — Mais tipos de percussão
+Hoje há **4 sintetizadores** (`synthesize_kick/snare/hihat/ride`) e **5 linhas**
+(o hi-hat aberto e fechado partilham sintetizador).
+1. Acrescenta sintetizadores em `audio/backing_tracks.py`, no mesmo estilo
+   numpy dos existentes (100% locais, sem ficheiros):
+   - **Tom grave / médio / agudo** — seno com varredura descendente de
+     frequência + envelope curto; é essencialmente o `synthesize_kick` com
+     frequências mais altas e menos varredura.
+   - **Palmas (clap)** — 3-4 rajadas de ruído filtrado, separadas por ~10 ms,
+     com uma cauda de reverberação curta. É o que dá o carácter de palma.
+   - **Prato de ataque (crash)** — como o `ride` mas com cauda muito mais longa
+     (2-4 s) e espectro mais denso.
+   - **Aro (rim shot)** — clique muito curto e agudo, ruído filtrado em banda
+     estreita.
+   - **Caixa chinesa / cowbell** — dois quadrados desafinados, como já fazes
+     no hi-hat mas com frequências mais baixas e afinadas.
+2. Acrescenta as linhas correspondentes a `DRUM_ROWS` em `step_grid.py`, com
+   ícone, nome PT/EN e cor distinta.
+3. **Atenção ao comprimento do buffer**: um crash de 4 s no último passo tem de
+   caber. O renderer já dimensiona pela cauda mais longa — confirma que
+   continua correto com os sons novos (teste: crash no último passo, verificar
+   que decai a zero e não é cortado).
+4. **Cache**: os sons de percussão são sintetizados uma vez e reutilizados
+   (`_get_synthesized_drum_sample`). Garante que os novos entram na mesma
+   cache, senão o primeiro render fica lento.
+5. Com mais linhas, a grelha fica mais alta — confirma que continua a caber ou
+   que o scroll vertical funciona.
+
+### Fora de âmbito (continua a não implementar)
+Piano roll, gravação ao vivo, samples externos, exportação para ficheiro.
+
+---
+
 ## Revisão — Fase 43 APROVADA ✅ — SÉRIE 40-43 FECHADA (Estúdio de Composição completo)
 - Commits revistos: `aa22edb`, `c1b8a36`
 - Testes: 243/243 OK
