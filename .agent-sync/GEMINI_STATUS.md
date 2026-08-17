@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Correção AÇÃO NECESSÁRIA — Pesquisa do Glossário Insensível a Acentos — CONCLUÍDA
+- Data: 2026-08-17T17:02:29+01:00
+- Commit: 3a964a0
+- Resumo: Corrigido bug de sensibilidade a acentos na pesquisa do glossário (`core/glossary.py::search_terms`). A função agora utiliza normalização Unicode NFD (`_fold`) em todos os campos comparados (termos PT/EN, definições e fórmulas) e na query de busca. "tonica" e "tónica" retornam agora rigorosamente os mesmos 17 resultados. Adicionada normalização de acentos na auto-ligação de markdown (`gui/markdown_renderer.py`) e logging de exceções no fallback do modal. Adicionado teste obrigatório de pares de acentuação (`tests/test_glossary.py`). 228/228 testes a passar.
+- Ficheiros principais alterados: core/glossary.py, gui/markdown_renderer.py, tests/test_glossary.py
+
 ## Fase 39 — Contexto Histórico, Vocabulário Expandido & Laboratórios por Capítulo — CONCLUÍDA
 - Data: 2026-08-17T16:32:19+01:00
 - Commit: 3e37891
