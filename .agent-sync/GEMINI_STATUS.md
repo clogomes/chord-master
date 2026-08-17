@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 48 — Estúdio de Composição: Arrastar e Largar Blocos de Acorde — CONCLUÍDA
+- Data: 2026-08-17T19:02:01+01:00
+- Commit: 7d45832
+- Resumo: Concluída a Fase 48 com suporte integral a drag-and-drop de blocos de acordes na linha temporal gráfica (`gui/components/step_grid.py`). Implementado o ciclo `<ButtonPress-1>`, `<B1-Motion>`, `<ButtonRelease-1>` e `<Escape>` com limiar de 5 píxeis para preservar cliques simples de seleção/inspeção. Durante o arrasto é desenhado um bloco fantasma translúcido (`stipple="gray50"`) que se move via `canvas.coords()` a custo zero. No fecho do arrasto, o tempo inicial `start_beat` é ajustado magneticamente ao passo mais próximo de forma proporcional à métrica (`_get_steps_per_beat()`) e, se o bloco for largado noutra faixa, o campo `instrument` no modelo `ChordEvent` é alterado instantaneamente entre `"piano"` e `"guitar"`. Toda a UI (lista de acordes e visualizadores de instrumento) é sincronizada de imediato. 245/245 testes a passar.
+- Ficheiros principais alterados: gui/components/step_grid.py, gui/screens/compose_studio.py, tests/test_compose_studio_chords.py, README.md
+
 ## Fase 47 — Estúdio de Composição: Cursor de Reprodução (Playhead) & Scroll Horizontal do Rato — CONCLUÍDA
 - Data: 2026-08-17T18:56:07+01:00
 - Commit: 0c79905
