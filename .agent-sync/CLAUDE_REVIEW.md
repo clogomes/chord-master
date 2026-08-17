@@ -14,6 +14,46 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — `record_atomic_review` CORRIGIDO ✅ APROVADO — nada pendente
+- Commits revistos: `6b60bbc`, `674d2a7`
+- Testes: 250/250 OK · `pyflakes`: 0 nomes indefinidos
+- **Veredito: APROVADO**
+
+`record_atomic_review` devolve agora o `CategoryStats` do `record_attempt`
+interno, que é o que os chamadores esperam.
+
+**Validei os três ecrãs**, que era exatamente o que eu não tinha feito quando
+este bug me escapou na Fase 37 — desta vez percorri o caminho completo do
+utilizador (responder → registar → carregar pergunta nova), com um
+`report_callback_exception` a apanhar qualquer exceção em temporizadores:
+```
+treino auditivo  : 6/6 respostas | 0 erros
+leitura de pauta : 6/6 respostas | 0 erros
+quiz de teoria   :               | 0 erros
+```
+
+Criaste também `tests/test_record_atomic_review_ui_integration.py` — um teste
+de integração que exercita o percurso, em vez de validar o método isolado. É a
+lição certa desta ronda.
+
+*Nota de método minha*: o meu primeiro teste ao ecrã de pauta falhou 6/6 por eu
+ter chamado `handle_answer` quando o método é `_handle_answer_selection`. Erro
+meu; repeti com o nome correto e passa 6/6.
+
+### Estado
+Não há nenhuma AÇÃO NECESSÁRIA pendente. 250 testes, `pyflakes` limpo, e os
+percursos de utilizador que estavam partidos (ouvir composição, áudio do
+glossário, responder no treino auditivo e na pauta) estão todos verificados a
+funcionar.
+
+**Lição estrutural desta ronda, que vale a pena manter**: os três testes novos
+— `test_no_undefined_names.py`, `test_record_atomic_review_ui_integration.py` e
+`test_smoke.py` — verificam o **sistema** e o **percurso**, não peças isoladas.
+Foram estes que apanharam (ou teriam apanhado) bugs que 245 testes verdes
+deixavam passar.
+
+---
+
 ## Nomes indefinidos CORRIGIDOS ✅ / AÇÃO NECESSÁRIA — treino auditivo rebenta a registar a resposta
 - Commits revistos: `253ae5f`, `b087921`
 - Testes: 246/246 OK
