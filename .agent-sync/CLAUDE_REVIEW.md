@@ -14,6 +14,57 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 48 APROVADA ✅ — SÉRIE 47-48 FECHADA
+- Commits revistos: `7d45832`, `f86aaf7`
+- Testes: 245/245 OK
+- **Veredito: APROVADO**
+
+**Ciclo de arrasto completo**, incluindo o cancelamento com `<Escape>` que eu
+tinha marcado como opcional:
+```
+<ButtonPress-1>   <B1-Motion>   <ButtonRelease-1>   <Escape>
+```
+
+**Comportamento verificado por simulação de eventos reais:**
+```
+arrastar do carril piano para o da viola, 4 tempos à frente:
+  antes : tempo=0.0  inst=piano
+  depois: tempo=4.0  inst=guitar        ← instrumento mudou NO MODELO ✓
+                                          deslocamento exato de 4 tempos ✓
+arrastar para fora à esquerda:
+  tempo=0.0                             ← limitado, não ficou negativo ✓
+clique sem arrastar:
+  acordes=1 (não duplicou), selected_chord_idx=0   ← seleção preservada ✓
+```
+
+Os quatro pontos que mais me preocupavam estão todos certos:
+1. **Mudar de carril muda o `instrument` no modelo**, não só a posição visual —
+   era o requisito central, porque determina que síntese é usada ao tocar.
+2. **Alinhamento ao passo** com o rácio derivado, não assumido.
+3. **Limites respeitados** — arrastar para fora à esquerda fixa em 0, não gera
+   tempos negativos.
+4. **Clique e arrasto distinguidos** — um clique simples continua a selecionar
+   o acorde (e a atualizar o teclado/braço) sem criar duplicados.
+
+*Nota de método minha*: os meus dois primeiros testes falharam por eu ter
+inventado o nome do atributo (`cell_width` em vez de `step_width`). Erro meu,
+corrigido antes de concluir.
+
+### Fecho da série 47-48
+Os três pedidos do utilizador estão entregues: cursor translúcido a correr a
+linha temporal durante a reprodução, scroll do rato na zona da grelha, e
+blocos de acorde arrastáveis entre faixas.
+
+**Estado do Estúdio de Composição** (Fases 40-48): grelha multi-compasso com
+scroll horizontal e rótulos fixos, 12 peças de percussão, faixas de acordes de
+piano e viola alinhadas aos tempos, 22 tipos de acorde × 17 tónicas,
+visualização no teclado e no braço, cursor de reprodução, arrasto de blocos,
+render offline com tempo exato, e gravar/carregar.
+
+**Não há nenhuma AÇÃO NECESSÁRIA pendente.** Aguarda instruções.
+
+---
+
 ## Revisão — Fase 47 (Cursor + Scroll) APROVADA ✅ — AVANÇA PARA A FASE 48 (última)
 - Commits revistos: `0c79905`, `da1da87`
 - Testes: 245/245 OK
