@@ -14,6 +14,71 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA — Botões de som do glossário não tocam nada (+ debounce a 220 ms parece lento)
+- Reportado pelo utilizador: *"o glossário já aparece mas reage ainda lento.
+  Quando clico nos botões de conceito sonoro não toca nada."*
+
+### ❌ 1. BUG: os botões de áudio estão partidos — assinatura errada
+`gui/screens/glossary_screen.py::_play_term_audio` **e**
+`gui/components/glossary_modal.py::_play_audio` fazem ambos:
+```python
+self.audio_player.play_note(p, duration_ms=650)
+```
+Mas a assinatura real (`audio/player.py:74`) é:
+```python
+def play_note(self, note: Note, duration: float = 0.7, volume: float = 0.5, instrument: str = "piano")
+```
+**Dois erros na mesma chamada**: `duration_ms` não existe (é `duration`, em
+segundos), e `p` é uma **string** vinda de `hear_it` (ex: `'C4'`), não um
+objeto `Note`.
+
+Provado por execução:
+```
+termo='Acidente Musical'  hear_it=['C4', 'C#4', 'C4']
+como está no código : FALHA -> TypeError: play_note() got an unexpected keyword argument 'duration_ms'
+forma correta       : OK      (play_note(Note('C4'), duration=0.65))
+```
+Como a chamada está dentro de um `self.after(...)`, a exceção morre em silêncio
+— o utilizador clica e não acontece **nada**, sem qualquer mensagem.
+
+**Corrigir** nos dois ficheiros:
+```python
+self.after(i * 320, lambda p=pitch: self.audio_player.play_note(Note(p), duration=0.65))
+```
+(não te esqueças do `from core.notes import Note` no `glossary_modal.py` se
+ainda não estiver lá).
+
+**Isto é a terceira vez que este erro exato aparece** — `play_note` com string
+em vez de `Note` foi o bug 32.2, no ecrã de técnica. Sugestão para o matar de
+vez: acrescenta uma verificação defensiva no início de `AudioPlayer.play_note`
+que aceite `str` e converta (`if isinstance(note, str): note = Note(note)`), ou
+que levante um erro claro em vez de falhar num `AttributeError` obscuro dentro
+de uma thread.
+
+**Teste obrigatório**: percorre `GLOSSARY_DATABASE` e, para cada termo com
+`hear_it`, confirma que `Note(p)` é construível para todos os `p` e que
+`play_note` aceita a chamada. Teria apanhado isto.
+
+### ⚠️ 2. O debounce de 220 ms é o que resta da sensação de lentidão
+Medi as interações depois da tua otimização e estão **rápidas**:
+```
+clicar num termo (painel de detalhe) :  9 ms (média de 5)
+filtro por letra                     : 23 ms
+voltar a "Todos"                     : 41 ms
+```
+Ou seja, o problema de fundo está resolvido. O que sobra é o
+`self.after(220, self._filter_terms)` da linha 672: ao escrever, a lista só
+reage **220 ms depois da última tecla**, e isso lê-se como "reage lento".
+
+**Sugestão**: baixa para **120-150 ms**. Continua a evitar as re-renderizações
+por tecla (era esse o objetivo) mas fica abaixo do limiar em que se nota a
+espera. Com os 9-41 ms que agora custa filtrar, há margem de sobra.
+
+*(Não é bug — foi uma escolha minha pedir debounce e tu escolheste 220 ms, que
+é um valor razoável. É só afinação.)*
+
+---
+
 ## Revisão — Glossário OTIMIZADO ✅ APROVADO — nada pendente
 - Commits revistos: `4baf160`, `5a057a6`
 - Testes: 228/228 OK
