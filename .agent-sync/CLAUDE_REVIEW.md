@@ -14,6 +14,58 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Áudio do Glossário CORRIGIDO ✅ + Fase 40 APROVADA ✅ — AVANÇA PARA A FASE 41
+- Commits revistos: `31cd17f`, `f68ca6e` (áudio), `c1935bf`, `37d43a2` (Fase 40)
+- Testes: 235/235 OK
+
+### ✅ Áudio do glossário — corrigido e verificado a fundo
+```
+play_note(Note(p), duration=0.65)   nos dois ficheiros (ecrã e modal)
+```
+Não me limitei a um termo — testei **os 129 termos com `hear_it`**:
+```
+termos com hear_it: 129
+hear_it inválidos:    0    (todas as alturas construíveis e reproduzíveis)
+_play_term_audio() no ecrã real: OK, sem exceção
+```
+**A conversão defensiva em `AudioPlayer.play_note` foi a decisão certa** —
+aceitar uma string e converter mata a classe de bug que apareceu 3 vezes
+(ecrã de técnica, ecrã de glossário, modal de glossário). Vale mais do que
+qualquer teste que se escrevesse para isto.
+
+**Debounce a 130 ms**, dentro da faixa que sugeri (120-150). Com os 9-41 ms
+que filtrar custa agora, a resposta deve sentir-se imediata.
+
+### ✅ Fase 40 (Modelo de dados) — APROVADA
+Verifiquei por execução, não pelos testes:
+```
+ida-e-volta JSON      : bpm=120, 1 acorde, schema_version=1  ✓
+dict mínimo {id,title}: carrega com defaults (bpm=100)       ✓  ← compatibilidade
+guardar/carregar      : OK                                   ✓
+RhythmTrack.from_pattern: 12/12 padrões convertidos          ✓
+```
+Os três pontos que mais me interessavam estão certos:
+1. **`schema_version` desde o início** — não repetiste o erro do
+   `user_songs.json`, que não tem versão nenhuma.
+2. **Tolerância a campos em falta** — um dicionário com só `id` e `title`
+   carrega com valores por omissão em vez de rebentar. É isto que permite
+   evoluir o formato sem partir ficheiros de utilizadores.
+3. **Os 12 ritmos existentes convertem-se todos** via `RhythmTrack.from_pattern`,
+   com `grid` e `steps_per_bar` preservados — o conteúdo grátis do primeiro dia
+   está garantido.
+
+O ficheiro `user_compositions.json` já está no `.gitignore` desde a Fase 33,
+por isso os dados do utilizador não vão parar ao repositório público.
+
+**Avança para a Fase 41** (motor de render offline). Lembretes que valem a
+pena: **não importes pygame** nesse módulo (mantém-no testável sem placa de
+som), **cache dos arrays float32** por causa do `generate_plucked_string`
+(~35 ms por segundo de áudio, é o único ponto lento do stack), dimensiona o
+buffer para incluir a **cauda** do último som, e usa limitador suave
+(`np.tanh`) em vez de `np.clip`.
+
+---
+
 ## TRABALHO PEDIDO — Fases 40 a 43: Estúdio de Composição (versão útil)
 - Pedido por clogomes há já algum tempo; a especificação atrasou-se do meu
   lado. Âmbito escolhido pelo utilizador: **versão útil primeiro** — grelha de
