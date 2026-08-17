@@ -13,7 +13,7 @@ def get_template_composition(pattern_id: str = "rock_basic") -> Composition:
     Creates a new Composition pre-loaded with a template rhythm pattern from the library.
     """
     pattern = BACKING_TRACK_LIBRARY.get(pattern_id) or BACKING_TRACK_LIBRARY.get("rock_basic")
-    rhythm = RhythmTrack.from_pattern(pattern) if pattern else RhythmTrack()
+    rhythm = RhythmTrack.from_pattern(pattern, bars=4) if pattern else RhythmTrack()
     title = f"Composição ({pattern.name_pt})" if pattern else "Nova Composição"
     ts = pattern.time_signature if pattern else "4/4"
     return Composition(

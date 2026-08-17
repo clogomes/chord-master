@@ -612,3 +612,15 @@ Implementação nativa de um sistema de i18n em duas vertentes:
   - Seleção de qualquer acorde da composição atualiza instantaneamente a visualização no teclado de piano (destaque de notas e cálculo de teclas) e no braço da viola (formas CAGED completas e dedilhação acústica de `GUITAR_CHORD_LIBRARY`).
   - Seletor de visualização (🎹 Piano / 🎸 Viola / 👥 Ambos) para adaptação a qualquer contexto pedagógico.
 - **Suite de Testes Unitários (`tests/test_compose_studio_chords.py`)**: Validação da cobertura das 17 tónicas e 22 tipos de acorde, adição/seleção/eliminação de eventos harmónicos e sincronização com `PianoKeyboard` e `GuitarFretboard`. Total de **243/243 testes a passar**.
+
+### Fase 44 — Estúdio de Composição: Grelha Multi-Compasso com Scroll Horizontal
+- **Grelha Multi-Compasso Completa (`gui/components/step_grid.py`)**:
+  - A matriz de percussão cobre agora todos os compassos da composição (`bars × steps_per_bar` passos, ex: 8 compassos × 16 = 128 passos ou 16 compassos = 256 passos), permitindo compor progressões e variações rítmicas completas.
+  - **Coluna de Rótulos Fixa**: Divisão em dois canvas coordenados — canvas esquerdo fixo de 155px com nomes dos instrumentos de percussão e canvas direito scrollável com a grelha de passos.
+  - **Scroll Horizontal Integrado**: `CTkScrollbar` horizontal ligado ao `xscrollcommand` da grelha de passos com cálculo dinâmico de `scrollregion`.
+  - **Divisores Visuais de Compasso**: Linhas verticais reforçadas a separar cada compasso e cabeçalho identificador numérico (`Comp 1`, `Comp 2`, etc.).
+- **Gestão Defensiva de Redimensionamento & Retrocompatibilidade (`gui/screens/compose_studio.py` & `core/composition.py`)**:
+  - Ao aumentar o número de compassos, os passos e acordes existentes são rigorosamente preservados e estendidos com passos vazios.
+  - Ao diminuir o número de compassos, é exibida confirmação modal (`messagebox.askyesno`) caso existam batidas ou acordes nos compassos a descartar.
+  - **Retrocompatibilidade com Composições Legadas**: `Composition.from_dict` expande automaticamente matrizes curtas de 16 passos para a duração completa de `bars × steps_per_bar` via `% len(grid)` mantendo a sonoridade idêntica.
+- **Suite de Testes Unitários (`tests/test_compose_studio_ui.py`, `tests/test_composition_models.py`)**: Validação de expansão multi-compasso, scroll e compatibilidade de carregamento de composições legadas. Total de **244/244 testes a passar**.

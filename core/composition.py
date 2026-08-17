@@ -60,11 +60,23 @@ class RhythmTrack:
         )
 
     @classmethod
-    def from_pattern(cls, pattern: RhythmPattern, volume: float = 0.8, muted: bool = False) -> "RhythmTrack":
-        """Adapter that converts a RhythmPattern into an editable RhythmTrack."""
+    def from_pattern(cls, pattern: RhythmPattern, bars: int = 4, volume: float = 0.8, muted: bool = False) -> "RhythmTrack":
+        """Adapter that converts a RhythmPattern into an editable RhythmTrack spanning all bars."""
+        steps_per_bar = pattern.steps_per_bar
+        total_steps = max(1, bars) * steps_per_bar
+        pat_grid = pattern.grid
+        pat_len = len(pat_grid) if pat_grid else 1
+        
+        full_grid = []
+        for step_idx in range(total_steps):
+            if pat_grid:
+                full_grid.append(list(pat_grid[step_idx % pat_len]))
+            else:
+                full_grid.append([])
+
         return cls(
-            steps_per_bar=pattern.steps_per_bar,
-            grid=[list(step) for step in pattern.grid],
+            steps_per_bar=steps_per_bar,
+            grid=full_grid,
             volume=volume,
             muted=muted,
         )
@@ -97,9 +109,22 @@ class Composition:
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "Composition":
+        bars = int(data.get("bars", 4))
         rhythm_data = data.get("rhythm", {})
         rhythm = RhythmTrack.from_dict(rhythm_data) if isinstance(rhythm_data, dict) else RhythmTrack()
         
+        # Compatibility: If loaded rhythm grid is shorter than bars * steps_per_bar (e.g. legacy 1-bar 16 steps),
+        # expand it using % len(grid) to preserve identical playback and prevent data loss
+        target_steps = max(1, bars) * rhythm.steps_per_bar
+        if rhythm.grid and len(rhythm.grid) < target_steps:
+            original_len = len(rhythm.grid)
+            expanded_grid = []
+            for s_idx in range(target_steps):
+                expanded_grid.append(list(rhythm.grid[s_idx % original_len]))
+            rhythm.grid = expanded_grid
+        elif not rhythm.grid:
+            rhythm.grid = [[] for _ in range(target_steps)]
+
         chords_data = data.get("chords", [])
         chords = []
         if isinstance(chords_data, list):
@@ -112,7 +137,7 @@ class Composition:
             title=str(data.get("title", "Nova Composição")),
             bpm=int(data.get("bpm", 100)),
             time_signature=str(data.get("time_signature", "4/4")),
-            bars=int(data.get("bars", 4)),
+            bars=bars,
             rhythm=rhythm,
             chords=chords,
             master_volume=float(data.get("master_volume", 0.8)),

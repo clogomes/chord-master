@@ -31,14 +31,17 @@ class TestComposeStudioUI(unittest.TestCase):
         grid_widget = StepGrid(
             frame,
             steps_per_bar=16,
+            bars=4,
             on_grid_change=lambda g: changes.append(list(g)),
         )
         self.assertEqual(grid_widget.steps_per_bar, 16)
-        self.assertEqual(len(grid_widget.grid_data), 16)
+        self.assertEqual(grid_widget.bars, 4)
+        self.assertEqual(len(grid_widget.grid_data), 64)
 
-        # Set custom grid
+        # Set custom grid across 4 bars
         custom_grid = [["kick"], ["hihat_closed"], ["snare"], []]
-        grid_widget.set_grid(custom_grid, steps_per_bar=16)
+        grid_widget.set_grid(custom_grid, steps_per_bar=16, bars=4)
+        self.assertEqual(len(grid_widget.grid_data), 64)
         self.assertEqual(grid_widget.grid_data[0], ["kick"])
         self.assertEqual(grid_widget.grid_data[2], ["snare"])
 
@@ -49,6 +52,27 @@ class TestComposeStudioUI(unittest.TestCase):
 
         grid_widget.destroy()
         frame.destroy()
+
+    def test_legacy_1_bar_composition_auto_expansion_compatibility(self):
+        """Validates that a legacy 16-step composition expands across all bars without data loss."""
+        legacy_data = {
+            "id": "legacy_rock",
+            "title": "Legacy Rock",
+            "bars": 4,
+            "rhythm": {
+                "steps_per_bar": 16,
+                "grid": [["kick", "hihat_closed"]] + [[] for _ in range(15)],
+            },
+        }
+        comp = Composition.from_dict(legacy_data)
+        self.assertEqual(comp.bars, 4)
+        # Should be expanded to 4 * 16 = 64 steps
+        self.assertEqual(len(comp.rhythm.grid), 64)
+        # Should have kick on steps 0, 16, 32, 48
+        for bar_idx in range(4):
+            step_idx = bar_idx * 16
+            self.assertIn("kick", comp.rhythm.grid[step_idx])
+            self.assertIn("hihat_closed", comp.rhythm.grid[step_idx])
 
     def test_compose_studio_screen_instantiation_and_controls(self):
         screen = ComposeStudioScreen(
@@ -71,6 +95,7 @@ class TestComposeStudioUI(unittest.TestCase):
         # Change Bars
         screen._on_bars_changed("8")
         self.assertEqual(screen.composition.bars, 8)
+        self.assertEqual(len(screen.composition.rhythm.grid), 8 * 16)
 
         screen.destroy()
 

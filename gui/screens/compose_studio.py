@@ -272,13 +272,15 @@ class ComposeStudioScreen(ctk.CTkFrame):
             text_color=theme.COLOR_TEXT_MUTED,
         ).pack(side="right")
 
-        # Step Grid Canvas Component
+        # Step Grid Canvas Component (Multi-bar with horizontal scroll)
         steps = self.composition.rhythm.steps_per_bar if self.composition.rhythm else 16
+        bars = self.composition.bars
         grid_data = self.composition.rhythm.grid if self.composition.rhythm else []
         self.step_grid = StepGrid(
             grid_card,
             grid=grid_data,
             steps_per_bar=steps,
+            bars=bars,
             on_grid_change=self._on_grid_updated,
         )
         self.step_grid.pack(fill="both", expand=True, padx=14, pady=(4, 12))
@@ -650,15 +652,50 @@ class ComposeStudioScreen(ctk.CTkFrame):
         self.bpm_val_lbl.configure(text=f"{bpm}")
 
     def _on_bars_changed(self, value: str):
-        self.composition.bars = int(value)
+        new_bars = int(value)
+        old_bars = self.composition.bars
+        steps_per_bar = self.composition.rhythm.steps_per_bar if self.composition.rhythm else 16
+        old_total_steps = old_bars * steps_per_bar
+        new_total_steps = new_bars * steps_per_bar
+
+        if new_bars < old_bars:
+            # Check if user has active percussion or chords past the new length
+            has_drums_to_lose = any(
+                len(step) > 0 for step in self.composition.rhythm.grid[new_total_steps:old_total_steps]
+            ) if self.composition.rhythm and self.composition.rhythm.grid else False
+            has_chords_to_lose = any(
+                c.start_beat >= new_bars * 4 for c in self.composition.chords
+            )
+            if has_drums_to_lose or has_chords_to_lose:
+                confirm = messagebox.askyesno(
+                    "Reduzir Compassos",
+                    f"Reduzir de {old_bars} para {new_bars} compassos irá descartar eventos nos compassos finais.\n\nDesejas continuar?",
+                )
+                if not confirm:
+                    self.bars_menu.set(str(old_bars))
+                    return
+
+        self.composition.bars = new_bars
+        if self.composition.rhythm:
+            # Adjust grid length
+            if len(self.composition.rhythm.grid) < new_total_steps:
+                while len(self.composition.rhythm.grid) < new_total_steps:
+                    self.composition.rhythm.grid.append([])
+            elif len(self.composition.rhythm.grid) > new_total_steps:
+                self.composition.rhythm.grid = self.composition.rhythm.grid[:new_total_steps]
+            self.step_grid.set_grid(self.composition.rhythm.grid, steps_per_bar, new_bars)
 
     def _on_preset_selected(self, value: str):
         for pid in BACKING_TRACK_LIBRARY:
             if pid in value:
                 pattern = BACKING_TRACK_LIBRARY[pid]
-                self.composition.rhythm = RhythmTrack.from_pattern(pattern)
+                self.composition.rhythm = RhythmTrack.from_pattern(pattern, bars=self.composition.bars)
                 self.composition.time_signature = pattern.time_signature
-                self.step_grid.set_grid(self.composition.rhythm.grid, self.composition.rhythm.steps_per_bar)
+                self.step_grid.set_grid(
+                    self.composition.rhythm.grid,
+                    self.composition.rhythm.steps_per_bar,
+                    self.composition.bars,
+                )
                 break
 
     def _on_saved_composition_selected(self, value: str):
@@ -673,7 +710,7 @@ class ComposeStudioScreen(ctk.CTkFrame):
                 self.bars_menu.set(str(c.bars))
                 steps = c.rhythm.steps_per_bar if c.rhythm else 16
                 grid_data = c.rhythm.grid if c.rhythm else []
-                self.step_grid.set_grid(grid_data, steps)
+                self.step_grid.set_grid(grid_data, steps, c.bars)
                 self._refresh_chords_list()
                 if self.composition.chords:
                     self._select_chord(0)

@@ -59,13 +59,17 @@ class TestCompositionModels(unittest.TestCase):
 
     def test_rhythm_pattern_adapter_all_12_library_patterns(self):
         for pattern_id, pattern in BACKING_TRACK_LIBRARY.items():
-            rt = RhythmTrack.from_pattern(pattern, volume=0.85)
-            self.assertEqual(rt.steps_per_bar, pattern.steps_per_bar)
-            self.assertEqual(len(rt.grid), len(pattern.grid))
-            self.assertEqual(rt.volume, 0.85)
-            self.assertFalse(rt.muted)
-            # Verify grid deep copy
-            self.assertEqual(rt.grid, pattern.grid)
+            # Test 1-bar expansion
+            rt1 = RhythmTrack.from_pattern(pattern, bars=1, volume=0.85)
+            self.assertEqual(rt1.steps_per_bar, pattern.steps_per_bar)
+            self.assertEqual(len(rt1.grid), len(pattern.grid))
+            self.assertEqual(rt1.volume, 0.85)
+            self.assertFalse(rt1.muted)
+            self.assertEqual(rt1.grid, pattern.grid)
+
+            # Test 4-bar expansion
+            rt4 = RhythmTrack.from_pattern(pattern, bars=4, volume=0.85)
+            self.assertEqual(len(rt4.grid), 4 * pattern.steps_per_bar)
 
     def test_composition_roundtrip(self):
         chords = [
