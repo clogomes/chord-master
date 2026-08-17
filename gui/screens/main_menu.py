@@ -338,6 +338,17 @@ class MainMenuScreen(ctk.CTkFrame):
             color_accent="#8B5CF6",
             target_screen="daily_review",
         )
+        self._create_nav_card(
+            cards_container,
+            row=5,
+            col=1,
+            icon="🎛️",
+            title="Estúdio de Composição",
+            subtitle="Cria ritmos com sequenciador interativo de 16 passos e renderização multi-pista offline.",
+            button_text="Compor Ritmos",
+            color_accent="#10B981",
+            target_screen="compose_studio",
+        )
 
     def _confirm_reset(self):
         user = self.user_manager.current_user

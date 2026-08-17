@@ -19,6 +19,7 @@ from gui.screens.practice_technique import PracticeTechniqueScreen
 from gui.screens.tuner_screen import LamireScreen
 from gui.screens.stats_screen import StatsScreen
 from gui.screens.glossary_screen import GlossaryScreen
+from gui.screens.compose_studio import ComposeStudioScreen
 
 # Appearance configuration
 ctk.set_appearance_mode("Dark")
@@ -228,6 +229,7 @@ class ChordMasterApp(ctk.CTk):
             ("practice_instrument", t("nav_practice_instrument", "🎯 Prática c/ Microfone")),
             ("practice_ear", t("nav_practice_ear", "🎧 Treino Auditivo")),
             ("practice_staff", t("nav_practice_staff", "🎼 Leitura de Pauta")),
+            ("compose_studio", t("nav_compose_studio", "🎛️ Estúdio de Composição")),
             ("glossary", t("nav_glossary", "📚 Glossário Musical")),
             ("daily_review", t("nav_daily_review", "🔄 Revisão de Hoje")),
             ("stats", t("nav_stats", "📊 Estatísticas & Alunos")),
@@ -376,6 +378,12 @@ class ChordMasterApp(ctk.CTk):
             )
         elif screen_name == "practice_staff":
             self.current_screen_widget = PracticeStaffScreen(
+                self.content_area,
+                user_manager=self.user_manager,
+                on_back=lambda: self.navigate_to("main_menu"),
+            )
+        elif screen_name == "compose_studio":
+            self.current_screen_widget = ComposeStudioScreen(
                 self.content_area,
                 user_manager=self.user_manager,
                 on_back=lambda: self.navigate_to("main_menu"),

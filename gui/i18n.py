@@ -36,7 +36,8 @@ UI_STRINGS: Dict[str, Dict[str, str]] = {
         "confirm_reset_title": "Confirmar Reinício",
         "confirm_reset_msg": "Tens a certeza de que desejas reiniciar todo o progresso do utilizador ativo?",
 
-        # Common Actions
+        "nav_compose_studio": "🎛️ Estúdio de Composição",
+        "compose_title": "Estúdio de Composição",
         "btn_back": "← Voltar ao Menu",
         "btn_play": "▶ Ouvir",
         "btn_stop": "⏹ Parar",
@@ -140,7 +141,8 @@ UI_STRINGS: Dict[str, Dict[str, str]] = {
         "confirm_reset_title": "Confirm Reset",
         "confirm_reset_msg": "Are you sure you want to reset all progress for the active student?",
 
-        # Common Actions
+        "nav_compose_studio": "🎛️ Composition Studio",
+        "compose_title": "Composition Studio",
         "btn_back": "← Back to Menu",
         "btn_play": "▶ Play",
         "btn_stop": "⏹ Stop",

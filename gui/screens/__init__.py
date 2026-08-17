@@ -10,6 +10,7 @@ from .tuner_screen import LamireScreen
 from .stats_screen import StatsScreen
 
 from .practice_technique import PracticeTechniqueScreen
+from .compose_studio import ComposeStudioScreen
 
 __all__ = [
     "MainMenuScreen",
@@ -22,4 +23,5 @@ __all__ = [
     "PracticeTechniqueScreen",
     "LamireScreen",
     "StatsScreen",
+    "ComposeStudioScreen",
 ]

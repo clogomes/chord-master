@@ -16,6 +16,7 @@ from gui.screens.practice_ear import PracticeEarScreen
 from gui.screens.practice_staff import PracticeStaffScreen
 from gui.screens.stats_screen import StatsScreen
 from gui.screens.glossary_screen import GlossaryScreen
+from gui.screens.compose_studio import ComposeStudioScreen
 from gui.screens.omr_review import OMRReviewScreen
 from gui.components.user_modal import UserManagementModal
 from gui.components.glossary_modal import GlossaryTermModal
@@ -61,6 +62,7 @@ class TestSmoke(unittest.TestCase):
             ("PracticeStaffScreen", lambda: PracticeStaffScreen(container, self.user_manager, lambda: None)),
             ("StatsScreen", lambda: StatsScreen(container, self.user_manager, lambda: None)),
             ("GlossaryScreen", lambda: GlossaryScreen(container, self.user_manager, lambda: None)),
+            ("ComposeStudioScreen", lambda: ComposeStudioScreen(container, self.user_manager, lambda: None)),
         ]
 
         for screen_name, factory in screens:

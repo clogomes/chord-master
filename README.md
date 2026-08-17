@@ -589,3 +589,15 @@ Implementação nativa de um sistema de i18n em duas vertentes:
   - **Espacialização Estéreo & Cauda Acústica**: Panning espacial independente para instrumentos rítmicos e harmónicos (Piano levemente à esquerda, Guitarra levemente à direita, pratos abertos no campo estéreo) e extensão de cauda de 1.5s para evitar cortes abruptos de ressonâncias.
   - **Limitador de Saturação Suave (*Soft Limiting*)**: Utilização de `np.tanh` no master mix final para impedir clipping digital duro mesmo ao sobrepor múltiplas camadas sonoras.
 - **Suite de Testes Unitários (`tests/test_composition_renderer.py`)**: 4 testes rigorosos incluindo precisão de temporização do bombo no índice exato de amostras, mistura estéreo de piano + guitarra e saturação suave de sobreposição de faixas. Total de **239/239 testes a passar**.
+
+### Fase 42 — Estúdio de Composição: Ecrã & Grelha de Ritmo Interativa
+- **Componente Canvas StepGrid (`gui/components/step_grid.py`)**:
+  - Matriz de 16 passos de alta performance desenhada diretamente em `tk.Canvas` com retângulos leves (sem overhead de widgets por célula), marcadores visuais de tempos fortes/fracos, feedback de ativação com cores temáticas por instrumento (bombo, tarola, hi-hats, ride) e deteção de clique por mapa de regiões retangulares.
+- **Ecrã ComposeStudioScreen (`gui/screens/compose_studio.py`)**:
+  - Barra de transporte com controlo de andamento (40 a 220 BPM), seletor de compassos (2, 4, 8, 16) e edição de título.
+  - Carregamento de modelos pré-definidos a partir dos 12 ritmos da `BACKING_TRACK_LIBRARY` com edição dinâmica em tempo real.
+  - Gravação e carregamento de composições do utilizador integrados com `core/compositions.py`.
+  - **Renderização em Segundo Plano (Thread Worker)**: Renderização multi-pista executada em thread separada com feedback de estado na UI e envio de buffer estéreo para reprodução instantânea via pygame sem bloquear a interface.
+- **Integração na Navegação & Suporte Bilingue**:
+  - Nova rota `"compose_studio"` registada na barra lateral e cartão dedicado no menu principal, com suporte integral a português e inglês (`gui/i18n.py`).
+- **Suite de Testes Unitários (`tests/test_compose_studio_ui.py`, `tests/test_smoke.py`, `tests/test_theme_tokens_scan.py`)**: Validação de alternância de passos na grelha, limpeza, instanciação do ecrã e varrimento estático de tokens visuais. Total de **241/241 testes a passar**.
