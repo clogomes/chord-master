@@ -14,6 +14,89 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA (CRÍTICA) — 5 nomes indefinidos em 3 ecrãs; o `pyflakes` apanha-os todos em 1 segundo
+- Reportado pelo utilizador: *"carrego em ouvir composição e não aparece nada.
+  No stdio aparece: Playback error: name 'time' is not defined."*
+- Corri `python3 -m pyflakes audio core gui tests main.py` e há **5**
+  ocorrências, não 1:
+```
+gui/screens/practice_ear.py:621:17    undefined name 're'
+gui/screens/glossary_screen.py:666:77 undefined name 'Note'
+gui/screens/compose_studio.py:790:67  undefined name 'e'
+gui/screens/compose_studio.py:811:41  undefined name 'time'
+gui/screens/compose_studio.py:825:19  undefined name 'time'
+```
+
+### Os 4 bugs distintos
+
+**1. `compose_studio.py:811,825` — falta `import time`** (o que o utilizador vê)
+O cursor de reprodução da Fase 47 usa `time.perf_counter()` e o módulo nunca
+importa `time`. **A reprodução inteira falha** — não é só o cursor que não
+aparece, é o som que não toca.
+→ Acrescenta `import time` no topo.
+
+**2. `compose_studio.py:790` — a variável `e` já não existe quando o lambda corre**
+```python
+except Exception as e:
+    self.after(0, lambda: self._handle_playback_error(e))
+```
+Em Python 3, o nome `e` é **apagado ao sair do bloco `except`**. Quando o
+`after(0, ...)` dispara, `e` já não existe, portanto o tratamento de erro
+rebenta e o erro original perde-se em silêncio. É por isso que o utilizador vê
+"Playback error" sem detalhe útil.
+→ Captura por valor: `lambda err=e: self._handle_playback_error(err)`.
+
+**3. `glossary_screen.py:666` — falta `Note`, e EU APROVEI ISTO**
+```python
+self.after(i * 320, lambda p=pitch: self.audio_player.play_note(Note(p), duration=0.65))
+```
+`Note` não está importado neste ficheiro. **O áudio do glossário nunca
+funcionou**, apesar de eu ter dado APROVADO. Reproduzido agora:
+```
+NameError: name 'Note' is not defined
+  File "gui/screens/glossary_screen.py", line 666, in <lambda>
+```
+→ `from core.notes import Note` no topo.
+
+**4. `practice_ear.py:621` — falta `import re`**
+```python
+match = re.search(r'\((.*?)\)', self.current_question.correct_answer)
+```
+Está no caminho de **registar a resposta** do treino auditivo (o `skill_id`
+da revisão espaçada). Ou seja: responder a uma pergunta de treino auditivo
+rebenta. Confirma tu o alcance exato — pode estar a impedir o registo de
+progresso em todo o módulo.
+→ `import re` no topo.
+
+### Porque é que isto escapou — e o que tem de mudar
+
+**Falha minha, e é a mais séria desta sessão.** Ao validar o áudio do glossário
+chamei `_play_term_audio()`, vi que não levantava exceção e aprovei. Mas a
+chamada real está dentro de `self.after(...)` — **a exceção só acontece quando
+o temporizador dispara, depois de a minha função já ter retornado**. Testei o
+disparo, não o efeito. Daqui em diante, sempre que houver `after()` ou threads,
+tenho de deixar o temporizador correr e verificar o resultado, não só a chamada.
+
+**Falha de processo tua**: eu pedi na Fase 33 que corresses
+`pyflakes`/`flake8 --select=F821` antes de cada commit. Este é o **sexto** bug
+desta classe no projeto (`render_markdown_to_textbox`, `LESSON_IDS`,
+`COLOR_CARD_SURFACE`, `COLOR_ACCENT_EMERALD`, e agora estes 5). Um comando de
+1 segundo apanha-os todos.
+
+**Correção estrutural obrigatória, além dos 4 bugs:**
+Cria `tests/test_no_undefined_names.py` que corre o pyflakes
+programaticamente sobre `audio/`, `core/`, `gui/`, `tests/` e `main.py` e
+**falha** se houver qualquer F821 (*undefined name*). Já temos
+`test_theme_tokens_scan.py`, que é a mesma ideia aplicada a um caso particular
+— isto generaliza-a. Sem esse teste, a suite continuará a dar 245/245 verdes
+com a aplicação partida, que é exatamente o que aconteceu agora.
+
+Se o `pyflakes` não estiver garantido no ambiente, faz o teste degradar com
+`unittest.skipUnless(HAS_PYFLAKES, ...)` — o padrão defensivo que o projeto já
+usa — mas com uma mensagem clara a dizer que a verificação foi saltada.
+
+---
+
 ## Revisão — Fase 48 APROVADA ✅ — SÉRIE 47-48 FECHADA
 - Commits revistos: `7d45832`, `f86aaf7`
 - Testes: 245/245 OK
