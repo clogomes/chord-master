@@ -1490,4 +1490,431 @@ Deliberate Practice is focused, goal-oriented study aimed at correcting specific
 • Isolate difficult barre chord switches by practicing the hand shape transition in the air for 1 minute.
 """,
     ),
+    TheoryChapter(
+        id="chap17_minor_harmonic_field",
+        number=17,
+        title="Campo Harmónico Menor & Tétrades Menores",
+        subtitle="Escala menor natural, harmónica e melódica — graus, acordes e armações",
+        difficulty="Intermédio",
+        category="harmony",
+        summary="O campo harmónico menor é o conjunto de acordes construídos sobre cada grau da escala menor. Existem três formas de escala menor, cada uma com implicações harmónicas distintas. Este capítulo ensina a construir, identificar e aplicar os acordes do campo menor em Piano e Viola.",
+        content_markdown="""## Campo Harmónico Menor
+
+### 1. As Três Formas de Escala Menor
+
+A tonalidade menor não é uma escala única — são três formas com carácteres distintos:
+
+| Forma | Alterações | Carácter |
+|---|---|---|
+| **Natural (Eólio)** | VII♭ (sem alterações adicionais) | Melancólico, modal |
+| **Harmónica** | VII♭ + VII♮ (7ª elevada) | Tensão dramática, oriental |
+| **Melódica** | VI♮ + VII♮ (ascendente) / Natural (descendente) | Lírico, fluido |
+
+### 2. Campo Harmónico Menor Natural (em Lá menor)
+
+Considerado o campo "de base" para análise tonal:
+
+| Grau | Nota | Acorde | Qualidade | Função |
+|---|---|---|---|---|
+| **I** | Lá | **Lam** | menor | Tónica |
+| **II** | Si | **Si°** | diminuto | Pré-dominante |
+| **III** | Dó | **DóM** | maior | Relativa Maior |
+| **IV** | Ré | **Rém** | menor | Subdominante |
+| **V** | Mi | **Mim** | menor | Dominante (fraca) |
+| **VI** | Fá | **FáM** | maior | Subdominante paralela |
+| **VII** | Sol | **SolM** | maior | Subtónica |
+
+### 3. Campo Harmónico Menor Harmónico (em Lá menor)
+
+A 7ª elevada (Sol♯ em vez de Sol) cria o intervalo de 2ª Aumentada (Sol♯→Fá), e transforma o grau V de menor para maior:
+
+| Grau | Nota | Acorde | Qualidade | Função |
+|---|---|---|---|---|
+| **I** | Lá | **Lam** | menor | Tónica |
+| **II** | Si | **Si°** | diminuto | Pré-dominante |
+| **III** | Dó | **DóM+** | maior aumentado | — |
+| **IV** | Ré | **Rém** | menor | Subdominante |
+| **V** | Mi | **MiM** | maior | Dominante (forte — V→i cadência) |
+| **VI** | Fá | **FáM** | maior | Subdominante paralela |
+| **VII** | Sol♯ | **Sol♯°** | diminuto | Sensível |
+
+**Porquê a escala harmónica existe**: o grau V menor (Mim) produz uma cadência V→i fraca. Ao elevar a 7ª (Sol→Sol♯), o grau V torna-se maior (MiM), e a sua 7ª menor (Ré) cria tensão de trítono com Sol♯, resolvendo dramaticamente em Lá.
+
+### 4. Tétrades do Campo Menor Harmónico
+
+| Grau | Acorde | Tipo | Notas |
+|---|---|---|---|
+| **Im7** | Lam7 | menor com 7ª menor | Lá-Dó-Mi-Sol |
+| **IIø7** | Siø7 | semidiminuto | Si-Ré-Fá-Lá |
+| **IIIMaj7+** | DóMaj7+ | maior aumentado | Dó-Mi-Sol♯-Si |
+| **IVm7** | Rém7 | menor com 7ª menor | Ré-Fá-Lá-Dó |
+| **V7** | MiM7 | dominante | Mi-Sol♯-Si-Ré |
+| **VIMaj7** | FáMaj7 | maior com 7ª maior | Fá-Lá-Dó-Mi |
+| **VII°7** | Sol♯°7 | diminuto com 7ª diminuta | Sol♯-Si-Ré-Fá |
+
+### 5. Progressões Clássicas em Menor
+
+**i – VI – III – VII** (Greensleeves, House of the Rising Sun)
+Lam – FáM – DóM – SolM → carácter modal, eólio puro
+
+**i – iv – V7 – i** (cadência menor clássica)
+Lam – Rém – MiM7 – Lam → cadência autêntica com dominante da escala harmónica
+
+**i – VII – VI – V7** (descida eólia cromatica)
+Lam – SolM – FáM – MiM7 → linha de baixo descendente, muito usada no Barroco e Pop
+
+**ii° – V7 – i** (semidiminuto → dominante → tónica)
+Si° – MiM7 – Lam → versão menor do ii-V-I do Jazz
+
+### 6. Análise: House of the Rising Sun (Lá Eólio)
+
+A música usa o campo menor natural (Eólio) com um empréstimo do campo maior:
+
+| Compasso | Acorde | Grau em Lám | Análise |
+|---|---|---|---|
+| 1 | Lam | i | Tónica menor |
+| 2 | DóM | III | Relativa Maior |
+| 3 | RéM | IV (emp.) | IV maior emprestado — color modal |
+| 4 | FáM | VI | Subdominante Paralela |
+| 5 | Lam | i | Retorno à tónica |
+| 6 | MiM | V | Dominante (da escala harmónica) |
+
+**Nota pedagógica**: O acorde RéM (IV maior) é tecnicamente do campo maior relativo (DóM), mas funciona como empréstimo modal no contexto de Lá Eólio. O contraste entre Rém (IV natural) e RéM (IV emprestado) é o que dá à música o seu carácter ambíguo entre tristeza e grandiosidade.""",
+        piano_focus="""### 🎹 Aplicação no Piano
+
+**Digitação da escala menor harmónica em Lá:**
+- Mão direita: Lá(1) Si(2) Dó(3) Ré(1) Mi(2) Fá(3) Sol♯(4) Lá(5)
+- A 2ª Aumentada Fá→Sol♯ (1,5 tons) exige atenção especial no 4.º dedo
+
+**Voicing do campo menor no piano (posição fechada):**
+```
+Lam:  Lá2 + Lá3-Dó4-Mi4
+MiM7: Si2 + Mi3-Sol♯3-Si3-Ré4  ← tensão máxima (trítono Sol♯↔Ré)
+Lam:  Lá2 + Lá3-Dó4-Mi4        ← resolução
+```
+
+**Progressão i-iv-V7-i para praticar (Lá menor):**
+- Lam → Rém → MiM7 → Lam
+- Toque a progressão em 3/4 para sentir o carácter de habanera""",
+        guitar_focus="""### 🎸 Aplicação na Viola
+
+**Posições CAGED para o campo menor:**
+- **Lam** (forma A aberta): Xo2210
+- **Rém** (forma D aberta): XXo231
+- **MiM** (forma E aberta): o22100 (V maior)
+- **FáM** (barra no 1.º traste, forma E): 133211
+
+**Progressão i-VII-VI-V7 (descida Eólia):**
+Lam – SolM – FáM – MiM7
+- Toca com arpejo descendente (sextas) para sentir o carácter flamenco/barroco
+
+**Dica**: Em guitarra acústica, a progressão Lam-DóM-RéM-FáM-Lam soa como "House of the Rising Sun". Usa compasso 6/8 (arpejo groups de 3 colcheias).""",
+        interactive_demo="chords",
+        title_en="Minor Harmonic Field & Minor Seventh Chords",
+        subtitle_en="Natural, harmonic and melodic minor scales — degrees, chords and key signatures",
+        summary_en="The minor harmonic field is the set of chords built on each degree of the minor scale. Three forms of the minor scale exist, each with distinct harmonic implications. This chapter teaches how to build, identify and apply minor field chords on Piano and Guitar.",
+        content_markdown_en="""## Minor Harmonic Field
+
+### 1. The Three Forms of Minor Scale
+
+The minor key is not a single scale — three forms exist with distinct characters:
+
+| Form | Alterations | Character |
+|---|---|---|
+| **Natural (Aeolian)** | ♭VII (no extra alterations) | Melancholic, modal |
+| **Harmonic** | ♭VII + ♮VII (raised 7th) | Dramatic tension, oriental |
+| **Melodic** | ♮VI + ♮VII ascending / Natural descending | Lyrical, fluid |
+
+### 2. Natural Minor Harmonic Field (in A minor)
+
+| Degree | Note | Chord | Quality | Function |
+|---|---|---|---|---|
+| **I** | A | **Am** | minor | Tonic |
+| **II** | B | **B°** | diminished | Pre-dominant |
+| **III** | C | **CM** | major | Relative Major |
+| **IV** | D | **Dm** | minor | Subdominant |
+| **V** | E | **Em** | minor | Dominant (weak) |
+| **VI** | F | **FM** | major | Parallel Subdominant |
+| **VII** | G | **GM** | major | Subtonic |
+
+### 3. Harmonic Minor Field (in A minor)
+
+The raised 7th (G♯ instead of G) transforms degree V from minor to major:
+
+| Degree | Chord | Quality | Function |
+|---|---|---|---|
+| **V** | EM | major | Strong Dominant (V→i cadence) |
+| **VII** | G♯° | diminished | Leading Tone |
+
+**Why the harmonic scale exists**: the minor V chord (Em) produces a weak V→i cadence. Raising the 7th (G→G♯) makes V major (EM), whose minor 7th (D) creates tritone tension with G♯, resolving dramatically to A.
+
+### 4. Minor Harmonic Field Seventh Chords
+
+| Degree | Chord | Type |
+|---|---|---|
+| **Im7** | Am7 | minor 7th |
+| **IIø7** | Bø7 | half-diminished |
+| **IIIMaj7+** | CMaj7+ | major augmented |
+| **IVm7** | Dm7 | minor 7th |
+| **V7** | EM7 | dominant 7th |
+| **VIMaj7** | FMaj7 | major 7th |
+| **VII°7** | G♯°7 | diminished 7th |
+
+### 5. Classic Progressions in Minor
+
+**i – VI – III – VII** (Greensleeves, House of the Rising Sun)
+Am – FM – CM – GM → modal, pure Aeolian character
+
+**i – iv – V7 – i** (classic minor cadence)
+Am – Dm – EM7 – Am → authentic cadence with harmonic scale dominant
+
+**i – VII – VI – V7** (Aeolian descent)
+Am – GM – FM – EM7 → descending bass line, common in Baroque and Pop""",
+        piano_focus_en="""### 🎹 On Piano
+
+**Harmonic minor scale fingering in A:**
+- Right hand: A(1) B(2) C(3) D(1) E(2) F(3) G♯(4) A(5)
+- The Augmented 2nd F→G♯ (1.5 tones) requires special attention on the 4th finger
+
+**Minor field voicing on piano (close position):**
+```
+Am:   A2 + A3-C4-E4
+EM7:  B2 + E3-G♯3-B3-D4  ← maximum tension (tritone G♯↔D)
+Am:   A2 + A3-C4-E4       ← resolution
+```
+
+**i-iv-V7-i progression to practice (A minor):**
+Am → Dm → EM7 → Am""",
+        guitar_focus_en="""### 🎸 On Guitar
+
+**CAGED positions for the minor field:**
+- **Am** (open A shape): Xo2210
+- **Dm** (open D shape): XXo231
+- **EM** (open E shape): o22100 (major V)
+- **FM** (1st fret barre, E shape): 133211
+
+**i-VII-VI-V7 progression (Aeolian descent):**
+Am – GM – FM – EM7
+- Play with descending arpeggio to feel the flamenco/baroque character""",
+    ),
+    TheoryChapter(
+        id="chap18_cadences",
+        number=18,
+        title="Cadências — Autêntica, Plagal, Meia-Cadência & Deceptiva",
+        subtitle="Os pontos de pontuação harmónica: como a música cria tensão, repouso e surpresa",
+        difficulty="Intermédio",
+        category="harmony",
+        summary="As cadências são sequências harmónicas que sinalizam momentos de chegada, pausa ou continuação. São a pontuação da música — vírgulas, pontos e ponto de exclamação. Compreender cadências é essencial para análise, composição e improvisação.",
+        content_markdown="""## Cadências — A Pontuação da Música
+
+### 1. O Que é uma Cadência?
+
+Uma **cadência** é uma sequência de dois ou mais acordes que cria um momento de pontuação harmónica:
+
+| Cadência | Sensação | Analogia verbal |
+|---|---|---|
+| **Autêntica Perfeita** | Repouso total | Ponto final |
+| **Autêntica Imperfeita** | Chegada, mas incompleta | Ponto e vírgula |
+| **Plagal** | Amém, conclusão suave | Ponto suave |
+| **Meia-Cadência** | Pausa, questão suspensa | Vírgula / ponto de interrogação |
+| **Deceptiva** | Surpresa, evasão | Ponto de exclamação |
+
+### 2. Cadência Autêntica — V → I
+
+A cadência mais forte e conclusiva da harmonia tonal:
+
+**Autêntica Perfeita (CAP)**:
+- Progressão: **V7 → I** (ou V → I)
+- Grau V em posição fundamental, Grau I em posição fundamental
+- Soprano termina na tónica (1.º grau)
+- Sensação: **conclusão total**
+- Exemplo: Beethoven — Für Elise (Lá menor → MiM7 → Lam)
+
+**Autêntica Imperfeita (CAI)**:
+- Progressão: **V → I** com qualquer inversão
+- Soprano não termina necessariamente na tónica
+- Sensação: **chegada, mas abertura para mais**
+- Usada no meio de frases
+
+### 3. Cadência Plagal — IV → I
+
+Conhecida como a "cadência Amém" pelos seus usos em hinos religiosos:
+
+- Progressão: **IV → I** (Subdominante → Tónica)
+- Sem tensão de sensível
+- Sensação: **conclusão suave, mística, espiritual**
+- Exemplos: "Amém" no final de hinos; Pachelbel — Canon em Ré
+
+**Variação menor**: iv → i (subdominante menor → tónica)
+- Progressão: Rém → Lam (em Lá)
+- Carácter ainda mais suave e nostálgico
+
+### 4. Meia-Cadência — X → V
+
+Qualquer progressão que termine no grau V sem resolver:
+
+- Progressões comuns: **I → V**, **II → V**, **IV → V**
+- O grau V fica "em suspenso" — pede resolução
+- Sensação: **pausa expectante, questão sem resposta**
+- Muito usada para dividir frases em antecedente (pergunta) e consequente (resposta)
+- Exemplo: Beethoven — Sonata "Luar" (primeiros compassos criam meia-cadência repetida)
+
+**Meia-Cadência Frígia** (especial):
+- Progressão: **iv6 → V** (subdominante menor em 1.ª inversão → dominante)
+- Muito usada no Barroco e Flamenco
+- Exemplo: Bach — Prelúdio em Dó menor BWV 847
+
+### 5. Cadência Deceptiva — V → VI
+
+A cadência surpresa — o ouvido espera I mas recebe VI:
+
+- Progressão: **V → VI** (dominante → submediante)
+- O VI é o relativo maior (ou menor) da tónica
+- Sensação: **surpresa suave, evasão elegante**
+- Usada para **estender frases** ou criar reinterpretação emocional
+- Exemplos: Pachelbel Canon, "Let It Be" (Beatles), Adagio de Albinoni
+
+**Em modo menor**: V → VI♭ (dominante → 6.º grau maior)
+- Exemplo: em Lá menor: MiM → FáM
+
+### 6. Análise Comparativa — Für Elise (Beethoven)
+
+A peça usa cadências contrastantes para criar drama:
+
+| Secção | Cadência | Acordes | Efeito |
+|---|---|---|---|
+| Frase A (final) | Autêntica Perfeita | MiM7 → Lam | Repouso conclusivo |
+| Frase B (meio) | Meia-Cadência | Lam → MiM | Suspensão, tensão |
+| Secção contrastante | Deceptiva | MiM → FáM | Surpresa, viragem emocional |
+
+**Nota pedagógica**: O poder emotivo de Für Elise vem exatamente da alternância entre o repouso da cadência autêntica (Lam) e a tensão criada pela meia-cadência e pela deceptiva.
+
+### 7. Reconhecer Cadências de Ouvido
+
+- **Autêntica**: sentes que a música "chegou" — a frase terminou
+- **Plagal**: soa como "Amém" — conclusão mas menos tensa
+- **Meia-Cadência**: sentes uma "vírgula" — a música vai continuar
+- **Deceptiva**: sentes uma surpresa — esperavas outra coisa
+
+**Exercício de ouvido**: Toca V7→I, depois V7→VI. A diferença de expectativa é imediata.""",
+        piano_focus="""### 🎹 Aplicação no Piano
+
+**Cadência Autêntica em Dó Maior (praticar em todas as tonalidades):**
+```
+Sol7: Sol2 | Sol3-Si3-Ré4-Fá4
+DóM:  Dó2  | Dó3-Mi3-Sol3
+```
+
+**Cadência Plagal em Dó Maior:**
+```
+FáM: Fá2 | Fá3-Lá3-Dó4
+DóM: Dó2 | Dó3-Mi3-Sol3
+```
+
+**Cadência Deceptiva em Dó Maior:**
+```
+Sol7: Sol2 | Sol3-Si3-Ré4-Fá4
+Lám:  Lá2  | Lá3-Dó4-Mi4  ← surpresa!
+```
+
+**Exercício de identificação**: Toca as 4 cadências com os olhos fechados e pede a alguém para as tocar numa ordem aleatória — tenta identificar cada uma de ouvido.""",
+        guitar_focus="""### 🎸 Aplicação na Viola
+
+**As 4 cadências em Sol Maior (guitarra):**
+
+- **Autêntica**: Ré7 (XX0213) → SolM (320003)
+- **Plagal**: DóM (X32010) → SolM (320003)
+- **Meia-Cadência**: SolM → Ré7 (parar no Ré7 com sustain)
+- **Deceptiva**: Ré7 → Mim (022000) ← esperavas Sol, recebes Mi menor
+
+**Progressão clássica com todas as cadências:**
+SolM | Ré7 | SolM | DóM | SolM | Lám | Mim | Ré7 |
+(CA) | (MC) | (CA) | (CP) | (CD) ← deceptiva no fim""",
+        interactive_demo="chords",
+        title_en="Cadences — Authentic, Plagal, Half-Cadence & Deceptive",
+        subtitle_en="Harmonic punctuation: how music creates tension, rest and surprise",
+        summary_en="Cadences are harmonic sequences that signal moments of arrival, pause or continuation. They are music's punctuation — commas, full stops and exclamation marks. Understanding cadences is essential for analysis, composition and improvisation.",
+        content_markdown_en="""## Cadences — Music's Punctuation
+
+### 1. What is a Cadence?
+
+A **cadence** is a sequence of two or more chords creating harmonic punctuation:
+
+| Cadence | Feeling | Verbal analogy |
+|---|---|---|
+| **Perfect Authentic** | Total rest | Full stop |
+| **Imperfect Authentic** | Arrival, incomplete | Semicolon |
+| **Plagal** | Amen, gentle conclusion | Soft stop |
+| **Half-Cadence** | Suspended pause | Comma / question mark |
+| **Deceptive** | Surprise, evasion | Exclamation mark |
+
+### 2. Authentic Cadence — V → I
+
+The strongest and most conclusive cadence in tonal harmony:
+
+**Perfect Authentic Cadence (PAC)**:
+- Progression: **V7 → I** (or V → I)
+- Both V and I in root position, soprano ends on the tonic
+- Feeling: **total conclusion**
+- Example: Beethoven — Für Elise (A minor → EM7 → Am)
+
+**Imperfect Authentic Cadence (IAC)**:
+- Progression: **V → I** with any inversion — used mid-phrase
+
+### 3. Plagal Cadence — IV → I
+
+Known as the "Amen cadence" from religious hymns:
+- Progression: **IV → I**
+- Feeling: **gentle, mystical, spiritual conclusion**
+- Examples: "Amen" in hymns; Pachelbel Canon in D
+
+### 4. Half-Cadence — X → V
+
+Any progression ending on degree V without resolving:
+- Common: **I → V**, **II → V**, **IV → V**
+- Feeling: **expectant pause, unanswered question**
+
+**Phrygian Half-Cadence**: iv6 → V (Baroque, Flamenco)
+
+### 5. Deceptive Cadence — V → VI
+
+The surprise cadence — the ear expects I but receives VI:
+- Progression: **V → VI**
+- Feeling: **gentle surprise, elegant evasion**
+- Used to extend phrases or create emotional reinterpretation
+
+### 6. Analysis — Für Elise (Beethoven, A minor)
+
+| Section | Cadence | Chords | Effect |
+|---|---|---|---|
+| Phrase A (end) | Perfect Authentic | EM7 → Am | Conclusive rest |
+| Phrase B (mid) | Half-Cadence | Am → EM | Suspension, tension |
+| Contrasting section | Deceptive | EM → FM | Surprise, emotional turn |""",
+        piano_focus_en="""### 🎹 On Piano
+
+**Authentic Cadence in C Major:**
+```
+G7: G2 | G3-B3-D4-F4
+CM: C2 | C3-E3-G3
+```
+
+**Plagal Cadence in C Major:**
+```
+FM: F2 | F3-A3-C4
+CM: C2 | C3-E3-G3
+```
+
+**Deceptive Cadence in C Major:**
+```
+G7: G2 | G3-B3-D4-F4
+Am: A2 | A3-C4-E4  ← surprise!
+```""",
+        guitar_focus_en="""### 🎸 On Guitar
+
+**4 cadences in G Major:**
+- **Authentic**: D7 (XX0213) → GM (320003)
+- **Plagal**: CM (X32010) → GM (320003)
+- **Half-Cadence**: GM → D7 (hold D7 with sustain)
+- **Deceptive**: D7 → Em (022000) ← expected G, received E minor""",
+    ),
 ]

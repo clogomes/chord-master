@@ -33,7 +33,6 @@ def get_glossary_keywords_map() -> Dict[str, str]:
                     continue
                 clean = re.sub(r"\(.*?\)", "", cand).strip().lower()
                 clean = clean.replace("/", " ").replace("—", " ").replace("-", " ")
-                parts = [p.strip() for p in clean.split() if len(p.strip()) >= 3]
                 
                 # Full candidate phrase
                 if len(clean) >= 3:

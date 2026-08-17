@@ -827,14 +827,14 @@ SONG_LIBRARY: List[Song] = [
         description_en="Short introductory study arrangement of Beethoven's famous motif for piano.",
         theory_analysis="""### 🎓 Análise Harmónica & Estrutural
 
-• **Tonalidade**: Lá Menor Harmónica.
-• **Tema Principal**: O famoso motivo semitonal alternado **Mi - Dó♯ (E5 - D♯5)** cria uma tensão cromática resolvida em **Si4 - Dó5 - Lá4**.
-• **Conexão com a Teoria**: Exemplo vivo do **Capítulo 2 (Intervalos - 2ª Menor)** e da oscilação de sensível expressiva.""",
+• **Tonalidade**: Lá Menor Harmónica (Am).
+• **Cadências & Harmonia**: Cadência autêntica perfeita **MiM7 → Lam** (grau V7 da escala menor harmónica), meia-cadência **Lam → MiM**, e cadência deceptiva **MiM → FáM** na secção contrastante.
+• **Conexão com a Teoria**: Aplicação direta do **Capítulo 17 (Campo Harmónico Menor)** e **Capítulo 18 (Cadências)**, com o motivo semitonal inicial Mi - Ré♯ (E5 - D♯5).""",
         theory_analysis_en="""### 🎓 Harmonic & Structural Analysis
 
-• **Key**: A Harmonic Minor.
-• **Main Theme**: The iconic semitone motif alternating **E5 - D♯5** creates chromatic tension resolving to **B4 - C5 - A4**.
-• **Theory Link**: Practical application of **Chapter 2 (Minor 2nd Interval)**.""",
+• **Key**: A Harmonic Minor (Am).
+• **Cadences & Harmony**: Features a perfect authentic cadence **EM7 → Am** (degree V7 of the harmonic minor field), a half-cadence **Am → EM**, and a deceptive cadence **EM → FM** in the contrasting section.
+• **Theory Link**: Direct application of **Chapter 17 (Minor Harmonic Field)** and **Chapter 18 (Cadences)**.""",
         notes=[
             _sn("E5", 0.5), _sn("D#5", 0.5), _sn("E5", 0.5),
             _sn("D#5", 0.5), _sn("E5", 0.5), _sn("B4", 0.5),
@@ -967,14 +967,14 @@ SONG_LIBRARY: List[Song] = [
         description_en="American folk classic.",
         theory_analysis="""### 🎓 Análise Harmónica & Estrutural
 
-• **Tonalidade**: Lá Menor (Am) em métrica de 6/8.
-• **Progressão Harmónica**: Arpejos sobre a progressão **Am - C - D - F - Am - E**.
-• **Conexão com a Teoria**: Demonstra o uso de arpejos dedilhados em métrica composta (**Capítulo 9**).""",
+• **Tonalidade**: Lá Eólio (menor natural) em métrica de 6/8.
+• **Progressão Harmónica**: **Am – C – D – F – Am – E** (i – III – IV – VI – i – V). O acorde Ré Maior (IV maior) atua como empréstimo modal com coloração Dórica/Maior, enquanto Mi Maior (V) provém da escala menor harmónica para fornecer cadência autêntica de regresso à tónica.
+• **Conexão com a Teoria**: Exemplo magistral do **Capítulo 17 (Campo Harmónico Menor)** e arpejos em métrica composta (**Capítulo 9**).""",
         theory_analysis_en="""### 🎓 Harmonic & Structural Analysis
 
-• **Key**: A Minor (Am) in 6/8 time.
-• **Progression**: Fingerstyle arpeggios over **Am - C - D - F - Am - E**.
-• **Theory Link**: Features fingerpicked arpeggios in compound time (**Chapter 9**).""",
+• **Key**: A Aeolian (natural minor) in 6/8 compound time.
+• **Progression**: **Am – C – D – F – Am – E** (i – III – IV – VI – i – V). The D Major (IV) chord acts as a modal borrowing providing Dorian/Major flavor, while E Major (V) is borrowed from the harmonic minor scale for an authentic cadence.
+• **Theory Link**: Masterful demonstration of **Chapter 17 (Minor Harmonic Field)** and compound time arpeggios (**Chapter 9**).""",
         notes=[
             _sn("A3", 0.5), _sn("C4", 0.5), _sn("E4", 0.5), _sn("A4", 0.5), _sn("E4", 0.5), _sn("C4", 0.5),
             _sn("D4", 0.5), _sn("F4", 0.5), _sn("A4", 0.5), _sn("D5", 0.5), _sn("A4", 0.5), _sn("F4", 0.5),

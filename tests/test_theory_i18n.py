@@ -3,7 +3,7 @@ from core.theory_content import THEORY_CHAPTERS
 
 class TestTheoryI18n(unittest.TestCase):
     def test_all_chapters_have_en_fields(self):
-        self.assertEqual(len(THEORY_CHAPTERS), 16, "Should have 16 chapters")
+        self.assertEqual(len(THEORY_CHAPTERS), 18, "Should have 18 chapters")
         for chap in THEORY_CHAPTERS:
             self.assertTrue(chap.title_en, f"Chapter {chap.id} missing title_en")
             self.assertTrue(chap.subtitle_en, f"Chapter {chap.id} missing subtitle_en")

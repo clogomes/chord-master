@@ -8,7 +8,6 @@ from gui.i18n import t, get_language
 from gui import theme
 from audio.player import get_audio_player
 from gui.scroll_utils import bind_mousewheel
-from gui.markdown_renderer import render_markdown_to_textbox
 
 
 CATEGORY_OPTIONS = [

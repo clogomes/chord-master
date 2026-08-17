@@ -43,7 +43,9 @@ class TestUserManager(unittest.TestCase):
 
         manager.mark_lesson_completed("chap1_fundamentals")
         self.assertTrue(manager.is_lesson_completed("chap1_fundamentals"))
-        self.assertEqual(manager.current_user.lessons_progress_percent, 6.25)
+        from core.user_manager import LESSON_IDS
+        expected_pct = (1.0 / len(LESSON_IDS)) * 100.0
+        self.assertAlmostEqual(manager.current_user.lessons_progress_percent, expected_pct)
 
         # Switch to another user and check lesson is not completed for them
         manager.create_user("João", avatar="🎸")

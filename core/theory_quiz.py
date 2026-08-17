@@ -832,4 +832,104 @@ CHAPTER_QUIZZES: List[ChapterQuiz] = [
             ),
         ]
     ),
+    ChapterQuiz(
+        chapter_id="chap17_minor_harmonic_field",
+        questions=[
+            QuizQuestion(
+                question="Qual é a diferença entre a escala menor natural e a harmónica?",
+                options=["A harmónica tem a 6ª elevada", "A harmónica tem a 7ª elevada", "A harmónica tem a 3ª diminuída", "Não há diferença"],
+                correct_index=1,
+                explanation="A escala menor harmónica eleva o 7.º grau (ex: Sol→Sol♯ em Lá menor), criando uma sensível e fortalecendo a cadência V→i.",
+                question_en="What is the difference between the natural minor and harmonic minor scales?",
+                options_en=["Harmonic minor raises the 6th", "Harmonic minor raises the 7th", "Harmonic minor lowers the 3rd", "There is no difference"],
+                explanation_en="The harmonic minor scale raises the 7th degree (e.g., G→G♯ in A minor), creating a leading tone and strengthening the V→i cadence."
+            ),
+            QuizQuestion(
+                question="Em Lá menor, qual é o acorde do grau V na escala harmónica?",
+                options=["Mim (menor)", "MiM (maior)", "Mi°", "MiM7"],
+                correct_index=1,
+                explanation="A escala menor harmónica eleva o Sol para Sol♯, tornando a tríade do grau V maior (MiM) em vez de menor (Mim).",
+                question_en="In A minor, what is the V degree chord in the harmonic minor scale?",
+                options_en=["Em (minor)", "EM (major)", "E°", "EM7"],
+                explanation_en="The harmonic minor scale raises G to G♯, making the V degree triad major (EM) instead of minor (Em)."
+            ),
+            QuizQuestion(
+                question="Qual é o acorde do grau II na escala menor natural?",
+                options=["Maior", "Menor", "Diminuto", "Aumentado"],
+                correct_index=2,
+                explanation="O grau II da escala menor natural é sempre diminuto (ex: Si° em Lá menor), formado pelas notas Si-Ré-Fá.",
+                question_en="What is the chord on degree II in the natural minor scale?",
+                options_en=["Major", "Minor", "Diminished", "Augmented"],
+                explanation_en="Degree II of the natural minor scale is always diminished (e.g., B° in A minor), formed by the notes B-D-F."
+            ),
+            QuizQuestion(
+                question="Qual progressão é típica do modo Eólio (menor natural)?",
+                options=["I – IV – V – I", "i – VI – III – VII", "I – V – vi – IV", "i – iv – V7 – i"],
+                correct_index=1,
+                explanation="A progressão i – VI – III – VII (ex: Lam – FáM – DóM – SolM) é característica do modo Eólio puro, como em 'House of the Rising Sun'.",
+                question_en="Which progression is typical of the Aeolian mode (natural minor)?",
+                options_en=["I – IV – V – I", "i – VI – III – VII", "I – V – vi – IV", "i – iv – V7 – i"],
+                explanation_en="The progression i – VI – III – VII (e.g., Am – FM – CM – GM) is characteristic of the pure Aeolian mode, as in 'House of the Rising Sun'."
+            ),
+            QuizQuestion(
+                question="O intervalo de 2ª Aumentada na escala menor harmónica ocorre entre que graus?",
+                options=["I e II", "II e III", "VI e VII", "V e VI"],
+                correct_index=2,
+                explanation="A 2ª Aumentada (3 semitons) surge entre o 6.º grau (ex: Fá) e o 7.º elevado (ex: Sol♯) na escala menor harmónica.",
+                question_en="The Augmented 2nd interval in the harmonic minor scale occurs between which degrees?",
+                options_en=["I and II", "II and III", "VI and VII", "V and VI"],
+                explanation_en="The Augmented 2nd (3 semitones) appears between the 6th degree (e.g., F) and the raised 7th (e.g., G♯) in harmonic minor."
+            ),
+        ]
+    ),
+    ChapterQuiz(
+        chapter_id="chap18_cadences",
+        questions=[
+            QuizQuestion(
+                question="Qual cadência é conhecida como a 'cadência Amém'?",
+                options=["Autêntica Perfeita", "Deceptiva", "Plagal", "Meia-Cadência"],
+                correct_index=2,
+                explanation="A cadência Plagal (IV→I) é chamada 'cadência Amém' pelo uso tradicional em hinos religiosos. Transmite conclusão suave e serena.",
+                question_en="Which cadence is known as the 'Amen cadence'?",
+                options_en=["Perfect Authentic", "Deceptive", "Plagal", "Half-Cadence"],
+                explanation_en="The Plagal cadence (IV→I) is called the 'Amen cadence' due to its traditional use in hymns. It conveys a gentle, serene resolution."
+            ),
+            QuizQuestion(
+                question="Numa Cadência Autêntica Perfeita (CAP), como terminam os acordes?",
+                options=["V em inversão, I em fundamental", "V em fundamental, I em inversão", "Ambos em fundamental, soprano na tónica", "V→VI"],
+                correct_index=2,
+                explanation="A Cadência Autêntica Perfeita exige grau V em fundamental, grau I em fundamental, e o soprano a terminar na tónica.",
+                question_en="In a Perfect Authentic Cadence (PAC), how do the chords end?",
+                options_en=["V in inversion, I in root", "V in root, I in inversion", "Both in root position, soprano on the tonic", "V→VI"],
+                explanation_en="The Perfect Authentic Cadence requires both V and I in root position, with the soprano resolving to the tonic."
+            ),
+            QuizQuestion(
+                question="Qual cadência termina no grau V sem resolver?",
+                options=["Autêntica", "Plagal", "Meia-Cadência", "Deceptiva"],
+                correct_index=2,
+                explanation="A Meia-Cadência termina no grau V (Dominante), criando uma sensação de pausa expectante (como uma vírgula).",
+                question_en="Which cadence ends on degree V without resolving?",
+                options_en=["Authentic", "Plagal", "Half-Cadence", "Deceptive"],
+                explanation_en="The Half-Cadence ends on degree V (Dominant), creating a feeling of expectant pause (like a comma)."
+            ),
+            QuizQuestion(
+                question="A Cadência Deceptiva (ou de Engano) vai tipicamente de V para...?",
+                options=["I (Tónica)", "IV (Subdominante)", "VI (Submediante)", "II (Supertónica)"],
+                correct_index=2,
+                explanation="A Cadência Deceptiva resolve V→VI (ex: Sol7→Lám em Dó Maior), criando surpresa ao evitar a tónica esperada.",
+                question_en="The Deceptive Cadence typically resolves from V to...?",
+                options_en=["I (Tonic)", "IV (Subdominant)", "VI (Submediant)", "II (Supertonic)"],
+                explanation_en="The Deceptive Cadence resolves V→VI (e.g., G7→Am in C Major), creating surprise by evading the expected tonic."
+            ),
+            QuizQuestion(
+                question="Em 'Für Elise', que tipo de cadência cria o momento de suspensão na frase intermédia?",
+                options=["Plagal", "Autêntica Perfeita", "Deceptiva", "Meia-Cadência"],
+                correct_index=3,
+                explanation="A Meia-Cadência (Lam→MiM) na secção intermédia de Für Elise gera tensão suspensa antes do regresso ao tema.",
+                question_en="In 'Für Elise', what type of cadence creates the suspended tension in the middle phrase?",
+                options_en=["Plagal", "Perfect Authentic", "Deceptive", "Half-Cadence"],
+                explanation_en="The Half-Cadence (Am→EM) in the middle section of Für Elise creates suspended tension before returning to the theme."
+            ),
+        ]
+    ),
 ]
