@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 41 — Estúdio de Composição: Motor de Renderização Offline — CONCLUÍDA
+- Data: 2026-08-17T17:50:32+01:00
+- Commit: 4ea79a2
+- Resumo: Implementado o motor de renderização offline multi-pista em `audio/composition_renderer.py` (`CompositionRenderer`). O motor converte composições para arrays float32 estéreo (N, 2) a 44.1kHz sem dependência de hardware nem de pygame (100% testável em CI). Utiliza posicionamento de amostras exato por aritmética de índices, cache de waveforms em memória (`_SAMPLE_CACHE`) para síntese rápida de bateria, piano aditivo e guitarra Karplus-Strong, espaçamento estéreo com cauda acústica de 1.5s e limitador de saturação suave `np.tanh`. 239/239 testes a passar (4 novos testes em `tests/test_composition_renderer.py`).
+- Ficheiros principais alterados: audio/composition_renderer.py, tests/test_composition_renderer.py, README.md
+
 ## Fase 40 — Estúdio de Composição: Modelo de Dados & Persistência — CONCLUÍDA
 - Data: 2026-08-17T17:46:04+01:00
 - Commit: c1935bf
