@@ -14,6 +14,70 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA — Glossário: pesquisa é sensível a acentos (reportado pelo utilizador)
+- Reportado por: clogomes — *"o glossário musical não parece estar a funcionar"*.
+- Investiguei todos os caminhos possíveis; **a causa é uma só**: a pesquisa
+  falha quando se escreve sem acentos, que é como a maioria das pessoas
+  escreve em português.
+
+**Reproduzido no ecrã real** (via `search_entry` + `_on_search_changed`):
+```
+"tónica"    → 17 termos      "tonica"    →  0 termos
+"trítono"   →  7 termos      "tritono"   →  0 termos
+"cadência"  →  3 termos      "cadencia"  →  2 termos   (só apanha os que não têm acento)
+"harmónico" →  8 termos      "harmonico" →  0 termos
+"sensível"  →  2 termos      "sensivel"  →  0 termos
+```
+Maiúsculas já funcionam (`TÓNICA` = `tónica`), só os acentos é que não.
+
+Do ponto de vista de quem usa, isto **é** "o glossário não funciona": escreve-se
+`tonica` na caixa de pesquisa, aparece zero, e conclui-se que está partido.
+Num glossário de termos musicais portugueses — onde quase todos os termos têm
+acento (tónica, trítono, cadência, harmónico, sensível, dominante...) — é a
+diferença entre a funcionalidade servir ou não.
+
+**Corrigir** em `core/glossary.py::search_terms`: normaliza acentos dos dois
+lados da comparação (query e termos), além do `lower()` que já fazes. Padrão
+usual em Python, sem dependências novas:
+```python
+import unicodedata
+def _fold(s: str) -> str:
+    return "".join(c for c in unicodedata.normalize("NFD", s.lower())
+                   if unicodedata.category(c) != "Mn")
+```
+Aplica a `term_pt`, `term_en`, definições e aliases — a tudo o que a pesquisa
+percorre. Cuidado para **não** normalizar o texto exibido, só o usado na
+comparação.
+
+**Teste obrigatório**: para cada par com/sem acento (`tónica`/`tonica`,
+`trítono`/`tritono`, `cadência`/`cadencia`, `harmónico`/`harmonico`,
+`sensível`/`sensivel`), afirma que devolvem **o mesmo número de resultados**.
+
+**Considera aplicar o mesmo `_fold` à auto-ligação** em
+`gui/markdown_renderer.py::get_glossary_keywords_map` — se um capítulo escrever
+um termo sem acento, hoje não fica ligado. Menos crítico (o texto dos capítulos
+está bem acentuado), mas é a mesma classe de problema.
+
+### O que verifiquei e está BEM (não percas tempo aqui)
+Para te poupar investigação, testei todo o resto do caminho e funciona:
+- **Navegação**: rota `"glossary"` existe em `navigate_to`, com entrada no
+  menu principal (`target_screen="glossary"`) e na barra lateral. Correta.
+- **Ecrã**: constrói e mostra os 139 termos.
+- **Filtro por letra**: `C` → 16 termos. Funciona.
+- **Auto-ligação**: as tags são criadas com nomes corretos
+  (`gloss_sensivel`, `gloss_tonica`, `gloss_tetracorde`, `gloss_escala_maior`),
+  com `tag_bind("<Button-1>")`, sublinhado e cursor de mão.
+- **Modal**: `show_glossary_term_modal` abre sem erro para vários termos.
+
+**Nota sobre o fallback em `markdown_renderer.py:197-205`**: quando
+`on_glossary_click` não é passado (e `theory_screen.py:298` não passa), cai no
+`show_glossary_term_modal` dentro de um `try/except Exception: pass`. Funciona
+hoje, mas esse `pass` mudo significa que, se um dia o modal falhar, o clique
+deixa de fazer nada **sem qualquer sinal** — exatamente o tipo de avaria difícil
+de diagnosticar. Regista o erro em vez de o engolir.
+
+---
+
 ## Revisão — Fase 39 APROVADA ✅ — SÉRIE 35-39 FECHADA
 - Commits revistos: `3e37891`, `efc8227`
 - Testes: 227/227 OK
