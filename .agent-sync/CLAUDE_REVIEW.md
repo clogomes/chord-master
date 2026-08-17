@@ -14,6 +14,65 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA (URGENTE) — Glossário: causa raiz da lentidão encontrada (1737 widgets + 5200 bindings)
+- Utilizador voltou a reportar, agora mais grave: *"continua a demorar tempo e
+  nem sei se aparece"*.
+- Investiguei mais fundo e **encontrei a causa raiz**, que é diferente (e pior)
+  do que eu tinha diagnosticado antes.
+
+### A causa: o ecrã constrói uma árvore de widgets 8× maior que qualquer outro
+Medido dentro da app a correr:
+```
+theory   :  222 widgets na árvore
+glossary : 1737 widgets na árvore     ← 8×
+```
+São **139 cartões**, cada um com vários sub-widgets, num contentor com
+**11.398 píxeis de altura** dentro de uma janela de 900.
+
+### O agravante: `bind_mousewheel` liga eventos a TODOS eles
+`glossary_screen.py` chama `bind_mousewheel` **três vezes** (linhas 202, 228,
+239), e `gui/scroll_utils.py::_bind_widget_recursively` percorre a árvore
+inteira ligando **3 eventos por widget** (`<MouseWheel>`, `<Button-4>`,
+`<Button-5>`):
+```
+1737 widgets × 3 eventos ≈ 5200 bindings
+```
+E há um handler `<Enter>` que **volta a percorrer a árvore** para apanhar
+widgets criados dinamicamente — ou seja, o custo repete-se sempre que o rato
+entra na área. É isto que faz o ecrã parecer pendurado em vez de apenas lento.
+
+### Correções, por ordem de retorno
+1. **Não construir 139 cartões.** Mostra ~30-40 e carrega o resto ao scroll
+   (ou exige 2 caracteres de pesquisa antes de listar). Isto sozinho corta a
+   árvore de 1737 para ~400 widgets e resolve a maior parte do problema.
+2. **Debounce na pesquisa** (`after(250, ...)` + `after_cancel`) — escrever
+   "tonica" passa de 6 reconstruções para 1. Medi 436 ms de UI bloqueada para
+   uma palavra de 6 letras.
+3. **Não chamar `bind_mousewheel` três vezes** no mesmo ecrã, e considerar
+   ligar o evento **só ao contentor de scroll** em vez de a cada descendente.
+   O Tkinter propaga eventos pela hierarquia; a ligação recursiva a milhares de
+   widgets é o que custa. Se a ligação recursiva for mesmo necessária noutros
+   ecrãs, torna-a opcional (`recursive=False`) e usa isso aqui.
+
+### Como validar
+```
+navigate_to("glossary") + update_idletasks()  →  deve ficar ~150 ms (está em 548)
+contagem de widgets da árvore                 →  deve ficar abaixo de ~500 (está em 1737)
+escrever palavra de 6 letras                  →  1 re-renderização, não 6
+```
+
+### Correção a uma conclusão minha anterior
+Na revisão anterior escrevi que `app.update()` bloqueava no glossário e sugeri
+que fosse específico dele. **Não é**: fiz o teste de controlo e o `update()`
+bloqueia igualmente no ecrã de teoria quando corrido em processo de fundo
+neste ambiente — é artefacto do meu método de teste, não da app. Os números
+que **são** fiáveis, e que sustentam esta AÇÃO NECESSÁRIA, são os medidos com
+`update_idletasks()`: 548 ms de navegação, 1737 widgets, 436 ms por palavra
+escrita. Não quero que percas tempo a caçar um bloqueio que era do meu
+harness.
+
+---
+
 ## Revisão — Acentos CORRIGIDOS ✅ / AÇÃO NECESSÁRIA — Glossário lento ("pendurado")
 - Commits revistos: `3a964a0`, `9e4e942`
 - Testes: 228/228 OK
