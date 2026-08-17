@@ -14,6 +14,59 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 45 (Faixas de Acordes na Grelha) APROVADA ✅ — AVANÇA PARA A FASE 46 (última)
+- Commits revistos: `1c9e6c0`, `a9375d5`
+- Testes: 244/244 OK
+- **Veredito: APROVADO**
+
+**Os acordes estão agora na mesma linha temporal da percussão**, que era o
+pedido do utilizador ("para poder marcar os tempos melhor"). Dois carris
+(`CHORD_LANES`) no mesmo canvas, por baixo da bateria.
+
+**O alinhamento temporal está exato** — verifiquei convertendo a posição em
+píxeis de volta para tempos:
+```
+acorde no tempo 0 → x=  4   (origem da grelha)
+acorde no tempo 8 → x=772   = 4 + (8 tempos × 4 passos × 24 px) ✓
+steps_per_beat derivado: 4.0
+```
+E o rácio é **derivado** de `steps_per_bar` e do compasso
+(`_get_steps_per_beat`, linha 135), não assumido fixo — foi um dos pontos que
+pedi explicitamente, porque com compassos ternários um 4 fixo daria posições
+erradas.
+
+**Inserção por clique funciona** nos dois carris:
+```
+clicar no carril piano  no tempo 12 → C major, inst=piano,  dur=4.0
+clicar no carril guitar no tempo  4 → C major, inst=guitar, dur=4.0
+blocos redesenhados no canvas: 2
+```
+Usa a raiz, o tipo e a duração selecionados nos menus, como especificado.
+
+**A lista de acordes existente foi mantida e sincronizada**, não substituída
+(`_refresh_chords_list` continua lá) — pedi isso porque a lista é mais prática
+para editar duração e apagar.
+
+**Render final continua correto**: ritmo + acordes juntos, pico 0.796 sem
+clipping.
+
+**Desempenho estável**: 169 ms a abrir com 154 widgets (era 158 ms / 154 na
+Fase 44 — o acréscimo dos carris não custou praticamente nada, porque são
+desenhados no mesmo canvas).
+
+*Nota de método minha*: dois dos meus testes falharam por eu ter adivinhado
+nomes de métodos (`_on_chord_lane_click` em vez de `_on_chord_lane_clicked`, e
+`set_chords`). Erros meus, não do código — corrigi e repeti antes de concluir
+seja o que for.
+
+**Avança para a Fase 46** — a última: mais tipos de percussão (toms, palmas,
+prato de ataque, aro, cowbell). Lembretes: sintetiza em numpy no estilo dos
+existentes; confirma que o **prato de ataque (2-4 s de cauda) não é cortado**
+quando colocado no último passo; e garante que os sons novos entram na cache
+`_get_synthesized_drum_sample`, senão o primeiro render fica lento.
+
+---
+
 ## Revisão — Fase 44 (Grelha Multi-Compasso) APROVADA ✅ — AVANÇA PARA A FASE 45
 - Commits revistos: `47ba74f`, `342a20c`
 - Testes: 244/244 OK
