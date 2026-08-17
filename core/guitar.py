@@ -109,6 +109,75 @@ GUITAR_CHORD_LIBRARY: Dict[str, List[GuitarChordShape]] = {
     "Am7": [GuitarChordShape("Lá Menor com 7ª", "Am7", "min7", "A", [-1, 0, 2, 0, 1, 0], [0, 0, 2, 0, 1, 0], description="Am com a 3ª corda solta.")],
     "Dm7": [GuitarChordShape("Ré Menor com 7ª", "Dm7", "min7", "D", [-1, -1, 0, 2, 1, 1], [0, 0, 0, 2, 1, 1], barre_fret=1, description="Mini-pestana no 1º traste das duas primeiras cordas.")],
     "Em7": [GuitarChordShape("Mi Menor com 7ª", "Em7", "min7", "E", [0, 2, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0], description="Apenas 1 dedo no 2º traste da 5ª corda.")],
+
+    # ACORDES SUSPENDED & ADD9 (Espinha dorsal do violão/guitarra)
+    "Cadd9": [
+        GuitarChordShape("Dó com Nona (add9)", "Cadd9", "add9", "C", [-1, 3, 2, 0, 3, 3], [0, 2, 1, 0, 3, 4], description="O famoso acorde folk/acústico com nona adicionada nas duas primeiras cordas.")
+    ],
+    "Dsus4": [
+        GuitarChordShape("Ré com Quarta Suspensa", "Dsus4", "sus4", "D", [-1, -1, 0, 2, 3, 3], [0, 0, 0, 1, 2, 4], description="Resolução suspensa clássica para D Maior.")
+    ],
+    "Dsus2": [
+        GuitarChordShape("Ré com Segunda Suspensa", "Dsus2", "sus2", "D", [-1, -1, 0, 2, 3, 0], [0, 0, 0, 1, 2, 0], description="Sonoridade aberta e luminosa sem a terça.")
+    ],
+    "Asus2": [
+        GuitarChordShape("Lá com Segunda Suspensa", "Asus2", "sus2", "A", [-1, 0, 2, 2, 0, 0], [0, 0, 1, 2, 0, 0], description="Forma aberta suave com cordas B e E soltas.")
+    ],
+    "Asus4": [
+        GuitarChordShape("Lá com Quarta Suspensa", "Asus4", "sus4", "A", [-1, 0, 2, 2, 3, 0], [0, 0, 1, 2, 3, 0], description="Suspensão com o 3º traste na 2ª corda.")
+    ],
+    "Esus4": [
+        GuitarChordShape("Mi com Quarta Suspensa", "Esus4", "sus4", "E", [0, 2, 2, 2, 0, 0], [0, 1, 2, 3, 0, 0], description="Suspensão de Mi Maior elevando a terça para Lá.")
+    ],
+    "Gsus4": [
+        GuitarChordShape("Sol com Quarta Suspensa", "Gsus4", "sus4", "G", [3, 2, 0, 0, 1, 3], [3, 2, 0, 0, 1, 4], description="Forma aberta de Sol com C na 2ª corda.")
+    ],
+
+    # POWER CHORDS (5) — Rock, Metal & Pop
+    "C5": [
+        GuitarChordShape("Dó Power Chord", "C5", "power", "C", [-1, 3, 5, 5, -1, -1], [0, 1, 3, 4, 0, 0], description="Power chord de Dó na 5ª corda (traste 3).")
+    ],
+    "D5": [
+        GuitarChordShape("Ré Power Chord", "D5", "power", "D", [-1, 5, 7, 7, -1, -1], [0, 1, 3, 4, 0, 0], description="Power chord de Ré na 5ª corda (traste 5)."),
+        GuitarChordShape("Ré Power Chord (Aberto)", "D5", "power", "D", [-1, -1, 0, 2, 3, -1], [0, 0, 0, 1, 2, 0], description="Power chord aberto de Ré.")
+    ],
+    "E5": [
+        GuitarChordShape("Mi Power Chord", "E5", "power", "E", [0, 2, 2, -1, -1, -1], [0, 1, 2, 0, 0, 0], description="O power chord mais pesado com o grave da 6ª corda solta.")
+    ],
+    "F5": [
+        GuitarChordShape("Fá Power Chord", "F5", "power", "F", [1, 3, 3, -1, -1, -1], [1, 3, 4, 0, 0, 0], description="Power chord de Fá no 1º traste da 6ª corda.")
+    ],
+    "G5": [
+        GuitarChordShape("Sol Power Chord", "G5", "power", "G", [3, 5, 5, -1, -1, -1], [1, 3, 4, 0, 0, 0], description="Power chord de Sol na 6ª corda (traste 3)."),
+        GuitarChordShape("Sol Power Chord (Rock)", "G5", "power", "G", [3, -1, 0, 0, 3, 3], [1, 0, 0, 0, 3, 4], description="Forma folk/rock aberta de G5.")
+    ],
+    "A5": [
+        GuitarChordShape("Lá Power Chord", "A5", "power", "A", [-1, 0, 2, 2, -1, -1], [0, 0, 1, 2, 0, 0], description="Power chord aberto de Lá na 5ª corda.")
+    ],
+    "B5": [
+        GuitarChordShape("Si Power Chord", "B5", "power", "B", [-1, 2, 4, 4, -1, -1], [0, 1, 3, 4, 0, 0], description="Power chord de Si na 5ª corda (traste 2).")
+    ],
+
+    # ACORDES COM RAÍZES ALTERADAS (BEMOL / SUSTENIDO)
+    "Bb": [
+        GuitarChordShape("Si♭ Maior (Pestana)", "Bb", "major", "Bb", [-1, 1, 3, 3, 3, 1], [0, 1, 2, 3, 4, 1], barre_fret=1, description="Pestana na 5ª corda no 1º traste (CAGED A)."),
+        GuitarChordShape("Si♭ Maior (6º traste)", "Bb", "major", "Bb", [6, 8, 8, 7, 6, 6], [1, 3, 4, 2, 1, 1], barre_fret=6, description="Pestana na 6ª corda no 6º traste (CAGED E).")
+    ],
+    "Eb": [
+        GuitarChordShape("Mi♭ Maior (Pestana)", "Eb", "major", "Eb", [-1, 6, 8, 8, 8, 6], [0, 1, 2, 3, 4, 1], barre_fret=6, description="Pestana no 6º traste da 5ª corda.")
+    ],
+    "Ab": [
+        GuitarChordShape("Lá♭ Maior (Pestana)", "Ab", "major", "Ab", [4, 6, 6, 5, 4, 4], [1, 3, 4, 2, 1, 1], barre_fret=4, description="Pestana no 4º traste da 6ª corda.")
+    ],
+    "F#": [
+        GuitarChordShape("Fá♯ Maior (Pestana)", "F#", "major", "F#", [2, 4, 4, 3, 2, 2], [1, 3, 4, 2, 1, 1], barre_fret=2, description="Pestana no 2º traste da 6ª corda.")
+    ],
+    "Bbm": [
+        GuitarChordShape("Si♭ Menor (Pestana)", "Bbm", "minor", "Bb", [-1, 1, 3, 3, 2, 1], [0, 1, 3, 4, 2, 1], barre_fret=1, description="Pestana menor no 1º traste da 5ª corda.")
+    ],
+    "Ebm": [
+        GuitarChordShape("Mi♭ Menor (Pestana)", "Ebm", "minor", "Eb", [-1, 6, 8, 8, 7, 6], [0, 1, 3, 4, 2, 1], barre_fret=6, description="Pestana menor no 6º traste da 5ª corda.")
+    ],
 }
 
 

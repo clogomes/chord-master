@@ -478,10 +478,13 @@ class PracticeSongScreen(ctk.CTkFrame):
         )
         self.song_desc_lbl.pack(anchor="w", padx=16, pady=(0, 6))
 
-        # Theory Analysis Button
+        # Analysis & History Button Row
+        btn_row = ctk.CTkFrame(self.info_card, fg_color="transparent")
+        btn_row.pack(anchor="w", padx=16, pady=(0, 12))
+
         self.theory_analysis_btn = ctk.CTkButton(
-            self.info_card,
-            text="🎓 Ver Análise Teórica",
+            btn_row,
+            text="🎓 Análise Teórica",
             font=theme.get_font(theme.FONT_SMALL_BOLD),
             fg_color=theme.COLOR_PRIMARY,
             hover_color=theme.COLOR_PRIMARY_HOVER,
@@ -490,7 +493,20 @@ class PracticeSongScreen(ctk.CTkFrame):
             corner_radius=theme.RADIUS_SM,
             command=self._show_theory_analysis_modal,
         )
-        self.theory_analysis_btn.pack(anchor="w", padx=16, pady=(0, 12))
+        self.theory_analysis_btn.pack(side="left", padx=(0, 8))
+
+        self.history_context_btn = ctk.CTkButton(
+            btn_row,
+            text="📜 Contexto Histórico",
+            font=theme.get_font(theme.FONT_SMALL_BOLD),
+            fg_color="#0284C7",
+            hover_color="#0369A1",
+            text_color="#FFFFFF",
+            height=30,
+            corner_radius=theme.RADIUS_SM,
+            command=self._show_history_modal,
+        )
+        self.history_context_btn.pack(side="left")
 
         # Playback Controls & Metronome Bar
         ctrl_bar = ctk.CTkFrame(
@@ -832,14 +848,22 @@ class PracticeSongScreen(ctk.CTkFrame):
         self.song_title_lbl.configure(text=f"{song.title} — {song.composer}")
         from gui.i18n import get_language, t
         lang = get_language()
-        self.song_meta_lbl.configure(text=f"{t('song_difficulty', 'Dificuldade')}: {song.get_difficulty(lang)} • {t('song_time', 'Compasso')}: {song.time_signature} • BPM: {song.bpm} • {song.note_count} {t('song_notes', 'Notas')}")
+        period_str = song.get_period(lang)
+        period_lbl = "Period" if lang == "en" else "Período"
+        self.song_meta_lbl.configure(text=f"{period_lbl}: {period_str} • {t('song_difficulty', 'Dificuldade')}: {song.get_difficulty(lang)} • {t('song_time', 'Compasso')}: {song.time_signature} • BPM: {song.bpm} • {song.note_count} {t('song_notes', 'Notas')}")
         
         self.song_desc_lbl.configure(text=song.get_description(lang))
         if hasattr(self, "theory_analysis_btn"):
             if song.get_theory_analysis(lang):
-                self.theory_analysis_btn.pack(anchor="w", padx=16, pady=(0, 12))
+                self.theory_analysis_btn.pack(side="left", padx=(0, 8))
             else:
                 self.theory_analysis_btn.pack_forget()
+
+        if hasattr(self, "history_context_btn"):
+            if song.get_historical_context(lang):
+                self.history_context_btn.pack(side="left")
+            else:
+                self.history_context_btn.pack_forget()
 
         # Update Slider
         if self.tempo_ramp_var.get():
@@ -1180,6 +1204,59 @@ class PracticeSongScreen(ctk.CTkFrame):
             close_btn.pack(anchor="e", padx=16, pady=(0, 16))
 
             # Ensure top window receives focus after complete build
+            top.transient(self.winfo_toplevel())
+            top.grab_set()
+        except Exception:
+            top.destroy()
+            raise
+
+    def _show_history_modal(self):
+        if not self.current_song:
+            return
+
+        from gui.i18n import get_language, t
+        lang = get_language()
+        history_text = self.current_song.get_historical_context(lang)
+        if not history_text:
+            return
+
+        top = ctk.CTkToplevel(self)
+        top.title(f"📜 Contexto Histórico — {self.current_song.title}")
+        top.geometry("680x520")
+        top.configure(fg_color=theme.COLOR_BG)
+
+        try:
+            card = ctk.CTkFrame(top, corner_radius=theme.RADIUS_LG, fg_color=theme.COLOR_SURFACE, border_width=1, border_color=theme.COLOR_BORDER)
+            card.pack(fill="both", expand=True, padx=16, pady=16)
+
+            header_frame = ctk.CTkFrame(card, fg_color="transparent")
+            header_frame.pack(fill="x", padx=16, pady=(16, 8))
+
+            ctk.CTkLabel(
+                header_frame,
+                text=f"{self.current_song.title} ({self.current_song.composer})",
+                font=theme.get_font(theme.FONT_TITLE),
+                text_color=theme.COLOR_TEXT_PRIMARY,
+            ).pack(side="left")
+
+            period_badge = ctk.CTkLabel(
+                header_frame,
+                text=f"  {self.current_song.get_period(lang).upper()}  ",
+                font=theme.get_font(theme.FONT_BADGE),
+                text_color="#FFFFFF",
+                fg_color="#0284C7",
+                corner_radius=theme.RADIUS_SM,
+            )
+            period_badge.pack(side="right")
+
+            textbox = ctk.CTkTextbox(card, corner_radius=theme.RADIUS_MD, fg_color=theme.COLOR_SURFACE_SECONDARY, text_color=theme.COLOR_TEXT_PRIMARY, font=theme.get_font(theme.FONT_BODY), wrap="word")
+            textbox.pack(fill="both", expand=True, padx=16, pady=(0, 12))
+
+            render_markdown_to_textbox(textbox, history_text, base_font_size=13)
+
+            close_btn = ctk.CTkButton(card, text=t("btn_close", "Fechar"), font=theme.get_font(theme.FONT_BODY_BOLD), fg_color="#0284C7", hover_color="#0369A1", command=top.destroy)
+            close_btn.pack(anchor="e", padx=16, pady=(0, 16))
+
             top.transient(self.winfo_toplevel())
             top.grab_set()
         except Exception:

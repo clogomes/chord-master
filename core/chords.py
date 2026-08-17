@@ -127,7 +127,117 @@ CHORD_TYPES: Dict[str, ChordDefinition] = {
         formula_degrees="1 - ♭3 - ♭5 - ♭♭7",
         formula_intervals="Tríade Diminuta + Sétima Diminuta (9 st)",
         description="Acorde perfeitamente simétrico formado por 4 terças menores consecutivas. Altamente dramático e com multi-possibilidades modulatórias."
-    )
+    ),
+    "power": ChordDefinition(
+        key="power",
+        symbol="5",
+        name_pt="Power Chord (Quinta)",
+        name_en="Power Chord (5th)",
+        intervals=[0, 7],
+        formula_degrees="1 - 5",
+        formula_intervals="Tónica + Quinta Justa (7 st)",
+        description="Bidiade sem terça, neutra entre maior e menor. O pilar do Rock, Hard Rock e Heavy Metal, perfeito para distorção."
+    ),
+    "6": ChordDefinition(
+        key="6",
+        symbol="6",
+        name_pt="Maior com Sexta",
+        name_en="Major 6th",
+        intervals=[0, 4, 7, 9],
+        formula_degrees="1 - 3 - 5 - 6",
+        formula_intervals="Tríade Maior + Sexta Maior (9 st)",
+        description="Acorde clássico de Swing, Jazz e Bossa Nova, oferecendo uma resolução suave e luminosa sem a tensão da sétima maior."
+    ),
+    "m6": ChordDefinition(
+        key="m6",
+        symbol="m6",
+        name_pt="Menor com Sexta",
+        name_en="Minor 6th",
+        intervals=[0, 3, 7, 9],
+        formula_degrees="1 - ♭3 - 5 - 6",
+        formula_intervals="Tríade Menor + Sexta Maior (9 st)",
+        description="Sonoridade Dórica rica, muito presente no Jazz tradicional e na música de cinema noir / espionagem."
+    ),
+    "add9": ChordDefinition(
+        key="add9",
+        symbol="add9",
+        name_pt="Maior com Nona Adicionada (add9)",
+        name_en="Major Added 9th (add9)",
+        intervals=[0, 4, 7, 14],
+        formula_degrees="1 - 3 - 5 - 9",
+        formula_intervals="Tríade Maior + Nona Maior (14 st)",
+        description="Tríade maior com uma 9ª sobreposta (sem a 7ª). Extremamente brilhante, emotiva e indispensável na guitarra acústica contemporânea."
+    ),
+    "9": ChordDefinition(
+        key="9",
+        symbol="9",
+        name_pt="Nona da Dominante",
+        name_en="Dominant 9th",
+        intervals=[0, 4, 7, 10, 14],
+        formula_degrees="1 - 3 - 5 - ♭7 - 9",
+        formula_intervals="Acorde Dominante 7 + Nona Maior (14 st)",
+        description="Dominante expandida cheia de cor funk, blues e jazz."
+    ),
+    "7sus4": ChordDefinition(
+        key="7sus4",
+        symbol="7sus4",
+        name_pt="Sétima com Quarta Suspensa",
+        name_en="Dominant 7th Suspended 4th",
+        intervals=[0, 5, 7, 10],
+        formula_degrees="1 - 4 - 5 - ♭7",
+        formula_intervals="Tríade Sus4 + Sétima Menor (10 st)",
+        description="Mistura a suspensão da 4ª com a atração da 7ª menor. Sonoridade modal moderna de grande amplitude."
+    ),
+    "mMaj7": ChordDefinition(
+        key="mMaj7",
+        symbol="m(Maj7)",
+        name_pt="Menor com Sétima Maior",
+        name_en="Minor Major 7th",
+        intervals=[0, 3, 7, 11],
+        formula_degrees="1 - ♭3 - 5 - 7",
+        formula_intervals="Tríade Menor + Sétima Maior (11 st)",
+        description="Tétrade construída sobre o 1º grau da escala menor harmónica ou melódica. Famoso 'acorde de James Bond', misterioso e intrigante."
+    ),
+    "7b9": ChordDefinition(
+        key="7b9",
+        symbol="7(♭9)",
+        name_pt="Dominante com Nona Bemol",
+        name_en="Dominant 7th Flat 9",
+        intervals=[0, 4, 7, 10, 13],
+        formula_degrees="1 - 3 - 5 - ♭7 - ♭9",
+        formula_intervals="Dominante 7 + Nona Menor (13 st)",
+        description="Dominante alterada essencial na resolução para tonalidades menores (grau V7 no modo menor)."
+    ),
+    "7#9": ChordDefinition(
+        key="7#9",
+        symbol="7(♯9)",
+        name_pt="Dominante com Nona Aumentada (Hendrix Chord)",
+        name_en="Dominant 7th Sharp 9 (Hendrix Chord)",
+        intervals=[0, 4, 7, 10, 15],
+        formula_degrees="1 - 3 - 5 - ♭7 - ♯9",
+        formula_intervals="Dominante 7 + Nona Aumentada (15 st)",
+        description="O lendário 'Hendrix Chord' (Purple Haze). Combina a 3ª maior com a 3ª menor enarmónica (♯9), gerando tensão blues/rock única."
+    ),
+    "7#11": ChordDefinition(
+        key="7#11",
+        symbol="7(♯11)",
+        name_pt="Dominante com 11ª Aumentada (Lídio ♭7)",
+        name_en="Dominant 7th Sharp 11 (Lydian Dominant)",
+        intervals=[0, 4, 7, 10, 18],
+        formula_degrees="1 - 3 - 5 - ♭7 - ♯11",
+        formula_intervals="Dominante 7 + Décima Primeira Aumentada (18 st)",
+        description="Acorde do modo Lídio Dominante (4º grau da menor melódica), muito comum em substituições tritónicas."
+    ),
+    "7b13": ChordDefinition(
+        key="7b13",
+        symbol="7(♭13)",
+        name_pt="Dominante com Décima Terceira Bemol",
+        name_en="Dominant 7th Flat 13",
+        intervals=[0, 4, 7, 10, 20],
+        formula_degrees="1 - 3 - 5 - ♭7 - ♭13",
+        formula_intervals="Dominante 7 + Décima Terceira Menor (20 st)",
+        description="Dominante alterada de grande densidade harmónica usada em jazz e bossa nova."
+    ),
 }
 
 

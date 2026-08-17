@@ -16,7 +16,8 @@ class TheoryChapter:
     content_markdown: str
     piano_focus: str
     guitar_focus: str
-    interactive_demo: str  # "notes", "intervals", "scales", "chords", "fretboard", "circle_of_fifths"
+    interactive_demo: str  # "notes", "intervals", "scales", "chords", "fretboard", "circle_of_fifths", "voice_leading", "harmonic_field_builder"
+    prerequisites: List[str] = None
     
     # Optional English translations (i18n)
     title_en: str = ""
@@ -25,6 +26,10 @@ class TheoryChapter:
     content_markdown_en: str = ""
     piano_focus_en: str = ""
     guitar_focus_en: str = ""
+
+    def __post_init__(self):
+        if self.prerequisites is None:
+            self.prerequisites = []
 
     def get_title(self, lang: str = "pt") -> str:
         return self.title_en if lang == "en" and self.title_en else self.title
@@ -98,6 +103,7 @@ A pauta (ou pentagrama) é composta por **5 linhas e 4 espaços**, contados de b
 • **Ataque na Ponta dos Dedos**: Pressiona as cordas rigorosamente com a ponta dos dedos (a 90º da escala) para evitar que a almofada do dedo encoste e abafe as cordas soltas vizinhas.
 """,
         interactive_demo="notes",
+        prerequisites=[],
         title_en="Music Fundamentals & Notation",
         subtitle_en="Properties of sound, notes, staff, clefs, and accidentals",
         summary_en="Learn the foundations of musical language: the 12 chromatic notes, solfège and letter notation, the staff with Treble and Bass clefs, and how accidentals work.",
@@ -177,6 +183,8 @@ Um **intervalo** é a distância de altura entre duas notas musicais. É o bloco
 | **11** | Sétima Maior | M7 | Dissonância Tensa | *Take On Me* (salto do refrão) |
 | **12** | Oitava Justa | P8 | Consonância Perfeita | *Over the Rainbow* |
 
+> 📜 **Nota Histórica sobre o Trítono**: A famosa expressão latina *Diabolus in Musica* ("o diabo na música") e a lenda de que o trítono era estritamente proibido pela Igreja Católica sob pena de excomunhão é, em grande parte, uma invenção romântica do século XVIII e XIX (cunhada pelo teórico Johann Joseph Fux em 1725). No canto gregoriano medieval e no Renascimento, o trítono era simplesmente evitado por ser uma dissonância melódica difícil de entoar com precisão vocal (*mi contra fa*), resolvendo-se através do uso do Si bemol (*musica ficta*).
+
 ---
 
 ### 3. Inversão de Intervalos
@@ -204,6 +212,7 @@ Quando invertemos as duas notas de um intervalo (por exemplo, Dó-Sol vira Sol-D
 • **Pressão Mínima**: Experimenta tocar uma nota aliviando a força até trastejar, e depois aperta apenas o milímetro suficiente para soar limpa — evita gastar o dobro da energia necessária.
 """,
         interactive_demo="intervals",
+        prerequisites=["chap1_fundamentals"],
         title_en="Intervals & Harmonic Physics",
         subtitle_en="The fundamental building blocks of harmony and consonances",
         summary_en="Discover what intervals are, how to measure note distances in semitones, melodic vs harmonic intervals, and ear training mnemonics.",
@@ -306,7 +315,8 @@ O Círculo de Quintas organiza as 12 armações de clave:
 • **Palhetada Alternada Estrita**: Pratica cada escala com palhetada estritamente alternada (Baixo - Cima - Baixo - Cima) para sincronizar o movimento rítmico das duas mãos com o metrónomo.
 • **Mão Esquerda Estável**: Mantém os dedos curvados e perto das cordas mesmo quando não estão a tocar — dedos que voam longe do braço perdem preciosas frações de segundo.
 """,
-        interactive_demo="scales",
+        interactive_demo="circle_of_fifths",
+        prerequisites=["chap1_fundamentals", "chap2_intervals"],
         title_en="Scales, Greek Modes & Circle of Fifths",
         subtitle_en="Tonal, modal melodic structures and key signatures",
         summary_en="Learn formulaic structures for Major, Minor (Natural, Harmonic, Melodic), Pentatonic scales, Greek modes, and Circle of Fifths.",
@@ -403,7 +413,8 @@ A nota mais grave tocada no acorde (o **Baixo**) define o estado de inversão:
 • **Técnica do Dedo Pivot**: Na transição entre acordes (ex: Am para C), mantém o dedo indicador e médio fixos na 2ª e 4ª cordas e desloca apenas o dedo 3 para a 5ª corda.
 • **Troca Antecipada no Ar**: Ao mudar de acorde, move todos os dedos em bloco no ar já com a forma do próximo acorde, em vez de assentar um dedo de cada vez.
 """,
-        interactive_demo="chords",
+        interactive_demo="voice_leading",
+        prerequisites=["chap1_fundamentals", "chap2_intervals"],
         title_en="Chord Construction, Triads & Inversions",
         subtitle_en="Triad anatomy, suspended chords, and voice leading",
         summary_en="Understand how notes stack in 3rds to form chords, structural differences between Major, Minor, Diminished, and Augmented triads, and inversions.",
@@ -504,7 +515,8 @@ Ao adicionar uma quarta nota a 1 terça de distância da quinta, criamos as **T�
 • **Abafamento Intencional de Cordas (String Muting)**: Usa a lateral do polegar esquerdo ou a ponta do dedo que faz a tónica para tocar suavemente na corda 6 ou 5 e calá-la, garantindo que cordas indesejadas nunca soam.
 • **Sincronismo Polegar + Dedos (PIMA)**: O polegar toca o baixo no tempo forte e os dedos I-M-A puxam as 3 cordas agudas em simultâneo como uma pinça coordenada.
 """,
-        interactive_demo="fretboard",
+        interactive_demo="harmonic_field_builder",
+        prerequisites=["chap2_intervals", "chap3_scales_modes", "chap4_chords_triads"],
         title_en="Harmonic Field, Tonal Functions & Seventh Chords",
         subtitle_en="Harmonic progressions matrix, functional harmony, and 7th chords",
         summary_en="Learn how to harmonize major/minor scales to build diatonic fields, Tonic/Subdominant/Dominant functions, and 7th chords (maj7, 7, m7, m7b5).",
@@ -600,7 +612,8 @@ Todo o acorde dominante com 7ª pode ser substituído por outro dominante locali
 • **Deslizar de Traste com Dedo Guia**: Mantém a pressão do dedo que faz a nota guia enquanto deslizas 1 traste para trás, mantendo a continuidade tímbrica.
 • **Substituição de Baixos com o Polegar**: Nas cordas graves 6 e 5, usa o polegar com peso natural para dar clareza aos baixos cromáticos descendentes.
 """,
-        interactive_demo="circle_of_fifths",
+        interactive_demo="voice_leading",
+        prerequisites=["chap5_harmonic_field_tetrads"],
         title_en="Advanced Harmony, Modulation & Modal Interchange",
         subtitle_en="Secondary dominants, modal borrowing, and tritone substitution",
         summary_en="Master secondary dominants (V7/V), modal borrowing (like minor iv and bVI), tritone substitution (SubV7), and smooth modulations.",
@@ -690,6 +703,7 @@ Em ambas as mãos, os dedos são numerados do polegar ao mindinho:
 • **Treino de Ouvido Harmónico**: Toca um acorde de piano no estúdio e tenta reproduzir o mesmo som na viola de ouvido, encontrando os trastes certos.
 """,
         interactive_demo="piano_interactive",
+        prerequisites=["chap1_fundamentals"],
         title_en="Practical Piano & Keyboard Guide",
         subtitle_en="Posture, fingering, hand coordination, and chord voicings",
         summary_en="Essential guide to playing piano with sound technique: finger numbering, scale fingerings, hand independence, and accompaniment patterns.",
@@ -780,7 +794,8 @@ Qualquer um destes 5 formatos pode ser deslocado para a frente no braço usando 
   - 10 min: Mudanças de pestanas e repertório com metrónomo a 70% BPM.
   - 5 min: Prática de palhetada alternada e improvisação sobre backing track.
 """,
-        interactive_demo="guitar_fretboard",
+        interactive_demo="fretboard",
+        prerequisites=["chap1_fundamentals"],
         title_en="Practical Guitar & CAGED System Guide",
         subtitle_en="Fretboard navigation, barre chords, fingerpicking, and mobile chord shapes",
         summary_en="Master the guitar fretboard: the CAGED system for 5 positions per chord, pain-free barre technique, and PIMA fingerpicking.",
@@ -878,7 +893,8 @@ A **síncopa** ocorre quando o acento cai num tempo fraco ou entre tempos, crian
 2. Adiciona as palhetadas para cima entre os tempos.
 3. Varia o padrão criando o teu próprio groove.
 """,
-        interactive_demo="notes",
+        interactive_demo="rhythm",
+        prerequisites=["chap1_fundamentals"],
         title_en="Rhythm, Meter & Pulse",
         subtitle_en="The temporal dimension of music: tempo, meters, and rhythmic values",
         summary_en="Understand how music organizes in time: pulse, meters, note values, rest durations, and syncopation.",
@@ -990,7 +1006,8 @@ A música usa repetição para criar familiaridade e coerência, e variação pa
 • B: Em - C - G - D (Mi menor — mais íntimo)
 • A: G - D - Em - C (regresso)
 """,
-        interactive_demo="chords",
+        interactive_demo="form",
+        prerequisites=["chap1_fundamentals", "chap9_rhythm"],
         title_en="Musical Form & Structure",
         subtitle_en="How music organizes in sections, themes, and dramatic arcs",
         summary_en="Learn to recognize common musical forms (AB, ABA, Rondo, Sonata) and how repetition and contrast build musical narrative.",
@@ -1092,7 +1109,8 @@ O fraseado é a arte de organizar as notas em **frases musicais** com início, d
 
 **Exercício de fraseado**: Toca uma melodia simples (ex: os primeiros 8 compassos de "Greensleeves") com staccato, depois com legato, depois com vibrato em cada nota longa. Sente como cada articulação cria uma emoção completamente diferente.
 """,
-        interactive_demo="notes",
+        interactive_demo="dynamics",
+        prerequisites=["chap1_fundamentals"],
         title_en="Dynamics, Articulation & Expression",
         subtitle_en="How volume, touch, and phrasing turn notes into emotion",
         summary_en="Master dynamic range (pp to ff), articulations (legato, staccato, accents), musical phrasing, and pedal technique.",
@@ -1235,6 +1253,7 @@ A **capotraste** (ou cejilha) é a ferramenta de transposição por excelência 
 **Exercício**: Aprende a progressão G-Em-C-D. Agora coloca a capo no 2º traste e toca as mesmas formas — a música está agora em Lá Maior!
 """,
         interactive_demo="circle_of_fifths",
+        prerequisites=["chap2_intervals", "chap3_scales_modes"],
         title_en="Practical Transposition & Key Signatures",
         subtitle_en="Shifting music between keys and applying the Circle of Fifths",
         summary_en="Learn to transpose melodies and chords to any key, use the Circle of Fifths as a harmonic map, and identify key signatures.",
@@ -1304,7 +1323,8 @@ No Jazz, cada acorde da progressão é associado a uma escala ou modo específic
 🎸 **Na Viola / Guitarra**:
 • Usa formas Drop 2 nas cordas 4-3-2-1 para deslizar ii-V-I suavemente pelo braço.
 """,
-        interactive_demo="circle_of_fifths",
+        interactive_demo="harmonic_field_builder",
+        prerequisites=["chap5_harmonic_field_tetrads", "chap6_advanced_harmony"],
         title_en="Basic Jazz Harmony",
         subtitle_en="ii-V-I progressions, 12-bar blues form, and introduction to chord-scale theory",
         summary_en="Discover jazz harmony foundations: the cadential ii-V-I progression, 12-bar blues structure, and introductory chord-scale theory.",
@@ -1362,6 +1382,7 @@ Os **Guide Tones** são a **3ª e a 7ª** de cada acorde. São as notas mais imp
 • Usa a Posição 1 da Pentatónica Menor com a 'Blue Note' (trítono) para criar frases de blues expressivas.
 """,
         interactive_demo="scales",
+        prerequisites=["chap3_scales_modes", "chap5_harmonic_field_tetrads"],
         title_en="Improvisation Fundamentals",
         subtitle_en="Phrase construction, guide tones, and melodic connection over chords",
         summary_en="Learn real-time melody creation: selecting scales over chords, targeting Guide Tones (3rd and 7th), and phrase articulation.",
@@ -1414,7 +1435,8 @@ Ao mover duas linhas melódicas simultâneas:
 🎸 **Na Viola / Guitarra**:
 • Em peças a duas vozes (como as Bourrées de Bach), mantém o baixo com o polegar e a melodia nos dedos agudos.
 """,
-        interactive_demo="fretboard",
+        interactive_demo="voice_leading",
+        prerequisites=["chap2_intervals", "chap4_chords_triads"],
         title_en="Counterpoint & Voice Leading",
         subtitle_en="Voice motion types, melodic independence, and polyphonic rules",
         summary_en="Deepen voice leading and counterpoint: 4 types of voice motion (parallel, contrary, oblique, direct) and polyphonic rules.",
@@ -1470,7 +1492,8 @@ Praticar não é apenas "tocar a peça do início ao fim várias vezes". A **Pr�
 🎸 **Na Viola / Guitarra**:
 • Treina a transição entre pestanas difíceis repetindo apenas o movimento no ar entre os dois acordes durante 1 minuto.
 """,
-        interactive_demo="notes",
+        interactive_demo="tempo_ramp",
+        prerequisites=[],
         title_en="Deliberate Practice Techniques",
         subtitle_en="How to study efficiently: slow practice, spaced repetition, and chunking",
         summary_en="Learn to study like a professional musician: Deliberate Practice principles, isolating trouble spots (chunking), tempo ramping, and session management.",
@@ -1609,7 +1632,8 @@ Lam – SolM – FáM – MiM7
 - Toca com arpejo descendente (sextas) para sentir o carácter flamenco/barroco
 
 **Dica**: Em guitarra acústica, a progressão Lam-DóM-RéM-FáM-Lam soa como "House of the Rising Sun". Usa compasso 6/8 (arpejo groups de 3 colcheias).""",
-        interactive_demo="chords",
+        interactive_demo="harmonic_field_builder",
+        prerequisites=["chap3_scales_modes", "chap4_chords_triads", "chap5_harmonic_field_tetrads"],
         title_en="Minor Harmonic Field & Minor Seventh Chords",
         subtitle_en="Natural, harmonic and melodic minor scales — degrees, chords and key signatures",
         summary_en="The minor harmonic field is the set of chords built on each degree of the minor scale. Three forms of the minor scale exist, each with distinct harmonic implications. This chapter teaches how to build, identify and apply minor field chords on Piano and Guitar.",
@@ -1830,7 +1854,8 @@ Lám:  Lá2  | Lá3-Dó4-Mi4  ← surpresa!
 **Progressão clássica com todas as cadências:**
 SolM | Ré7 | SolM | DóM | SolM | Lám | Mim | Ré7 |
 (CA) | (MC) | (CA) | (CP) | (CD) ← deceptiva no fim""",
-        interactive_demo="chords",
+        interactive_demo="voice_leading",
+        prerequisites=["chap4_chords_triads", "chap5_harmonic_field_tetrads", "chap17_minor_harmonic_field"],
         title_en="Cadences — Authentic, Plagal, Half-Cadence & Deceptive",
         subtitle_en="Harmonic punctuation: how music creates tension, rest and surprise",
         summary_en="Cadences are harmonic sequences that signal moments of arrival, pause or continuation. They are music's punctuation — commas, full stops and exclamation marks. Understanding cadences is essential for analysis, composition and improvisation.",

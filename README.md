@@ -539,3 +539,21 @@ Implementação nativa de um sistema de i18n em duas vertentes:
   - **Capítulo 18 — Cadências (Autêntica, Plagal, Meia-Cadência & Deceptiva)**: A pontuação harmónica da música comparada a sinais de pontuação (ponto final, vírgula, interrogação, exclamação), critérios rigorosos de Cadência Autêntica Perfeita vs Imperfeita, Cadência Plagal ("Amém"), Meia-Cadência (incluindo Frígia) e Cadência Deceptiva (resolução surpresa no VI).
 - **Quizzes Interativos Dedicados (`core/theory_quiz.py`)**: 10 novas perguntas com explicações detalhadas e suporte bilingue integral (PT e EN) cobrindo graus menores, acordes diminutos/aumentados e classificação funcional de cadências.
 - **Re-derivação e Alinhamento Harmónico do Repertório (`core/songs.py`)**: Análises estruturais de *The House of the Rising Sun* (Lá Eólio com empréstimo modal de IV Maior e dominante harmónica no V) e *Pour Élise* (Lá menor harmónica com alternância expressiva entre cadência autêntica perfeita, meia-cadência e cadência deceptiva) re-derivadas a partir dos novos capítulos.
+
+### Fase 39 — Contexto Histórico, Vocabulário Expandido & Laboratórios Interativos por Capítulo
+- **Contexto Histórico Completo em Todas as 24 Canções (`core/songs.py`)**:
+  - Adição dos campos `period`, `period_en`, `historical_context` e `historical_context_en` a cada uma das 24 músicas da biblioteca (150-250 palavras por peça).
+  - Narrativas históricas rigorosas: a transmissão de *Grândola, Vila Morena* às 00h20m na Rádio Renascença como senha da Revolução dos Cravos; a reatribuição do *Minueto em Sol* de Bach para Christian Petzold em 1970; a descoberta e publicação póstuma de *Für Elise* por Ludwig Nohl em 1867 e o enigma de "Elise"; a lenda elisabetana de *Greensleeves* e Henrique VIII; a génese de *Smoke on the Water* no incêndio do Casino de Montreux; e a desmistificação musicológica da lenda do *Diabolus in Musica* no Capítulo 2.
+  - Novo botão e modal dedicado **"📜 Contexto Histórico"** com badge do período estético no ecrã de repertório (`gui/screens/practice_song.py`).
+- **Vocabulário de Acordes Completo (`core/chords.py` & `core/guitar.py`)**:
+  - Expansão de `CHORD_TYPES` com: **Power Chord (5)**, **6**, **m6**, **add9**, **9**, **7sus4**, **mMaj7** (acorde James Bond) e dominantes alterados (**7♭9**, **7♯9 Hendrix Chord**, **7♯11**, **7♭13**).
+  - Expansão de `GUITAR_CHORD_LIBRARY` com formatos acústicos essenciais: `Cadd9`, `Dsus4`, `Dsus2`, `Asus2`, `Asus4`, `Esus4`, `Gsus4`, Power Chords (`C5`, `D5`, `E5`, `F5`, `G5`, `A5`, `B5`) e raízes com bemol/sustenido (`Bb`, `Eb`, `Ab`, `F#`, `Bbm`, `Ebm`).
+- **Laboratórios Interativos Específicos por Capítulo (`gui/screens/theory_screen.py`)**:
+  - Honra e especialização do campo `interactive_demo` para todos os 18 capítulos:
+    1. **Círculo de Quintas Interativo (`circle_of_fifths`)**: Seleção instantânea de tonalidades, cálculo de armações de clave, relativa menor e visualização/reprodução de todos os acordes diatónicos.
+    2. **Visualizador de Condução de Vozes (`voice_leading`)**: Análise de notas comuns e movimentos por semitom/tom entre acordes (cadências autêntica, plagal, deceptiva, ii-V-I jazz, substituição tritónica e pop eólio) com animação sincronizada na pauta e piano.
+    3. **Construtor / Harmonizador de Campo Harmónico (`harmonic_field_builder`)**: Harmonização automática de escalas maiores, menores naturais, menores harmónicas e modos com reprodução imediata dos 7 graus.
+    4. **Laboratório Teórico Geral (`notes`, `intervals`, `scales`, `chords`, `fretboard`)**: Pauta, teclado e braço de viola sincronizados.
+- **Pré-requisitos e Percurso de Aprendizagem Recomendado (`core/theory_content.py`)**:
+  - Novo campo `prerequisites: List[str]` em cada `TheoryChapter` com mapeamento pedagógico estrito e apresentação destacada de pré-requisitos recomendados no cabeçalho de cada capítulo.
+- **Suite de Testes Unitários**: 227/227 testes a passar (`tests/test_chords.py`, `tests/test_guitar.py`, `tests/test_double_accidentals.py`, etc.).

@@ -48,6 +48,32 @@ class TestChords(unittest.TestCase):
         c_inv2 = Chord(Note("C4"), "major", inversion=2)
         self.assertEqual([n.midi for n in c_inv2.notes], [67, 72, 76])
 
+    def test_power_chord(self):
+        c5 = Chord(Note("C4"), "power")
+        pitches = [n.pitch for n in c5.notes]
+        self.assertEqual(pitches, ["C", "G"])
+        self.assertEqual(c5.chord_symbol, "C5")
+
+    def test_add9_chord(self):
+        c_add9 = Chord(Note("C4"), "add9")
+        pitches = [n.pitch for n in c_add9.notes]
+        self.assertEqual(pitches, ["C", "E", "G", "D"])
+        self.assertEqual(c_add9.chord_symbol, "Cadd9")
+
+    def test_6_and_m6_chords(self):
+        c6 = Chord(Note("C4"), "6")
+        self.assertEqual([n.pitch for n in c6.notes], ["C", "E", "G", "A"])
+
+        cm6 = Chord(Note("C4"), "m6")
+        self.assertEqual([n.pitch for n in cm6.notes], ["C", "Eb", "G", "A"])
+
+    def test_altered_dominants(self):
+        g7b9 = Chord(Note("G3"), "7b9")
+        self.assertEqual([n.pitch for n in g7b9.notes], ["G", "B", "D", "F", "Ab"])
+
+        e7sharp9 = Chord(Note("E3"), "7#9")
+        self.assertEqual(e7sharp9.chord_symbol, "E7(♯9)")
+
 
 if __name__ == "__main__":
     unittest.main()

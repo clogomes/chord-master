@@ -83,6 +83,26 @@ class TestGuitar(unittest.TestCase):
         # Empty test
         self.assertEqual(assign_guitar_coordinates([]), [])
 
+    def test_expanded_guitar_chord_library(self):
+        # Test Cadd9, Dsus4, Asus2
+        cadd9 = self.model.get_chord_shape("Cadd9")
+        self.assertIsNotNone(cadd9)
+        self.assertEqual(cadd9.frets, [-1, 3, 2, 0, 3, 3])
+
+        dsus4 = self.model.get_chord_shape("Dsus4")
+        self.assertIsNotNone(dsus4)
+        self.assertEqual(dsus4.frets, [-1, -1, 0, 2, 3, 3])
+
+        # Test Power Chords
+        e5 = self.model.get_chord_shape("E5")
+        self.assertIsNotNone(e5)
+        self.assertEqual(e5.frets[:3], [0, 2, 2])
+
+        # Test Flat / Sharp root shapes
+        bb = self.model.get_chord_shape("Bb")
+        self.assertIsNotNone(bb)
+        self.assertEqual(bb.frets, [-1, 1, 3, 3, 3, 1])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -27,7 +27,7 @@ class TestDoubleAccidentals(unittest.TestCase):
             for chord_type in CHORD_TYPES:
                 try:
                     notes = get_chord_notes(root_str, chord_type)
-                    self.assertTrue(len(notes) >= 3)
+                    self.assertTrue(len(notes) >= 2, f"Chord {chord_type} must have at least 2 notes")
                 except Exception as e:
                     self.fail(f"Chord combination {root_str} {chord_type} raised an exception: {e}")
 
