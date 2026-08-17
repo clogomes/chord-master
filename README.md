@@ -35,48 +35,61 @@
 
 ---
 
-### 3. 📖 Academia Completa de Teoria Musical (16 Capítulos com Áudio & Quizzes Interativos)
+### 3. 📖 Academia Completa de Teoria Musical (18 Capítulos com Áudio & Quizzes Interativos)
 Um curso completo de harmonia e teoria desde os conceitos fundamentais até técnicas avançadas, com sincronização em tempo real entre **Pauta Musical**, **Teclado de Piano** e **Braço de Viola (15 Trastes)**:
 - **Capítulo 1 — Fundamentos & Notação**: Som, altura, notação internacional (`C, D, E...`), Solfejo português (`Dó, Ré, Mi...`), acidentes (♯ / ♭), oitavas científicas e claves.
-- **Capítulo 2 — Intervalos Musicais & Física Harmónica**: Frequências em Hz, semitons, classificação de intervalos (2ªm a 8ªJ), consonâncias/dissonâncias e mnemónicas de músicas conhecidas.
-- **Capítulo 3 — Escalas, Círculo de 5ªs & Modos Gregos**: Estruturas de Escala Maior, Menores (Natural, Harmónica e Melódica), Pentatónicas e os 7 Modos Gregos.
-- **Capítulo 4 — Formação de Acordes & Tríades**: Como empilhar terças para construir tríades Maiores, Menores, Diminutas, Aumentadas e Suspensas, com inversões.
-- **Capítulo 5 — Campo Harmónico & Tétrades**: Harmonização da escala maior, graus harmónicos e acordes de quatro notas (`maj7`, `7`, `m7`, `m7♭5`).
+- **Capítulo 2 — Intervalos Musicais & Física Harmónica**: Frequências em Hz, semitons, classificação de intervalos (2ªm a 8ªJ), consonâncias/dissonâncias, mnemónicas de músicas conhecidas e desmistificação do *Diabolus in Musica*.
+- **Capítulo 3 — Escalas, Círculo de 5ªs & Modos Gregos**: Estruturas de Escala Maior, Menores (Natural, Harmónica e Melódica), Pentatónicas, os 7 Modos Gregos e Círculo de Quintas interativo.
+- **Capítulo 4 — Formação de Acordes & Tríades**: Como empilhar terças para construir tríades Maiores, Menores, Diminutas, Aumentadas e Suspensas, com inversões e condução de vozes.
+- **Capítulo 5 — Campo Harmónico & Tétrades**: Harmonização da escala maior, graus harmónicos, tétrades (`maj7`, `7`, `m7`, `m7♭5`, `dim7`) e construtor de campo harmónico.
 - **Capítulo 6 — Harmonia Avançada & Modulação**: Funções tonais, cadências harmónicas, dominantes secundários, empréstimo modal e substituição tritónica (`SubV7`).
 - **Capítulo 7 — Guia Prático de Piano**: Técnica de dedilhação, postura, passagem de polegar e acompanhamentos.
 - **Capítulo 8 — Guia Prático de Viola / Guitarra**: Afinação padrão, Sistema CAGED e técnica de pestana.
-- **Capítulo 9 — Ritmo, Compasso & Pulsação**: Métricas (4/4, 3/4, 6/8), figuras rítmicas e síncopas.
+- **Capítulo 9 — Ritmo, Compasso & Pulsação**: Métricas (4/4, 3/4, 6/8, 3/8), figuras rítmicas e síncopas.
 - **Capítulo 10 — Forma Musical & Estrutura**: Formas AB, ABA, Rondó e Sonata.
 - **Capítulo 11 — Dinâmica, Articulação & Expressão**: Volume, legato, staccato, acento e uso de pedal.
 - **Capítulo 12 — Transposição Prática & Tonalidades**: Mover peças entre tons e uso de capotraste.
-- **Capítulo 13 — Harmonia de Jazz Básica (Fase 28)**: Cadência `ii-V-I`, blues de 12 compassos e teoria acorde-escala.
-- **Capítulo 14 — Fundamentos de Improvisação (Fase 28)**: Guide tones (3ª e 7ª), aproximações cromáticas e construção de frases.
-- **Capítulo 15 — Contraponto & Condução de Vozes (Fase 28)**: Movimentos de vozes (contrário, oblíquo), regras contrapontísticas e eliminação de quintas/oitavas paralelas.
-- **Capítulo 16 — Técnicas de Prática Deliberada (Fase 28)**: Estudo eficiente a 70% BPM, chunking e repetição espaçada.
-- **Acompanhamento de Lição Concluída & Quizzes**: Quizzes interativos de 5 perguntas com recompensa de XP e badges.
+- **Capítulo 13 — Harmonia de Jazz Básica**: Cadência `ii-V-I`, blues de 12 compassos, acordes alterados e teoria acorde-escala.
+- **Capítulo 14 — Fundamentos de Improvisação**: Guide tones (3ª e 7ª), aproximações cromáticas e construção de frases.
+- **Capítulo 15 — Contraponto & Condução de Vozes**: Movimentos de vozes (contrário, oblíquo), regras contrapontísticas e eliminação de quintas/oitavas paralelas.
+- **Capítulo 16 — Técnicas de Prática Deliberada**: Estudo eficiente a 70% BPM, chunking e repetição espaçada.
+- **Capítulo 17 — Campo Harmónico Menor & Tétrades Menores (Fase 38)**: As 3 formas da menor (Eólio, Harmónica, Melódica), graus, tétrades (`Im7`, `IIø7`, `IIIMaj7+`, `V7`, `VII°7`), progressões clássicas e análises modais.
+- **Capítulo 18 — Cadências (Fase 38)**: Autêntica Perfeita e Imperfeita, Plagal ("Amém"), Meia-Cadência (incluindo Frígia) e Cadência Deceptiva (resolução surpresa no VI).
+- **Acompanhamento de Lição Concluída & Quizzes**: 18 quizzes com 90 perguntas interativas (PT/EN), recompensas de XP e badges.
+- **Laboratórios Específicos por Capítulo (Fase 39)**: Círculo de Quintas interativo, visualizador de Condução de Vozes (*Voice Leading*) e Construtor/Harmonizador de Campo Harmónico.
 
 ---
 
-### 4. 🎶 Estúdio de Repertório & Tocar Peças (16 Músicas Completas)
-Estúdio de execução interativa com pauta iluminada, teclas destacadas com número de dedo e posição de corda/traste, contendo as **16 músicas completas na íntegra** (clássicos, cancioneiro tradicional e temas lendários de rock acústico):
-- **Análise Harmónica Didática (Fase 27)**: Botão *"🎓 Ver Análise Teórica"* disponível para peças didáticas de piano e viola (*Für Elise*, *Sonata ao Luar*, *Gymnopédie*, *Cânone*, *Malagueña*, *House of the Rising Sun*, *Romance Anónimo*, *Greensleeves*), detalhando a tonalidade, modo, forma e conexões teóricas com o curso.
-- **16 Peças do Repertório Clássico, Tradicional & Rock**:
-  1. *Hino à Alegria* (Ludwig van Beethoven — 9ª Sinfonia Completa: Frase A + A' + Ponte B + Conclusão)
-  2. *Brilha, Brilha Estrelinha* (W. A. Mozart / Tradicional — Forma Ternária Completa A-B-A)
-  3. *Papagaio Loiro* (Folclore Português — 3 Estrofes e Refrão Tradicional Integral)
-  4. *Pombinha Branca* (Cancioneiro Tradicional Português — Versão Integral de 4 Frases)
-  5. *Für Elise* (L. van Beethoven — Bagatela WoO 59: Motivo Cromático, Arpejos Am/E e Cadência)
-  6. *Minueto em Sol Maior* (J. S. Bach / Petzold — BWV Anh. 114: Seção A Completa de 16 Compassos)
-  7. *Marcha Nupcial* (Richard Wagner — Lohengrin: Tema Coral e Frase Central Solene)
-  8. *Canon em Dó / Ré* (Johann Pachelbel — Tema Principal e Variação em Colcheias)
-  9. *Eine kleine Nachtmusik* (W. A. Mozart — Serenata K. 525: Allegro Completo com Resolução)
-  10. *Greensleeves* (Melodia Renascentista Inglesa — Verso e Refrão Tradicional Completo)
-  11. *O Cravo e a Rosa* (Cantiga Tradicional Lusófona — 4 Estrofes Integrais)
-  12. *Grândola, Vila Morena* (José Afonso / Zeca Afonso — Hino Completo com Estrofes e Cadência)
-  13. *Stairway to Heaven* (Led Zeppelin — Introdução Acústica Dedilhada em Lá Menor)
-  14. *Nothing Else Matters* (Metallica — Introdução Clássica em Cordas Soltas de Mi Menor)
-  15. *Enter Sandman* (Metallica — Riff Principal em Mi Menor)
-  16. *Smoke on the Water* (Deep Purple — O Riff Lendário em Sol Menor)
+### 4. 🎶 Estúdio de Repertório & Tocar Peças (24 Músicas Completas com Contexto Histórico)
+Estúdio de execução interativa com pauta iluminada, teclas destacadas com número de dedo e posição de corda/traste, contendo as **24 músicas completas na íntegra** (clássicos, cancioneiro tradicional, temas pedagógicos e lendas de rock acústico):
+- **Contexto Histórico Ricos & Período Estético (Fase 39)**: Botão *"📜 Contexto Histórico"* com narrativas detalhadas de 150-250 palavras para cada uma das 24 músicas (Renascença, Barroco, Clássico, Romântico, Folk e Rock) e badge do período.
+- **Análise Harmónica Didática**: Botão *"🎓 Ver Análise Teórica"* detalhando a tonalidade, modo, forma, cadências e conexões com os capítulos do curso.
+- **24 Peças do Repertório Clássico, Tradicional & Rock**:
+  1. *Hino à Alegria* (Ludwig van Beethoven — 9ª Sinfonia Completa)
+  2. *Brilha, Brilha Estrelinha* (W. A. Mozart / Variações K. 265)
+  3. *Papagaio Loiro* (Folclore Português Tradicional)
+  4. *Pombinha Branca* (Cancioneiro Tradicional Português)
+  5. *Für Elise* (L. van Beethoven — Bagatela WoO 59 Integral)
+  6. *Minueto em Sol Maior* (Christian Petzold / J. S. Bach — BWV Anh. 114)
+  7. *Marcha Nupcial* (Richard Wagner — Lohengrin)
+  8. *Cânone em Ré Maior* (Johann Pachelbel)
+  9. *Eine kleine Nachtmusik* (W. A. Mozart — Serenata K. 525)
+  10. *Greensleeves* (Melodia Renascentista Inglesa do Século XVI)
+  11. *O Cravo e a Rosa* (Cancioneiro Popular Luso-Brasileiro)
+  12. *Grândola, Vila Morena* (José Afonso / Zeca Afonso — Senha do 25 de Abril de 1974)
+  13. *Stairway to Heaven* (Led Zeppelin — Linha de Baixo Cromática Descendente)
+  14. *Nothing Else Matters* (Metallica — Dedilhado Aberto em Mi Menor)
+  15. *Enter Sandman* (Metallica — Riff do Trítono)
+  16. *Smoke on the Water* (Deep Purple — Quartas Paralelas do Incêndio de Montreux)
+  17. *Pour Élise (Estudo Introdutório)* (L. van Beethoven — Piano)
+  18. *Sonata ao Luar (Adagio)* (L. van Beethoven — Piano)
+  19. *Gymnopédie No. 1* (Erik Satie — Piano)
+  20. *Cânone em Dó Maior (Baixo Ostinato)* (Johann Pachelbel — Piano)
+  21. *Malagueña (Tema Flamenco)* (Tradicional Espanhol / Cadência Andaluza — Viola)
+  22. *The House of the Rising Sun* (Tradicional Folk Americano em 6/8 — Viola)
+  23. *Romance Anónimo (Jeux Interdits)* (Tradicional Espanhol Romântico — Viola)
+  24. *Greensleeves (Estudo Dedilhado em 6/8)* (Tradicional Inglês — Viola)
+
 - **3 Métodos Flexíveis de Execução**:
   - **Teclado do Computador**: Mapeamento QWERTY ergonómico no Piano (`A..L` para notas brancas Dó4 a Mi5; `W..P` para notas pretas) e cordas da Viola (`1..6`).
   - **Teclados MIDI USB**: Deteção automática *Plug-and-Play* de pianos digitais e sintetizadores USB físicos.
