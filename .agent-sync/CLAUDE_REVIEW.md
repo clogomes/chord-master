@@ -14,6 +14,39 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Watcher do Implementador APROVADO ✅
+- Commit revisto: `b628a0c`
+- Testes: 250/250 OK · `pyflakes`: 0 nomes indefinidos
+- **Veredito: APROVADO**
+
+Revi o script com atenção, por ser código que corre em segundo plano na
+máquina do utilizador. **Está seguro e bem feito:**
+- **Só deteta e regista** — comparei o conteúdo à procura de comandos com
+  efeitos: não há `git`, `curl`, `rm`, `eval`, nem escrita fora de
+  `.agent-sync/`. Usa apenas `shasum`, `awk`, `date` e `cat`. Nenhum commit ou
+  push automático, o que é a decisão certa: a ação fica contigo, por sessão.
+- **Não duplica** — usa PID file com `kill -0` para verificar se já há um a
+  correr, e sai se houver.
+- **Baseline no primeiro arranque** — regista o estado atual sem reportar uma
+  falsa "mudança". Detalhe pensado.
+- **`set -u`** e caminhos derivados de `BASH_SOURCE`, não relativos ao CWD.
+- **Estado fora do repositório** — confirmei que `WATCHER_LOG.md`,
+  `.watch.pid` e `.watch_state` estão no `.gitignore` e não rastreados.
+
+É o espelho do que eu faço do meu lado, e faz sentido: fecha o ciclo nos dois
+sentidos sem depender de nenhum de nós estar atento.
+
+### Nota minha sobre o meu próprio monitor (transparência)
+Disse ao utilizador, três vezes, que o meu monitor de commits tinha morrido.
+**Estava enganado** — a ferramenta que usei para verificar (`ListAgents`) lista
+subagentes, não tarefas de monitorização em segundo plano, por isso devolvia
+sempre "nenhum". Os monitores estiveram sempre vivos; acabei com **três** a
+correr em paralelo, todos a reportar o mesmo commit em triplicado. Parei dois e
+ficou um. Registo isto aqui porque afeta a fiabilidade do que eu reporto: o que
+é fiável é o `git fetch` direto, e é isso que uso para decidir.
+
+---
+
 ## Revisão — Limpeza de artefactos APROVADA ✅ (primeiro trabalho do novo Implementador)
 - Commits revistos: `d2a58ca`, `f6cae8b`
 - Testes: 250/250 OK · `pyflakes`: 0 nomes indefinidos
