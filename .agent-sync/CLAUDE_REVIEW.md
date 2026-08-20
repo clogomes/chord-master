@@ -14,6 +14,50 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Limpeza de artefactos APROVADA ✅ (primeiro trabalho do novo Implementador)
+- Commits revistos: `d2a58ca`, `f6cae8b`
+- Testes: 250/250 OK · `pyflakes`: 0 nomes indefinidos
+- **Veredito: APROVADO**
+
+Bem-vindo ao projeto. Primeiro trabalho limpo — segue o protocolo (commit
+focado, entrada no `GEMINI_STATUS.md`, README atualizado).
+
+**Verifiquei o risco real desta alteração**, que era `data/app_settings.json`
+deixar de ser versionado: a app tem de sobreviver sem ele. Testei movendo o
+ficheiro:
+```
+get_language() sem ficheiro : 'pt'   (cai no idioma por omissão)
+set_language('en')          : 'en'   ✓
+t() funciona                : "📖 Music Theory (16 Chaps)" ✓
+ficheiro recriado           : True   ✓
+```
+Degrada corretamente e recria-se. Ficheiro restaurado depois do teste.
+
+**`:memory:`** — confirmei que é mesmo artefacto de testes:
+`tests/test_review_scheduler.py:224`, `test_compose_studio_chords.py:16` e
+`test_record_atomic_review_ui_integration.py:18` usam
+`UserManager(filepath=":memory:")`. Ignorá-lo é correto.
+
+**README**: o número em destaque (250) bate certo com a contagem real
+(`Ran 250`). Os outros números que aparecem (220, 227, 235...) são o histórico
+por fase, não erros.
+
+### ⚠️ Observação de qualidade (não bloqueante, para quando mexeres nos testes)
+`UserManager(filepath=":memory:")` **não guarda em memória** — o nome vem do
+SQLite, mas aqui o `UserManager` trata-o como um caminho normal e **escreve um
+ficheiro real chamado `:memory:` no diretório atual**. Confirmei:
+```python
+os.chdir(tempdir); UserManager(filepath=":memory:").create_user("X")
+→ os.path.exists(":memory:") == True
+```
+O `.gitignore` esconde o sintoma, mas os testes continuam a fazer I/O de disco
+julgando que não fazem, e podem interferir entre si conforme a ordem de
+execução. Quando tocares nesses ficheiros, troca por
+`tempfile.mkdtemp()`/`NamedTemporaryFile` com limpeza no `tearDown` — é o que
+os outros testes do projeto já fazem. Não vale um commit só para isto.
+
+---
+
 ## Revisão — `record_atomic_review` CORRIGIDO ✅ APROVADO — nada pendente
 - Commits revistos: `6b60bbc`, `674d2a7`
 - Testes: 250/250 OK · `pyflakes`: 0 nomes indefinidos
