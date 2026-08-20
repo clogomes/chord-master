@@ -1,5 +1,4 @@
 """Main CustomTkinter application window, multi-user manager, and screen router."""
-import tkinter as tk
 from tkinter import messagebox
 from typing import Dict, Optional
 import customtkinter as ctk
@@ -16,6 +15,7 @@ from gui.screens.practice_song import PracticeSongScreen
 from gui.screens.practice_scales import PracticeScalesScreen
 from gui.screens.practice_instrument import PracticeInstrumentScreen
 from gui.screens.practice_technique import PracticeTechniqueScreen
+from gui.screens.practice_rhythm import PracticeRhythmScreen
 from gui.screens.tuner_screen import LamireScreen
 from gui.screens.stats_screen import StatsScreen
 from gui.screens.glossary_screen import GlossaryScreen
@@ -228,6 +228,7 @@ class ChordMasterApp(ctk.CTk):
             ("lamire", t("nav_lamire", "🎙️ Lamiré & Afinador")),
             ("practice_instrument", t("nav_practice_instrument", "🎯 Prática c/ Microfone")),
             ("practice_ear", t("nav_practice_ear", "🎧 Treino Auditivo")),
+            ("practice_rhythm", t("nav_practice_rhythm", "🥁 Prática Rítmica")),
             ("practice_staff", t("nav_practice_staff", "🎼 Leitura de Pauta")),
             ("compose_studio", t("nav_compose_studio", "🎛️ Estúdio de Composição")),
             ("glossary", t("nav_glossary", "📚 Glossário Musical")),
@@ -378,6 +379,12 @@ class ChordMasterApp(ctk.CTk):
             )
         elif screen_name == "practice_staff":
             self.current_screen_widget = PracticeStaffScreen(
+                self.content_area,
+                user_manager=self.user_manager,
+                on_back=lambda: self.navigate_to("main_menu"),
+            )
+        elif screen_name == "practice_rhythm":
+            self.current_screen_widget = PracticeRhythmScreen(
                 self.content_area,
                 user_manager=self.user_manager,
                 on_back=lambda: self.navigate_to("main_menu"),

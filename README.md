@@ -120,7 +120,13 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
   - Resolução do import em falta `render_markdown_to_textbox` e proteção com `try/except` na janela modal de Análise Teórica do Repertório.
   - Correção das chamadas `AudioPlayer.play_note` no ecrã de técnica para passar objetos `Note` diretamente em vez de strings.
   - Correção da assinatura do evento MIDI USB (`_on_midi_note_on`) no ecrã de exercícios técnicos para aceitar números inteiros de MIDI.
-  - Uniformização dos callbacks do metrónomo (`(beat_num, timestamp)`) em todos os ecrãs de prática.
+   - Uniformização dos callbacks do metrónomo (`(beat_num, timestamp)`) em todos os ecrãs de prática.
+
+- **Ecrã de Prática Rítmica (Fase 49)**:
+   - Fecha a lacuna do Capítulo 9 (ritmo) com o primeiro **exercício prático de ritmo** da app: o aluno bate (Espaço/botão) no tempo certo contra um metrónomo com **contagem de 1 compasso de entrada**.
+   - **10 padrões progressivos** (níveis 1–5): semínimas, colcheias, semínima pontuada + colcheia, semicolcheias e síncopa, em **4/4, 3/4 e 6/8**.
+   - Feedback **numérico em milissegundos** por batida (`PERFEITO ⭐ / BOM 👍 / FORA DE TEMPO ⚠️`) e relatório final com precisão média, batidas certas/erradas e **desvio médio com orientação** (avisa se o aluno está a atrasar ou a adiantar sistematicamente).
+   - Rampa de tempo 70% ➔ 100% e registo por **competência atómica** com a nova categoria **«ritmo»** (revisão espaçada, estatísticas e motor adaptativo).
 
 ---
 
@@ -385,6 +391,7 @@ chord-master/
 │   ├── ear_mnemonics.py            # Fonte de verdade das mnemónicas auditivas (ascendentes e descendentes)
 │   ├── staff_tutor.py              # Guia interativo passo-a-passo de leitura de pauta (Fase 25)
 │   ├── technique_exercises.py      # Biblioteca de 9 exercícios técnicos de aquecimento (Fase 30)
+│   ├── rhythm_exercises.py         # Biblioteca de 10 padrões rítmicos para prática de tempo (Fase 49)
 │   ├── glossary.py                 # Enciclopédia de 139 termos musicais com auto-ligação (Fase 36)
 │   ├── review_scheduler.py         # Revisão espaçada SM-2 & 5 Caixas de Leitner (Fase 37)
 │   ├── composition.py              # Modelo de dados do Estúdio de Composição (Fase 40)
@@ -428,13 +435,14 @@ chord-master/
 │       ├── practice_ear.py         # Treino Auditivo & Ditado de Solfejo Cantado com Microfone
 │       ├── practice_staff.py       # Exercícios de Leitura de Pauta
 │       ├── practice_technique.py   # Exercícios Técnicos & Aquecimento (Hanon, Spider Walk, 9 padrões)
+│       ├── practice_rhythm.py      # Ecrã de Prática Rítmica (metrónomo, batida, feedback em ms) (Fase 49)
 │       ├── omr_review.py           # Revisão & Correcção Manual de Notas OMR antes de Guardar
 │       ├── glossary_screen.py      # Glossário Musical Interativo (139 termos, pesquisa, índice A-Z)
 │       ├── daily_review_screen.py  # Revisão Espaçada Diária (SM-2, 5 Caixas de Leitner)
 │       ├── compose_studio.py       # Estúdio de Composição (grelha de ritmo + faixas de acordes)
 │       └── stats_screen.py         # Painel de Estatísticas, Conquistas, Leaderboard e Exportação
 │
-└── tests/                          # 250 Testes Unitários Automatizados (100% de Sucesso)
+└── tests/                          # 262 Testes Unitários Automatizados (100% de Sucesso)
     ├── __init__.py
     ├── test_notes.py               # Testes de notas, frequências e conversões MIDI
     ├── test_intervals.py           # Testes de intervalos e transposição
@@ -456,6 +464,8 @@ chord-master/
     ├── test_adaptive.py            # Testes do motor adaptativo e decaimento de recência
     ├── test_theme.py               # Testes de tokens de cores e tipografia
     ├── test_quiz.py                # Testes do motor de perguntas, solfejo cantado e streaks
+    ├── test_rhythm_exercises.py    # Testes da biblioteca de padrões rítmicos (Fase 49)
+    ├── test_practice_rhythm_screen.py # Testes de integração do ecrã de prática rítmica (Fase 49)
     └── test_users.py               # Testes de perfis multi-utilizador e persistência
 ```
 

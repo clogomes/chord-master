@@ -7,7 +7,8 @@ CATEGORY_NAMES_PT = {
     "repertorio": "Repertório Clássico",
     "pratica_instrumento": "Aulas Acústicas",
     "escalas_modos": "Escalas & Modos",
-    "tecnica": "Exercícios Técnicos"
+    "tecnica": "Exercícios Técnicos",
+    "ritmo": "Prática Rítmica"
 }
 
 CATEGORY_NAMES_EN = {
@@ -17,7 +18,8 @@ CATEGORY_NAMES_EN = {
     "repertorio": "Classical Repertoire",
     "pratica_instrumento": "Acoustic Lessons",
     "escalas_modos": "Scales & Modes",
-    "tecnica": "Technical Exercises"
+    "tecnica": "Technical Exercises",
+    "ritmo": "Rhythm Practice"
 }
 
 CATEGORY_ROUTES = {
@@ -27,7 +29,8 @@ CATEGORY_ROUTES = {
     "repertorio": "practice_song",
     "pratica_instrumento": "practice_instrument",
     "escalas_modos": "practice_scales",
-    "tecnica": "practice_technique"
+    "tecnica": "practice_technique",
+    "ritmo": "practice_rhythm"
 }
 
 CATEGORY_TIPS = {
@@ -37,7 +40,8 @@ CATEGORY_TIPS = {
     "repertorio": "Pratica devagar (com o metrónomo) antes de aumentar a velocidade.",
     "pratica_instrumento": "Mantém o teu instrumento afinado e a postura correta.",
     "escalas_modos": "As escalas são a base de tudo. Toca com ritmo firme.",
-    "tecnica": "Aquece sempre antes de tocar e mantém as mãos relaxadas."
+    "tecnica": "Aquece sempre antes de tocar e mantém as mãos relaxadas.",
+    "ritmo": "Bate a barra de espaço exatamente a cada tempo; o desvio em ms diz-te se estás a atrasar."
 }
 
 CATEGORY_TIPS_EN = {
@@ -47,7 +51,8 @@ CATEGORY_TIPS_EN = {
     "repertorio": "Practice slowly (with the metronome) before increasing speed.",
     "pratica_instrumento": "Keep your instrument in tune and maintain good posture.",
     "escalas_modos": "Scales are the foundation of everything. Play with a steady rhythm.",
-    "tecnica": "Always warm up before playing and keep your hands relaxed."
+    "tecnica": "Always warm up before playing and keep your hands relaxed.",
+    "ritmo": "Tap the spacebar exactly on each beat; the ms offset tells you if you're running late."
 }
 
 CATEGORY_COLORS = {
@@ -57,5 +62,6 @@ CATEGORY_COLORS = {
     "repertorio": "#F59E0B",
     "pratica_instrumento": "#EF4444",
     "escalas_modos": "#0ea5e9",
-    "tecnica": "#F59E0B"
+    "tecnica": "#F59E0B",
+    "ritmo": "#EC4899"
 }

@@ -349,6 +349,17 @@ class MainMenuScreen(ctk.CTkFrame):
             color_accent="#10B981",
             target_screen="compose_studio",
         )
+        self._create_nav_card(
+            cards_container,
+            row=6,
+            col=0,
+            icon="🥁",
+            title="Prática Rítmica",
+            subtitle="Bate no tempo com o metrónomo: semínimas, colcheias, pontuadas, semicolcheias e síncopa.",
+            button_text="Praticar Ritmo",
+            color_accent="#EC4899",
+            target_screen="practice_rhythm",
+        )
 
     def _confirm_reset(self):
         user = self.user_manager.current_user
