@@ -14,6 +14,122 @@ Cada entrada tem um veredito:
 
 ---
 
+## TRABALHO PEDIDO — Fases 49 a 51: as 3 lacunas pedagógicas que ficaram por fechar
+- Pedido do utilizador depois de eu fazer o balanço do que ficou por fazer.
+  Estas três vêm de uma auditoria pedagógica feita por um modelo especializado
+  e de notas minhas em fases anteriores. **A falha de nunca as ter
+  especificado é minha**, não tua — foram-se perdendo entre blocos de trabalho.
+- **REGRA: uma fase de cada vez**, com o meu APROVADO escrito entre cada uma.
+- Ordem por impacto: o ritmo primeiro, que é a lacuna mais séria.
+
+### FASE 49 — Ecrã de Prática Rítmica (a lacuna mais séria que resta)
+**O problema**: o Capítulo 9 *ensina* ritmo (compassos, figuras, síncopa) e a
+app **não tem um único exercício que o pratique**. É a dimensão que a app só
+descreve e nunca treina — e o ritmo é a razão mais comum de a execução de um
+principiante soar errada, mais do que as notas.
+
+**Já existe e deves reaproveitar** (não construas de raiz):
+- `audio/metronome.py::Metronome` — pulsação com callback `on_beat(beat, ts)`.
+- `audio/metronome.py::evaluate_rhythm_accuracy(esperado, real)` → devolve
+  `(rótulo, delta_ms, pontos)` com "PERFEITO ⭐ / BOM 👍 / FORA DE TEMPO ⚠️".
+  **É exatamente o que precisas** — não escrevas outra avaliação.
+- `gui/components/staff_canvas.py` — para desenhar a figura rítmica.
+- `core/review_scheduler.py` — para registar por competência atómica.
+
+**Cria `core/rhythm_exercises.py`**:
+```python
+@dataclass
+class RhythmPattern_Exercise:
+    id: str
+    name_pt: str; name_en: str
+    level: int                      # 1..5
+    time_signature: str             # "4/4", "3/4", "6/8"
+    durations: List[float]          # em tempos: [1,1,1,1] / [0.5,0.5,1,...] 
+    description_pt: str; description_en: str
+```
+Níveis progressivos, um por dificuldade:
+1. **Semínimas** — 1 por tempo, 4/4.
+2. **Colcheias** — subdivisão em 2.
+3. **Semínima pontuada + colcheia** — o padrão que mais tropeça.
+4. **Semicolcheias** — subdivisão em 4.
+5. **Síncopa** — acentos fora do tempo forte.
+Mais alguns em 3/4 e 6/8, para não ficar tudo em 4/4.
+
+**Cria `gui/screens/practice_rhythm.py`**:
+- Metrónomo a tocar, com contagem de entrada de 1 compasso ("1, 2, 3, 4").
+- A figura rítmica desenhada na pauta, com a nota atual destacada.
+- O utilizador **bate** com a barra de espaço (e/ou clique num botão grande).
+- Cada batida é avaliada com `evaluate_rhythm_accuracy` e mostra o desvio
+  **em milissegundos** e o rótulo. O feedback numérico é o que ensina — "estás
+  47 ms atrasado" é acionável, "erraste" não é.
+- No fim: precisão média, batidas certas/erradas, e desvio médio (se for
+  sistematicamente positivo, o aluno está a atrasar; diz-lho explicitamente).
+- Rampa de tempo opcional (70%→100%), como nos outros ecrãs.
+- Regista com `category="ritmo"` — **e acrescenta essa categoria a
+  `core/categories.py`** (`CATEGORY_NAMES_PT`, `CATEGORY_ROUTES`,
+  `CATEGORY_TIPS`) e ao gráfico de `stats_screen.py`. Já falhámos isto duas
+  vezes com categorias novas; não repitas.
+- Entrada no menu principal e barra lateral, com `t()` PT/EN.
+
+### FASE 50 — Reconhecimento de Progressões de Acordes (treino auditivo)
+**O problema**: o treino auditivo só treina **intervalos isolados**, que é a
+competência auditiva menos transferível. Não treina reconhecer progressões —
+que é a via mais rápida para tocar música de ouvido, o que a maioria dos alunos
+realmente quer.
+
+1. Acrescenta `QuestionType.EAR_PROGRESSION` a `core/quiz_engine.py`.
+2. `generate_ear_progression_question(difficulty)`:
+   - **beginner**: I-V-vi-IV vs I-vi-IV-V vs I-IV-V-I (3 opções)
+   - **intermediate**: acrescenta ii-V-I, I-vi-ii-V, i-♭VII-♭VI-V (menor)
+   - **advanced**: acrescenta blues de 12 compassos, cadência andaluza
+     (iv-♭III-♭II-I), e progressões com dominante secundária
+   - Toca a progressão em qualquer tonalidade (aleatória), para forçar o
+     reconhecimento **relativo** e não por altura absoluta. Usa
+     `generate_polyphonic` (já vetorizado, 1,3 ms) e `core/chords.py`.
+   - Na explicação, **diz onde essa progressão aparece na biblioteca** — ex:
+     "é a progressão do Cânone de Pachelbel, que tens no repertório". Liga o
+     ouvido ao que ele já toca.
+3. Liga em `gui/screens/practice_ear.py` como terceiro tipo de exercício, a
+   par de Intervalos e Acordes. O **modo Aprender** (guiado) deve funcionar
+   também aqui: tocar a progressão com os graus visíveis antes de testar.
+4. Regista por competência atómica: `progression:I-V-vi-IV` etc., para entrar
+   na revisão espaçada.
+
+### FASE 51 — Progressão Automática de Dificuldade no Treino Auditivo
+**O problema**: assinalei isto na Fase 22 e nunca foi feito. Os três níveis
+(`beginner`/`intermediate`/`advanced`) existem em `quiz_engine.py` mas o
+utilizador escolhe-os **manualmente num dropdown**, sem orientação. Quem está a
+começar não sabe quando está pronto para subir.
+
+1. Usa `core/adaptive_engine.py::get_weak_areas` (já existe) para decidir:
+   - **Subir de nível** quando a precisão recente no nível atual for ≥ 85% num
+     mínimo de ~15 tentativas (define tu os valores exatos, mas **documenta-os
+     na interface** — o aluno tem de saber o que falta para subir).
+   - **Descer** se cair abaixo de ~50%, para não deixar ninguém preso a
+     falhar.
+2. Interruptor "🎯 Dificuldade Automática" no ecrã, **ligado por omissão**,
+   com o dropdown manual a continuar disponível para quem o desligar. **Não
+   removas a escolha manual** — regra do protocolo.
+3. Mostra o progresso: "Nível Intermédio · 12/15 respostas · 87% (precisas de
+   85% em 15 para subir)". Sem isto, a subida automática parece arbitrária.
+4. Aplica o mesmo a `practice_staff.py` se encaixar sem esforço extra (os
+   níveis 1-4 de `staff_tutor.py` já existem); se complicar, deixa só no
+   treino auditivo e diz que ficou de fora.
+
+### Validação que vou fazer
+- **Fase 49**: simular batidas com desvios conhecidos e confirmar que os
+  milissegundos reportados batem certo; verificar que a categoria "ritmo"
+  aparece nas estatísticas e no motor adaptativo (não só que grava).
+- **Fase 50**: confirmar que a mesma progressão em tonalidades diferentes é
+  reconhecida como a mesma, e que as opções não têm duplicados.
+- **Fase 51**: simular um histórico de respostas certas e confirmar que o nível
+  sobe; simular falhas e confirmar que desce.
+Em todos: percorrer o caminho completo do utilizador (responder → registar →
+pergunta seguinte) com as exceções de temporizadores capturadas, que foi a
+lição desta ronda.
+
+---
+
 ## Revisão — Watcher do Implementador APROVADO ✅
 - Commit revisto: `b628a0c`
 - Testes: 250/250 OK · `pyflakes`: 0 nomes indefinidos
