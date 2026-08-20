@@ -1,19 +1,38 @@
-# Protocolo de Colaboração Claude ↔ Gemini — ChordMaster
+# Protocolo de Colaboração Supervisor ↔ Implementador — ChordMaster
 
 Este projeto é desenvolvido por dois agentes de IA com papéis distintos e
 complementares, coordenados pelo utilizador (clogomes). Este ficheiro é a
-referência única do protocolo — `CLAUDE.md` e `GEMINI.md`, na raiz do projeto,
-apontam para aqui.
+referência única do protocolo — `CLAUDE.md` (Supervisor) e `AGENTS.md`
+(Implementador), na raiz do projeto, apontam para aqui.
+
+## Nota sobre nomes (2026-08-17)
+
+O protocolo é definido por **papéis**, não por ferramentas. O papel de
+Implementador foi desempenhado pelo **Gemini/Antigravity** até à Fase 48 e
+passou depois para o **opencode**. O papel de Supervisor é do **Claude**.
+
+Por isso, alguns nomes são históricos e **mantêm-se de propósito**:
+- `.agent-sync/GEMINI_STATUS.md` é o **ficheiro de estado do Implementador**,
+  seja ele quem for. Não foi renomeado porque contém 400+ linhas de histórico
+  e é referenciado centenas de vezes no `CLAUDE_REVIEW.md`.
+- `GEMINI.md` na raiz é legado; o ponto de entrada atual do Implementador é
+  **`AGENTS.md`**.
+- Onde este documento e o `CLAUDE_REVIEW.md` dizem "Gemini", lê
+  "**o Implementador**".
 
 ## Papéis
 
-**Gemini — Implementador**
+**Implementador** (atualmente opencode)
 - Escreve o código de todas as funcionalidades do ChordMaster.
 - Corre a suite de testes (`python3 -m unittest discover tests`) antes de
   considerar uma fase concluída.
+- Corre `python3 -m pyflakes audio core gui tests main.py` antes de cada
+  commit — nomes indefinidos causaram 6 bugs neste projeto, e há um teste
+  (`tests/test_no_undefined_names.py`) que falha se houver algum.
 - Atualiza o `README.md` (funcionalidades + árvore de ficheiros) no fim de
   CADA fase, não só no fim de tudo.
-- Faz commit + push de cada fase concluída.
+- Faz commit + push de cada fase concluída, e regista-a em
+  `.agent-sync/GEMINI_STATUS.md`.
 
 **Claude — Supervisor / QA**
 - Não escreve funcionalidades novas por iniciativa própria no código do
@@ -28,13 +47,13 @@ apontam para aqui.
 - Quando o utilizador pede funcionalidades novas, Claude desenha a
   especificação em fases, **mostra ao utilizador para aprovação**, e só
   depois de aprovado escreve a especificação em `CLAUDE_REVIEW.md` como
-  "TRABALHO PEDIDO" para o Gemini implementar.
+  "TRABALHO PEDIDO" para o Implementador executar.
 
 ## Ficheiros do protocolo (`.agent-sync/`)
 
-- **`GEMINI_STATUS.md`** — escrito só pelo Gemini. Uma entrada no topo da
-  secção "Histórico" por cada fase concluída (fase, estado, commit, resumo,
-  ficheiros alterados).
+- **`GEMINI_STATUS.md`** — escrito só pelo **Implementador** (nome histórico,
+  ver nota acima). Uma entrada no topo da secção "Histórico" por cada fase
+  concluída (fase, estado, commit, resumo, ficheiros alterados).
 - **`CLAUDE_REVIEW.md`** — escrito só pelo Claude. Cada entrada tem um
   veredito:
   - **APROVADO** — nada a fazer.
@@ -45,16 +64,16 @@ apontam para aqui.
 
 ## Regra de ordem (importante)
 
-Antes de começar uma fase nova, o Gemini deve ler `CLAUDE_REVIEW.md` e
+Antes de começar uma fase nova, o Implementador deve ler `CLAUDE_REVIEW.md` e
 resolver qualquer "AÇÃO NECESSÁRIA" pendente primeiro. Já aconteceu uma vez
-neste projeto o Gemini avançar para a fase seguinte antes de corrigir um item
+neste projeto o Implementador avançar para a fase seguinte antes de corrigir um item
 pendente — não é grave se nada depender disso, mas a ordem correta é sempre:
 corrigir pendências → só depois trabalho novo.
 
 ## Uma fase de cada vez, com aprovação escrita (pedido explícito do utilizador)
 
 Quando um pedido tiver várias fases numeradas (ex: "Fases 27 a 30"), o
-Gemini implementa **uma fase de cada vez**, por esta ordem obrigatória:
+Implementador faz **uma fase de cada vez**, por esta ordem obrigatória:
 1. Implementa só a fase seguinte (não adianta trabalho de fases posteriores).
 2. Corre a suite de testes completa.
 3. Faz commit + push só dessa fase, com mensagem clara identificando o
