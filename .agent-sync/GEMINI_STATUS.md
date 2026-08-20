@@ -24,6 +24,15 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 49 — Ecrã de Prática Rítmica — CONCLUÍDA
+- Data: 2026-08-20T23:32:10+01:00
+- Commit: d2cf2c2
+- Resumo: Implementado o primeiro exercício prático de ritmo da app — o Capítulo 9 *ensina* ritmo (compassos, figuras, síncopa) mas a app não tinha um único exercício que o treinasse. Criado `core/rhythm_exercises.py` com 10 padrões progressivos (níveis 1–5: semínimas, colcheias, semínima pontuada + colcheia, semicolcheias, síncopa) em 4/4, 3/4 e 6/8, e `gui/screens/practice_rhythm.py`: metrónomo com contagem de 1 compasso de entrada, figura rítmica desenhada na pauta com a posição atual destacada, batida por Espaço/botão grande, avaliação de cada batida via `evaluate_rhythm_accuracy` (feedback em ms + rótulo PERFEITO/BOM/FORA DE TEMPO), relatório final com precisão média, batidas certas/erradas e desvio médio com orientação de tendência (avisa se o aluno está a atrasar/adiantar sistematicamente), e rampa de tempo 70%➔100%. Adicionada a nova categoria «ritmo» a `core/categories.py` (nomes PT/EN, rota, dicas PT/EN, cor) de modo a aparecer no gráfico de `stats_screen.py` e no motor adaptativo. Ligado no router, barra lateral e menu principal com i18n PT/EN. Registo por competência atómica via `record_atomic_review(category="ritmo", skill_id="rhythm:<id>")`.
+- Ficheiros principais alterados: core/rhythm_exercises.py, gui/screens/practice_rhythm.py, core/categories.py, gui/app.py, gui/screens/main_menu.py, gui/i18n.py, tests/test_rhythm_exercises.py, tests/test_practice_rhythm_screen.py, README.md
+- Validação: 262/262 testes a passar (12 novos: 9 da biblioteca de padrões, incluindo o teste de regressão «as durações somam os tempos da medida», e 3 de integração headless do ecrã, verificando que a categoria «ritmo» fica registada e que batidas atrasadas produzem desvio assinado positivo); `pyflakes` limpo nos ficheiros alterados; rota `practice_rhythm` validada pelo `test_categories`.
+- Nota: também corrigidos avisos `pyflakes` pré-existentes em `gui/app.py` (import `tk` órfã) e garantida a consistência das durações de todos os padrões (a soma iguala os tempos da medida; um padrão 6/8 e duas síncopas estavam a somar mais tempos do que o compasso).
+- Estado: **PRONTO PARA REVISÃO DO CLAUDE** — trabalho do lado do implementador concluído. Segue a regra de uma fase de cada vez; aguardo o APROVADO antes de avançar para a Fase 50.
+
 ## Limpeza — Artefacto :memory:, app_settings.json fora do git e README desatualizado — CONCLUÍDA
 - Data: 2026-08-20T10:10:13+01:00
 - Commit: d2a58ca
