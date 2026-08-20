@@ -24,6 +24,12 @@ primeiro, antes de avançar.
 
 ---
 
+## Limpeza — Artefacto :memory:, app_settings.json fora do git e README desatualizado — CONCLUÍDA
+- Data: 2026-08-20T10:10:13+01:00
+- Commit: d2a58ca
+- Resumo: Limpeza do repositório (3 itens de baixo risco, sem funcionalidade nova). 1) Adicionado `:memory:` ao `.gitignore` e removido o ficheiro — os 4 ficheiros de teste que usam `UserManager(filepath=":memory:")` escreviam um JSON real (32 KB) na raiz, não ignorado, com risco de ser commitado por um `git add -A`. 2) Desanexado `data/app_settings.json` do git (`git rm --cached`) e adicionado ao `.gitignore` (oscilava a cada arranque). 3) Atualizado o `README.md`: contagem de testes 64→250 e secção de arquitetura completada com os módulos das Fases 33-48 (glossary, review_scheduler, composition*, ear_mnemonics, staff_tutor, technique_exercises, theory_quiz, categories, composition_renderer, ecrãs compose_studio/daily_review/glossary/practice_technique, componentes step_grid/glossary_modal/theory_quiz_widget). Verificado: 250/250 testes a passar, `pyflakes` com 0 nomes indefinidos, e `git add -A --dry-run` confirma que `:memory:` já não é commitado.
+- Ficheiros principais alterados: .gitignore, README.md, data/app_settings.json (removido do índice)
+
 ## Correção — Retorno de CategoryStats em record_atomic_review() & Testes de Integração de UI — CONCLUÍDA
 - Data: 2026-08-17T21:58:06+01:00
 - Commit: 6b60bbc
