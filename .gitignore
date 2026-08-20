@@ -28,3 +28,7 @@ user_profiles.json
 user_scores.json
 user_songs.json
 user_compositions.json
+data/app_settings.json
+
+# Artefacto de testes (UserManager(filepath=":memory:") escreve um JSON real na CWD)
+:memory:

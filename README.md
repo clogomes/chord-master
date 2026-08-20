@@ -366,29 +366,39 @@ chord-master/
 │   ├── notes.py                    # Classes de Notas, Frequências e Cálculos de Transposição
 │   ├── intervals.py                # Intervalos Musicais (Semitons, Nomes PT/EN, Tipos)
 │   ├── scales.py                   # Fórmulas de Escalas e Modos Gregos
-│   ├── chords.py                   # Tríades, Tétrades e Inversões de Acordes
+│   ├── chords.py                   # Tríades, Tétrades (22 tipos) e Inversões de Acordes
 │   ├── fingering.py                # Motor de Dedilhação Inteligente para Piano (Mão Direita e Esquerda)
-│   ├── guitar.py                   # Mapeamento do Braço da Viola, Trastes e Sistema CAGED
-│   ├── songs.py                    # Biblioteca de 16 Músicas Completas de Repertório
+│   ├── guitar.py                   # Mapeamento do Braço da Viola, Trastes e Sistema CAGED (45 raízes)
+│   ├── songs.py                    # Biblioteca de 24 Músicas Completas de Repertório
 │   ├── midi_importer.py            # Parser SMF de Ficheiros MIDI (.mid) e Conversão para Repertório
 │   ├── omr_importer.py             # Motor OMR Leve: PDF/Imagem → Pauta → Notas (sem ML)
-│   ├── theory_content.py           # Conteúdo Pedagógico Estruturado (8 Lições de Teoria)
+│   ├── theory_content.py           # Conteúdo Pedagógico Estruturado (18 Capítulos de Teoria)
+│   ├── theory_quiz.py              # 18 Quizzes de Teoria (90 perguntas PT/EN), um por capítulo
 │   ├── gamification.py             # Sistema de Gamificação (XP, 7 Níveis, 12 Conquistas/Medalhas)
 │   ├── exporter.py                 # Exportador de Relatórios de Progresso e Certificados em Markdown
 │   ├── adaptive_engine.py          # Motor de Prática Adaptativa & Identificação de Pontos Fracos
 │   ├── quiz_engine.py              # Motor de Geração de Questões (Intervalos, Acordes, Pauta, Solfejo Cantado)
 │   ├── score_tracker.py            # Gestor de Pontuações e Métricas
 │   ├── user_manager.py             # Gestor Multi-Utilizador, Persistência e Progressão
-│   └── i18n_helpers.py             # Helpers de Localização de Entidades Musicais
+│   ├── i18n_helpers.py             # Helpers de Localização de Entidades Musicais
+│   ├── categories.py               # Registo centralizado das categorias de treino (Fase 33)
+│   ├── ear_mnemonics.py            # Fonte de verdade das mnemónicas auditivas (ascendentes e descendentes)
+│   ├── staff_tutor.py              # Guia interativo passo-a-passo de leitura de pauta (Fase 25)
+│   ├── technique_exercises.py      # Biblioteca de 9 exercícios técnicos de aquecimento (Fase 30)
+│   ├── glossary.py                 # Enciclopédia de 139 termos musicais com auto-ligação (Fase 36)
+│   ├── review_scheduler.py         # Revisão espaçada SM-2 & 5 Caixas de Leitner (Fase 37)
+│   ├── composition.py              # Modelo de dados do Estúdio de Composição (Fase 40)
+│   └── compositions.py             # Persistência JSON de composições (user_compositions.json)
 │
 ├── audio/                          # Motores de Síntese Sonora, Microfone e MIDI
 │   ├── __init__.py
 │   ├── synthesizer.py              # Síntese Harmónica Aditiva com ADSR e Modelação Física Karplus-Strong
-│   ├── backing_tracks.py           # Síntese de Bateria e Motor de Acompanhamento Rítmico
+│   ├── backing_tracks.py           # Síntese de Bateria (12 instrumentos) e Motor de Acompanhamento Rítmico
 │   ├── player.py                   # Reprodução Sonora Assíncrona Thread-Safe (Pygame Mixer)
 │   ├── pitch_listener.py           # Captura de Microfone e Deteção de Afinação por Autocorrelação FFT
 │   ├── metronome.py                # Metrónomo Acústico Thread-Safe e Avaliador de Precisão Rítmica
-│   └── midi_manager.py             # Gestor de Teclados MIDI USB Hardware (Plug-and-Play)
+│   ├── midi_manager.py             # Gestor de Teclados MIDI USB Hardware (Plug-and-Play)
+│   └── composition_renderer.py     # Renderizador offline multi-pista estéreo float32 (Fase 41)
 │
 ├── gui/                            # Interface Gráfica com CustomTkinter
 │   ├── __init__.py
@@ -403,21 +413,28 @@ chord-master/
 │   │   ├── guitar_fretboard.py     # Braço de Viola Interativo de 15 Trastes (CAGED) com Timbre de Viola
 │   │   ├── staff_canvas.py         # Desenho Vetorial de Pauta Musical (Claves de Sol e Fá)
 │   │   ├── score_card.py           # Cartão de Feedback Imediato, Streaks e XP
-│   │   └── user_modal.py           # Diálogo Modal de Gestão e Criação de Alunos
+│   │   ├── user_modal.py           # Diálogo Modal de Gestão e Criação de Alunos
+│   │   ├── theory_quiz_widget.py   # Componente de Quiz Interativo por Capítulo de Teoria
+│   │   ├── glossary_modal.py       # Modal Flutuante de Termo do Glossário (auto-ligação)
+│   │   └── step_grid.py            # Grelha de ritmo multi-compasso + faixas de acordes (drag & drop)
 │   └── screens/                    # Ecrãs Principais da Aplicação
 │       ├── __init__.py
 │       ├── main_menu.py            # Dashboard Inicial com Nível de XP, Progresso e Acessos Rápidos
-│       ├── theory_screen.py        # Academia de Teoria (8 Capítulos com Piano e Viola Sincronizados)
-│       ├── practice_song.py        # Estúdio de Repertório (16 Músicas + Acompanhamento Rítmico + MIDI)
+│       ├── theory_screen.py        # Academia de Teoria (18 Capítulos com Piano e Viola Sincronizados)
+│       ├── practice_song.py        # Estúdio de Repertório (24 Músicas + Acompanhamento Rítmico + MIDI)
 │       ├── practice_scales.py      # Estúdio de Prática de Escalas (16 Escalas, Piano, Viola, Bateria)
 │       ├── tuner_screen.py         # Lamiré & Afinador Cromático com Agulha e Deteção por Microfone
 │       ├── practice_instrument.py  # Treino Acústico com Microfone para Piano e Viola Físicos
 │       ├── practice_ear.py         # Treino Auditivo & Ditado de Solfejo Cantado com Microfone
 │       ├── practice_staff.py       # Exercícios de Leitura de Pauta
+│       ├── practice_technique.py   # Exercícios Técnicos & Aquecimento (Hanon, Spider Walk, 9 padrões)
 │       ├── omr_review.py           # Revisão & Correcção Manual de Notas OMR antes de Guardar
+│       ├── glossary_screen.py      # Glossário Musical Interativo (139 termos, pesquisa, índice A-Z)
+│       ├── daily_review_screen.py  # Revisão Espaçada Diária (SM-2, 5 Caixas de Leitner)
+│       ├── compose_studio.py       # Estúdio de Composição (grelha de ritmo + faixas de acordes)
 │       └── stats_screen.py         # Painel de Estatísticas, Conquistas, Leaderboard e Exportação
 │
-└── tests/                          # 131 Testes Unitários Automatizados (100% de Sucesso)
+└── tests/                          # 250 Testes Unitários Automatizados (100% de Sucesso)
     ├── __init__.py
     ├── test_notes.py               # Testes de notas, frequências e conversões MIDI
     ├── test_intervals.py           # Testes de intervalos e transposição
@@ -480,10 +497,10 @@ python3 main.py
 
 ## 🧪 Execução da Suíte de Testes Automatizados
 
-A aplicação inclui **64 testes unitários** que cobrem toda a lógica musical, motores de áudio, ditado de solfejo cantado, gamificação, gestão de utilizadores e integridade das peças de repertório:
+A aplicação inclui **250 testes unitários** que cobrem toda a lógica musical, motores de áudio, ditado de solfejo cantado, gamificação, gestão de utilizadores, revisão espaçada, glossário e integridade das peças de repertório:
 
 ```bash
-# Executar todos os 64 testes com detalhes
+# Executar todos os 250 testes com detalhes
 python3 -m unittest discover -v tests
 ```
 
