@@ -14,6 +14,83 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA (pedagógica) — Fase 49: os limiares dizem "PERFEITO" a 95 ms de desvio
+- Commit revisto: `d2cf2c2`
+- Testes: 250/250 OK (+ 2 ficheiros de teste novos) · `pyflakes`: 0
+- **Veredito: AÇÃO NECESSÁRIA — um só item, mas vai à razão de ser do ecrã.**
+
+### ✅ O que está muito bem feito
+**Reaproveitaste o que existia** — `Metronome` e `evaluate_rhythm_accuracy`,
+sem reescrever avaliação nova.
+
+**Os 10 padrões fecham todos o compasso** (era 9/10 no trabalho em curso; a
+síncopa em 4/4 somava 5 tempos). E o melhor: escreveste
+`test_durations_fill_the_measure`, que **impede a regressão**. Cobre 5 níveis
+progressivos em 4/4, 3/4 e 6/8.
+
+**O ponto pedagógico central está lá**: guardas o desvio **com sinal**
+(`+ = atrasado, − = adiantado`) e mostras o desvio médio no resumo. É o que
+transforma "erraste" em "estás sistematicamente 40 ms atrasado".
+
+**E resolveste a classe de problema, não a instância** — ver correção minha
+abaixo.
+
+### 🔧 Correção minha (importante, para o registo)
+Enquanto o trabalho estava por commitar, escrevi que a categoria "ritmo" não
+aparecia no gráfico de estatísticas e chamei-lhe "a armadilha recorrente".
+**Estava enganado.** Refatorizaste `stats_screen.py:513-514` para derivar as
+categorias dinamicamente:
+```python
+from core.categories import CATEGORY_NAMES_PT, CATEGORY_COLORS
+categories = [(v, k, CATEGORY_COLORS.get(k, "#6B7280")) for k, v in CATEGORY_NAMES_PT.items()]
+```
+A minha verificação procurava a lista fixa antiga e não encontrou nada — daí a
+conclusão errada. Confirmei agora: as 8 categorias são derivadas, "ritmo"
+inclusive (`'Prática Rítmica'`, cor `#EC4899`). **Isto é melhor do que eu tinha
+pedido**: elimina de vez a classe de bug que nos mordeu três vezes, em vez de
+remendar mais uma instância. Peço desculpa pela acusação.
+
+### ❌ AÇÃO NECESSÁRIA — os limiares de precisão são demasiado permissivos
+`audio/metronome.py:144-149`:
+```python
+if   delta_ms <=  95.0: return "PERFEITO ⭐", ...
+elif delta_ms <= 220.0: return "BOM 👍", ...
+else:                   return "FORA DE TEMPO ⚠️", ...
+```
+E `practice_rhythm.py:30` usa `ON_TIME_MS = 220.0` para contar "batidas
+certas". Verifiquei por execução:
+```
+desvio real  80 ms → "PERFEITO ⭐"
+desvio real 200 ms → "BOM 👍"
+```
+**Isto mina a razão de ser do ecrã.** Um desvio de 95 ms é claramente audível
+como fora de tempo; a 120 BPM, 220 ms é quase **metade de um tempo**. Um aluno
+que bata consistentemente 90 ms atrasado vai ser informado de que está
+"PERFEITO" — e o ecrã existe precisamente para lhe ensinar o contrário.
+Referência prática: músicos treinados percebem desvios na ordem dos 20-30 ms.
+
+**Corrigir** — e atenção a um efeito colateral: `evaluate_rhythm_accuracy` é
+usada também em `practice_song.py`, `practice_scales.py` e
+`practice_instrument.py`, onde a batida é *ao tocar uma nota* e alguma
+tolerância faz sentido. Duas hipóteses, escolhe uma:
+1. **Parametrizar** — `evaluate_rhythm_accuracy(..., perfect_ms=45, good_ms=110)`
+   com os valores atuais por omissão, e o ecrã de ritmo a passar limiares
+   estritos. Preserva o comportamento dos outros ecrãs (regra "não alterar
+   funcionalidade existente").
+2. **Apertar globalmente** para algo como 40/100 ms, assumindo que os outros
+   ecrãs também estavam demasiado permissivos — mas então diz isso
+   explicitamente e verifica que não tornas os outros exercícios frustrantes.
+Prefiro a **1**, por ser reversível e não mexer no que já está aprovado.
+
+Ajusta também `ON_TIME_MS` no ecrã de ritmo em conformidade, e **mostra o
+critério ao utilizador** (ex: "±45 ms = perfeito") — senão a classificação
+parece arbitrária, que é o mesmo problema dos contadores que já corrigimos.
+
+**Teste**: afirma que 30 ms dá "perfeito" e 90 ms **não** dá, com os limiares
+do ecrã de ritmo.
+
+---
+
 ## TRABALHO PEDIDO — Fases 49 a 51: as 3 lacunas pedagógicas que ficaram por fechar
 - Pedido do utilizador depois de eu fazer o balanço do que ficou por fazer.
   Estas três vêm de uma auditoria pedagógica feita por um modelo especializado
