@@ -32,3 +32,8 @@ data/app_settings.json
 
 # Artefacto de testes (UserManager(filepath=":memory:") escreve um JSON real na CWD)
 :memory:
+
+# Watcher do implementador (estado de runtime — não versionar)
+.agent-sync/.watch_state
+.agent-sync/.watch.pid
+.agent-sync/WATCHER_LOG.md
