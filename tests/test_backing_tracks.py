@@ -45,7 +45,7 @@ class TestBackingTracks(unittest.TestCase):
 
     def test_backing_track_library_patterns(self):
         self.assertGreaterEqual(len(BACKING_TRACK_LIBRARY), 5)
-        valid_instruments = {"kick", "snare", "hihat_closed", "hihat_open", "ride"}
+        valid_instruments = {"kick", "snare", "hihat_closed", "hihat_open", "ride", "rimshot"}
 
         for pattern_id, pattern in BACKING_TRACK_LIBRARY.items():
             self.assertIsInstance(pattern, RhythmPattern)
@@ -58,6 +58,18 @@ class TestBackingTracks(unittest.TestCase):
                 self.assertIsInstance(step, list)
                 for inst in step:
                     self.assertIn(inst, valid_instruments, f"Instrumento inválido '{inst}' no padrão {pattern_id}")
+
+    def test_no_duplicate_grids(self):
+        """Asserts that no two patterns in the library share an identical grid."""
+        seen = {}
+        for pattern_id, pattern in BACKING_TRACK_LIBRARY.items():
+            grid_key = tuple(tuple(sorted(step)) for step in pattern.grid)
+            if grid_key in seen:
+                self.fail(
+                    f"Grelha duplicada: '{seen[grid_key]}' e '{pattern_id}' "
+                    f"têm a mesma grelha de {len(pattern.grid)} passos."
+                )
+            seen[grid_key] = pattern_id
 
     def test_backing_track_player_lifecycle(self):
         player = BackingTrackPlayer(bpm=120, volume=0.5)
