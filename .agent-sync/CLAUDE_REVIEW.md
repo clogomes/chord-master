@@ -14,6 +14,136 @@ Cada entrada tem um veredito:
 
 ---
 
+## TRABALHO PEDIDO — Fases 55 a 57: completar o Estúdio de Composição
+- Pedido do utilizador. É o que ficou **deliberadamente fora de âmbito** quando
+  ele escolheu a "versão útil primeiro" nas Fases 40-43.
+- **Uma fase de cada vez**, com o meu APROVADO entre elas. Ordem por
+  valor/esforço: a exportação é rápida e desbloqueia logo utilidade; o piano
+  roll é a maior peça de interface; os samples são a maior infraestrutura.
+- Arquitetura já assente, **não a mudes**: render **offline** para um buffer
+  numpy (precisão de 0 amostras, medida), cache de vozes float32, `tanh` como
+  limitador.
+
+### FASE 55 — Exportar a composição para ficheiro WAV
+A peça mais pequena e a que dá utilidade imediata: hoje o utilizador compõe e
+**não consegue levar nada para fora da app**.
+1. `Synthesizer._create_wav_header(pcm, sample_rate, num_channels)` já existe e
+   já é usado em 4 sítios — reutiliza-o com `num_channels=2`.
+2. Botão "💾 Exportar WAV" no `compose_studio.py`, com `filedialog.asksaveasfilename`
+   (o `filedialog` já está importado em `practice_song.py`, segue o mesmo padrão).
+3. **Renderiza em thread**, como já fazes na reprodução — um render frio pode
+   demorar ~1,2 s e não pode congelar a interface. Mostra progresso ou pelo
+   menos um estado "A exportar…".
+4. Nome por omissão a partir do título da composição, com extensão `.wav`.
+5. **Não** faças exportação para MP3 — exigiria um codificador externo e não
+   traz valor proporcional.
+6. Teste: exportar para um ficheiro temporário e confirmar que é um WAV válido
+   (lê-o de volta com o módulo `wave` da biblioteca padrão e verifica canais,
+   taxa de amostragem e duração ≈ esperada).
+
+### FASE 56 — Notas melódicas e piano roll
+Hoje o `Composition` só tem `rhythm` e `chords` — **não há forma de escrever
+uma melodia**. É a maior lacuna do estúdio.
+
+1. **Modelo** (`core/composition.py`): acrescenta
+   ```python
+   @dataclass
+   class NoteEvent:
+       midi: int              # int, não Note — evita reconstruir objetos ao carregar
+       start_beat: float
+       duration_beats: float
+       velocity: float = 0.8
+       instrument: str = "piano"   # "piano" | "guitar"
+   ```
+   e `notes: List[NoteEvent]` no `Composition`. **Sobe o `schema_version`** e
+   garante que composições antigas (sem o campo) continuam a carregar — usa
+   `.get()` com default, como já fazes.
+2. **Render** (`audio/composition_renderer.py`): trata `notes` como já tratas
+   `chords`, reutilizando a cache de vozes. Piano → síntese aditiva; viola →
+   Karplus-Strong. **Atenção**: o Karplus-Strong custa ~35 ms por segundo de
+   áudio, por isso a cache é obrigatória; uma melodia tem muito mais eventos
+   que uma progressão de acordes.
+3. **Piano roll** (`gui/components/piano_roll.py`, componente novo):
+   - Vertical = altura (MIDI), horizontal = tempo, alinhado à **mesma linha
+     temporal** da grelha de ritmo e das faixas de acorde.
+   - Notas como retângulos no canvas — **nunca widgets**, pela lição do
+     glossário (1737 widgets = ecrã lento).
+   - Clicar em zona vazia insere nota; arrastar move; arrastar a borda
+     redimensiona a duração; `Delete`/`Backspace` apaga a selecionada.
+   - Reutiliza o padrão de arrasto que já implementaste nas faixas de acorde
+     (`_on_canvas_press`/`_drag`/`_release` com limiar para distinguir clique).
+   - Régua de alturas à esquerda **fixa** (não desliza com o scroll
+     horizontal), como fizeste com os rótulos dos instrumentos.
+   - Alinha ao passo da grelha, com o rácio derivado de `steps_per_bar`.
+4. **Ligação pedagógica** — é o que distingue isto de um DAW qualquer: ao
+   selecionar uma nota, mostra-a no `PianoKeyboard` e no `GuitarFretboard`, e
+   espelha a melodia no `StaffCanvas` (que já sabe desenhar notas e durações).
+5. **Aviso de desempenho**: uma melodia de 8 compassos pode ter 100+ notas.
+   Mede `navigate_to("compose_studio")` antes e depois; hoje está em ~98 ms e
+   não deve passar dos ~200 ms.
+
+### FASE 57 — Samples reais (bibliotecas externas)
+O utilizador decidiu explicitamente (ver `PROTOCOL.md`, regra de áudio revista)
+que quer **samples reais, maximizando realismo**, com o licenciamento à
+responsabilidade dele. A síntese atual **mantém-se como fallback**.
+
+Tenho um estudo técnico com números medidos; segue-o:
+1. **Descodificação**: `soundfile` (traz o libsndfile embutido; wheel de ~1 MB
+   no macOS, sem Homebrew; suporta WAV/FLAC/OGG/MP3). **Fixa a versão
+   `soundfile>=0.13.1,<0.14`** — a 0.14.0 acrescenta uma dependência de
+   `typing-extensions` que parte o import. Padrão defensivo `HAS_SOUNDFILE`,
+   com `wave` da biblioteca padrão como recurso para WAV.
+   *Nota: verifiquei e nem `soundfile` nem `scipy` estão instalados no
+   `python3` desta máquina — a app tem de continuar a funcionar sem eles.*
+2. **Pasta de samples**: local, configurável e **no `.gitignore`**. Ordem de
+   procura: variável de ambiente → `data/local_settings.json` (novo, também
+   ignorado; **não uses o `app_settings.json`**, que é versionado) →
+   `~/Documents/ChordMaster/Samples`.
+3. **Manifesto por instrumento** (`instrument.json`): mapeamento nota→ficheiro,
+   camadas de velocidade, variantes round-robin, afinação e ganho por sample.
+4. **Espaçamento de samples** (números medidos, não os inventes):
+   - Bateria: **um por articulação, sem transposição** — transpor uma tarola
+     muda o tamanho aparente do tambor.
+   - Baixo e guitarra: **de 3 em 3 semitons** (±1 semitom de desvio ⇒ ≤6% de
+     erro de formante, impercetível).
+   - Piano: 2-3 semitons.
+   - Pads/leads: por oitava.
+   - Acima de ±7 semitons o efeito "chipmunk" é audível — não ultrapasses.
+5. **Transposição**: `scipy.signal.resample_poly` (46-60 dB mais limpo que
+   interpolação linear, medido), com `Fraction(r).limit_denominator(512)` —
+   valores menores desafinam até 2 cents, que se ouve. `np.interp` como
+   alternativa quando `HAS_SCIPY` for falso.
+6. **Camadas de velocidade**: 4 é o ponto ideal. **Comuta, não faças
+   crossfade** — misturar duas gravações diferentes do mesmo tambor produz
+   filtro de pente no ataque. Aplica o ganho contínuo no momento da mistura,
+   e mantém a cache com ganho unitário.
+7. **Round-robin determinístico** (contador, não aleatório) — assim
+   re-renderizar a mesma composição dá áudio idêntico, e os testes podem
+   afirmar sobre o resultado. 4 variantes para hi-hat e tarola, 2 para o resto.
+8. **Degradação obrigatória**: sem pasta, sem ficheiro, ou sem `soundfile`, a
+   app **cai na síntese atual e nunca falha nem fica em silêncio**. Silêncio é
+   a pior degradação possível — o utilizador não a distingue de um bug.
+
+### ❌ Gravação ao vivo — NÃO implementes, e a razão é técnica
+O utilizador mencionou gravação ao vivo em tempo real contra o transporte a
+tocar. **Avaliei e não é viável neste stack**, por isso não a especifico:
+- O `pygame` não expõe relógio de amostras nem callback de áudio; o buffer é
+  de **1024 amostras a 44100 Hz = 23 ms**, e o `Sound` não permite consultar a
+  posição (foi por isso que o cursor da Fase 47 teve de usar o relógio do
+  sistema).
+- Uma nota tocada ao vivo chegaria ao ficheiro com 25-45 ms de desfasamento
+  face ao que o utilizador ouve. É tolerável para pré-escuta, **inaceitável
+  para gravar**.
+- O resultado seria uma imitação fraca de um DAW, com a agravante de o
+  utilizador só descobrir o problema depois de gravar algo que soa errado.
+
+Entrada por grelha, piano roll e rato — que é o que estas fases dão — não têm
+este problema, porque o render é offline e o tempo é exato por construção.
+Se o utilizador insistir, digo-lhe isto diretamente antes de pedirmos o
+trabalho.
+
+---
+
 ## Revisão — Fase 54 APROVADA ✅ — dívida técnica fechada · nada pendente
 - Commits revistos: `8ab56e9`, `5a2d79a`
 - Testes: 302/302 OK
