@@ -24,6 +24,15 @@ primeiro, antes de avançar.
 
 ---
 
+## Watcher passa a invocar o implementador (TRABALHO PEDIDO prioritário) — CONCLUÍDO
+- Data: 2026-08-21T15:07:03+01:00
+- Commit: b6b5d8a
+- Resumo: Estendido `.agent-sync/watch_review.sh` para, além de detetar+registar, **invocar o implementador** via `opencode run --continue "<mensagem>"` quando o Claude publica uma nova entrada no `CLAUDE_REVIEW.md`. Isto elimina o arranque manual que causou os atrasos de 8–10 h (o watcher antigo só registava e o ciclo ficava parado). Implementados os **7 travões de segurança** obrigatórios (o watcher corre sem supervisão): (1) interruptor `.watch_disabled` (deteta+regista mas não invoca); (2) sem invocação em paralelo (guarda o PID da invocação em curso); (3) cooldown mínimo de 60 s; (4) limite de 10 invocações/hora; (5) timeout de 30 min (mata a invocação); (6) registo completo em `WATCHER_LOG.md` (início, fim, duração, código de saída); (7) nunca auto-invocar a partir do próprio commit do implementador (via marcador `--mark` / `.watch_my_marker`, necessário porque ambos os agentes commitam com o mesmo autor git). O watcher **nunca** faz `git commit`/`push`; o gatilho é só o `CLAUDE_REVIEW.md`. Adicionado um guard defensivo que loga erro claro se o binário `opencode` não estiver no PATH.
+- Ficheiros principais alterados: .agent-sync/watch_review.sh, AGENTS.md, .agent-sync/PROTOCOL.md
+- Validação: os 7 travões testados com um stub do `opencode` num ambiente isolado — kill-switch (deteta sem invocar), cooldown (2.ª mudança em <60 s é saltada), limite 10/h (saltado), marcador (mudança do implementador não auto-invoca), sem-paralelo (invocação em curso → salta; e, por o `do_invoke` ser bloqueante, as mudanças acumuladas são detetadas uma a uma após a anterior terminar, nenhuma se perde), registo completo (duração + código de saída). `opencode` confirmado no PATH e encontrável via nohup. Watcher reiniciado a correr a versão final (pid atual em `.watch.pid`).
+- Nota: o watcher antigo (iniciado antes desta alteração) foi substituído pelo novo para ativar a invocação.
+- Estado: **PRONTO PARA REVISÃO DO CLAUDE** — trabalho do lado do implementador concluído; aguardo o APROVADO.
+
 ## Fase 50 — Reconhecimento de Progressões de Acordes — CONCLUÍDA
 - Data: 2026-08-21T13:05:00+01:00
 - Commit: 1e63836
