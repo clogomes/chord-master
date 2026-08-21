@@ -24,6 +24,15 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 50 — Reconhecimento de Progressões de Acordes — CONCLUÍDA
+- Data: 2026-08-21T13:05:00+01:00
+- Commit: 1e63836
+- Resumo: Implementado o reconhecimento auditivo de progressões de acordes (3.º tipo no treino auditivo, ao lado de Intervalos e Acordes). `core/quiz_engine.py`: novo `QuestionType.EAR_PROGRESSION`, campo `chords_to_play` no `QuizQuestion`, tabela `_PROGRESSIONS` com 9 progressões em 3 níveis (iniciante: I–V–vi–IV, I–vi–IV–V, I–IV–V–I; intermédio: ii–V–I, I–vi–ii–V, i–♭VII–♭VI–V; avançado: blues de 12 compassos, cadência andaluza iv–♭III–♭II–I, dominante secundária I–V/V–V–I) e `generate_ear_progression_question(difficulty)`. Cada progressão é construída por grau diatónico na tonalidade (maior/menor natural) e tocada em **tonalidade aleatória** (tónica entre C3–A3) para forçar o reconhecimento relativo, conforme pedido. A explicação indica onde a progressão aparece na biblioteca (Cânone de Pachelbel, Greensleeves, Ode to Joy, The House of the Rising Sun, Malagueña) e é bilingue PT/EN. `audio/player.py`: `play_progression` (sequência de acordes bloco a bloco, reutilizando `play_chord`/`generate_polyphonic`) + dispatch `play_mode=='progression'` em `play_question`. `gui/screens/practice_ear.py`: 4.ª opção «Progressões» no `type_select`, ramo em `load_new_question`, modo Aprender guiado (mostra os graus/numerais romanos, esconde pauta/piano, opções desativadas até o utilizador ouvir) e registo por competência atómica `progression:<label>` (ex.: `progression:I-V-vi-IV`).
+- Ficheiros principais alterados: core/quiz_engine.py, audio/player.py, gui/screens/practice_ear.py, tests/test_quiz.py, tests/test_record_atomic_review_ui_integration.py, README.md
+- Validação: 272/272 testes a passar (estável em 4 execuções consecutivas; 8 novos: estrutura da pergunta, tríades diatónicas I–V–vi–IV em Dó, V menor = Maior com 5.ª elevada em Lá menor, tonalidade aleatória, referência à biblioteca, `play_progression`, fluxo do ecrã + `skill_id`). `pyflakes` limpo nos ficheiros alterados (limpeza de imports órfãos pré-existentes em `quiz_engine.py`, `player.py` e no teste de integração).
+- Nota: o import de `get_language` foi feito de forma *lazy* dentro do gerador para evitar um import circular (`core.quiz_engine` → `gui.i18n` → `gui.app` → `core.adaptive_engine` → `core.quiz_engine`).
+- Estado: **PRONTO PARA REVISÃO DO CLAUDE** — trabalho do lado do implementador concluído; aguardo o APROVADO antes de avançar.
+
 ## Fase 49 — AÇÃO NECESSÁRIA resolvida: limiares de precisão estritos — CONCLUÍDA
 - Data: 2026-08-21T09:38:48+01:00
 - Commit: 019d074
