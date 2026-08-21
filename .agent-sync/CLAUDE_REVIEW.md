@@ -14,6 +14,68 @@ Cada entrada tem um veredito:
 
 ---
 
+## APROVADO — Fase 55: Exportação para WAV (commit `a854066`)
+
+**Veredito: APROVADO. Avança para a Fase 56.**
+
+Suite completa: **304/304 a passar** (3 skips), `pyflakes` limpo, app arranca sem
+erro de runtime.
+
+### O que validei além dos testes
+
+Não me bastei pelos testes que escreveste (que só verificam o cabeçalho e que o
+ficheiro existe). Exportei uma composição real e li o ficheiro de volta:
+
+- **WAV válido**: 2 canais, 16-bit, 44100 Hz — lido pelo módulo `wave` da stdlib
+  sem avisos. 2 compassos a 120 BPM = 7.00 s (4 s de grelha + cauda das notas).
+- **Canais bem entrelaçados**: `1º som L = amostra 0`, `R = amostra 0`. Se o
+  buffer fosse escrito na forma `(2, N)` em vez de `(N, 2)`, o ficheiro sairia
+  com o canal esquerdo inteiro seguido do direito — soaria a duas metades
+  desfasadas. Não é o caso. Correlação L/R = 0.9955, ou seja há estéreo real
+  (o *panning* por instrumento sobrevive), não uma cópia mono duplicada.
+- **Fidelidade**: erro máximo entre o buffer renderizado e o WAV lido de volta =
+  **0.000031**, que é exatamente o passo de quantização de 16 bits (1/32768).
+  A exportação não perde nada além do inevitável.
+- **Sem clipping**: picos de 0.782 / 0.795. O limitador `tanh` do `render()` está
+  a fazer o trabalho antes da conversão para inteiro.
+- **Composição vazia** (sem ritmo nem acordes): exporta um ficheiro válido de
+  5.00 s de silêncio em vez de rebentar.
+- **Caminho inválido**: levanta `FileNotFoundError`, que o `_on_export_error`
+  apanha e mostra em caixa de diálogo. Não deixa ficheiro meio-escrito.
+
+### Interface
+
+- O botão existe, está ligado (`command` → `_export_wav`) e responde. Instanciei
+  o ecrã e confirmei-o em vez de assumir — já aprovei um botão morto neste
+  projeto (Fase 27) por não o ter feito.
+- Render em `threading.Thread(daemon=True)` com regresso à *main thread* por
+  `self.after(0, ...)`. Correto: uma renderização a frio leva ~1.2 s e
+  congelaria a interface se corresse no fio principal.
+- O botão fica `disabled` com "⏳ A exportar..." e é reposto nos dois caminhos
+  (sucesso e erro). Não fica preso.
+- Nome de ficheiro sanitizado a partir do título, com `"composicao"` como
+  recurso quando o título só tem caracteres inválidos.
+
+### Desempenho — sem regressão
+
+Medi a instanciação do ecrã antes e depois desta fase, 3 vezes cada:
+- antes (`a854066~1`): 1180 / 1423 / 1615 ms
+- depois (Fase 55): 1061 / 1237 / 1370 ms
+
+A Fase 55 não piorou nada. (O ~1.2 s do Estúdio é anterior a esta fase e não é
+motivo de bloqueio; se quisermos atacá-lo, é trabalho próprio, não desta.)
+
+### Reutilização
+
+Reutilizaste `Synthesizer._create_wav_header(..., num_channels=2)` como pedi, em
+vez de escrever geração de WAV nova. `render_to_wav_bytes` e `export_to_wav_file`
+ficaram separados — 13 linhas ao todo, e a versão em *bytes* fica disponível para
+quem precisar dela sem passar pelo disco.
+
+**Nada a corrigir. Segue para a Fase 56 (notas melódicas + piano roll).**
+
+---
+
 ## TRABALHO PEDIDO — Fases 55 a 57: completar o Estúdio de Composição
 - Pedido do utilizador. É o que ficou **deliberadamente fora de âmbito** quando
   ele escolheu a "versão útil primeiro" nas Fases 40-43.
