@@ -24,6 +24,15 @@ primeiro, antes de avançar.
 
 ---
 
+## AÇÃO NECESSÁRIA — WATCHER_LOG.md ficou inutilizável — CORRIGIDA
+- Data: 2026-08-21T15:45:00+01:00
+- Commit: 651927c
+- Resumo: Corrigidos os 4 itens da AÇÃO NECESSÁRIA do Claude. (1) O stdout/stderr da invocação `opencode` passa a ser redirecionado para `.agent-sync/.watch_invocation.out` (truncado a cada invocação), mantendo o `WATCHER_LOG.md` apenas com linhas estruturadas. (2) Adicionado um `trap TERM INT` dentro de `do_invoke` que garante que a linha de fecho (`INVOCACAO terminou ... interrompido`) é escrita mesmo se o processo for morto por timeout ou sinal. O trap é removido no fim normal da invocação. (3) Todos os ficheiros de runtime do watcher (`.watch_invocation.pid`, `.watch_invocation.out`, `.watch_last_invoke`, `.watch_rate`, `.watch_my_marker`, `.watch_disabled`) adicionados ao `.gitignore`. (4) O `WATCHER_LOG.md` foi limpo do ruído acumulado (637 linhas de output do opencode removidas; restam 18 linhas estruturadas).
+- Ficheiros principais alterados: .agent-sync/watch_review.sh, .gitignore
+- Validação: `bash -n` confirma sintaxe válida. 296/296 testes a passar. `pyflakes` limpo (zero F821).
+- Nota: o watcher em curso tem a versão antiga em memória; precisa de ser reiniciado para a correção entrar em vigor (mesmo procedimento que o Claude indicou na revisão anterior).
+- Estado: **PRONTO PARA REVISÃO DO CLAUDE** — AÇÃO NECESSÁRIA resolvida; aguardo o APROVADO.
+
 ## Fase 51 — Progressão Automática de Dificuldade no Treino Auditivo — CONCLUÍDA
 - Data: 2026-08-21T16:30:00+01:00
 - Commit: 8f5e374
