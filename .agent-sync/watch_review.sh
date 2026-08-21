@@ -71,6 +71,8 @@ MAX_PER_HOUR="${WATCH_MAX_PER_HOUR:-10}"
 INVOKE_TIMEOUT="${WATCH_TIMEOUT:-1800}"
 OPENCODE_BIN="${OPENCODE_BIN:-opencode}"
 
+INVOKE_OUT="$SCRIPT_DIR/.watch_invocation.out"
+
 INVOKE_MSG='Nova entrada do Claude em .agent-sync/CLAUDE_REVIEW.md. Lê o TOPO do ficheiro e age conforme o veredito (AÇÃO NECESSÁRIA / TRABALHO PEDIDO / APROVADO com "avança para"). Segue o AGENTS.md.'
 
 # ── Subcomando --mark: registar o estado atual como "meu" (travão 7) ─────────
@@ -164,8 +166,10 @@ invocation_running() {
 }
 
 # ── Invocação do implementador (com timeout — travão 5) ─────────────────────
-# Corre `opencode run --continue` num subshell com timeout; regista início,
-# fim, duração e código de saída (travão 6). Guarda o PID (travão 2).
+# Corre `opencode run --continue` com timeout; regista início, fim, duração e
+# código de saída (travão 6). O stdout/stderr da invocação vai para
+# $INVOKE_OUT (não para o WATCHER_LOG.md, que só tem linhas estruturadas).
+# Um trap garante que a linha de fecho é escrita mesmo em caso de interrupção.
 do_invoke() {
   local cur="$1"
 
@@ -184,15 +188,29 @@ do_invoke() {
   echo "$(now_epoch)" >> "$RATE_FILE"
   echo "$(now_epoch)" > "$COOLDOWN_FILE"
 
-  # Lança a invocação em segundo plano e guarda o PID (travão 2).
-  (
-    "$OPENCODE_BIN" run --continue "$INVOKE_MSG" >> "$LOG" 2>&1
-  ) &
+  # Trunca o ficheiro de saída da invocação (cada invocação começa limpo).
+  : > "$INVOKE_OUT"
+
+  # Lança a invocação em segundo plano; stdout/stderr vai para $INVOKE_OUT.
+  "$OPENCODE_BIN" run --continue "$INVOKE_MSG" > "$INVOKE_OUT" 2>&1 &
   local inv_pid=$!
   echo "$inv_pid" > "$INV_PIDFILE"
 
-  # Aguarda com timeout (travão 5). O `wait` num subshell permite aplicar
-  # um timeout simples: se passar do limite, mata o processo.
+  # Trap para garantir que a linha de fecho é escrita mesmo se o script
+  # for interrompido (SIGTERM/SIGINT) durante a invocação.
+  local _inv_start_epoch="$start_epoch"
+  trap '
+    local _rc=143
+    if [ -f "'"$INV_PIDFILE"'" ]; then
+      local _ep _ts _dur
+      _ep="$(date +%s)"; _ts="$(date "+%Y-%m-%d %H:%M:%S")"
+      _dur=$(( _ep - _inv_start_epoch ))
+      printf "[%s] INVOCACAO terminou (fim %s, duração %ss, código de saída %s — interrompido)\n" "$_ts" "$_ts" "$_dur" "$_rc" >> "'"$LOG"'"
+      rm -f "'"$INV_PIDFILE"'"
+    fi
+  ' TERM INT
+
+  # Aguarda com timeout (travão 5).
   local waited=0 rc=0
   while kill -0 "$inv_pid" 2>/dev/null; do
     if [ "$waited" -ge "$INVOKE_TIMEOUT" ]; then
@@ -206,6 +224,9 @@ do_invoke() {
     waited=$(( waited + 5 ))
   done
   wait "$inv_pid" 2>/dev/null; rc=$?
+
+  # Remove o trap agora que a invocação terminou normalmente.
+  trap - TERM INT
 
   local end_epoch end_ts duration
   end_epoch="$(now_epoch)"; end_ts="$(date '+%Y-%m-%d %H:%M:%S')"

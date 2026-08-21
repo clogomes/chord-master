@@ -36,4 +36,10 @@ data/app_settings.json
 # Watcher do implementador (estado de runtime — não versionar)
 .agent-sync/.watch_state
 .agent-sync/.watch.pid
+.agent-sync/.watch_invocation.pid
+.agent-sync/.watch_invocation.out
+.agent-sync/.watch_last_invoke
+.agent-sync/.watch_rate
+.agent-sync/.watch_my_marker
+.agent-sync/.watch_disabled
 .agent-sync/WATCHER_LOG.md
