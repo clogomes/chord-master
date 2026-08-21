@@ -61,6 +61,15 @@ Por isso, alguns nomes são históricos e **mantêm-se de propósito**:
     fase nova (ver regra de ordem abaixo).
   - **TRABALHO PEDIDO** — especificação de funcionalidade nova, já aprovada
     pelo utilizador, pronta a implementar.
+- **`watch_review.sh`** — watcher do Implementador (Fase 50+). Deteta quando o
+  Claude publica uma nova entrada no `CLAUDE_REVIEW.md` e **invoca o
+  Implementador** automaticamente via `opencode run --continue`, para o ciclo
+  não ficar parado à espera de uma invocação manual. Corre com 7 travões de
+  segurança (interruptor `.watch_disabled`, sem invocação em paralelo, cooldown
+  60 s, máx. 10/hora, timeout 30 min, registo completo em `WATCHER_LOG.md`, e
+  nunca auto-invocar a partir do próprio commit do Implementador). **Não faz
+  `git commit`/`push`.** Ver `AGENTS.md` (secção "Watcher") e o cabeçalho do
+  script para detalhes.
 
 ## Regra de ordem (importante)
 
