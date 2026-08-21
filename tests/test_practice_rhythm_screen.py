@@ -1,10 +1,5 @@
-"""Testes de integração do Ecrã de Prática Rítmica (Fase 49).
-
-Verificam, sem dependência de tempo real preciso, que:
-- o ecrã se constrói sem exceções;
-- o fluxo de batidas regista cada batida e termina a sessão;
-- a categoria "ritmo" fica registada nas estatísticas do utilizador.
-"""
+import tempfile
+import os
 import time
 import unittest
 import customtkinter as ctk
@@ -19,7 +14,9 @@ class TestPracticeRhythmScreen(unittest.TestCase):
         ctk.set_appearance_mode("Dark")
         cls.root = ctk.CTk()
         cls.root.withdraw()
-        cls.user_manager = UserManager(filepath=":memory:")
+        cls.tmp_file = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
+        cls.tmp_file.close()
+        cls.user_manager = UserManager(filepath=cls.tmp_file.name)
         cls.user_manager.create_user("TesterRhythm", "🥁")
 
     @classmethod
@@ -28,6 +25,8 @@ class TestPracticeRhythmScreen(unittest.TestCase):
             cls.root.destroy()
         except Exception:
             pass
+        if hasattr(cls, "tmp_file") and os.path.exists(cls.tmp_file.name):
+            os.unlink(cls.tmp_file.name)
 
     def test_screen_construction(self):
         screen = PracticeRhythmScreen(self.root, self.user_manager, on_back=lambda: None)

@@ -714,3 +714,11 @@ Implementação nativa de um sistema de i18n em duas vertentes:
   - O método `record_atomic_review()` passa a devolver o objeto `CategoryStats` gerado por `record_attempt()`, permitindo que os ecrãs de treino (`PracticeEarScreen`, `PracticeStaffScreen`, `TheoryQuizWidget`) leiam imediatamente as sequências `current_streak` e `best_streak` e atualizem os respetivos `ScoreCard` e cartões de feedback sem exceções.
 - **Suite de Testes de Integração de UI (`tests/test_record_atomic_review_ui_integration.py`)**:
   - Simulação completa do fluxo de resposta em múltiplos tipos de exercício em `PracticeEarScreen`, `PracticeStaffScreen` e `TheoryQuizWidget` validando a ausência de exceções e a atualização das estatísticas na interface. Total de **250/250 testes a passar**.
+
+### Fase 54 — Resolução de Dívida Técnica: Unificação de `CategoryStats`, Ecrã de Técnica na Barra Lateral & Isolamento de Testes
+- **Unificação de Modelos `CategoryStats` (`gui/components/score_card.py`)**:
+  - O componente `ScoreCard` passa a importar e tipar diretamente a classe `core.user_manager.CategoryStats` (objeto devolvido em tempo de execução por `record_attempt()` e `record_atomic_review()`), eliminando o acoplamento erróneo à definição legada em `core.score_tracker`.
+- **Ecrã de Exercícios Técnicos na Barra Lateral (`gui/app.py`, `gui/i18n.py`)**:
+  - Adicionado o botão de navegação «⚡ Exercícios Técnicos» / «⚡ Technical Drills» (`nav_practice_technique`) à barra lateral principal, tornando o módulo imediatamente acessível a partir de qualquer ecrã com suporte bilingue PT/EN.
+- **Isolamento de I/O em Testes Unitários**:
+  - Substituição da convenção `:memory:` por `tempfile.NamedTemporaryFile` com limpeza rigorosa em `tearDown` e `tearDownClass` em todos os testes (`test_compose_studio_chords.py`, `test_compose_studio_ui.py`, `test_practice_rhythm_screen.py`, `test_record_atomic_review_ui_integration.py`, `test_review_scheduler.py`). Zero ficheiros residuais deixados no disco durante a execução da suite de testes. Total de **302/302 testes a passar**.

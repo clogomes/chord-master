@@ -225,6 +225,7 @@ class ChordMasterApp(ctk.CTk):
             ("theory", t("nav_theory", f"📖 Teoria Musical ({len(LESSON_IDS)} Cap)")),
             ("practice_song", t("nav_practice_song", "🎶 Tocar Repertório")),
             ("practice_scales", t("nav_practice_scales", "🎼 Prática de Escalas")),
+            ("practice_technique", t("nav_practice_technique", "⚡ Exercícios Técnicos")),
             ("lamire", t("nav_lamire", "🎙️ Lamiré & Afinador")),
             ("practice_instrument", t("nav_practice_instrument", "🎯 Prática c/ Microfone")),
             ("practice_ear", t("nav_practice_ear", "🎧 Treino Auditivo")),

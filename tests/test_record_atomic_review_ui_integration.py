@@ -1,4 +1,5 @@
-"""Integration tests verifying full user answering flow and ScoreCard updates across practice screens."""
+import tempfile
+import os
 import unittest
 import customtkinter as ctk
 from core.user_manager import UserManager, CategoryStats
@@ -14,7 +15,9 @@ class TestRecordAtomicReviewUIIntegration(unittest.TestCase):
         ctk.set_appearance_mode("Dark")
         cls.root = ctk.CTk()
         cls.root.withdraw()
-        cls.user_manager = UserManager(filepath=":memory:")
+        cls.tmp_file = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
+        cls.tmp_file.close()
+        cls.user_manager = UserManager(filepath=cls.tmp_file.name)
         cls.user_manager.create_user("TesterUI", "🎯")
 
     @classmethod
@@ -23,6 +26,8 @@ class TestRecordAtomicReviewUIIntegration(unittest.TestCase):
             cls.root.destroy()
         except Exception:
             pass
+        if hasattr(cls, "tmp_file") and os.path.exists(cls.tmp_file.name):
+            os.unlink(cls.tmp_file.name)
 
     def test_record_atomic_review_returns_category_stats(self):
         """Validates that record_atomic_review returns a CategoryStats object with streak/correct counts."""

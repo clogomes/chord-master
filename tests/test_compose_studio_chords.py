@@ -1,4 +1,5 @@
-"""Comprehensive tests for chord track and visualizer synchronization in ComposeStudio (Phase 43)."""
+import tempfile
+import os
 import unittest
 import customtkinter as ctk
 from core.user_manager import UserManager
@@ -13,7 +14,9 @@ class TestComposeStudioChords(unittest.TestCase):
         ctk.set_appearance_mode("Dark")
         cls.root = ctk.CTk()
         cls.root.withdraw()
-        cls.user_manager = UserManager(filepath=":memory:")
+        cls.tmp_file = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
+        cls.tmp_file.close()
+        cls.user_manager = UserManager(filepath=cls.tmp_file.name)
         cls.user_manager.create_user("ChordStudioTester", "🎹")
 
     @classmethod
@@ -22,6 +25,8 @@ class TestComposeStudioChords(unittest.TestCase):
             cls.root.destroy()
         except Exception:
             pass
+        if hasattr(cls, "tmp_file") and os.path.exists(cls.tmp_file.name):
+            os.unlink(cls.tmp_file.name)
 
     def test_root_options_and_chord_types_coverage(self):
         # 17 roots including all flats and sharps

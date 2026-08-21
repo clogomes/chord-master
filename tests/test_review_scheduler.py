@@ -1,4 +1,5 @@
-"""Unit tests for core/review_scheduler.py — SM-2 algorithm, persistence schema, queue generation."""
+import tempfile
+import os
 import time
 import unittest
 
@@ -221,8 +222,14 @@ class TestUserManagerIntegration(unittest.TestCase):
     """Tests for spaced review persistence in UserManager."""
 
     def setUp(self):
-        self.um = UserManager(filepath=":memory:")
+        self.tmp_file = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
+        self.tmp_file.close()
+        self.um = UserManager(filepath=self.tmp_file.name)
         self.um.create_user("TestAluno")
+
+    def tearDown(self):
+        if hasattr(self, "tmp_file") and os.path.exists(self.tmp_file.name):
+            os.unlink(self.tmp_file.name)
 
     def test_fresh_profile_has_empty_spaced_data(self):
         user = self.um.current_user

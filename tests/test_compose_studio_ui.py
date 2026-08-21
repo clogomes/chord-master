@@ -1,4 +1,5 @@
-"""Unit tests for Compose Studio screen and StepGrid canvas component (Phase 42)."""
+import tempfile
+import os
 import unittest
 import customtkinter as ctk
 from core.user_manager import UserManager
@@ -13,7 +14,9 @@ class TestComposeStudioUI(unittest.TestCase):
         ctk.set_appearance_mode("Dark")
         cls.root = ctk.CTk()
         cls.root.withdraw()
-        cls.user_manager = UserManager(filepath=":memory:")
+        cls.tmp_file = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
+        cls.tmp_file.close()
+        cls.user_manager = UserManager(filepath=cls.tmp_file.name)
         cls.user_manager.create_user("ComposeTester", "🎛️")
 
     @classmethod
@@ -22,6 +25,8 @@ class TestComposeStudioUI(unittest.TestCase):
             cls.root.destroy()
         except Exception:
             pass
+        if hasattr(cls, "tmp_file") and os.path.exists(cls.tmp_file.name):
+            os.unlink(cls.tmp_file.name)
 
     def test_step_grid_toggle_and_clear(self):
         frame = ctk.CTkFrame(self.root)
