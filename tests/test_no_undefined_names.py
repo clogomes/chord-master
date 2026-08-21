@@ -1,7 +1,6 @@
 """Automated static analysis test to ensure zero undefined names (F821) across all python modules."""
 import os
 import unittest
-import ast
 
 try:
     import pyflakes.api

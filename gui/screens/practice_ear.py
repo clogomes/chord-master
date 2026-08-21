@@ -6,6 +6,7 @@ from typing import Callable, List, Optional
 import customtkinter as ctk
 from core.quiz_engine import QuizEngine, QuizQuestion, QuestionType
 from core.adaptive_engine import generate_adaptive_question
+from core.auto_difficulty import AutoDifficultyTracker
 from core.user_manager import UserManager
 from core.notes import Note
 from audio.player import get_audio_player
@@ -45,7 +46,14 @@ class PracticeEarScreen(ctk.CTkFrame):
         self._is_gui_busy: bool = False
         self._last_gui_update: float = 0.0
 
+        # Auto difficulty progression
+        self._auto_diff_tracker = AutoDifficultyTracker()
+        self._current_auto_difficulty: str = "beginner"
+
         self._build_ui()
+        if self.auto_diff_var.get():
+            self.diff_select.configure(state="disabled")
+            self._update_auto_diff_progress()
         self.load_new_question()
 
     def _build_ui(self):
@@ -134,6 +142,27 @@ class PracticeEarScreen(ctk.CTkFrame):
             progress_color=theme.COLOR_PRIMARY,
         )
         self.adaptive_switch.pack(side="right", padx=16, pady=10)
+
+        # Auto Difficulty Toggle Switch
+        self.auto_diff_var = ctk.BooleanVar(value=True)
+        self.auto_diff_switch = ctk.CTkSwitch(
+            settings_frame,
+            text="⚡ Dificuldade Automática",
+            variable=self.auto_diff_var,
+            command=self._on_auto_diff_toggled,
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            progress_color=theme.COLOR_SUCCESS,
+        )
+        self.auto_diff_switch.pack(side="right", padx=8, pady=10)
+
+        # Auto Difficulty Progress Label
+        self._auto_diff_progress_lbl = ctk.CTkLabel(
+            self,
+            text="",
+            font=theme.get_font(theme.FONT_BODY),
+            text_color=theme.COLOR_TEXT_MUTED,
+        )
+        self._auto_diff_progress_lbl.pack(fill="x", padx=24, pady=(0, 4))
 
         # Mode Toggle (Learn / Test)
         mode_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -345,6 +374,31 @@ class PracticeEarScreen(ctk.CTkFrame):
     def _on_mode_changed(self):
         self.load_new_question()
 
+    def _on_auto_diff_toggled(self):
+        if self.auto_diff_var.get():
+            self._current_auto_difficulty = self._get_current_difficulty()
+            self._auto_diff_tracker.reset()
+            self.diff_select.configure(state="disabled")
+        else:
+            self.diff_select.configure(state="normal")
+            self._auto_diff_progress_lbl.configure(text="")
+        self._update_auto_diff_progress()
+        self.load_new_question()
+
+    def _get_current_difficulty(self) -> str:
+        diff_map = {t("diff_beginner", "Iniciante"): "beginner", t("diff_intermediate", "Intermédio"): "intermediate", t("diff_advanced", "Avançado"): "advanced"}
+        return diff_map.get(self.diff_select.get(), "beginner")
+
+    def _set_difficulty(self, difficulty: str) -> None:
+        reverse_map = {"beginner": t("diff_beginner", "Iniciante"), "intermediate": t("diff_intermediate", "Intermédio"), "advanced": t("diff_advanced", "Avançado")}
+        self.diff_select.set(reverse_map.get(difficulty, t("diff_beginner", "Iniciante")))
+
+    def _update_auto_diff_progress(self) -> None:
+        if self.auto_diff_var.get():
+            self._auto_diff_progress_lbl.configure(text=f"⚡ {self._auto_diff_tracker.progress_text()}")
+        else:
+            self._auto_diff_progress_lbl.configure(text="")
+
     def _play_guided_example(self):
         if not self.current_question:
             return
@@ -374,8 +428,10 @@ class PracticeEarScreen(ctk.CTkFrame):
         self.learning_play_btn.configure(text="🔊 Ouvir Exemplo Guiado")
 
         ex_type = self.type_select.get()
-        diff_map = {t("diff_beginner", "Iniciante"): "beginner", t("diff_intermediate", "Intermédio"): "intermediate", t("diff_advanced", "Avançado"): "advanced"}
-        difficulty = diff_map.get(self.diff_select.get(), "beginner")
+        if self.auto_diff_var.get():
+            difficulty = self._current_auto_difficulty
+        else:
+            difficulty = self._get_current_difficulty()
 
         if hasattr(self, "adaptive_var") and self.adaptive_var.get():
             self.current_question = generate_adaptive_question(
@@ -660,6 +716,16 @@ class PracticeEarScreen(ctk.CTkFrame):
             user_answer="Voz Afinada" if from_voice else self.current_question.options[chosen_index],
             correct_answer=self.current_question.correct_answer,
         )
+
+        # Auto difficulty progression
+        if self.auto_diff_var.get():
+            self._auto_diff_tracker.record(is_correct)
+            new_diff = self._auto_diff_tracker.next_difficulty(self._current_auto_difficulty)
+            if new_diff != self._current_auto_difficulty:
+                self._current_auto_difficulty = new_diff
+                self._auto_diff_tracker.reset()
+                self._set_difficulty(new_diff)
+            self._update_auto_diff_progress()
 
         prefix = "🎤 Cantaste com afinação perfeita! " if from_voice else ""
         explanation_full = f"{prefix}{self.current_question.explanation}"
