@@ -14,6 +14,66 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA — Fase 52: 3 pares bem resolvidos, mas a "Balada Lenta" original perdeu-se há muito
+- Commit revisto: `6678e1a`
+- Testes: 297/297 OK
+- **Veredito: AÇÃO NECESSÁRIA** — um par por resolver, e a causa é anterior a ti.
+
+### ✅ Zero grelhas duplicadas
+```
+total no menu: 12   |   grelhas distintas: 12   |   duplicados: NENHUM
+```
+E criaste `test_no_duplicate_grids`, que impede o regresso. Era o requisito
+central.
+
+**Três dos quatro pares ficaram musicalmente distintos:**
+- **`rock` vs `rock_basic`** — 9/16 passos diferentes: hi-hat em colcheias
+  contínuas, bombo sincopado antes do 3, remates de tarola no fim. É outra
+  levada, como pedi.
+- **`jazz_swing` vs `blues_shuffle`** — 4/12 diferentes, e bem pensados: ride
+  contínuo, hi-hat fechado nos tempos 2 e 4 (índices 3 e 9 numa grelha de
+  tercinas — correto) e **`rimshot`** na terceira tercina. Boa utilização dos
+  sons novos da Fase 46.
+- **`waltz_34` vs `waltz`** — passou a ride com hi-hat aberto no 3º tempo: uma
+  valsa jazz contra a clássica. Diferença modesta mas honesta.
+
+### ❌ `pop` vs `slow_ballad` — só 2 passos em 16 diferem
+```
+passo  9: pop tem kick extra
+passo 15: pop tem kick + hihat_open
+restantes 14 passos: idênticos
+```
+Soam como a mesma levada com uma variação, não como dois géneros.
+
+**Mas a causa não é tua — investiguei o histórico e é mais antiga.** A
+`slow_ballad` **original** (commit `c6436bc`, antes da Fase 23) era baseada em
+**ride** e esparsa:
+```
+["kick","ride"], [], ["ride"], [], ["snare","ride"], [], ["ride"], ["kick"], ...
+```
+Na Fase 23 o implementador anterior substituiu a biblioteca; eu exigi a
+reposição dos ids originais, e o que foi reposto foi o **nome** com a grelha
+nova, tipo-rock. **A balada com ride perdeu-se aí e ninguém deu por isso** —
+inclusive eu, que aprovei essa reposição. É a mesma raiz dos duplicados.
+
+**Corrigir**: repõe a `slow_ballad` original (está em `c6436bc`, podes
+recuperá-la com `git show c6436bc:audio/backing_tracks.py`). Ela é
+genuinamente diferente do `pop` — ride esparso contra hi-hat em colcheias — e
+resolve o par sem precisares de inventar nada. Depois disso, considera se o
+`pop` ainda precisa dos retoques dos passos 9 e 15 ou se fica melhor no padrão
+clássico que descrevi (bombo em 1 e no "e" do 3, tarola firme em 2 e 4).
+
+**Verifica também os outros ids repostos nessa altura** (`rock_basic`,
+`blues_shuffle`, `waltz`) contra `c6436bc` — se algum deles também perdeu a
+grelha original no mesmo acidente, repõe-na. Não presumas; compara.
+
+*Nota minha*: na especificação descrevi a `slow_ballad` como "lenta e espaçada
+(ride, poucas notas)" a partir do que ela **era** originalmente, sem verificar
+o que é hoje. Tive sorte — a descrição estava certa quanto à intenção, mas eu
+devia ter confirmado o estado atual antes de escrever.
+
+---
+
 ## TRABALHO PEDIDO — Fases 52 e 53: dívidas antigas que afetam o utilizador
 - Pedido do utilizador depois de eu fazer o inventário das recomendações
   não-bloqueantes que ficaram por implementar. São as **duas com efeito
