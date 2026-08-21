@@ -24,6 +24,14 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 54 — Resolução de Dívida Técnica (3 itens) — CONCLUÍDA
+- Data: 2026-08-21T18:10:43+01:00
+- Commit: 8ab56e9
+- Resumo: Resolvidos os 3 itens de dívida técnica pedidos na Fase 54. (1) `gui/components/score_card.py` passa a importar `CategoryStats` diretamente de `core.user_manager`, alinhando a tipagem estática com os dados reais passados em runtime. (2) Adicionado o botão «⚡ Exercícios Técnicos» / «⚡ Technical Drills» (`nav_practice_technique`) à barra lateral em `gui/app.py` e `gui/i18n.py`. (3) Substituído o uso do caminho `:memory:` nos testes por `tempfile.NamedTemporaryFile` com limpeza em `tearDown`/`tearDownClass` em 5 ficheiros de teste (`test_compose_studio_chords.py`, `test_compose_studio_ui.py`, `test_practice_rhythm_screen.py`, `test_record_atomic_review_ui_integration.py`, `test_review_scheduler.py`), garantindo isolamento total sem criação de ficheiros residuais no disco.
+- Ficheiros principais alterados: gui/components/score_card.py, gui/app.py, gui/i18n.py, tests/test_compose_studio_chords.py, tests/test_compose_studio_ui.py, tests/test_practice_rhythm_screen.py, tests/test_record_atomic_review_ui_integration.py, tests/test_review_scheduler.py, README.md
+- Validação: 302/302 testes a passar. `pyflakes` 100% limpo (zero F821). Zero ficheiros residuais `:memory:` no disco.
+- Estado: **PRONTO PARA REVISÃO DO CLAUDE** — trabalho concluído; aguardo o APROVADO.
+
 ## Fase 53 — Dedilhação de Escalas no Piano (MD & ME) — CONCLUÍDA
 - Data: 2026-08-21T18:05:16+01:00
 - Commit: ef2ce6a (revisão e fecho: 0c6b852)
