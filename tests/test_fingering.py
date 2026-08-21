@@ -2,7 +2,8 @@
 import unittest
 from core.notes import Note
 from core.chords import Chord
-from core.fingering import get_chord_piano_fingering, RIGHT_HAND_TRIAD_FINGERINGS
+from core.fingering import get_chord_piano_fingering, get_scale_piano_fingering_description, RIGHT_HAND_TRIAD_FINGERINGS
+from core.scales import SCALE_TYPES
 
 
 class TestFingering(unittest.TestCase):
@@ -62,6 +63,57 @@ class TestFingering(unittest.TestCase):
 
         # Empty list test
         self.assertEqual(assign_piano_fingerings([]), [])
+
+
+class TestScaleFingeringDescription(unittest.TestCase):
+    """Tests for get_scale_piano_fingering_description (Fase 53)."""
+
+    def test_different_families_return_different_text(self):
+        from core.fingering import get_scale_piano_fingering_description
+        from core.scales import SCALE_TYPES
+
+        seven = get_scale_piano_fingering_description("major", "right")
+        five = get_scale_piano_fingering_description("major_pentatonic", "right")
+        twelve = get_scale_piano_fingering_description("chromatic", "right")
+        six = get_scale_piano_fingering_description("blues", "right")
+
+        self.assertNotEqual(seven, five)
+        self.assertNotEqual(seven, twelve)
+        self.assertNotEqual(five, twelve)
+        self.assertNotEqual(seven, six)
+
+    def test_all_scale_types_return_nonempty(self):
+        from core.fingering import get_scale_piano_fingering_description
+        from core.scales import SCALE_TYPES
+
+        for scale_key in SCALE_TYPES:
+            for hand in ("right", "left"):
+                result = get_scale_piano_fingering_description(scale_key, hand)
+                self.assertTrue(len(result) > 0, f"Empty result for {scale_key}/{hand}")
+
+    def test_hand_variants(self):
+        from core.fingering import get_scale_piano_fingering_description
+
+        right = get_scale_piano_fingering_description("major", "right")
+        direita = get_scale_piano_fingering_description("major", "direita")
+        self.assertEqual(right, direita)
+
+        left = get_scale_piano_fingering_description("major", "left")
+        esquerda = get_scale_piano_fingering_description("major", "esquerda")
+        self.assertEqual(left, esquerda)
+
+    def test_right_and_left_differ(self):
+        from core.fingering import get_scale_piano_fingering_description
+
+        right = get_scale_piano_fingering_description("major", "right")
+        left = get_scale_piano_fingering_description("major", "left")
+        self.assertNotEqual(right, left)
+
+    def test_unknown_scale_returns_generic(self):
+        from core.fingering import get_scale_piano_fingering_description
+
+        result = get_scale_piano_fingering_description("nonexistent_scale", "right")
+        self.assertIn("padrão genérico", result)
 
 
 if __name__ == "__main__":

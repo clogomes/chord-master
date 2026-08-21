@@ -432,11 +432,15 @@ class PracticeScalesScreen(ctk.CTkFrame):
 
         # Update description card
         def_obj = scale_obj.definition
+        fingering_md = get_scale_piano_fingering_description(self.current_scale_key, "right")
+        fingering_me = get_scale_piano_fingering_description(self.current_scale_key, "left")
         desc_text = (
             f"📖 **{scale_obj.name_pt}** ({def_obj.name_en})\n"
             f"• Fórmula de Graus: {def_obj.formula_degrees}\n"
             f"• Fórmula de Passos: {def_obj.formula_steps}\n"
-            f"• Carácter e Aplicação: {def_obj.description}"
+            f"• Carácter e Aplicação: {def_obj.description}\n"
+            f"• 🎹 Dedilhação MD: {fingering_md.split(': ', 1)[1]}\n"
+            f"• 🎹 Dedilhação ME: {fingering_me.split(': ', 1)[1]}"
         )
         self.scale_desc_lbl.configure(text=desc_text)
 

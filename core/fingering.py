@@ -76,11 +76,46 @@ def get_chord_piano_fingering(
 
 
 def get_scale_piano_fingering_description(scale_name: str, hand: str = "right") -> str:
-    """Returns a textual explanation of the thumb under/finger over pattern for standard scales."""
-    if hand == "right":
-        return "Mão Direita: 1-2-3-1-2-3-4-5 (o polegar passa por baixo do dedo 3)"
+    """Returns a textual fingering pattern for the given scale family and hand.
+
+    Accepts hand as 'right'/'direita' or 'left'/'esquerda'.
+    """
+    from .scales import SCALE_TYPES
+
+    is_right = hand in ("right", "direita")
+    hand_label = "Mão Direita" if is_right else "Mão Esquerda"
+
+    if scale_name not in SCALE_TYPES:
+        return f"{hand_label}: 1-2-3-1-2-3-4-5 (padrão genérico)"
+
+    intervals = SCALE_TYPES[scale_name].intervals
+    num_degrees = len(intervals) - 1
+
+    if num_degrees == 7:
+        if is_right:
+            return "Mão Direita: 1-2-3-1-2-3-4-5 (o polegar passa por baixo do dedo 3)"
+        else:
+            return "Mão Esquerda: 5-4-3-2-1-3-2-1 (o dedo 3 passa por cima do polegar)"
+    elif num_degrees == 5:
+        if is_right:
+            return "Mão Direita: 1-2-3-1-2 (o polegar passa por baixo do dedo 3)"
+        else:
+            return "Mão Esquerda: 5-4-3-2-1 (o dedo 3 passa por cima do polegar)"
+    elif num_degrees == 6:
+        if is_right:
+            return "Mão Direita: 1-2-3-1-2-3 (o polegar passa por baixo do dedo 3)"
+        else:
+            return "Mão Esquerda: 5-4-3-2-1-3 (o dedo 3 passa por cima do polegar)"
+    elif num_degrees == 12:
+        if is_right:
+            return "Mão Direita: 1-3-1-3-1-2-3-1-3-1-3-1-2 (polegar nas brancas, dedo 3 nas pretas)"
+        else:
+            return "Mão Esquerda: 5-3-5-3-5-4-3-5-3-5-3-5-4 (polegar nas brancas, dedo 3 nas pretas)"
     else:
-        return "Mão Esquerda: 5-4-3-2-1-3-2-1 (o dedo 3 passa por cima do polegar)"
+        if is_right:
+            return f"{hand_label}: 1-2-3-1-2-3-4-5 (dedilhação aproximada para {num_degrees} graus)"
+        else:
+            return f"{hand_label}: 5-4-3-2-1-3-2-1 (dedilhação aproximada para {num_degrees} graus)"
 
 
 def assign_piano_fingerings(notes: List[Note]) -> List[int]:
