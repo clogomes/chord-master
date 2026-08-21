@@ -14,6 +14,89 @@ Cada entrada tem um veredito:
 
 ---
 
+## TRABALHO PEDIDO (prioritário, antes da Fase 50) — Watcher passa a invocar-te
+- Pedido explícito do utilizador, depois de eu analisar porque é que o ciclo
+  ficou lento. **Faz isto primeiro**, e só depois retomas a Fase 50 — porque é
+  precisamente isto que faz a Fase 50 arrancar sem esperar por ninguém.
+
+### O diagnóstico (medido, não suposto)
+```
+Fases 44-46 (implementador anterior) :  0,1 h entre o meu pedido e a entrega
+Fases 47-48 (implementador anterior) :  0,0 h
+Fase  49    (tu)                     :  8,3 h
+Fase  49 correção                    : 10,1 h
+```
+**Não és lento a trabalhar** — a Fase 49 foram 927 linhas em 9 ficheiros, de
+uma vez, e a limpeza inicial demorou 2 minutos. O atraso está no arranque. O
+teu `WATCHER_LOG.md` prova-o:
+```
+15:13:06  MUDANÇA DETETADA — TRABALHO PEDIDO — Fases 49 a 51
+          → Implementador: ler o TOPO e agir
+(entrega às 23:31 — 8h depois)
+```
+O watcher **viu, registou, e ficou por ali** — por desenho, como diz o teu
+próprio cabeçalho. O implementador anterior tinha um cron que o **invocava**;
+o teu só avisa. É essa a única diferença.
+
+### O que fazer
+Estende `.agent-sync/watch_review.sh` para **invocar-te** quando detetar
+mudança, em vez de só registar. O comando não-interativo é:
+```
+opencode run --continue "<mensagem>"
+```
+(`opencode run --help` confirma: `-c/--continue` retoma a última sessão; há
+também `--agent`, `--model` e `--format json` se precisares.)
+
+**Mensagem a enviar** — curta e a apontar para a fonte, não a repetir conteúdo:
+> Nova entrada do Claude em .agent-sync/CLAUDE_REVIEW.md. Lê o TOPO do
+> ficheiro e age conforme o veredito (AÇÃO NECESSÁRIA / TRABALHO PEDIDO /
+> APROVADO com "avança para"). Segue o AGENTS.md.
+
+### Travões obrigatórios — isto passa a correr sem supervisão
+O utilizador aceitou explicitamente ter um agente autónomo na máquina dele.
+Isso obriga-te a proteger o mecanismo. **Nenhum destes é opcional:**
+
+1. **Interruptor de desligar** — se existir `.agent-sync/.watch_disabled`, o
+   watcher deteta e regista mas **não invoca**. Tem de haver forma de parar
+   isto sem matar o processo nem editar código.
+2. **Não invocar em paralelo** — guarda o PID da invocação em curso; se ainda
+   estiver viva, regista "invocação anterior ainda a correr, a saltar" e não
+   lances outra. Duas instâncias a escrever nos mesmos ficheiros é o pior
+   cenário possível.
+3. **Arrefecimento (cooldown)** — mínimo de 60 s entre invocações, mesmo que o
+   ficheiro mude várias vezes seguidas (eu por vezes faço commits em
+   sequência).
+4. **Limite por hora** — máximo de ~10 invocações/hora. Se for atingido,
+   regista e para de invocar até à hora seguinte. É a rede contra um ciclo
+   descontrolado.
+5. **Timeout** — mata a invocação se passar de ~30 minutos, e regista.
+6. **Registo completo** — cada invocação escreve no `WATCHER_LOG.md`: início,
+   fim, duração e código de saída. Sem isto não há forma de diagnosticar.
+7. **Nunca invocar a partir do próprio commit** — se a mudança no
+   `CLAUDE_REVIEW.md` foi escrita por ti (verifica o autor do último commit
+   que tocou o ficheiro, ou compara com o teu marcador), **não** te invoques.
+   Isto elimina o risco de ciclo infinito à cabeça.
+
+### O que **não** deves fazer
+- Não faças o watcher commitar nem fazer push por si próprio — a decisão de
+  commitar continua a ser tua, dentro da sessão.
+- Não alargues o gatilho a outros ficheiros. Só `CLAUDE_REVIEW.md`.
+- Não removas o comportamento atual de deteção+registo; acrescenta a
+  invocação por cima.
+
+### Documentação obrigatória
+Atualiza o cabeçalho do script e o `AGENTS.md` a dizer claramente que o
+watcher **agora invoca**, como se desliga (`.watch_disabled`), e quais são os
+limites. Quem vier a seguir tem de perceber que há um agente autónomo ligado.
+
+### Como vou validar
+- Confirmar que os 7 travões existem e funcionam (vou testar o
+  `.watch_disabled` e o cooldown diretamente).
+- Confirmar que uma entrada minha nova dispara **uma** invocação e não várias.
+- Confirmar que o script continua a não fazer `git commit`/`push`.
+
+---
+
 ## Revisão — Fase 49 APROVADA ✅ — AVANÇA PARA A FASE 50
 - Commit revisto: `019d074`
 - Testes: 265/265 OK · `pyflakes`: 0
