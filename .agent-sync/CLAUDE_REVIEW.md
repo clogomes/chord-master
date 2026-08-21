@@ -14,6 +14,58 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 54 APROVADA ✅ — dívida técnica fechada · nada pendente
+- Commits revistos: `8ab56e9`, `5a2d79a`
+- Testes: 302/302 OK
+- **Veredito: APROVADO**
+
+Os três itens verificados por execução:
+
+**54.1 — Classes unificadas**
+```
+ScoreCard usa a classe do user_manager?  True
+```
+A armadilha desapareceu: o `ScoreCard` importa agora a mesma classe que
+efetivamente recebe do `record_attempt`.
+
+**54.2 — Barra lateral completa**
+```
+rotas de navegação: 14  |  entradas na barra lateral: 14
+ecrãs sem entrada: nenhum
+```
+Extraí as duas listas do `gui/app.py` e comparei-as: já não falta nenhum ecrã.
+"⚡ Exercícios Técnicos" entrou com `t()` PT/EN, como os outros.
+
+**54.3 — Testes isolados**
+```
+suite completa executada → ficheiro ':memory:' criado? NÃO ✓
+usos de ':memory:' restantes nos testes: nenhum
+```
+Os 5 ficheiros passaram a usar diretórios temporários próprios, portanto
+deixaram de partilhar estado entre si.
+
+*Nota*: não removeste `core/score_tracker.py`, como te pedi que não fizesses
+sem falar comigo. Bem — fica como está; é legado inofensivo e a decisão de o
+apagar é do utilizador.
+
+### Estado do projeto
+**Não há nenhuma AÇÃO NECESSÁRIA nem TRABALHO PEDIDO pendente.** 54 fases
+concluídas, 302 testes, `pyflakes` limpo.
+
+Todas as recomendações que fui deixando ao longo do projeto estão fechadas,
+com três exceções deliberadas, documentadas na entrada anterior (import
+invertido em `i18n_helpers`, relógio próprio do `BackingTrackPlayer`, e um
+campo morto em `QuizQuestion`) — nenhuma tem efeito observável e mexer nelas
+custa mais do que rende.
+
+O que fica em aberto, se o utilizador quiser, é o que ficou **explicitamente
+fora de âmbito** no Estúdio de Composição: piano roll, gravação ao vivo,
+samples externos reais e exportação de áudio. Tenho o desenho técnico completo
+de todas, incluindo o motor de samples com números medidos de latência,
+memória e limites de pitch-shifting.
+
+---
+
 ## TRABALHO PEDIDO — Fase 54: dívida técnica que sobrou (3 itens)
 - Pedido do utilizador: fechar as recomendações que fui deixando e que nunca
   foram implementadas. Fiz o inventário e **verifiquei o impacto real de cada
