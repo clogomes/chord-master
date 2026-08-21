@@ -14,6 +14,86 @@ Cada entrada tem um veredito:
 
 ---
 
+## APROVADO — Fase 58: repetir compassos em ciclo (commit `4b919b0`)
+
+**Veredito: APROVADO. Falta só a Fase 59 (samples reais).**
+
+Suite **313/313** (3 skips), `pyflakes` sem nomes indefinidos, app arranca.
+Cumpriste os 6 pontos da especificação.
+
+### Ciclo verificado a tocar, não só no código
+
+Pus a aplicação a correr com o `mainloop` real, um compasso em ciclo a 120 BPM
+(2.0 s), e observei ao longo de 5,5 s:
+
+| momento | ainda a tocar | botão |
+|---|---|---|
+| 2.5 s | sim | ⏹ Parar Reprodução |
+| 5.5 s | sim | ⏹ Parar Reprodução |
+| após `stop()` | canal limpo, `is_playing=False` | — |
+
+O som tem exactamente **2.0 s** — a cauda não foi anexada — e continua a tocar
+depois de quase três voltas. **O botão não se repõe sozinho**, que era a falha
+concreta contra a qual avisei: sem o `if not is_loop` à volta do
+`after(duration_ms, ...)`, ao fim de 2 s a interface diria que a reprodução tinha
+acabado enquanto o som continuava.
+
+### Região renderizada com precisão exacta
+
+- `render(comp, start_bar=3, end_bar=4)` → **4.000 s**, exactamente 2 compassos a
+  120 BPM. Sem cauda pendurada.
+- Correlação de **1.0000** com a fatia correspondente do render completo: a
+  região é mesmo a região certa, não está desfasada de um compasso.
+- Limites bem tratados: `(0,3)` → 6.00 s, `(1,99)` → 16.00 s, `(4,2)` → 2.00 s.
+  Nenhum rebenta; o `e_bar = max(s_bar, ...)` resolve a gama invertida.
+- Interface: menus `disabled` até o tick ser ligado, opções acompanham o número
+  de compassos, e ao reduzir de 8 para 4 compassos uma seleção de 7-8 encolhe
+  sozinha para 1-4. Pôr fim < início corrige para fim = início.
+
+### A dobragem da cauda funciona — e uma nota sobre como a validei
+
+Ao primeiro teste a diferença entre a região e a fatia crua deu **0.000000** e
+pareceu que a dobragem não estava a acontecer. Estava certo: o acorde do teste
+acabava exactamente na fronteira do compasso, portanto não havia cauda nenhuma
+para dobrar. Com um acorde que **começa** no beat 6 e se estende para lá da
+região, o início passa a ter som (pico 0.339 antes do beat 6, onde sem dobragem
+haveria silêncio). Com viola (Karplus-Strong, cauda mais longa) o efeito também
+aparece. **A dobragem está correcta**; a ordem também — o `tanh` é aplicado
+*depois* da soma, por isso a sobreposição não pode passar de 1.0.
+
+### Sem regressão
+
+A exportação WAV continua a exportar a **composição inteira** (11.00 s para 4
+compassos + cauda), não a região do ciclo — como especifiquei. `render()` sem
+argumentos mantém o comportamento anterior.
+
+### Reparo de desempenho (não bloqueia, mas vale a pena)
+
+A dobragem usa um ciclo Python sobre 132 300 amostras, duas vezes:
+
+```python
+for i in range(len(tail_left)):
+    mix_left[i % core_samples] += tail_left[i]
+```
+
+Custa ~12 ms por canal — é o que explica o render de região demorar **26 ms a
+quente** contra 3 ms do render completo. Medi a alternativa vectorizada:
+
+```python
+n = len(tail_left); pad = (-n) % core_samples
+t = np.concatenate([tail_left, np.zeros(pad, dtype=tail_left.dtype)])
+mix_left += t.reshape(-1, core_samples).sum(axis=0)
+```
+
+**0.1 ms em vez de 11.9 ms — 89× mais rápido, e o resultado é bit a bit igual**
+(diferença máxima 0.00e+00). Não bloqueia porque isto acontece uma vez, numa
+thread, antes de a reprodução começar; mas num ficheiro que é todo numpy o ciclo
+Python destoa. Aproveita quando passares por lá.
+
+**Nada a corrigir. A Fase 59 (samples reais) é a última da série.**
+
+---
+
 ## APROVADO — Fase 57: escalas com viola — som e nota destacada (commit `3e3b98c`)
 
 **Veredito: APROVADO. Segue para a Fase 58 (loop de compassos).**
@@ -127,7 +207,7 @@ distinta acompanha `guitar_coords[idx]` e que há **uma e uma só**.
 
 ---
 
-## ▶ PRÓXIMA — TRABALHO PEDIDO — Fase 58: repetir compassos em ciclo (loop)
+## TRABALHO PEDIDO (CONCLUÍDA) — Fase 58: repetir compassos em ciclo (loop)
 
 Pedido do utilizador: *"No estúdio de composição adiciona um tick para colocar
 em loop infinito os compassos selecionados."* Ele já escolheu a interface —
@@ -350,7 +430,7 @@ uma melodia**. É a maior lacuna do estúdio.
    Mede `navigate_to("compose_studio")` antes e depois; hoje está em ~98 ms e
    não deve passar dos ~200 ms.
 
-### FASE 59 — Samples reais (bibliotecas externas)
+### ▶ PRÓXIMA — FASE 59 — Samples reais (bibliotecas externas)
 > **Renumerada de 57 para 59** em 2026-08-21: o utilizador pediu entretanto
 > o loop de compassos (Fase 58) e a correção do som de viola nas escalas
 > (Fase 57), ambas mais pequenas e mais urgentes. O conteúdo desta fase
