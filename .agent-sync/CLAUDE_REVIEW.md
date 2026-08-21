@@ -14,6 +14,92 @@ Cada entrada tem um veredito:
 
 ---
 
+## TRABALHO PEDIDO — Fases 52 e 53: dívidas antigas que afetam o utilizador
+- Pedido do utilizador depois de eu fazer o inventário das recomendações
+  não-bloqueantes que ficaram por implementar. São as **duas com efeito
+  visível/audível**; as restantes (import invertido em `i18n_helpers`, relógio
+  do `BackingTrackPlayer`, `":memory:"` nos testes) são higiene interna e
+  ficam para quando alguém lhes mexer por outra razão.
+- **Uma fase de cada vez**, com o meu APROVADO entre elas.
+
+### FASE 52 — 4 dos 12 ritmos são duplicados exatos
+Verificado por comparação das grelhas:
+```
+Rock Básico (4/4)   ==  Rock (4/4)            rock_basic / rock
+Balada Lenta (4/4)  ==  Pop (4/4)             slow_ballad / pop
+Blues Shuffle (4/4) ==  Jazz Swing (4/4)      blues_shuffle / jazz_swing
+Valsa (3/4)         ==  Valsa 3/4             waltz / waltz_34
+
+menu oferece: 12   distintos de facto: 8
+```
+**Como isto aconteceu**: na Fase 23 o implementador anterior renomeou padrões;
+eu exigi a reposição dos originais e ficaram os dois nomes a apontar para a
+mesma grelha. Culpa partilhada — a minha instrução resolveu a regressão mas
+criou esta.
+
+**O que o utilizador vê**: escolhe "Jazz Swing" à espera de outra levada e
+ouve exatamente o Blues Shuffle. O menu promete 12 e entrega 8.
+
+**Corrigir** — **não apagues nenhum**; a regra é não remover funcionalidade.
+Torna-os genuinamente diferentes, que é o que os nomes prometem:
+- **`rock` vs `rock_basic`** — o básico fica como está (bombo nos tempos 1 e 3,
+  tarola em 2 e 4). O `rock` deve ser mais denso: colcheias contínuas no
+  hi-hat, bombo sincopado antes do tempo 3, e um remate no fim do compasso.
+- **`pop` vs `slow_ballad`** — a balada é lenta e espaçada (ride, poucas
+  notas). O pop precisa de hi-hat em colcheias regulares, bombo em 1 e no "e"
+  do 3, tarola firme em 2 e 4. É a levada mais reconhecível da rádio.
+- **`jazz_swing` vs `blues_shuffle`** — ambos em 12 passos (tercinas), mas o
+  jazz vive do **ride** com o padrão característico (tempo · tempo-a · tempo)
+  e do hi-hat com pedal em 2 e 4; o shuffle é mais pesado no bombo e tarola.
+  Usa os sons novos da Fase 46 (`rimshot`, `ride`) para os distinguir.
+- **`waltz_34` vs `waltz`** — a valsa clássica é *bombo-tarola-tarola*. Faz do
+  `waltz_34` uma variante com hi-hat aberto no 3º tempo, ou uma valsa jazz com
+  ride. Se não encontrares diferença musical honesta, **funde os dois**
+  mantendo os dois ids a apontar para a mesma entrada (alias explícito e
+  documentado), em vez de fingir que são padrões distintos.
+
+**Teste obrigatório**: percorre `BACKING_TRACK_LIBRARY` e afirma que **não há
+duas grelhas iguais** — é o teste que impede isto de voltar.
+
+### FASE 53 — Dedilhação de escalas: função morta e errada
+`core/fingering.py:78` — `get_scale_piano_fingering_description(scale_name, hand)`
+**ignora o `scale_name`** e devolve sempre a dedilhação de dó maior:
+```
+major → "1-2-3-1-2-3-4-5"
+blues → "1-2-3-1-2-3-4-5"   ← a mesma, e está errada para blues
+```
+**Correção a uma afirmação minha**: eu disse ao utilizador que isto afetava
+quem pratica escalas. **Não afeta** — verifiquei e a função está apenas
+importada em `gui/screens/practice_scales.py:8` e **nunca é chamada**. É código
+morto que por acaso também está errado. Menos urgente do que eu indiquei.
+
+**Corrigir** — vale a pena ligá-la em vez de a apagar, porque a dedilhação
+correta é informação que um aluno de piano precisa e que a app já mostra para
+músicas mas não para escalas:
+1. Dá-lhe dedilhações reais por família de escala. Não inventes: usa as
+   convencionais.
+   - **Maior / menor natural / modos** (7 notas): MD `1-2-3-1-2-3-4-5`,
+     ME `5-4-3-2-1-3-2-1` — o que já lá está, mas só para estas.
+   - **Pentatónicas** (5 notas): MD `1-2-3-1-2` (com passagem do polegar
+     diferente, por serem 5 graus).
+   - **Blues** (6 notas com a blue note): MD `1-2-3-1-2-3`.
+   - **Cromática** (12 notas): MD `1-3-1-3-1-2-3-1-3-1-3-1-2` — a regra é
+     polegar nas brancas, dedo 3 nas pretas.
+   - **Tons inteiros** (6 notas): MD `1-2-3-1-2-3`.
+   - Escalas exóticas (húngara menor, bebop, frígia dominante): usa a regra
+     dos 7 graus como aproximação e **di-lo no texto** ("dedilhação
+     aproximada"), em vez de fingir precisão que não tens.
+2. **Liga-a** ao ecrã: mostra a dedilhação da escala selecionada em
+   `practice_scales.py`, junto à fórmula que já aparece. É onde faz falta.
+3. Se o `hand` for `"left"`/`"esquerda"`, aceita ambas as grafias — hoje o
+   parâmetro é `"right"` mas o resto do projeto usa português.
+
+**Teste**: afirma que escalas de famílias diferentes devolvem textos
+**diferentes** (é literalmente o bug), e que todas as 16+ entradas de
+`SCALE_TYPES` devolvem algo não-vazio.
+
+---
+
 ## Revisão — Log do Watcher CORRIGIDO ✅ — SÉRIE 49-51 FECHADA · nada pendente
 - Commits revistos: `651927c`, `d476365`
 - Testes: 265/265 OK
