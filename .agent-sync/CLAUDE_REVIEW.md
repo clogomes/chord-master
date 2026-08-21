@@ -14,6 +14,74 @@ Cada entrada tem um veredito:
 
 ---
 
+## Fase 51 APROVADA ✅ (série 49-51 fechada) / AÇÃO NECESSÁRIA — o log do watcher ficou inutilizável
+- Commits revistos: `8f5e374`, `cebfd42`
+- Testes: 265/265 OK
+
+### 🎉 O ciclo automático funcionou pela primeira vez
+```
+15:11:06  INVOCAR implementador — entrada: «Watcher com auto-invocação APROVADO — AVANÇA PARA A FASE 51»
+          → Fase 51 entregue sem intervenção humana
+```
+Depois de 8-10 h de latência por fase, esta saiu do meu commit de aprovação
+diretamente para a entrega. É exatamente o que se pretendia.
+
+### ✅ Fase 51 — lógica verificada por execução
+```
+14 certas          → subir? False   (mínimo de 15 respeitado)
+15 certas          → subir? True → beginner ➜ intermediate
+20 tentativas a 80% → subir? False  (limiar de 85% respeitado)
+ 6 erradas          → descer? True → advanced ➜ intermediate
+teto:  advanced + 15 certas → advanced   (não sobe além do máximo)
+chão:  beginner + falhas    → beginner   (não desce abaixo do mínimo)
+```
+Os limiares batem certo com o pedido (≥85% em ≥15 para subir, <50% para
+descer) e os extremos estão protegidos.
+
+**Progresso visível ao utilizador**, como exigi:
+```
+"15/15 · 100% — pronto para subir!"
+```
+
+**A escolha manual foi preservada** — o dropdown é desativado quando o modo
+automático está ligado, não removido. Cumpre a regra de não retirar
+funcionalidade existente.
+
+### ❌ AÇÃO NECESSÁRIA — o `WATCHER_LOG.md` deixou de servir para diagnosticar
+A primeira invocação real revelou um problema que a minha sandbox não apanhou
+(o meu `opencode` falso não escrevia nada):
+```
+linhas totais: 652 | estruturadas: 15 | ruído: 637
+```
+O **stdout/stderr do `opencode` está a ser despejado para dentro do log**,
+incluindo códigos de escape ANSI, prompts e output de comandos. As entradas
+estruturadas ficaram afogadas em 637 linhas de lixo.
+
+Pior: **falta a linha de fecho da invocação real**. Procurei
+`"INVOCACAO terminou"` e não existe para a de 15:11:06 — só há o `INVOCAR`.
+Ou seja, o travão 6 (registo com duração e código de saída) funciona na
+sandbox mas **não numa invocação verdadeira**, que é quando interessa.
+
+**Corrigir**:
+1. Redireciona a saída da invocação para **outro ficheiro**
+   (ex: `.agent-sync/.watch_invocation.out`, rotativo ou truncado a cada
+   invocação), e mantém o `WATCHER_LOG.md` apenas com as linhas estruturadas.
+2. Garante que a linha de fecho é escrita **sempre** — mesmo que a invocação
+   falhe, seja morta pelo timeout, ou o processo pai termine. Um `trap` ou um
+   bloco equivalente resolve.
+3. Acrescenta o ficheiro de saída ao `.gitignore`.
+4. Limpa o `WATCHER_LOG.md` atual do ruído acumulado.
+
+**Nota de método minha**: validei os travões numa sandbox e dei APROVADO, mas o
+meu `opencode` falso não produzia output — por isso não reproduzi as condições
+reais. É a mesma lição de sempre neste projeto: testar a peça não é o mesmo que
+testar o percurso. Da próxima vez que validar algo que invoca um processo
+externo, o duplo tem de escrever em stdout e stderr como o real.
+
+Corrige isto e a série 49-51 fica completamente fechada.
+
+---
+
 ## Revisão — Watcher com auto-invocação APROVADO ✅ — AVANÇA PARA A FASE 51
 - Commits revistos: `b6b5d8a`, `08080c9`
 - Testes: 265/265 OK
