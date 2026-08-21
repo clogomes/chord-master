@@ -260,23 +260,45 @@ class GuitarFretboard(ctk.CTkFrame):
             color = data.get("color", "#38BDF8")
             label = data.get("label", "")
             is_root = data.get("is_root", False)
+            is_active = data.get("is_active", False)
 
             # Note circle bubble
-            r = 10.5
-            self.canvas.create_oval(
-                cx - r, cy - r, cx + r, cy + r,
-                fill=color,
-                outline="#FFFFFF" if is_root else "#0F172A",
-                width=1.5 if is_root else 1,
-            )
-
-            # Label inside circle
-            self.canvas.create_text(
-                cx, cy,
-                text=label,
-                font=("Helvetica", 9, "bold"),
-                fill="#FFFFFF" if color in ["#10B981", "#2563EB", "#7C3AED", "#EF4444"] else "#0F172A",
-            )
+            if is_active:
+                # Distinctive active note styling: Outer glowing ring + enlarged bubble + thick white border
+                r_outer = 15.0
+                self.canvas.create_oval(
+                    cx - r_outer, cy - r_outer, cx + r_outer, cy + r_outer,
+                    fill="",
+                    outline="#38BDF8",
+                    width=2,
+                )
+                r = 12.5
+                self.canvas.create_oval(
+                    cx - r, cy - r, cx + r, cy + r,
+                    fill=color,
+                    outline="#FFFFFF",
+                    width=3,
+                )
+                self.canvas.create_text(
+                    cx, cy,
+                    text=label,
+                    font=("Helvetica", 10, "bold"),
+                    fill="#FFFFFF",
+                )
+            else:
+                r = 10.5
+                self.canvas.create_oval(
+                    cx - r, cy - r, cx + r, cy + r,
+                    fill=color,
+                    outline="#FFFFFF" if is_root else "#0F172A",
+                    width=1.5 if is_root else 1,
+                )
+                self.canvas.create_text(
+                    cx, cy,
+                    text=label,
+                    font=("Helvetica", 9, "bold"),
+                    fill="#FFFFFF" if color in ["#10B981", "#2563EB", "#7C3AED", "#EF4444"] else "#0F172A",
+                )
 
         # 8. Draw Hover Cursor
         if self._hovered_cell and self._hovered_cell not in self.highlighted_positions:

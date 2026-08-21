@@ -746,3 +746,12 @@ Implementação nativa de um sistema de i18n em duas vertentes:
   - A seleção de notas no Piano Roll destaca simultaneamente a nota no `PianoKeyboard`, no `GuitarFretboard` e espelha a partitura no `StaffCanvas`.
 - **Suite de Testes Unitários e Integração (`tests/test_piano_roll_and_melodic_notes.py`)**:
   - Validação da serialização, carregamento regressivo, renderização de melodia e interações do Piano Roll. Total de **308/308 testes a passar**.
+
+### Fase 57 — Prática de Escalas e Repertório: Timbre de Viola & Distinção Visual da Nota Ativa
+- **Timbre Acústico de Viola em Escalas e Repertório (`gui/screens/practice_scales.py`, `gui/screens/practice_song.py`)**:
+  - Encaminhamento do parâmetro `instrument="guitar"` para `AudioPlayer.play_note()` tanto na reprodução do utilizador como no modo de demonstração quando o modo Viola é selecionado.
+  - Sincronização automática do seletor de timbre com o modo de instrumento em `PracticeSongScreen`.
+- **Distinção Visual da Nota Ativa no Braço da Viola (`gui/components/guitar_fretboard.py`, `gui/screens/practice_scales.py`)**:
+  - Implementação de renderização dedicada para notas ativas (`is_active=True`) no braço: anel externo brilhante, bolha de nota ampliada (raio 12.5px vs 10.5px) e contorno branco grosso (3px), permitindo distinguir univocamente a nota em execução mesmo quando partilha a cor verde das tónicas da escala.
+- **Suite de Testes (`tests/test_practice_scales_viola_active_note.py`)**:
+  - Validação do disparo de áudio de viola e unicidade do marcador ativo no braço. Total de **310/310 testes a passar**.

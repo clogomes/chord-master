@@ -780,10 +780,16 @@ class PracticeSongScreen(ctk.CTkFrame):
         from gui.i18n import t
         if mode == t("lbl_piano_only", "🎹 Piano"):
             self.instrument_mode = "piano"
+            self.selected_instrument = "piano"
+            if hasattr(self, "timbre_select"):
+                self.timbre_select.set("🎹 Piano")
             self.piano_view.pack(pady=4)
             self.guitar_view.pack_forget()
         elif mode == t("lbl_guitar_only", "🎸 Viola"):
             self.instrument_mode = "guitar"
+            self.selected_instrument = "guitar"
+            if hasattr(self, "timbre_select"):
+                self.timbre_select.set("🎸 Viola")
             self.piano_view.pack_forget()
             self.guitar_view.pack(pady=4)
         else:

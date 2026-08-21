@@ -488,6 +488,7 @@ class PracticeScalesScreen(ctk.CTkFrame):
             "color": theme.COLOR_SUCCESS,
             "label": active_note.pitch,
             "is_root": (active_note.pitch == self.current_root),
+            "is_active": True,
             "note": active_note,
         }
         self.guitar_view.redraw()
@@ -609,7 +610,8 @@ class PracticeScalesScreen(ctk.CTkFrame):
             self._expected_note_timestamp = time.time() + (60.0 / self.metronome.bpm)
 
         target_note = self.scale_notes[self.current_note_idx]
-        self.audio_player.play_note(target_note, duration=0.45)
+        inst = "guitar" if self.instrument_mode == "guitar" else "piano"
+        self.audio_player.play_note(target_note, duration=0.45, instrument=inst)
 
         if self.current_note_idx < len(self.scale_notes) - 1:
             self.current_note_idx += 1
@@ -718,7 +720,8 @@ class PracticeScalesScreen(ctk.CTkFrame):
         note_dur_sec = 60.0 / bpm
 
         self._highlight_active_note()
-        self.audio_player.play_note(note, duration=note_dur_sec * 0.85)
+        inst = "guitar" if self.instrument_mode == "guitar" else "piano"
+        self.audio_player.play_note(note, duration=note_dur_sec * 0.85, instrument=inst)
 
         self.current_note_idx += 1
         delay_ms = int(note_dur_sec * 1000)
