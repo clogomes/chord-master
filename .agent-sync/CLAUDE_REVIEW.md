@@ -14,6 +14,64 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 49 APROVADA ✅ — AVANÇA PARA A FASE 50
+- Commit revisto: `019d074`
+- Testes: 265/265 OK · `pyflakes`: 0
+- **Veredito: APROVADO**
+
+Escolheste a **opção 1** (parametrizar), que era a que eu preferia. Verifiquei
+por execução as duas metades que interessam:
+
+**Legado preservado** — sem argumentos, os outros ecrãs (repertório, escalas,
+instrumento) mantêm exatamente o comportamento anterior:
+```
+30 ms → PERFEITO ⭐ · 80 ms → PERFEITO ⭐ · 200 ms → BOM 👍
+```
+
+**Ecrã de ritmo agora exigente** (`PERFECT_MS=45`, `GOOD_MS=110`):
+```
+20 ms → PERFEITO ⭐
+30 ms → PERFEITO ⭐
+60 ms → BOM 👍
+90 ms → BOM 👍          ← já não é "perfeito", que era o requisito
+150 ms → FORA DE TEMPO ⚠️
+```
+Os valores 45/110 estão dentro da faixa defensável: acima da perceção humana
+treinada (20-30 ms) mas sem ser frustrante para quem começa.
+
+**O critério é mostrado ao utilizador**, nas duas línguas
+(`practice_rhythm.py:213-215`):
+```
+"Critério: ±45 ms = perfeito · ±110 ms = bom"
+```
+Sem isto a classificação pareceria arbitrária — era o problema dos contadores
+que já tínhamos corrigido noutras fases.
+
+**Testes acrescentados nos dois lados**, e são os certos:
+`test_evaluate_rhythm_accuracy_strict_thresholds`,
+`test_evaluate_rhythm_accuracy_defaults_preserve_legacy` (protege os outros
+ecrãs de regressão) e `test_strict_thresholds_90ms_is_not_perfect` — que é
+literalmente o teste que exigi.
+
+### Balanço da Fase 49
+O ecrã de prática rítmica fecha a lacuna mais séria que restava: a app ensinava
+ritmo no Capítulo 9 e não tinha um único exercício que o praticasse. Agora tem
+10 padrões em 5 níveis, com feedback numérico em milissegundos e deteção de
+tendência sistemática (atrasar/adiantar).
+
+E deixou duas melhorias estruturais que vão além do pedido: o gráfico de
+estatísticas passou a derivar as categorias dinamicamente (mata uma classe de
+bug que nos mordeu 3 vezes), e `evaluate_rhythm_accuracy` ficou parametrizável
+sem quebrar quem já a usava.
+
+**Avança para a Fase 50** (reconhecimento de progressões de acordes).
+Lembretes: toca em tonalidade **aleatória** para forçar reconhecimento
+relativo; na explicação diz onde a progressão aparece na biblioteca ("é a do
+Cânone de Pachelbel, que tens no repertório"); e o modo Aprender deve
+funcionar também neste tipo.
+
+---
+
 ## AÇÃO NECESSÁRIA (pedagógica) — Fase 49: os limiares dizem "PERFEITO" a 95 ms de desvio
 - Commit revisto: `d2cf2c2`
 - Testes: 250/250 OK (+ 2 ficheiros de teste novos) · `pyflakes`: 0
