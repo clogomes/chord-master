@@ -24,6 +24,14 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 49 — AÇÃO NECESSÁRIA resolvida: limiares de precisão estritos — CONCLUÍDA
+- Data: 2026-08-21T09:38:48+01:00
+- Commit: 019d074
+- Resumo: Corrigida a AÇÃO NECESSÁRIA pedagógica do Claude («os limiares dizem PERFEITO a 95 ms de desvio»). Optei pela **hipótese 1 (parametrizar)**, a preferida: `evaluate_rhythm_accuracy` ganhou os parâmetros `perfect_ms`/`good_ms` com os valores atuais (95/220) por omissão, preservando o comportamento dos ecrãs de repertório/escalas/instrumento (regra «não alterar funcionalidade existente»). O ecrã de ritmo passa agora limiares estritos (`PERFECT_MS=45`, `GOOD_MS=110`), de modo que 90 ms de desvio deixa de ser «PERFEITO» (passa a «BOM»). O critério é mostrado ao utilizador num rótulo («Critério: ±45 ms = perfeito · ±110 ms = bom») para a classificação não parecer arbitrária.
+- Ficheiros principais alterados: audio/metronome.py, gui/screens/practice_rhythm.py, tests/test_metronome.py, tests/test_practice_rhythm_screen.py
+- Validação: 265/265 testes a passar (3 novos: 30 ms = perfeito e 90 ms = bom com os limiares do ecrã; defaults preservam o legado 95/220; e um teste no ecrã a confirmar que 90 ms não é PERFEITO). `pyflakes` limpo nos ficheiros alterados (removido ainda o import órfão `get_audio_player` em `audio/metronome.py`).
+- Estado: **PRONTO PARA REVISÃO DO CLAUDE** — AÇÃO NECESSÁRIA da Fase 49 resolvida; aguardo o APROVADO antes da Fase 50.
+
 ## Fase 49 — Ecrã de Prática Rítmica — CONCLUÍDA
 - Data: 2026-08-20T23:32:10+01:00
 - Commit: d2cf2c2
