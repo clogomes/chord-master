@@ -2,16 +2,114 @@
 import random
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List, Optional, Tuple
+from typing import List, Optional
 from .notes import Note, NOTE_NAMES, NOTE_NAMES_PT
-from .intervals import INTERVALS, Interval, get_interval
+from .intervals import INTERVALS
 from .scales import SCALE_TYPES, Scale
 from .chords import CHORD_TYPES, Chord
+
+
+# ── Reconhecimento de progressões de acordes (Fase 50) ────────────────────────
+# Desvios em semitons dos graus 1-7 das escalas maior e menor natural.
+_MAJOR_SCALE_OFFSETS = [0, 2, 4, 5, 7, 9, 11]
+_MINOR_SCALE_OFFSETS = [0, 2, 3, 5, 7, 8, 10]
+
+# Cada progressão: (grau da escala, qualidade do acorde). O grau dá a raiz
+# (na escala maior ou menor natural da tonalidade); a qualidade dá a tríade.
+# "ref_pt"/"ref_en" indicam onde a progressão aparece na biblioteca (repertório).
+_PROGRESSIONS = {
+    "beginner": [
+        {
+            "label": "I – V – vi – IV",
+            "mode": "major",
+            "chords": [(1, "major"), (5, "major"), (6, "minor"), (4, "major")],
+            "ref_pt": "é a progressão do Cânone em Ré Maior de Pachelbel, que tens no repertório",
+            "ref_en": "is the progression of Pachelbel's Canon in D, which is in your repertoire",
+        },
+        {
+            "label": "I – vi – IV – V",
+            "mode": "major",
+            "chords": [(1, "major"), (6, "minor"), (4, "major"), (5, "major")],
+            "ref_pt": "é a progressão doo-wop dos anos 50, a base de inúmeros clássicos de pop",
+            "ref_en": "is the 1950s doo-wop progression, the backbone of countless pop classics",
+        },
+        {
+            "label": "I – IV – V – I",
+            "mode": "major",
+            "chords": [(1, "major"), (4, "major"), (5, "major"), (1, "major")],
+            "ref_pt": "é a cadência clássica que ouves no Hino à Alegria, que tens no repertório",
+            "ref_en": "is the classic cadence you hear in Ode to Joy, which is in your repertoire",
+        },
+    ],
+    "intermediate": [
+        {
+            "label": "ii – V – I",
+            "mode": "major",
+            "chords": [(2, "minor"), (5, "major"), (1, "major")],
+            "ref_pt": "é a progressão ii-V-I, o motor harmónico do jazz e do pop",
+            "ref_en": "is the ii-V-I progression, the harmonic engine of jazz and pop",
+        },
+        {
+            "label": "I – vi – ii – V",
+            "mode": "major",
+            "chords": [(1, "major"), (6, "minor"), (2, "minor"), (5, "major")],
+            "ref_pt": "é a progressão do jazz modal, a base de 'Take Five' e 'So What'",
+            "ref_en": "is the modal jazz progression, the basis of 'Take Five' and 'So What'",
+        },
+        {
+            "label": "i – ♭VII – ♭VI – V",
+            "mode": "minor",
+            "chords": [(1, "minor"), (7, "major"), (6, "major"), (5, "major")],
+            "ref_pt": "é a progressão de Greensleeves, que tens no repertório",
+            "ref_en": "is the progression of Greensleeves, which is in your repertoire",
+        },
+    ],
+    "advanced": [
+        {
+            "label": "I7 – IV7 – I7 – I7 · V7 – IV7 – I7 – V7",
+            "mode": "major",
+            "chords": [(1, "dom7"), (4, "dom7"), (1, "dom7"), (1, "dom7"),
+                      (5, "dom7"), (4, "dom7"), (1, "dom7"), (5, "dom7")],
+            "ref_pt": "é o padrão do blues de 12 compassos, a forma de The House of the Rising Sun, que tens no repertório",
+            "ref_en": "is the 12-bar blues pattern, the form of The House of the Rising Sun, which is in your repertoire",
+        },
+        {
+            "label": "iv – ♭III – ♭II – I",
+            "mode": "minor",
+            "chords": [(4, "minor"), (3, "major"), (2, "major"), (1, "major")],
+            "ref_pt": "é a cadência andaluza, a base da Malagueña (flamenco), que tens no repertório",
+            "ref_en": "is the Andalusian cadence, the basis of Malagueña (flamenco), which is in your repertoire",
+        },
+        {
+            "label": "I – V/V – V – I",
+            "mode": "major",
+            "chords": [(1, "major"), (4, "major"), (5, "major"), (1, "major")],
+            "ref_pt": "usa uma dominante secundária (V/V) para reforçar a cadência final",
+            "ref_en": "uses a secondary dominant (V/V) to strengthen the final cadence",
+        },
+    ],
+}
+
+
+def _build_progression_chords(mode: str, chords, root_midi: int) -> List[List[Note]]:
+    """Constrói a lista de acordes (cada um como lista de Note) de uma progressão.
+
+    ``mode`` é "major" ou "minor"; ``chords`` é uma lista de (grau, qualidade);
+    ``root_midi`` é o MIDI da tónica. As raiz de cada acorde é o grau da escala
+    (maior ou menor natural) da tonalidade; a qualidade define a tríade.
+    """
+    offsets = _MAJOR_SCALE_OFFSETS if mode == "major" else _MINOR_SCALE_OFFSETS
+    result: List[List[Note]] = []
+    for degree, quality in chords:
+        root = Note.from_midi(root_midi + offsets[degree - 1])
+        result.append(Chord(root, quality).notes)
+    return result
 
 
 class QuestionType(Enum):
     EAR_INTERVAL = "ear_interval"
     EAR_CHORD = "ear_chord"
+    EAR_PROGRESSION = "ear_progression"
     STAFF_NOTE = "staff_note"
     THEORY_INTERVAL = "theory_interval"
     THEORY_SCALE = "theory_scale"
@@ -29,7 +127,8 @@ class QuizQuestion:
     correct_index: int
     explanation: str
     notes_to_play: List[Note] = field(default_factory=list)
-    play_mode: str = "melodic_asc"  # "melodic_asc", "melodic_desc", "harmonic", "chord"
+    chords_to_play: List[List[Note]] = field(default_factory=list)
+    play_mode: str = "melodic_asc"  # "melodic_asc", "melodic_desc", "harmonic", "chord", "progression"
     staff_note: Optional[Note] = None
     clef: str = "treble"  # "treble" or "bass"
     target_note: Optional[Note] = None
@@ -164,6 +263,72 @@ class QuizEngine:
             explanation=explanation,
             notes_to_play=chord_obj.notes,
             play_mode="chord",
+        )
+
+    @staticmethod
+    def generate_ear_progression_question(difficulty: str = "beginner") -> QuizQuestion:
+        """
+        Generates an ear training chord-progression exercise (Fase 50).
+
+        Plays a harmonic progression in a random key (to force relative
+        recognition) and asks the student to identify it by its Roman-numeral
+        function. The explanation points to where the progression appears in
+        the repertoire library.
+        """
+        # Import here (not at module top) to avoid a circular import: gui.i18n
+        # pulls in the full app package, which in turn imports this module.
+        from gui.i18n import get_language
+
+        pool = _PROGRESSIONS.get(difficulty, _PROGRESSIONS["beginner"])
+        target = random.choice(pool)
+
+        # Random key: tonic between C3 and A3 (MIDI 48..57) keeps the chords in a
+        # comfortable, clearly audible register.
+        root_midi = random.randint(48, 57)
+        chords = _build_progression_chords(target["mode"], target["chords"], root_midi)
+
+        # Options: the correct label + 3 distractors. Distractors come from the
+        # same level first, then other levels, so there are always 4 distinct
+        # choices even though each level only has 3 progressions.
+        correct_label = target["label"]
+        distractor_pool = [p["label"] for p in pool if p["label"] != correct_label]
+        if len(distractor_pool) < 3:
+            for level in ("beginner", "intermediate", "advanced"):
+                for p in _PROGRESSIONS[level]:
+                    if p["label"] != correct_label and p["label"] not in distractor_pool:
+                        distractor_pool.append(p["label"])
+        random.shuffle(distractor_pool)
+        options = distractor_pool[:3] + [correct_label]
+        random.shuffle(options)
+        correct_index = options.index(correct_label)
+
+        lang = get_language()
+        ref = target["ref_pt"] if lang == "pt" else target["ref_en"]
+        if lang == "pt":
+            prompt = "Ouve a progressão de acordes e identifica a sua função (numerais romanos):"
+            explanation = (
+                f"Correto! A progressão tocada é **{target['label']}**. {ref[0].upper()}{ref[1:]}.\n"
+                f"Foi tocada numa tonalidade aleatória para treinares o reconhecimento "
+                f"relativo — a função dos acordes importa mais do que a tonalidade."
+            )
+        else:
+            prompt = "Listen to the chord progression and identify its function (Roman numerals):"
+            explanation = (
+                f"Correct! The progression played is **{target['label']}**. {ref[0].upper()}{ref[1:]}.\n"
+                f"It was played in a random key to train relative recognition — chord "
+                f"function matters more than the key."
+            )
+
+        return QuizQuestion(
+            question_type=QuestionType.EAR_PROGRESSION,
+            prompt_text=prompt,
+            category="treino_auditivo",
+            options=options,
+            correct_index=correct_index,
+            explanation=explanation,
+            notes_to_play=[],
+            chords_to_play=chords,
+            play_mode="progression",
         )
 
     @staticmethod
@@ -347,7 +512,7 @@ class QuizEngine:
                 f"Descrição: {chord_def.description}"
             )
             sample_chord = Chord(Note("C", 4), key)
-            notes_to_play = chord_obj_notes = sample_chord.notes
+            notes_to_play = sample_chord.notes
 
         else:  # interval_semitones
             st = random.randint(1, 12)

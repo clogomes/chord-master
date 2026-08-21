@@ -94,7 +94,7 @@ class PracticeEarScreen(ctk.CTkFrame):
 
         self.type_select = ctk.CTkSegmentedButton(
             settings_frame,
-            values=["Intervalos", "Acordes", "🎤 Ditado de Solfejo (Cantar)"],
+            values=["Intervalos", "Acordes", "Progressões", "🎤 Ditado de Solfejo (Cantar)"],
             command=lambda v: self.load_new_question(),
             selected_color=theme.COLOR_PRIMARY,
             selected_hover_color=theme.COLOR_PRIMARY_HOVER,
@@ -408,6 +408,11 @@ class PracticeEarScreen(ctk.CTkFrame):
             self.vocal_mic_card.pack_forget()
             self.play_btn.configure(text="🔊 Ouvir Acorde")
             self.play_slow_btn.pack(side="left", padx=6)
+        elif ex_type == "Progressões":
+            self.current_question = QuizEngine.generate_ear_progression_question(difficulty)
+            self.vocal_mic_card.pack_forget()
+            self.play_btn.configure(text="🔊 Ouvir Progressão")
+            self.play_slow_btn.pack(side="left", padx=6)
         else:
             self.current_question = QuizEngine.generate_ear_interval_question(difficulty)
             self.vocal_mic_card.pack_forget()
@@ -419,7 +424,8 @@ class PracticeEarScreen(ctk.CTkFrame):
             # Only show learning card for intervals
             from core.ear_mnemonics import get_mnemonic_by_code
             import re
-            
+
+            self.learning_vis_frame.pack(fill="x", pady=4, padx=16)
             # Extract short code from correct answer (e.g. "Terça Maior (M3)")
             match = re.search(r'\((.*?)\)', self.current_question.correct_answer)
             if match:
@@ -440,6 +446,18 @@ class PracticeEarScreen(ctk.CTkFrame):
             else:
                 self.learning_card.pack_forget()
                 self.play_card.pack(fill="x", pady=(4, 12))
+        elif is_learn_mode and self.current_question.question_type == QuestionType.EAR_PROGRESSION:
+            # Guided mode for progressions: show the degrees (Roman numerals)
+            # before testing, so the student associates the sound with the function.
+            self.learning_vis_frame.pack_forget()
+            self.learning_title_lbl.configure(text=f"Progressão: {self.current_question.correct_answer}")
+            self.learning_songs_lbl.configure(text="")
+            self.learning_desc_lbl.configure(
+                text="Ouve a progressão e associa o som à função dos graus. "
+                     "Depois escolhe a resposta correta."
+            )
+            self.learning_card.pack(fill="x", pady=(4, 12))
+            self.play_card.pack_forget()
         else:
             self.learning_card.pack_forget()
             self.play_card.pack(fill="x", pady=(4, 12))
@@ -470,7 +488,7 @@ class PracticeEarScreen(ctk.CTkFrame):
                 fg_color=theme.COLOR_SURFACE_SECONDARY,
                 hover_color=theme.COLOR_SURFACE_HOVER,
                 text_color=theme.COLOR_TEXT_PRIMARY,
-                state="disabled" if (is_learn_mode and self.current_question.question_type == QuestionType.EAR_INTERVAL) else "normal",
+                state="disabled" if (is_learn_mode and self.current_question.question_type in (QuestionType.EAR_INTERVAL, QuestionType.EAR_PROGRESSION)) else "normal",
                 command=lambda i=idx: self.handle_answer(i),
             )
             btn.grid(row=r, column=c, padx=6, pady=6, sticky="nsew")
@@ -619,12 +637,19 @@ class PracticeEarScreen(ctk.CTkFrame):
 
         # Record atomic spaced review in UserManager
         skill_id = f"ear:{self.current_question.question_type.value}"
-        match = re.search(r'\((.*?)\)', self.current_question.correct_answer)
-        if match:
-            code = match.group(1)
-            direction = getattr(self.current_question, "play_mode", "melodic_asc")
-            dir_suffix = "desc" if "desc" in str(direction) else "asc"
-            skill_id = f"interval:{code}:{dir_suffix}"
+        if self.current_question.question_type == QuestionType.EAR_PROGRESSION:
+            # Atomic competency per progression (e.g. "progression:I-V-vi-IV").
+            slug = (self.current_question.correct_answer
+                    .replace("–", "-").replace("—", "-").replace("·", "-")
+                    .replace(" ", ""))
+            skill_id = f"progression:{slug}"
+        else:
+            match = re.search(r'\((.*?)\)', self.current_question.correct_answer)
+            if match:
+                code = match.group(1)
+                direction = getattr(self.current_question, "play_mode", "melodic_asc")
+                dir_suffix = "desc" if "desc" in str(direction) else "asc"
+                skill_id = f"interval:{code}:{dir_suffix}"
 
         stats = self.user_manager.record_atomic_review(
             skill_id=skill_id,

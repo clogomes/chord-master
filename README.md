@@ -336,6 +336,7 @@ Estúdio de execução interativa com pauta iluminada, teclas destacadas com nú
 - **Treino Auditivo (Ear Training)**:
   - Identificação de **Intervalos Melódicos** (ascendentes/descendentes) e **Harmónicos** (duas notas em simultâneo).
   - Identificação de **Qualidade de Acordes** (Maiores, Menores, Diminutos, Aumentados, Sétimas).
+  - **Reconhecimento de Progressões de Acordes** (Fase 50): 9 progressões em 3 níveis (I–V–vi–IV, ii–V–I, i–♭VII–♭VI–V, blues de 12 compassos, cadência andaluza, dominante secundária, etc.), tocadas em **tonalidade aleatória** para forçar o reconhecimento relativo; a explicação indica onde a progressão aparece no repertório (ex.: Cânone de Pachelbel, Greensleeves, Malagueña). Modo Aprender guiado mostra os graus antes de testar; registo por competência atómica (`progression:<label>`).
   - Ditado de Solfejo Cantado com voz e microfone.
   - Níveis de dificuldade: *Iniciante*, *Intermédio* e *Avançado*.
 - **Leitura de Pauta Musical (Sight Reading)**:
@@ -383,7 +384,7 @@ chord-master/
 │   ├── gamification.py             # Sistema de Gamificação (XP, 7 Níveis, 12 Conquistas/Medalhas)
 │   ├── exporter.py                 # Exportador de Relatórios de Progresso e Certificados em Markdown
 │   ├── adaptive_engine.py          # Motor de Prática Adaptativa & Identificação de Pontos Fracos
-│   ├── quiz_engine.py              # Motor de Geração de Questões (Intervalos, Acordes, Pauta, Solfejo Cantado)
+│   ├── quiz_engine.py              # Motor de Geração de Questões (Intervalos, Acordes, Progressões, Pauta, Solfejo Cantado)
 │   ├── score_tracker.py            # Gestor de Pontuações e Métricas
 │   ├── user_manager.py             # Gestor Multi-Utilizador, Persistência e Progressão
 │   ├── i18n_helpers.py             # Helpers de Localização de Entidades Musicais

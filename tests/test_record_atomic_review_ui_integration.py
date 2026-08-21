@@ -2,7 +2,6 @@
 import unittest
 import customtkinter as ctk
 from core.user_manager import UserManager, CategoryStats
-from core.notes import Note
 from gui.screens.practice_ear import PracticeEarScreen
 from gui.screens.practice_staff import PracticeStaffScreen
 from gui.components.theory_quiz_widget import TheoryQuizWidget
@@ -55,6 +54,35 @@ class TestRecordAtomicReviewUIIntegration(unittest.TestCase):
             self.assertIn("Sequência:", screen.score_card.streak_label.cget("text"))
             screen.load_new_question()
 
+        screen.destroy()
+
+    def test_practice_ear_progression_flow(self):
+        """Progressões: o ecrã gera EAR_PROGRESSION e regista skill_id 'progression:<label>'."""
+        from core.quiz_engine import QuestionType
+        screen = PracticeEarScreen(self.root, self.user_manager, on_back=lambda: None)
+        screen.pack()
+        self.root.update_idletasks()
+
+        screen.type_select.set("Progressões")
+        screen.load_new_question()
+        self.root.update_idletasks()
+
+        q = screen.current_question
+        self.assertEqual(q.question_type, QuestionType.EAR_PROGRESSION)
+        self.assertEqual(q.play_mode, "progression")
+        self.assertGreaterEqual(len(q.chords_to_play), 3)
+
+        # Responder e verificar o skill_id atómico "progression:<label>".
+        before = set(self.user_manager.current_user.spaced_review_data.keys())
+        correct_idx = q.options.index(q.correct_answer)
+        screen.handle_answer(correct_idx)
+        self.root.update_idletasks()
+
+        new_keys = set(self.user_manager.current_user.spaced_review_data.keys()) - before
+        self.assertTrue(
+            any(k.startswith("progression:") for k in new_keys),
+            f"Nenhum skill_id 'progression:' registado; novos: {new_keys}",
+        )
         screen.destroy()
 
     def test_practice_staff_screen_answering_flow(self):

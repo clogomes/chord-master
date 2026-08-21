@@ -1,7 +1,6 @@
 """Asynchronous audio player engine with thread-safe playback and sound caching."""
 import io
 import os
-import queue
 import subprocess
 import sys
 import tempfile
@@ -133,12 +132,38 @@ class AudioPlayer:
         self._playback_thread = threading.Thread(target=_sequence_worker, daemon=True)
         self._playback_thread.start()
 
+    def play_progression(
+        self,
+        chords: List[List[Note]],
+        chord_duration: float = 1.0,
+        gap: float = 0.15,
+        volume: float = 0.5,
+    ):
+        """Plays a harmonic progression: each chord as a block, one after another."""
+        if not chords:
+            return
+        self.stop_all()
+        self._stop_event.clear()
+
+        def _progression_worker():
+            for chord in chords:
+                if self._stop_event.is_set():
+                    break
+                self.play_chord(chord, duration=chord_duration, volume=volume)
+                time.sleep(chord_duration + gap)
+
+        self._playback_thread = threading.Thread(target=_progression_worker, daemon=True)
+        self._playback_thread.start()
+
     def play_question(self, question, slow_mode: bool = False):
         """Plays the audio corresponding to a QuizQuestion according to its play mode."""
         delay = 0.6 if slow_mode else 0.35
         note_dur = 0.9 if slow_mode else 0.6
 
-        if question.play_mode == "harmonic" or question.play_mode == "chord":
+        if question.play_mode == "progression":
+            chord_dur = 1.4 if slow_mode else 1.0
+            self.play_progression(question.chords_to_play, chord_duration=chord_dur)
+        elif question.play_mode == "harmonic" or question.play_mode == "chord":
             self.play_chord(question.notes_to_play, duration=1.5 if slow_mode else 1.2)
         else:
             self.play_sequence(question.notes_to_play, delay_between=delay, note_duration=note_dur)
