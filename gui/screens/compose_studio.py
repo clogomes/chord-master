@@ -181,6 +181,48 @@ class ComposeStudioScreen(ctk.CTkFrame):
         self.bars_menu.set(str(self.composition.bars))
         self.bars_menu.pack(side="left", padx=(0, 14))
 
+        # Loop Controls (Phase 58)
+        self.loop_var = ctk.BooleanVar(value=False)
+        self.loop_checkbox = ctk.CTkCheckBox(
+            t_row,
+            text="🔁 Loop",
+            variable=self.loop_var,
+            command=self._on_loop_toggled,
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+        )
+        self.loop_checkbox.pack(side="left", padx=(0, 6))
+
+        bar_options = [str(i) for i in range(1, self.composition.bars + 1)]
+        self.loop_start_menu = ctk.CTkOptionMenu(
+            t_row,
+            values=bar_options,
+            width=50,
+            height=30,
+            font=theme.get_font(theme.FONT_SMALL_BOLD),
+            command=self._on_loop_range_changed,
+            state="disabled",
+        )
+        self.loop_start_menu.set("1")
+        self.loop_start_menu.pack(side="left", padx=(0, 4))
+
+        self.loop_to_lbl = ctk.CTkLabel(
+            t_row, text="a", font=theme.get_font(theme.FONT_SMALL), text_color=theme.COLOR_TEXT_MUTED
+        )
+        self.loop_to_lbl.pack(side="left", padx=(0, 4))
+
+        self.loop_end_menu = ctk.CTkOptionMenu(
+            t_row,
+            values=bar_options,
+            width=50,
+            height=30,
+            font=theme.get_font(theme.FONT_SMALL_BOLD),
+            command=self._on_loop_range_changed,
+            state="disabled",
+        )
+        self.loop_end_menu.set(str(self.composition.bars))
+        self.loop_end_menu.pack(side="left", padx=(0, 14))
+
         # Save & Export Buttons
         save_btn = ctk.CTkButton(
             t_row,
@@ -872,6 +914,36 @@ class ComposeStudioScreen(ctk.CTkFrame):
         self.composition.bpm = bpm
         self.bpm_val_lbl.configure(text=f"{bpm}")
 
+    def _on_loop_toggled(self):
+        is_loop = self.loop_var.get()
+        state = "normal" if is_loop else "disabled"
+        self.loop_start_menu.configure(state=state)
+        self.loop_end_menu.configure(state=state)
+
+    def _on_loop_range_changed(self, _=None):
+        try:
+            s = int(self.loop_start_menu.get())
+            e = int(self.loop_end_menu.get())
+            if s > e:
+                self.loop_end_menu.set(str(s))
+        except Exception:
+            pass
+
+    def _update_loop_bar_options(self, bars: int):
+        options = [str(i) for i in range(1, bars + 1)]
+        self.loop_start_menu.configure(values=options)
+        self.loop_end_menu.configure(values=options)
+        try:
+            curr_s = int(self.loop_start_menu.get())
+            if curr_s > bars:
+                self.loop_start_menu.set("1")
+            curr_e = int(self.loop_end_menu.get())
+            if curr_e > bars:
+                self.loop_end_menu.set(str(bars))
+        except Exception:
+            self.loop_start_menu.set("1")
+            self.loop_end_menu.set(str(bars))
+
     def _on_bars_changed(self, value: str):
         new_bars = int(value)
         old_bars = self.composition.bars
@@ -897,6 +969,7 @@ class ComposeStudioScreen(ctk.CTkFrame):
                     return
 
         self.composition.bars = new_bars
+        self._update_loop_bar_options(new_bars)
         if self.composition.rhythm:
             # Adjust grid length
             if len(self.composition.rhythm.grid) < new_total_steps:
@@ -933,6 +1006,7 @@ class ComposeStudioScreen(ctk.CTkFrame):
                 self.bpm_slider.set(c.bpm)
                 self.bpm_val_lbl.configure(text=f"{c.bpm}")
                 self.bars_menu.set(str(c.bars))
+                self._update_loop_bar_options(c.bars)
                 steps = c.rhythm.steps_per_bar if c.rhythm else 16
                 grid_data = c.rhythm.grid if c.rhythm else []
                 self.step_grid.set_grid(grid_data, steps, c.bars)
@@ -1010,12 +1084,28 @@ class ComposeStudioScreen(ctk.CTkFrame):
         self.is_playing = True
         self.play_btn.configure(text="⏳ A renderizar...", fg_color="#F59E0B")
 
+        is_loop = self.loop_var.get()
+        s_bar = None
+        e_bar = None
+        if is_loop:
+            try:
+                s_bar = int(self.loop_start_menu.get())
+                e_bar = int(self.loop_end_menu.get())
+            except Exception:
+                s_bar = 1
+                e_bar = self.composition.bars
+
+        self._active_is_loop = is_loop
+        self._active_loop_start_bar = s_bar if is_loop else 1
+        self._active_loop_end_bar = e_bar if is_loop else self.composition.bars
+
         def _render_and_play():
             try:
-                # 1. Offline render in worker thread
-                stereo_float32 = self.renderer.render(self.composition)
+                if is_loop and s_bar is not None and e_bar is not None:
+                    stereo_float32 = self.renderer.render(self.composition, start_bar=s_bar, end_bar=e_bar)
+                else:
+                    stereo_float32 = self.renderer.render(self.composition)
 
-                # 2. Marshal sound creation and playback back to UI
                 self.after(0, lambda: self._play_rendered_buffer(stereo_float32))
             except Exception as e:
                 self.after(0, lambda err=e: self._handle_playback_error(err))
@@ -1032,20 +1122,24 @@ class ComposeStudioScreen(ctk.CTkFrame):
             return
 
         try:
-            # Convert float32 [-1.0, 1.0] to int16 stereo array
             pcm_int16 = np.int16(np.clip(buffer_float32 * 32767.0, -32768, 32767))
             self._current_sound = pygame.sndarray.make_sound(pcm_int16)
-            self._current_sound.play()
+
+            is_loop = getattr(self, "_active_is_loop", False)
+            if is_loop:
+                self._current_channel = self._current_sound.play(loops=-1)
+            else:
+                self._current_channel = self._current_sound.play(loops=0)
+
             self.play_btn.configure(text="⏹ Parar Reprodução", fg_color=theme.COLOR_ACCENT_CRIMSON)
 
-            # Start clock-based playhead cursor tracking loop (~30 fps / 33ms)
             self._playback_start_time = time.perf_counter()
             self._total_playback_sec = len(buffer_float32) / 44100.0
             self._schedule_cursor_tick()
 
-            # Auto-reset button after audio finish
-            duration_ms = int(self._total_playback_sec * 1000.0)
-            self.after(duration_ms, self._on_playback_finished)
+            if not is_loop:
+                duration_ms = int(self._total_playback_sec * 1000.0)
+                self.after(duration_ms, self._on_playback_finished)
         except Exception as e:
             self._handle_playback_error(e)
 
@@ -1054,11 +1148,34 @@ class ComposeStudioScreen(ctk.CTkFrame):
             return
 
         elapsed = time.perf_counter() - self._playback_start_time
-        if elapsed <= self._total_playback_sec:
-            self.step_grid.update_playback_cursor(elapsed, self.composition.bpm)
+        is_loop = getattr(self, "_active_is_loop", False)
+
+        if is_loop:
+            bpm = self.composition.bpm
+            beats_per_bar = 4
+            if "/" in self.composition.time_signature:
+                try:
+                    beats_per_bar = int(self.composition.time_signature.split("/")[0])
+                except Exception:
+                    beats_per_bar = 4
+            s_bar = getattr(self, "_active_loop_start_bar", 1)
+            e_bar = getattr(self, "_active_loop_end_bar", self.composition.bars)
+            loop_bars = e_bar - s_bar + 1
+            loop_duration_sec = (loop_bars * beats_per_bar) * (60.0 / bpm)
+
+            if loop_duration_sec > 0:
+                rel_elapsed = elapsed % loop_duration_sec
+                start_offset_sec = ((s_bar - 1) * beats_per_bar) * (60.0 / bpm)
+                abs_elapsed = start_offset_sec + rel_elapsed
+                self.step_grid.update_playback_cursor(abs_elapsed, bpm)
+
             self._cursor_timer_id = self.after(33, self._schedule_cursor_tick)
         else:
-            self.step_grid.hide_playback_cursor()
+            if elapsed <= self._total_playback_sec:
+                self.step_grid.update_playback_cursor(elapsed, self.composition.bpm)
+                self._cursor_timer_id = self.after(33, self._schedule_cursor_tick)
+            else:
+                self.step_grid.hide_playback_cursor()
 
     def _handle_playback_error(self, error: Exception):
         self._stop_playback()
@@ -1080,6 +1197,13 @@ class ComposeStudioScreen(ctk.CTkFrame):
 
         if hasattr(self, "step_grid"):
             self.step_grid.hide_playback_cursor()
+
+        if hasattr(self, "_current_channel") and self._current_channel:
+            try:
+                self._current_channel.stop()
+            except Exception:
+                pass
+            self._current_channel = None
 
         if self._current_sound:
             try:

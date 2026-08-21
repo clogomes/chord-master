@@ -254,11 +254,17 @@ class CompositionRenderer:
     def __init__(self, sample_rate: int = SAMPLE_RATE):
         self.sample_rate = sample_rate
 
-    def render(self, composition: Composition) -> np.ndarray:
+    def render(
+        self,
+        composition: Composition,
+        start_bar: Optional[int] = None,
+        end_bar: Optional[int] = None,
+    ) -> np.ndarray:
         """
-        Renders an entire Composition to a stereo float32 array of shape (N, 2).
+        Renders a Composition (or a sub-region of bars [start_bar, end_bar], 1-indexed)
+        to a stereo float32 array of shape (N, 2).
         Uses exact sample index placement, cached synthesis, acoustic tail room,
-        and soft saturation limiting (np.tanh).
+        tail-folding for seamless looping, and soft saturation limiting (np.tanh).
         """
         bpm = max(20, min(300, composition.bpm))
         beats_per_bar = 4
@@ -268,13 +274,30 @@ class CompositionRenderer:
             except Exception:
                 beats_per_bar = 4
 
-        total_bars = max(1, composition.bars)
-        total_beats = total_bars * beats_per_bar
+        total_comp_bars = max(1, composition.bars)
+        is_region_loop = (start_bar is not None and end_bar is not None)
+
+        if is_region_loop:
+            s_bar = max(1, min(total_comp_bars, int(start_bar)))
+            e_bar = max(s_bar, min(total_comp_bars, int(end_bar)))
+            region_bars = e_bar - s_bar + 1
+            region_start_beat = (s_bar - 1) * beats_per_bar
+            region_end_beat = e_bar * beats_per_bar
+        else:
+            s_bar = 1
+            e_bar = total_comp_bars
+            region_bars = total_comp_bars
+            region_start_beat = 0.0
+            region_end_beat = total_comp_bars * beats_per_bar
+
+        total_beats = region_bars * beats_per_bar
         seconds_per_beat = 60.0 / bpm
         core_duration = total_beats * seconds_per_beat
+        core_samples = int(core_duration * self.sample_rate)
 
         # Acoustic tail extension (3.0 seconds for natural crash cymbal ring and reverb decay)
         tail_duration = 3.0
+        tail_samples = int(tail_duration * self.sample_rate)
         total_duration = core_duration + tail_duration
         total_samples = int(total_duration * self.sample_rate)
 
@@ -285,17 +308,21 @@ class CompositionRenderer:
         # 1. Render Rhythm Track
         if composition.rhythm and not composition.rhythm.muted and composition.rhythm.grid:
             steps_per_bar = composition.rhythm.steps_per_bar
-            total_steps = total_bars * steps_per_bar
             step_duration_sec = (60.0 / bpm) * (beats_per_bar / float(steps_per_bar))
             drum_vol = composition.rhythm.volume
 
-            for step_idx in range(total_steps):
-                step_start_sec = step_idx * step_duration_sec
+            region_start_step = (s_bar - 1) * steps_per_bar
+            region_end_step = e_bar * steps_per_bar
+            total_region_steps = region_bars * steps_per_bar
+
+            for region_step_idx in range(total_region_steps):
+                abs_step_idx = region_start_step + region_step_idx
+                step_start_sec = region_step_idx * step_duration_sec
                 start_sample = int(step_start_sec * self.sample_rate)
                 if start_sample >= total_samples:
                     continue
 
-                pattern_idx = step_idx % len(composition.rhythm.grid)
+                pattern_idx = abs_step_idx % len(composition.rhythm.grid)
                 active_drums = composition.rhythm.grid[pattern_idx]
 
                 for drum_inst in active_drums:
@@ -307,11 +334,6 @@ class CompositionRenderer:
                     if actual_len > 0:
                         scaled_drum = drum_sample[:actual_len] * drum_vol
 
-                        # Stereo placement:
-                        # Kick/Snare/Rimshot center (1.0, 1.0)
-                        # Hihat/Ride/Clap slightly right (0.9, 1.1)
-                        # Toms spread (low: right, mid: center, high: left)
-                        # Crash slightly left (1.1, 0.9)
                         pan_left, pan_right = 1.0, 1.0
                         if "hihat" in drum_inst or "ride" in drum_inst or "clap" in drum_inst:
                             pan_left, pan_right = 0.9, 1.1
@@ -328,20 +350,43 @@ class CompositionRenderer:
         # 2. Render Chords Track
         if composition.chords:
             for ce in composition.chords:
-                chord_start_sec = ce.start_beat * seconds_per_beat
+                # Check if chord event overlaps the rendered region
+                c_end_beat = ce.start_beat + ce.duration_beats
+                if c_end_beat <= region_start_beat or ce.start_beat >= region_end_beat:
+                    continue
+
+                rel_start_beat = ce.start_beat - region_start_beat
+                if rel_start_beat < 0:
+                    # Chord started before loop region
+                    chord_start_sec = 0.0
+                    skip_sec = (-rel_start_beat) * seconds_per_beat
+                    chord_dur_sec = (c_end_beat - region_start_beat) * seconds_per_beat
+                    full_dur = ce.duration_beats * seconds_per_beat
+                    chord_audio_full = _get_synthesized_chord_sample(
+                        instrument=ce.instrument,
+                        root=ce.root,
+                        chord_type=ce.chord_type,
+                        duration=full_dur,
+                        volume=0.75,
+                        sample_rate=self.sample_rate,
+                    )
+                    skip_samples = int(skip_sec * self.sample_rate)
+                    chord_audio = chord_audio_full[skip_samples:] if skip_samples < len(chord_audio_full) else np.zeros(0, dtype=np.float32)
+                else:
+                    chord_start_sec = rel_start_beat * seconds_per_beat
+                    chord_dur_sec = ce.duration_beats * seconds_per_beat
+                    chord_audio = _get_synthesized_chord_sample(
+                        instrument=ce.instrument,
+                        root=ce.root,
+                        chord_type=ce.chord_type,
+                        duration=chord_dur_sec,
+                        volume=0.75,
+                        sample_rate=self.sample_rate,
+                    )
+
                 start_sample = int(chord_start_sec * self.sample_rate)
                 if start_sample >= total_samples:
                     continue
-
-                chord_dur_sec = ce.duration_beats * seconds_per_beat
-                chord_audio = _get_synthesized_chord_sample(
-                    instrument=ce.instrument,
-                    root=ce.root,
-                    chord_type=ce.chord_type,
-                    duration=chord_dur_sec,
-                    volume=0.75,
-                    sample_rate=self.sample_rate,
-                )
 
                 sample_len = len(chord_audio)
                 end_sample = min(total_samples, start_sample + sample_len)
@@ -349,7 +394,6 @@ class CompositionRenderer:
 
                 if actual_len > 0:
                     scaled_chord = chord_audio[:actual_len]
-                    # Stereo spread for instruments: Piano slightly left (0.95/1.05), Guitar slightly right (1.05/0.95)
                     pan_l, pan_r = (0.95, 1.05) if ce.instrument == "piano" else (1.05, 0.95)
                     mix_left[start_sample:end_sample] += scaled_chord * pan_l
                     mix_right[start_sample:end_sample] += scaled_chord * pan_r
@@ -357,20 +401,40 @@ class CompositionRenderer:
         # 3. Render Melodic Notes Track
         if hasattr(composition, "notes") and composition.notes:
             for ne in composition.notes:
-                note_start_sec = ne.start_beat * seconds_per_beat
+                n_end_beat = ne.start_beat + ne.duration_beats
+                if n_end_beat <= region_start_beat or ne.start_beat >= region_end_beat:
+                    continue
+
+                rel_start_beat = ne.start_beat - region_start_beat
+                if rel_start_beat < 0:
+                    note_start_sec = 0.0
+                    skip_sec = (-rel_start_beat) * seconds_per_beat
+                    full_dur = ne.duration_beats * seconds_per_beat
+                    note_vol = getattr(ne, "velocity", 0.8)
+                    note_audio_full = _get_synthesized_note_sample(
+                        instrument=ne.instrument,
+                        midi=ne.midi,
+                        duration=full_dur,
+                        volume=note_vol,
+                        sample_rate=self.sample_rate,
+                    )
+                    skip_samples = int(skip_sec * self.sample_rate)
+                    note_audio = note_audio_full[skip_samples:] if skip_samples < len(note_audio_full) else np.zeros(0, dtype=np.float32)
+                else:
+                    note_start_sec = rel_start_beat * seconds_per_beat
+                    note_dur_sec = ne.duration_beats * seconds_per_beat
+                    note_vol = getattr(ne, "velocity", 0.8)
+                    note_audio = _get_synthesized_note_sample(
+                        instrument=ne.instrument,
+                        midi=ne.midi,
+                        duration=note_dur_sec,
+                        volume=note_vol,
+                        sample_rate=self.sample_rate,
+                    )
+
                 start_sample = int(note_start_sec * self.sample_rate)
                 if start_sample >= total_samples:
                     continue
-
-                note_dur_sec = ne.duration_beats * seconds_per_beat
-                note_vol = getattr(ne, "velocity", 0.8)
-                note_audio = _get_synthesized_note_sample(
-                    instrument=ne.instrument,
-                    midi=ne.midi,
-                    duration=note_dur_sec,
-                    volume=note_vol,
-                    sample_rate=self.sample_rate,
-                )
 
                 sample_len = len(note_audio)
                 end_sample = min(total_samples, start_sample + sample_len)
@@ -382,12 +446,25 @@ class CompositionRenderer:
                     mix_left[start_sample:end_sample] += scaled_note * pan_l
                     mix_right[start_sample:end_sample] += scaled_note * pan_r
 
-        # 4. Apply Master Volume
+        # 4. If region loop is active: Fold acoustic tail back into the beginning for seamless looping
+        if is_region_loop and core_samples > 0:
+            tail_left = mix_left[core_samples:]
+            tail_right = mix_right[core_samples:]
+            # Crop to exact core loop duration
+            mix_left = mix_left[:core_samples]
+            mix_right = mix_right[:core_samples]
+
+            # Fold tail with wrap-around
+            for i in range(len(tail_left)):
+                mix_left[i % core_samples] += tail_left[i]
+                mix_right[i % core_samples] += tail_right[i]
+
+        # 5. Apply Master Volume
         master_vol = composition.master_volume
         mix_left *= master_vol
         mix_right *= master_vol
 
-        # 5. Soft Saturation Limiter (np.tanh prevents hard clipping while keeping punch)
+        # 6. Soft Saturation Limiter (np.tanh prevents hard clipping while keeping punch)
         mix_left = np.tanh(mix_left)
         mix_right = np.tanh(mix_right)
 

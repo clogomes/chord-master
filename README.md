@@ -755,3 +755,15 @@ Implementação nativa de um sistema de i18n em duas vertentes:
   - Implementação de renderização dedicada para notas ativas (`is_active=True`) no braço: anel externo brilhante, bolha de nota ampliada (raio 12.5px vs 10.5px) e contorno branco grosso (3px), permitindo distinguir univocamente a nota em execução mesmo quando partilha a cor verde das tónicas da escala.
 - **Suite de Testes (`tests/test_practice_scales_viola_active_note.py`)**:
   - Validação do disparo de áudio de viola e unicidade do marcador ativo no braço. Total de **310/310 testes a passar**.
+
+### Fase 58 — Estúdio de Composição: Repetição de Compassos em Ciclo (Loop Infinito)
+- **Renderização por Região e Dobragem de Cauda Acústica (`audio/composition_renderer.py`)**:
+  - Extensão do método `render()` para aceitar `start_bar` e `end_bar` opcionais (1-indexed), preservando 100% de compatibilidade com chamadas anteriores.
+  - Dobragem acústica contínua (*tail folding with wrap-around*): os 3.0 segundos de ressonância natural (crash, harmónicos, reverb) da cauda do último compasso da seleção são somados de volta ao início do buffer com proteção contra saturação dura (`np.tanh`).
+- **Loop Infinito Nativo SDL e Controlo de Transporte (`gui/screens/compose_studio.py`)**:
+  - Adicionado `ctk.CTkCheckBox` `🔁 Loop` na barra de transporte e dois seletores `CTkOptionMenu` para compasso inicial e final (com sincronização e auto-encolhimento dinâmico ao redimensionar a grelha de compassos).
+  - Reprodução em ciclo infinito contínuo a nível de amostra através do mixer SDL nativo (`play(loops=-1)`) sem desfasamento temporal nem dependência de temporizadores Python.
+  - Cursor de reprodução scrollável sincronizado (`elapsed % duração_do_loop`) transladado para o início do compasso selecionado.
+  - Exportação WAV mantida estritamente para a totalidade da composição.
+- **Suite de Testes Unitários (`tests/test_composition_loop_playback.py`)**:
+  - Validação da precisão de amostras para fatias parciais de compassos, preservação de cauda dobrada e ausência de clipping. Total de **313/313 testes a passar**.
