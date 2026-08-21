@@ -767,3 +767,14 @@ Implementação nativa de um sistema de i18n em duas vertentes:
   - Exportação WAV mantida estritamente para a totalidade da composição.
 - **Suite de Testes Unitários (`tests/test_composition_loop_playback.py`)**:
   - Validação da precisão de amostras para fatias parciais de compassos, preservação de cauda dobrada e ausência de clipping. Total de **313/313 testes a passar**.
+
+### Fase 59 — Suporte a Samples Reais & Fallback de Síntese
+- **Motor de Carregamento e Gestão de Samples (`audio/sample_library.py`)**:
+  - Suporte a manifestos de instrumentos (`instrument.json`) com mapeamento de notas MIDI, camadas de velocidade (*velocity switching*) e variações *round-robin* determinísticas (garantindo repetibilidade matemática nas renderizações e testes).
+  - Descodificação de ficheiros de áudio via `soundfile` com fallback transparente para o módulo nativo `wave` (compatível com ficheiros WAV PCM 8/16/24-bit).
+  - Transposição de afinação de alta fidelidade via `scipy.signal.resample_poly` com `limit_denominator(512)` (e interpolação linear caso o scipy não esteja disponível) dentro do intervalo impercetível de ±7 semitons.
+  - Ordem de procura de diretórios de samples configurável (`CHORDMASTER_SAMPLES_DIR` -> `data/local_settings.json` -> `~/Documents/ChordMaster/Samples`).
+- **Integração no Renderizador e Fallback Transparente (`audio/composition_renderer.py`)**:
+  - Encaminhamento automático dos eventos de percussão, acordes e notas melódicas para a `SampleLibrary`. Na ausência de amostras reais ou de bibliotecas externas, o renderizador degrada de forma graciosa e sem falhas para os algoritmos de síntese acústica embutidos.
+- **Suite de Testes Unitários (`tests/test_sample_library.py`)**:
+  - Validação do carregamento de WAVs, transposição por resample, camadas de velocidade, round-robin e fallback sem erros. Total de **319/319 testes a passar**.

@@ -29,6 +29,9 @@ user_scores.json
 user_songs.json
 user_compositions.json
 data/app_settings.json
+data/local_settings.json
+samples/
+audio/samples/
 
 # Artefacto de testes (UserManager(filepath=":memory:") escreve um JSON real na CWD)
 :memory:

@@ -22,14 +22,26 @@ from audio.backing_tracks import (
     synthesize_cowbell,
 )
 
+from audio.sample_library import SampleLibrary
+
 SAMPLE_RATE = 44100
 
 # Cache for synthesized float32 audio arrays: (instrument, pitch_or_freq, duration_rounded, volume_rounded)
 _SAMPLE_CACHE: Dict[Tuple, np.ndarray] = {}
 
 
-def _get_synthesized_drum_sample(instrument: str, sample_rate: int = SAMPLE_RATE) -> np.ndarray:
-    """Returns mono float32 drum sample array from cache or synthesizes it."""
+def _get_synthesized_drum_sample(instrument: str, sample_rate: int = SAMPLE_RATE, velocity: float = 0.8) -> np.ndarray:
+    """Returns mono float32 drum sample array from SampleLibrary or fallback synthesis."""
+    # 1. Try real audio sample from SampleLibrary
+    try:
+        sample_lib = SampleLibrary.get_instance()
+        real_sample = sample_lib.get_drum_sample(instrument, velocity=velocity)
+        if real_sample is not None and len(real_sample) > 0:
+            return real_sample
+    except Exception:
+        pass
+
+    # 2. Fallback to built-in acoustic synthesis
     cache_key = ("drum", instrument, sample_rate)
     if cache_key in _SAMPLE_CACHE:
         return _SAMPLE_CACHE[cache_key]
@@ -59,7 +71,6 @@ def _get_synthesized_drum_sample(instrument: str, sample_rate: int = SAMPLE_RATE
     elif instrument == "cowbell":
         sample = synthesize_cowbell(sample_rate=sample_rate, duration=0.25)
     else:
-        # Fallback to soft click
         sample = np.zeros(int(sample_rate * 0.05), dtype=np.float32)
 
     _SAMPLE_CACHE[cache_key] = sample
@@ -190,16 +201,45 @@ def _get_synthesized_chord_sample(
     # Round duration and volume to prevent cache explosion
     dur_quant = round(duration, 3)
     vol_quant = round(volume, 2)
-    cache_key = (instrument, root, chord_type, dur_quant, vol_quant, sample_rate)
+    cache_key = ("chord", instrument, root, chord_type, dur_quant, vol_quant, sample_rate)
 
     if cache_key in _SAMPLE_CACHE:
         return _SAMPLE_CACHE[cache_key]
 
     try:
-        notes = get_chord_notes(root, chord_type)
+        notes = get_chord_notes(root, chord_type, octave=3)
     except Exception:
         notes = [Note("C", 4), Note("E", 4), Note("G", 4)]
 
+    # 1. Try real instrument note samples from SampleLibrary
+    try:
+        sample_lib = SampleLibrary.get_instance()
+        if sample_lib.has_instrument(instrument):
+            total_samples = int(sample_rate * duration)
+            combined = np.zeros(total_samples, dtype=np.float32)
+            has_real_samples = False
+
+            for note in notes:
+                s_audio = sample_lib.get_note_sample(
+                    instrument=instrument,
+                    midi_note=note.midi,
+                    duration_sec=duration,
+                    velocity=volume,
+                )
+                if s_audio is not None and len(s_audio) > 0:
+                    has_real_samples = True
+                    s_len = min(len(combined), len(s_audio))
+                    combined[:s_len] += s_audio[:s_len]
+
+            if has_real_samples and len(notes) > 0:
+                combined /= np.sqrt(len(notes))
+                result = combined.astype(np.float32)
+                _SAMPLE_CACHE[cache_key] = result
+                return result
+    except Exception:
+        pass
+
+    # 2. Fallback to synthesis
     if instrument == "guitar":
         # Sum individual plucked strings
         total_samples = int(sample_rate * duration)
@@ -228,7 +268,7 @@ def _get_synthesized_note_sample(
     volume: float,
     sample_rate: int = SAMPLE_RATE,
 ) -> np.ndarray:
-    """Returns cached mono float32 note waveform for melodic notes."""
+    """Returns mono float32 note waveform from SampleLibrary or fallback synthesis."""
     dur_quant = round(duration, 3)
     vol_quant = round(volume, 2)
     cache_key = ("note", instrument, int(midi), dur_quant, vol_quant, sample_rate)
@@ -236,6 +276,22 @@ def _get_synthesized_note_sample(
     if cache_key in _SAMPLE_CACHE:
         return _SAMPLE_CACHE[cache_key]
 
+    # 1. Try real instrument note sample from SampleLibrary
+    try:
+        sample_lib = SampleLibrary.get_instance()
+        real_note = sample_lib.get_note_sample(
+            instrument=instrument,
+            midi_note=int(midi),
+            duration_sec=duration,
+            velocity=volume,
+        )
+        if real_note is not None and len(real_note) > 0:
+            _SAMPLE_CACHE[cache_key] = real_note
+            return real_note
+    except Exception:
+        pass
+
+    # 2. Fallback to synthesis
     freq = 440.0 * (2.0 ** ((midi - 69) / 12.0))
 
     if instrument == "guitar":
@@ -450,14 +506,16 @@ class CompositionRenderer:
         if is_region_loop and core_samples > 0:
             tail_left = mix_left[core_samples:]
             tail_right = mix_right[core_samples:]
-            # Crop to exact core loop duration
             mix_left = mix_left[:core_samples]
             mix_right = mix_right[:core_samples]
 
-            # Fold tail with wrap-around
-            for i in range(len(tail_left)):
-                mix_left[i % core_samples] += tail_left[i]
-                mix_right[i % core_samples] += tail_right[i]
+            n = len(tail_left)
+            if n > 0:
+                pad = (-n) % core_samples
+                tl = np.concatenate([tail_left, np.zeros(pad, dtype=tail_left.dtype)])
+                tr = np.concatenate([tail_right, np.zeros(pad, dtype=tail_right.dtype)])
+                mix_left += tl.reshape(-1, core_samples).sum(axis=0)
+                mix_right += tr.reshape(-1, core_samples).sum(axis=0)
 
         # 5. Apply Master Volume
         master_vol = composition.master_volume
