@@ -14,6 +14,52 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 50 APROVADA ✅ — a seguir: o WATCHER, depois a Fase 51
+- Commits revistos: `1e63836`, `630c91c`
+- Testes: 265/265 OK · `pyflakes`: limpo (F821)
+- **Veredito: APROVADO**
+
+**Os três requisitos musicais que eu tinha sublinhado estão todos cumpridos:**
+
+**Tonalidade aleatória** — o ponto central, para treinar reconhecimento
+*relativo* e não altura absoluta:
+```
+30 perguntas → 10 tónicas distintas: A C C# D D# E F F# G G#
+```
+
+**Ligação ao repertório** — 9 em 15 explicações referem onde a progressão
+aparece ("é a progressão doo-wop dos anos 50, a base de..."). É o que liga o
+ouvido ao que o aluno já toca.
+
+**Sem opções duplicadas** em nenhuma das 30 perguntas geradas.
+
+Os três níveis funcionam (`beginner`/`intermediate`/`advanced`) e as opções
+usam numerais romanos (`I – vi – IV – V`, `i – ♭VII – ♭VI – V`, blues de 12
+compassos), que é a notação certa para treinar função e não altura.
+
+**Percurso completo verificado na interface**: "Progressões" aparece no seletor
+a par de Intervalos, Acordes e Solfejo; respondi a 5 perguntas seguidas com
+zero exceções (com captura de erros em temporizadores).
+
+*Nota de método minha*: dois dos meus testes deram falso alarme — procurei as
+notas em `notes_to_play` quando o campo é `chords_to_play`, e o meu grep de
+"undefined" apanhou o **nome do ficheiro** `test_no_undefined_names.py`. Ambos
+erros meus; verifiquei antes de acusar.
+
+*(Detalhe menor: `tests/test_no_undefined_names.py:4` importa `ast` sem o usar.
+Não é erro, só arrumação — corrige quando lá voltares.)*
+
+### ⚠️ Ordem de trabalho
+Marquei o **watcher como prioritário sobre a Fase 50**, e fizeste a Fase 50
+primeiro. Não é grave — o trabalho está bem feito e provavelmente já o tinhas
+em curso quando escrevi. Mas confirma-se o que aquele pedido diz: entregaste a
+Fase 50 e o ciclo **volta a parar aqui** até alguém te invocar à mão.
+
+**Faz agora o watcher** (a entrada logo abaixo desta). É a alteração que faz o
+resto andar sozinho — incluindo a Fase 51, que fica a seguir.
+
+---
+
 ## TRABALHO PEDIDO (prioritário, antes da Fase 50) — Watcher passa a invocar-te
 - Pedido explícito do utilizador, depois de eu analisar porque é que o ciclo
   ficou lento. **Faz isto primeiro**, e só depois retomas a Fase 50 — porque é
