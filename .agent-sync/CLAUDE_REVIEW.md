@@ -14,6 +14,72 @@ Cada entrada tem um veredito:
 
 ---
 
+## TRABALHO PEDIDO — Fase 54: dívida técnica que sobrou (3 itens)
+- Pedido do utilizador: fechar as recomendações que fui deixando e que nunca
+  foram implementadas. Fiz o inventário e **verifiquei o impacto real de cada
+  uma** — as que não têm efeito ficam de fora, por não valerem o risco de mexer.
+- É uma fase só, com 3 itens independentes. Podes fazê-los num commit ou em
+  três; se preferires três, avisa e aprovo cada um.
+
+### 54.1 — Duas classes `CategoryStats` diferentes com o mesmo nome (risco real)
+```
+core/score_tracker.CategoryStats  campos: total_attempts, correct_count, current_streak, best_streak
+core/user_manager.CategoryStats   campos: os mesmos
+São a mesma classe?  NÃO
+```
+`gui/components/score_card.py:5` importa a de **`score_tracker`**, mas quem lhe
+passa dados é o `record_attempt`, que devolve a de **`user_manager`**. Hoje
+funciona por acaso — os campos coincidem — mas é uma armadilha: no dia em que
+uma das duas ganhar um campo, o `ScoreCard` passa a receber um objeto que a
+anotação de tipo diz não ser aquele, e o erro será difícil de localizar.
+
+`core/score_tracker.py` é legado: só o `ScoreTracker` é usado, e apenas por
+testes.
+
+**Corrigir**: `score_card.py` passa a importar `CategoryStats` de
+`core.user_manager` (a que realmente recebe). Depois disso, avalia se
+`core/score_tracker.py` ainda serve para alguma coisa — se só os testes o
+usarem, propõe removê-lo **mas não o removas sem me dizer**: a regra de não
+apagar funcionalidade aplica-se, e prefiro decidir isso com o utilizador.
+
+### 54.2 — `practice_technique` não está na barra lateral
+Extraí a lista de ecrãs da barra lateral: estão lá **12** (menu, teoria,
+repertório, escalas, lamiré, instrumento, ouvido, ritmo, pauta, composição,
+glossário, revisão diária, estatísticas) — e **falta o de Exercícios Técnicos**,
+que só é acessível pelo cartão do menu principal.
+
+**Corrigir**: acrescenta a entrada, com `t()` PT/EN como as outras. É a única
+funcionalidade que ficou meio escondida.
+
+### 54.3 — Testes escrevem um ficheiro chamado `:memory:` no disco
+5 ficheiros de teste usam `UserManager(filepath=":memory:")`. O nome vem da
+convenção do SQLite, mas o `UserManager` trata-o como um caminho normal — e
+**escreve mesmo um ficheiro** com esse nome na pasta atual. Já confirmei isto
+por execução.
+
+Está no `.gitignore`, portanto não suja o repositório, mas os testes fazem I/O
+de disco julgando que não fazem e **partilham o mesmo ficheiro entre si** —
+podem interferir uns com os outros conforme a ordem de execução, e um teste que
+falhe a meio deixa estado sujo para o seguinte.
+
+**Corrigir**: substitui por `tempfile.mkdtemp()` ou `NamedTemporaryFile`, com
+limpeza no `tearDown`, como já fazem outros testes do projeto. Confirma no fim
+que nenhum ficheiro `:memory:` é criado ao correr a suite.
+
+### O que deixo deliberadamente de fora (e porquê)
+Para não gastares tempo nisto:
+- **`core/i18n_helpers.py` importar de `gui/i18n.py`** — inverte a regra de
+  `core/` não depender da GUI, mas não parte nada e mexer nisso obriga a
+  reorganizar o estado de idioma. Só vale a pena se alguém tocar nessa área.
+- **`BackingTrackPlayer` com relógio próprio** — o Estúdio de Composição, que
+  era o caso onde a dessincronização importava, usa render offline e não este
+  player. Nos ecrãs de prática, uma pista sozinha não tem com o que
+  dessincronizar.
+- **`QuizQuestion.reference_note` nunca lido** — campo morto e inofensivo; a
+  nota já vai em `notes_to_play`.
+
+---
+
 ## Revisão — Fase 53 APROVADA ✅ (commitada por mim) + mudança de Implementador
 - Commit: `ef2ce6a` — **commitado pelo Claude**, não pelo Implementador.
 - Testes: 302/302 OK · `pyflakes`: 0
