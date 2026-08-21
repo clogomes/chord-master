@@ -774,6 +774,30 @@ Implementação nativa de um sistema de i18n em duas vertentes:
   - Descodificação de ficheiros de áudio via `soundfile` com fallback transparente para o módulo nativo `wave` (compatível com ficheiros WAV PCM 8/16/24-bit).
   - Transposição de afinação de alta fidelidade via `scipy.signal.resample_poly` com `limit_denominator(512)` (e interpolação linear caso o scipy não esteja disponível) dentro do intervalo impercetível de ±7 semitons.
   - Ordem de procura de diretórios de samples configurável (`CHORDMASTER_SAMPLES_DIR` -> `data/local_settings.json` -> `~/Documents/ChordMaster/Samples`).
+- **Esquema do Manifesto `instrument.json`**:
+  Cada biblioteca de instrumento reside numa subpasta (ex.: `piano/`, `guitar/`, `drums/`) contendo um ficheiro `instrument.json`:
+  ```json
+  {
+    "name": "piano",
+    "samples": {
+      "60": {
+        "layers": [
+          {"min_velocity": 0.0, "files": ["60_soft_1.wav", "60_soft_2.wav"]},
+          {"min_velocity": 0.6, "files": ["60_loud_1.wav", "60_loud_2.wav"]}
+        ]
+      },
+      "63": {"file": "63.wav", "gain": 1.0},
+      "67": {"files": ["67_rr1.wav", "67_rr2.wav"], "gain": 0.9}
+    }
+  }
+  ```
+  - **Formas aceites por nota/articulação**:
+    - `"file": "nome.wav"`: sample único para a nota.
+    - `"files": ["v1.wav", "v2.wav"]`: variações *round-robin* determinísticas (alternância cíclica por repetição).
+    - `"layers": [{"min_velocity": 0.0, "files": [...]}, ...]`: comutação por camadas de velocidade (*velocity switching* sem *comb filtering*).
+  - **Instrumentos melódicos vs Bateria**:
+    - Instrumentos cromáticos (`piano`, `guitar`, `bass`): as chaves em `samples` correspondem a números inteiros MIDI (ex.: `"60"` para Dó4, espaçados idealmente de 2 a 3 semitons; transposição automática até ±7 semitons).
+    - Bateria (`drums` ou `drum_kit`): as chaves em `samples` correspondem a nomes de articulações (ex.: `"kick"`, `"snare"`, `"hihat_closed"`, `"hihat_open"`, `"ride"`, `"crash"`, `"tom_high"`, `"tom_mid"`, `"tom_low"`, `"clap"`, `"rimshot"`, `"cowbell"`), reproduzidos sem transposição para preservar o corpo e tamanho acústico original do tambor.
 - **Integração no Renderizador e Fallback Transparente (`audio/composition_renderer.py`)**:
   - Encaminhamento automático dos eventos de percussão, acordes e notas melódicas para a `SampleLibrary`. Na ausência de amostras reais ou de bibliotecas externas, o renderizador degrada de forma graciosa e sem falhas para os algoritmos de síntese acústica embutidos.
 - **Suite de Testes Unitários (`tests/test_sample_library.py`)**:
