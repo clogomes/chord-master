@@ -3,7 +3,7 @@ import threading
 import time
 from typing import Callable, Optional, Tuple, Any
 import numpy as np
-from audio.player import get_audio_player, HAS_PYGAME
+from audio.player import HAS_PYGAME
 
 try:
     import pygame
@@ -130,20 +130,33 @@ class Metronome:
 def evaluate_rhythm_accuracy(
     expected_timestamp: float,
     actual_timestamp: float,
+    perfect_ms: float = 95.0,
+    good_ms: float = 220.0,
 ) -> Tuple[str, float, int]:
     """
     Evaluates timing accuracy of a musical note press relative to expected beat.
 
+    Args:
+        expected_timestamp: momento esperado (referência time.time()).
+        actual_timestamp: momento em que a batida/nota aconteceu.
+        perfect_ms: |desvio| máximo (ms) para "PERFEITO" (omissão 95).
+        good_ms: |desvio| máximo (ms) para "BOM" (omissão 220).
+
     Returns:
         (rating_label, delta_ms, points)
         Ratings: "PERFEITO ⭐", "BOM 👍", "FORA DE TEMPO ⚠️"
+
+    Nota: os valores por omissão (95/220) preservam o comportamento dos ecrãs
+    onde a batida é ao tocar uma nota (repertório, escalas, instrumento), onde
+    alguma tolerância faz sentido. O ecrã de prática rítmica passa limiares
+    estritos (ver practice_rhythm.py).
     """
     delta_sec = abs(actual_timestamp - expected_timestamp)
     delta_ms = delta_sec * 1000.0
 
-    if delta_ms <= 95.0:
+    if delta_ms <= perfect_ms:
         return "PERFEITO ⭐", delta_ms, 50
-    elif delta_ms <= 220.0:
+    elif delta_ms <= good_ms:
         return "BOM 👍", delta_ms, 25
     else:
         return "FORA DE TEMPO ⚠️", delta_ms, 10

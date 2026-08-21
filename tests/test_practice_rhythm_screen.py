@@ -98,6 +98,27 @@ class TestPracticeRhythmScreen(unittest.TestCase):
                         "Desvio assinado deve ser positivo quando se bate atrasado")
         screen.destroy()
 
+    def test_strict_thresholds_90ms_is_not_perfect(self):
+        """Regressão (Fase 49): com os limiares estritos do ecrã, 90 ms não é PERFEITO."""
+        from audio.metronome import evaluate_rhythm_accuracy
+        from gui.screens.practice_rhythm import PERFECT_MS, GOOD_MS
+        # O ecrã usa limiares estritos (muito mais apertados que o default 95/220).
+        self.assertLess(PERFECT_MS, 95.0)
+        self.assertLess(GOOD_MS, 220.0)
+
+        expected = 100.0
+        # 90 ms de desvio -> BOM, não PERFEITO, com os limiares do ecrã.
+        label, _, _ = evaluate_rhythm_accuracy(
+            expected, expected + 0.090, perfect_ms=PERFECT_MS, good_ms=GOOD_MS,
+        )
+        self.assertNotIn("PERFEITO", label)
+        self.assertIn("BOM", label)
+        # E 30 ms -> PERFEITO.
+        label30, _, _ = evaluate_rhythm_accuracy(
+            expected, expected + 0.030, perfect_ms=PERFECT_MS, good_ms=GOOD_MS,
+        )
+        self.assertIn("PERFEITO", label30)
+
 
 if __name__ == "__main__":
     unittest.main()

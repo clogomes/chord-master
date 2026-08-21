@@ -26,8 +26,13 @@ from gui.scroll_utils import bind_mousewheel
 from gui.i18n import get_language, t
 from gui import theme
 
-# Limiar (ms) abaixo do qual uma batida conta como "certa" (rótulos BOM/PERFEITO)
-ON_TIME_MS = 220.0
+# Limiares estritos do ecrã de ritmo (ms de |desvio|). Músicos treinados percebem
+# desvios na ordem dos 20-30 ms; a 95 ms já se ouve claramente fora de tempo.
+# (Os outros ecrãs mantêm 95/220 por omissão — ver evaluate_rhythm_accuracy.)
+PERFECT_MS = 45.0
+GOOD_MS = 110.0
+# Uma batida conta como "certa" se ficar dentro do limiar BOM.
+ON_TIME_MS = GOOD_MS
 # Fração mínima de batidas certas para a sessão contar como "correta" (SRS grade 5)
 PASS_RATIO = 0.6
 
@@ -203,6 +208,17 @@ class PracticeRhythmScreen(ctk.CTkFrame):
         )
         self.tap_btn.pack(fill="x", padx=24, pady=(4, 8))
 
+        # Critério de classificação visível (evita que pareça arbitrária).
+        if get_language() == "pt":
+            crit = f"Critério: ±{PERFECT_MS:.0f} ms = perfeito · ±{GOOD_MS:.0f} ms = bom"
+        else:
+            crit = f"Criterion: ±{PERFECT_MS:.0f} ms = perfect · ±{GOOD_MS:.0f} ms = good"
+        self.criterion_lbl = ctk.CTkLabel(
+            self.stage_scroll, text=crit,
+            font=theme.get_font(theme.FONT_SMALL), text_color=theme.COLOR_TEXT_MUTED,
+        )
+        self.criterion_lbl.pack(pady=(0, 6))
+
         self.score_card = ScoreCard(self.stage_scroll, on_next=self._restart)
 
     # ── Seleção / carregamento ────────────────────────────────────────────────
@@ -336,7 +352,9 @@ class PracticeRhythmScreen(ctk.CTkFrame):
             return
         actual = time.time()
         expected = self._expected_timestamps[idx]
-        label, delta_ms, points = evaluate_rhythm_accuracy(expected, actual)
+        label, delta_ms, points = evaluate_rhythm_accuracy(
+            expected, actual, perfect_ms=PERFECT_MS, good_ms=GOOD_MS,
+        )
         signed_ms = (actual - expected) * 1000.0  # + = atrasado, - = adiantado
         self.taps.append((label, delta_ms, signed_ms, points))
 
