@@ -24,13 +24,13 @@ primeiro, antes de avançar.
 
 ---
 
-## Fase 59 — Suporte a Samples Reais & Fallback de Síntese — CONCLUÍDA
-- Data: 2026-08-21T20:28:37+01:00
-- Commit: ff24204
-- Resumo: Implementado o sistema completo de gestão e carregamento de samples reais de instrumentos e bateria (`audio/sample_library.py`). Suporta manifestos `instrument.json` por instrumento, comutação de camadas de velocidade sem *crossfade* comb filtering, variações *round-robin* determinísticas (para repetibilidade estrita de testes e renderização) e transposição de afinação de alta fidelidade via `scipy.signal.resample_poly` (com `limit_denominator(512)` para precisão sub-centésima) e interpolação linear quando o scipy não estiver presente. Descodificação de áudio via `soundfile` com fallback defensivo para o módulo nativo `wave` para ficheiros WAV PCM de 8, 16 e 24-bit. O renderizador `CompositionRenderer` consulta a `SampleLibrary` antes de disparar percussões, acordes ou notas melódicas, e na ausência de ficheiros ou bibliotecas degrada 100% sem falhas e sem silêncio para os sintetizadores acústicos embutidos. Otimizada também a dobragem de cauda do loop na Fase 58 com vetorização numpy reshape-sum. Nova suite de testes unitários `tests/test_sample_library.py`. Total de 319/319 testes a passar.
-- Ficheiros principais alterados: audio/sample_library.py (novo), audio/composition_renderer.py, .gitignore, tests/test_sample_library.py (novo), README.md
-- Validação: 319/319 testes a passar (+6 novos testes). `pyflakes` 100% limpo (zero F821).
-- Estado: **PRONTO PARA REVISÃO DO CLAUDE** — trabalho concluído de todas as fases planeadas (55 a 59).
+## Fase 59 — Suporte a Samples Reais & Fallback de Síntese — CONCLUÍDA (AÇÕES CORRIGIDAS)
+- Data: 2026-08-21T20:33:28+01:00
+- Commit: d1404e1
+- Resumo: Resolvidos os dois itens apontados na revisão do Claude: (1) Adicionada a dependência declarada `soundfile>=0.13.1,<0.14` ao `requirements.txt` para suporte integral a ficheiros FLAC e outros formatos na instalação do projeto; (2) Documentado exaustivamente no `README.md` o esquema completo do manifesto `instrument.json` com exemplos práticos, explicação das três variantes por nota (`file`, `files`, `layers`), mapeamento por MIDI para instrumentos cromáticos e por nome de articulação para percussão/bateria.
+- Ficheiros principais alterados: requirements.txt, README.md
+- Validação: 319/319 testes a passar. `pyflakes` 100% limpo (zero F821).
+- Estado: **PRONTO PARA REVISÃO DO CLAUDE** — trabalho concluído e itens de ação corrigidos.
 
 ## Fase 58 — Repetição de Compassos em Ciclo (Loop Infinito no Estúdio) — CONCLUÍDA
 - Data: 2026-08-21T20:17:00+01:00
