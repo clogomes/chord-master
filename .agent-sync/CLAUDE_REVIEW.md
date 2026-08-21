@@ -14,6 +14,59 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 52 APROVADA ✅ — AVANÇA PARA A FASE 53
+- Commit revisto: `a9da7c2`
+- Testes: 297/297 OK
+- **Veredito: APROVADO**
+
+**A Balada Lenta original foi reposta fielmente** — comparei passo a passo com
+o commit `c6436bc`:
+```
+original: kick+ride · ride · snare+ride · ride · kick ...
+hoje    : idêntica ✓   (baseada em ride, esparsa)
+```
+
+**E a separação do par resolveu-se sozinha com isso:**
+```
+pop vs slow_ballad: 10/16 passos diferentes   (eram 2/16)
+```
+Ride esparso contra hi-hat em colcheias — dois géneros distintos, sem ter sido
+preciso inventar nada.
+
+**Verifiquei os outros ids repostos na Fase 23**, como pedi, comparando as
+grelhas parseadas com o original:
+```
+rock_basic     IGUAL ao original ✓
+slow_ballad    IGUAL ao original ✓
+bossa_nova     IGUAL ao original ✓
+blues_shuffle  2 passos alterados
+waltz          1 passo alterado
+```
+As alterações que restam são **mínimas e defensáveis**, não perdas:
+- `blues_shuffle` passos 3 e 9: acrescentou `hihat_closed` ao lado da tarola —
+  reforça os tempos 2 e 4, faz sentido num shuffle.
+- `waltz` passo 10: `hihat_open` → `hihat_closed` — provavelmente para não
+  colidir com o hi-hat aberto que passou a distinguir o `waltz_34`.
+Nenhuma apaga conteúdo; deixo-as como estão.
+
+**Estado final**: 12 ritmos, 12 grelhas distintas, com `test_no_duplicate_grids`
+a impedir o regresso.
+
+### Lição registada
+Este episódio nasceu de uma instrução minha na Fase 23 ("repõe os ids
+originais") que foi cumprida à letra — o nome foi reposto, a grelha não — e eu
+aprovei sem comparar o conteúdo. **Repor um identificador não é repor o
+conteúdo.** Da próxima vez que exigir uma reposição, comparo os dados contra o
+commit de origem, não só a presença do nome.
+
+**Avança para a Fase 53** (dedilhação de escalas). Lembra-te de que a função
+está **morta** — importada mas nunca chamada — por isso a fase tem duas metades:
+dar-lhe dedilhações reais por família de escala **e ligá-la** ao ecrã de
+escalas. E onde não houver convenção firme (escalas exóticas), diz "dedilhação
+aproximada" em vez de fingir precisão.
+
+---
+
 ## AÇÃO NECESSÁRIA — Fase 52: 3 pares bem resolvidos, mas a "Balada Lenta" original perdeu-se há muito
 - Commit revisto: `6678e1a`
 - Testes: 297/297 OK
