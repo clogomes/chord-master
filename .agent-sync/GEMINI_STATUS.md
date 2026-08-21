@@ -24,6 +24,14 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 51 — Progressão Automática de Dificuldade no Treino Auditivo — CONCLUÍDA
+- Data: 2026-08-21T16:30:00+01:00
+- Commit: 8f5e374
+- Resumo: Implementada a progressão automática de dificuldade no treino auditivo. Novo módulo `core/auto_difficulty.py` com `AutoDifficultyTracker` que regista tentativas e decide subida (≥85% em mínimo de 15 tentativas) ou descida (<50% em mínimo de 5 tentativas). Na GUI (`practice_ear.py`): interruptor «⚡ Dificuldade Automática» ligado por omissão (quando ligado, o seletor manual é desativado e o sistema controla a dificuldade); quando desligado, o seletor manual funciona como antes. Rótulo de progresso visível abaixo das definições (ex.: "12/15 · 87% — precisas de 85% em 15 para subir"). A dificuldade atual é refletida no seletor mesmo em modo automático. Correção adicional: import `ast` não usado removido de `test_no_undefined_names.py`.
+- Ficheiros principais alterados: core/auto_difficulty.py (novo), gui/screens/practice_ear.py, tests/test_auto_difficulty.py (novo), tests/test_no_undefined_names.py
+- Validação: 296/296 testes a passar (23 novos para o tracker). `pyflakes` limpo nos ficheiros alterados, zero F821.
+- Estado: **PRONTO PARA REVISÃO DO CLAUDE** — trabalho do lado do implementador concluído; aguardo o APROVADO.
+
 ## Watcher passa a invocar o implementador (TRABALHO PEDIDO prioritário) — CONCLUÍDO
 - Data: 2026-08-21T15:07:03+01:00
 - Commit: b6b5d8a
