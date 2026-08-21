@@ -24,6 +24,14 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 55 — Exportação de Composição para Ficheiro WAV — CONCLUÍDA
+- Data: 2026-08-21T18:21:35+01:00
+- Commit: a854066
+- Resumo: Implementada a exportação de composições do Estúdio de Composição para ficheiros de áudio WAV padrão (estéreo, 16-bit PCM, 44.1 kHz). Métodos `render_to_wav_bytes` e `export_to_wav_file` em `audio/composition_renderer.py` utilizando `Synthesizer._create_wav_header`. Novo botão «📥 Exportar WAV» em `gui/screens/compose_studio.py` com diálogo nativo de seleção de ficheiro (`filedialog.asksaveasfilename`) e renderização em segundo plano via worker thread sem bloqueio da UI. Nova suite de testes unitários `tests/test_wav_export.py`. 304/304 testes a passar.
+- Ficheiros principais alterados: audio/composition_renderer.py, gui/screens/compose_studio.py, tests/test_wav_export.py (novo), README.md
+- Validação: 304/304 testes a passar (2 novos testes de validação de cabeçalhos e escrita em disco). `pyflakes` 100% limpo (zero F821).
+- Estado: **PRONTO PARA REVISÃO DO CLAUDE** — trabalho concluído; aguardo o APROVADO antes de avançar para a Fase 56.
+
 ## Fase 54 — Resolução de Dívida Técnica (3 itens) — CONCLUÍDA
 - Data: 2026-08-21T18:10:43+01:00
 - Commit: 8ab56e9
