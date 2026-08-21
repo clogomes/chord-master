@@ -221,6 +221,32 @@ def _get_synthesized_chord_sample(
     _SAMPLE_CACHE[cache_key] = result
     return result
 
+def _get_synthesized_note_sample(
+    instrument: str,
+    midi: int,
+    duration: float,
+    volume: float,
+    sample_rate: int = SAMPLE_RATE,
+) -> np.ndarray:
+    """Returns cached mono float32 note waveform for melodic notes."""
+    dur_quant = round(duration, 3)
+    vol_quant = round(volume, 2)
+    cache_key = ("note", instrument, int(midi), dur_quant, vol_quant, sample_rate)
+
+    if cache_key in _SAMPLE_CACHE:
+        return _SAMPLE_CACHE[cache_key]
+
+    freq = 440.0 * (2.0 ** ((midi - 69) / 12.0))
+
+    if instrument == "guitar":
+        result = _synthesize_guitar_note_raw(freq, duration, volume, sample_rate)
+    else:
+        # Piano note
+        result = _synthesize_piano_chord_raw([freq], duration, volume, sample_rate)
+
+    _SAMPLE_CACHE[cache_key] = result
+    return result
+
 
 class CompositionRenderer:
     """Offline renderer for compositions to 44.1kHz stereo float32 buffers."""
@@ -248,55 +274,51 @@ class CompositionRenderer:
         core_duration = total_beats * seconds_per_beat
 
         # Acoustic tail extension (3.0 seconds for natural crash cymbal ring and reverb decay)
-        tail_seconds = 3.0
-        total_duration = core_duration + tail_seconds
-        total_samples = int(self.sample_rate * total_duration)
+        tail_duration = 3.0
+        total_duration = core_duration + tail_duration
+        total_samples = int(total_duration * self.sample_rate)
 
-        # Stereo mixing buffer (Left, Right)
+        # Stereo mix channels (float32)
         mix_left = np.zeros(total_samples, dtype=np.float32)
         mix_right = np.zeros(total_samples, dtype=np.float32)
 
         # 1. Render Rhythm Track
         if composition.rhythm and not composition.rhythm.muted and composition.rhythm.grid:
-            rhythm = composition.rhythm
-            steps_per_bar = max(1, rhythm.steps_per_bar)
-            seconds_per_step = (beats_per_bar * seconds_per_beat) / steps_per_bar
-            track_vol = composition.rhythm.volume
-
-            grid_len = len(rhythm.grid)
+            steps_per_bar = composition.rhythm.steps_per_bar
             total_steps = total_bars * steps_per_bar
+            step_duration_sec = (60.0 / bpm) * (beats_per_bar / float(steps_per_bar))
+            drum_vol = composition.rhythm.volume
 
             for step_idx in range(total_steps):
-                grid_step = rhythm.grid[step_idx % grid_len]
-                if not grid_step:
+                step_start_sec = step_idx * step_duration_sec
+                start_sample = int(step_start_sec * self.sample_rate)
+                if start_sample >= total_samples:
                     continue
 
-                step_start_sec = step_idx * seconds_per_step
-                start_sample = int(step_start_sec * self.sample_rate)
+                pattern_idx = step_idx % len(composition.rhythm.grid)
+                active_drums = composition.rhythm.grid[pattern_idx]
 
-                for drum_inst in grid_step:
-                    drum_audio = _get_synthesized_drum_sample(drum_inst, self.sample_rate)
-                    sample_len = len(drum_audio)
+                for drum_inst in active_drums:
+                    drum_sample = _get_synthesized_drum_sample(drum_inst, self.sample_rate)
+                    sample_len = len(drum_sample)
                     end_sample = min(total_samples, start_sample + sample_len)
                     actual_len = end_sample - start_sample
 
                     if actual_len > 0:
-                        scaled_drum = drum_audio[:actual_len] * track_vol
-                        # Stereo panning for drum kit:
-                        # Kick/Snare: center; Hi-hat: left (-0.15); Ride: right (+0.2); Crash: left (+0.25);
-                        # Tom Low: right (+0.3); Tom Mid: center; Tom High: left (-0.3); Cowbell: right (+0.15)
-                        pan_left = 1.0
-                        pan_right = 1.0
-                        if "hihat" in drum_inst:
+                        scaled_drum = drum_sample[:actual_len] * drum_vol
+
+                        # Stereo placement:
+                        # Kick/Snare/Rimshot center (1.0, 1.0)
+                        # Hihat/Ride/Clap slightly right (0.9, 1.1)
+                        # Toms spread (low: right, mid: center, high: left)
+                        # Crash slightly left (1.1, 0.9)
+                        pan_left, pan_right = 1.0, 1.0
+                        if "hihat" in drum_inst or "ride" in drum_inst or "clap" in drum_inst:
+                            pan_left, pan_right = 0.9, 1.1
+                        elif "tom_high" in drum_inst or "crash" in drum_inst:
                             pan_left, pan_right = 1.15, 0.85
-                        elif "ride" in drum_inst:
-                            pan_left, pan_right = 0.85, 1.15
-                        elif "crash" in drum_inst:
-                            pan_left, pan_right = 1.25, 0.75
-                        elif "tom_high" in drum_inst:
-                            pan_left, pan_right = 1.2, 0.8
                         elif "tom_low" in drum_inst:
-                            pan_left, pan_right = 0.8, 1.2
+                            pan_left, pan_right = 0.85, 1.15
                         elif "cowbell" in drum_inst:
                             pan_left, pan_right = 0.9, 1.1
 
@@ -332,12 +354,40 @@ class CompositionRenderer:
                     mix_left[start_sample:end_sample] += scaled_chord * pan_l
                     mix_right[start_sample:end_sample] += scaled_chord * pan_r
 
-        # 3. Apply Master Volume
+        # 3. Render Melodic Notes Track
+        if hasattr(composition, "notes") and composition.notes:
+            for ne in composition.notes:
+                note_start_sec = ne.start_beat * seconds_per_beat
+                start_sample = int(note_start_sec * self.sample_rate)
+                if start_sample >= total_samples:
+                    continue
+
+                note_dur_sec = ne.duration_beats * seconds_per_beat
+                note_vol = getattr(ne, "velocity", 0.8)
+                note_audio = _get_synthesized_note_sample(
+                    instrument=ne.instrument,
+                    midi=ne.midi,
+                    duration=note_dur_sec,
+                    volume=note_vol,
+                    sample_rate=self.sample_rate,
+                )
+
+                sample_len = len(note_audio)
+                end_sample = min(total_samples, start_sample + sample_len)
+                actual_len = end_sample - start_sample
+
+                if actual_len > 0:
+                    scaled_note = note_audio[:actual_len]
+                    pan_l, pan_r = (1.02, 0.98) if ne.instrument == "piano" else (0.98, 1.02)
+                    mix_left[start_sample:end_sample] += scaled_note * pan_l
+                    mix_right[start_sample:end_sample] += scaled_note * pan_r
+
+        # 4. Apply Master Volume
         master_vol = composition.master_volume
         mix_left *= master_vol
         mix_right *= master_vol
 
-        # 4. Soft Saturation Limiter (np.tanh prevents hard clipping while keeping punch)
+        # 5. Soft Saturation Limiter (np.tanh prevents hard clipping while keeping punch)
         mix_left = np.tanh(mix_left)
         mix_right = np.tanh(mix_right)
 

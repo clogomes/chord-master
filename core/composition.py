@@ -83,6 +83,34 @@ class RhythmTrack:
 
 
 @dataclass
+class NoteEvent:
+    midi: int              # MIDI note number (e.g. 60 for C4)
+    start_beat: float      # 0.0, 1.0, 2.5, ...
+    duration_beats: float = 1.0
+    velocity: float = 0.8
+    instrument: str = "piano"   # "piano" | "guitar"
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "midi": int(self.midi),
+            "start_beat": float(self.start_beat),
+            "duration_beats": float(self.duration_beats),
+            "velocity": float(self.velocity),
+            "instrument": str(self.instrument),
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "NoteEvent":
+        return cls(
+            midi=int(data.get("midi", 60)),
+            start_beat=float(data.get("start_beat", 0.0)),
+            duration_beats=float(data.get("duration_beats", 1.0)),
+            velocity=float(data.get("velocity", 0.8)),
+            instrument=str(data.get("instrument", "piano")),
+        )
+
+
+@dataclass
 class Composition:
     id: str
     title: str
@@ -91,8 +119,9 @@ class Composition:
     bars: int = 4
     rhythm: RhythmTrack = field(default_factory=RhythmTrack)
     chords: List[ChordEvent] = field(default_factory=list)
+    notes: List[NoteEvent] = field(default_factory=list)
     master_volume: float = 0.8
-    schema_version: int = 1
+    schema_version: int = 2
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -103,6 +132,7 @@ class Composition:
             "bars": int(self.bars),
             "rhythm": self.rhythm.to_dict() if self.rhythm else RhythmTrack().to_dict(),
             "chords": [c.to_dict() for c in self.chords],
+            "notes": [n.to_dict() for n in self.notes],
             "master_volume": float(self.master_volume),
             "schema_version": int(self.schema_version),
         }
@@ -132,6 +162,13 @@ class Composition:
                 if isinstance(c_item, dict):
                     chords.append(ChordEvent.from_dict(c_item))
 
+        notes_data = data.get("notes", [])
+        notes = []
+        if isinstance(notes_data, list):
+            for n_item in notes_data:
+                if isinstance(n_item, dict):
+                    notes.append(NoteEvent.from_dict(n_item))
+
         return cls(
             id=str(data.get("id", "comp_default")),
             title=str(data.get("title", "Nova Composição")),
@@ -140,6 +177,7 @@ class Composition:
             bars=bars,
             rhythm=rhythm,
             chords=chords,
+            notes=notes,
             master_volume=float(data.get("master_volume", 0.8)),
-            schema_version=int(data.get("schema_version", 1)),
+            schema_version=int(data.get("schema_version", 2)),
         )

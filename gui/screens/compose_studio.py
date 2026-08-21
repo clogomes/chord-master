@@ -5,7 +5,7 @@ from tkinter import filedialog, messagebox
 from typing import Callable, Dict, List, Optional
 import customtkinter as ctk
 import numpy as np
-from core.composition import Composition, ChordEvent, RhythmTrack
+from core.composition import Composition, ChordEvent, NoteEvent, RhythmTrack
 from core.compositions import (
     get_template_composition,
     save_user_composition,
@@ -15,13 +15,15 @@ from core.compositions import (
 from core.user_manager import UserManager
 from core.chords import CHORD_TYPES, get_chord_notes
 from core.guitar import GUITAR_CHORD_LIBRARY, GuitarChordShape
-from core.notes import Note
+from core.notes import Note, midi_to_note
 from audio.composition_renderer import CompositionRenderer
 from audio.backing_tracks import BACKING_TRACK_LIBRARY
 from audio.player import get_audio_player
 from gui.components.step_grid import StepGrid
+from gui.components.piano_roll import PianoRoll
 from gui.components.piano_keyboard import PianoKeyboard
 from gui.components.guitar_fretboard import GuitarFretboard
+from gui.components.staff_canvas import StaffCanvas
 from gui.scroll_utils import bind_mousewheel
 from gui.i18n import t, get_language
 from gui import theme
@@ -309,7 +311,18 @@ class ComposeStudioScreen(ctk.CTkFrame):
         )
         self.step_grid.pack(fill="both", expand=True, padx=14, pady=(4, 12))
 
-        # 6. Harmonic Chords Track & Editor Card
+        # 6. Melodic Notes & Piano Roll Card (Phase 56)
+        self.piano_roll_card = ctk.CTkFrame(
+            self.scroll_container,
+            corner_radius=theme.RADIUS_LG,
+            fg_color=theme.COLOR_SURFACE,
+            border_width=1,
+            border_color=theme.COLOR_BORDER,
+        )
+        self.piano_roll_card.pack(fill="both", expand=True, pady=(0, 12))
+        self._build_piano_roll_section()
+
+        # 7. Harmonic Chords Track & Editor Card
         self.chords_card = ctk.CTkFrame(
             self.scroll_container,
             corner_radius=theme.RADIUS_LG,
@@ -320,7 +333,7 @@ class ComposeStudioScreen(ctk.CTkFrame):
         self.chords_card.pack(fill="both", expand=True, pady=(0, 12))
         self._build_chords_section()
 
-        # 7. Interactive Instrument Visualizers Card (Piano & Viola)
+        # 8. Interactive Instrument Visualizers Card (Piano, Viola & Pauta)
         vis_card = ctk.CTkFrame(
             self.scroll_container,
             corner_radius=theme.RADIUS_LG,
@@ -511,14 +524,137 @@ class ComposeStudioScreen(ctk.CTkFrame):
             )
             del_btn.pack(anchor="e", pady=(2, 0))
 
+    def _build_piano_roll_section(self):
+        """Builds the melodic piano roll canvas and controls."""
+        header = ctk.CTkFrame(self.piano_roll_card, fg_color="transparent")
+        header.pack(fill="x", padx=16, pady=(12, 6))
+
+        ctk.CTkLabel(
+            header,
+            text="🎼 Faixa Melódica (Piano Roll)",
+            font=theme.get_font(theme.FONT_SECTION),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+        ).pack(side="left")
+
+        ctk.CTkLabel(
+            header,
+            text="💡 Clica para inserir notas, arrasta para mover, arrasta a borda direita para estender a duração. Delete/Backspace para apagar.",
+            font=theme.get_font(theme.FONT_SMALL),
+            text_color=theme.COLOR_TEXT_MUTED,
+        ).pack(side="right")
+
+        # Roll Toolbar
+        r_tools = ctk.CTkFrame(self.piano_roll_card, fg_color=theme.COLOR_SURFACE_SECONDARY, corner_radius=theme.RADIUS_MD)
+        r_tools.pack(fill="x", padx=14, pady=(0, 8))
+
+        t_inner = ctk.CTkFrame(r_tools, fg_color="transparent")
+        t_inner.pack(fill="x", padx=12, pady=6)
+
+        ctk.CTkLabel(t_inner, text="Instrumento Melódico:", font=theme.get_font(theme.FONT_SMALL_BOLD)).pack(side="left", padx=(0, 6))
+        self.roll_inst_menu = ctk.CTkSegmentedButton(
+            t_inner,
+            values=["🎹 Piano", "🎸 Viola"],
+            font=theme.get_font(theme.FONT_SMALL),
+            command=self._on_roll_instrument_changed,
+        )
+        self.roll_inst_menu.set("🎹 Piano")
+        self.roll_inst_menu.pack(side="left", padx=(0, 14))
+
+        self.del_note_btn = ctk.CTkButton(
+            t_inner,
+            text="🗑️ Apagar Nota Selecionada",
+            font=theme.get_font(theme.FONT_SMALL),
+            fg_color=theme.COLOR_SURFACE,
+            hover_color=theme.COLOR_BORDER,
+            text_color=theme.COLOR_TEXT_PRIMARY,
+            height=28,
+            corner_radius=theme.RADIUS_SM,
+            command=self._delete_selected_roll_note,
+        )
+        self.del_note_btn.pack(side="left", padx=(0, 10))
+
+        self.clear_notes_btn = ctk.CTkButton(
+            t_inner,
+            text="🗑️ Limpar Melodia",
+            font=theme.get_font(theme.FONT_SMALL),
+            fg_color=theme.COLOR_SURFACE,
+            hover_color=theme.COLOR_ACCENT_CRIMSON,
+            text_color=theme.COLOR_TEXT_PRIMARY,
+            height=28,
+            corner_radius=theme.RADIUS_SM,
+            command=self._clear_melody_notes,
+        )
+        self.clear_notes_btn.pack(side="right")
+
+        # Piano Roll Canvas Component
+        steps = self.composition.rhythm.steps_per_bar if self.composition.rhythm else 16
+        bars = self.composition.bars
+        self.piano_roll = PianoRoll(
+            self.piano_roll_card,
+            notes=getattr(self.composition, "notes", []),
+            bars=bars,
+            steps_per_bar=steps,
+            on_notes_changed=self._on_melody_notes_changed,
+            on_note_selected=self._on_melody_note_selected,
+        )
+        self.piano_roll.pack(fill="both", expand=True, padx=14, pady=(4, 12))
+
+    def _on_roll_instrument_changed(self, value: str):
+        inst = "piano" if "Piano" in value else "guitar"
+        self.piano_roll.set_instrument(inst)
+
+    def _delete_selected_roll_note(self):
+        self.piano_roll.delete_selected_note()
+
+    def _clear_melody_notes(self):
+        self.composition.notes = []
+        self.piano_roll.set_notes(self.composition.notes)
+        self._update_staff_canvas()
+
+    def _on_melody_notes_changed(self, notes: List[NoteEvent]):
+        self.composition.notes = notes
+        self._update_staff_canvas()
+
+    def _on_melody_note_selected(self, note: Optional[NoteEvent]):
+        if note is not None:
+            # Highlight on PianoKeyboard, GuitarFretboard, and StaffCanvas
+            pitch_name, octv = midi_to_note(note.midi)
+            note_obj = Note(pitch_name, octv)
+            self.piano_widget.highlight_notes([note_obj], color="#38BDF8")
+            self.guitar_widget.highlight_scale([note_obj])
+            self.staff_widget.set_notes([note_obj], colors=["#38BDF8"], durations=[note.duration_beats])
+        else:
+            self.piano_widget.clear_highlights()
+            self.guitar_widget.clear_highlights()
+            self._update_staff_canvas()
+
+    def _update_staff_canvas(self):
+        """Refreshes the StaffCanvas to display the composition's melodic notes."""
+        if hasattr(self, "staff_widget") and self.composition.notes:
+            # Sort notes by start_beat
+            sorted_notes = sorted(self.composition.notes, key=lambda n: n.start_beat)
+            # Take up to 16 notes to avoid overflowing single staff view
+            disp_notes = sorted_notes[:16]
+            note_objs = []
+            dur_list = []
+            col_list = []
+            for n in disp_notes:
+                p_name, octv = midi_to_note(n.midi)
+                note_objs.append(Note(p_name, octv))
+                dur_list.append(n.duration_beats)
+                col_list.append("#4F46E5" if n.instrument == "piano" else "#10B981")
+            self.staff_widget.set_notes(note_objs, colors=col_list, durations=dur_list)
+        elif hasattr(self, "staff_widget"):
+            self.staff_widget.clear()
+
     def _build_visualizers_section(self, parent):
-        """Builds synchronized Piano Keyboard and Guitar Fretboard widgets."""
+        """Builds synchronized Piano Keyboard, Guitar Fretboard, and StaffCanvas widgets."""
         header = ctk.CTkFrame(parent, fg_color="transparent")
         header.pack(fill="x", padx=16, pady=(12, 6))
 
         ctk.CTkLabel(
             header,
-            text="🎼 Visualizadores de Instrumento (Sincronizados com o Acorde Ativo)",
+            text="🎼 Visualizadores Pedagógicos (Piano, Viola & Pauta Musical)",
             font=theme.get_font(theme.FONT_SECTION),
             text_color=theme.COLOR_TEXT_PRIMARY,
         ).pack(side="left")
@@ -526,12 +662,33 @@ class ComposeStudioScreen(ctk.CTkFrame):
         # Visualizer tabs / toggle
         self.vis_selector = ctk.CTkSegmentedButton(
             header,
-            values=["🎹 Piano", "🎸 Viola", "👥 Ambos"],
+            values=["🎹 Piano", "🎸 Viola", "🎼 Pauta", "👥 Todos"],
             font=theme.get_font(theme.FONT_SMALL_BOLD),
             command=self._on_vis_mode_changed,
         )
-        self.vis_selector.set("👥 Ambos")
+        self.vis_selector.set("👥 Todos")
         self.vis_selector.pack(side="right")
+
+        # Staff Container
+        self.staff_container = ctk.CTkFrame(parent, fg_color="transparent")
+        self.staff_container.pack(fill="x", padx=14, pady=(4, 6))
+
+        ctk.CTkLabel(
+            self.staff_container,
+            text="🎼 Pauta Musical (Partitura da Melodia):",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            text_color=theme.COLOR_TEXT_PRIMARY,
+        ).pack(anchor="w", padx=4, pady=(0, 2))
+
+        self.staff_widget = StaffCanvas(
+            self.staff_container,
+            width=680,
+            height=140,
+            clef="treble",
+            show_note_names=True,
+            time_signature=self.composition.time_signature,
+        )
+        self.staff_widget.pack(anchor="center", pady=2)
 
         # Piano Container
         self.piano_container = ctk.CTkFrame(parent, fg_color="transparent")
@@ -539,7 +696,7 @@ class ComposeStudioScreen(ctk.CTkFrame):
 
         ctk.CTkLabel(
             self.piano_container,
-            text="🎹 Teclado de Piano (Notas & Digitação do Acorde):",
+            text="🎹 Teclado de Piano (Notas & Digitação do Acorde/Melodia):",
             font=theme.get_font(theme.FONT_BODY_BOLD),
             text_color=theme.COLOR_TEXT_PRIMARY,
         ).pack(anchor="w", padx=4, pady=(0, 4))
@@ -578,11 +735,18 @@ class ComposeStudioScreen(ctk.CTkFrame):
     def _on_vis_mode_changed(self, value: str):
         if value == "🎹 Piano":
             self.piano_container.pack(fill="x", padx=14, pady=(4, 8))
+            self.staff_container.pack_forget()
             self.guitar_container.pack_forget()
         elif value == "🎸 Viola":
-            self.piano_container.pack_forget()
             self.guitar_container.pack(fill="x", padx=14, pady=(4, 14))
+            self.piano_container.pack_forget()
+            self.staff_container.pack_forget()
+        elif value == "🎼 Pauta":
+            self.staff_container.pack(fill="x", padx=14, pady=(4, 6))
+            self.piano_container.pack_forget()
+            self.guitar_container.pack_forget()
         else:
+            self.staff_container.pack(fill="x", padx=14, pady=(4, 6))
             self.piano_container.pack(fill="x", padx=14, pady=(4, 8))
             self.guitar_container.pack(fill="x", padx=14, pady=(4, 14))
 
@@ -741,6 +905,8 @@ class ComposeStudioScreen(ctk.CTkFrame):
             elif len(self.composition.rhythm.grid) > new_total_steps:
                 self.composition.rhythm.grid = self.composition.rhythm.grid[:new_total_steps]
             self.step_grid.set_grid(self.composition.rhythm.grid, steps_per_bar, new_bars)
+            if hasattr(self, "piano_roll"):
+                self.piano_roll.set_bars(new_bars, steps_per_bar)
 
     def _on_preset_selected(self, value: str):
         for pid in BACKING_TRACK_LIBRARY:
@@ -753,6 +919,8 @@ class ComposeStudioScreen(ctk.CTkFrame):
                     self.composition.rhythm.steps_per_bar,
                     self.composition.bars,
                 )
+                if hasattr(self, "piano_roll"):
+                    self.piano_roll.set_bars(self.composition.bars, self.composition.rhythm.steps_per_bar)
                 break
 
     def _on_saved_composition_selected(self, value: str):
@@ -768,6 +936,10 @@ class ComposeStudioScreen(ctk.CTkFrame):
                 steps = c.rhythm.steps_per_bar if c.rhythm else 16
                 grid_data = c.rhythm.grid if c.rhythm else []
                 self.step_grid.set_grid(grid_data, steps, c.bars)
+                if hasattr(self, "piano_roll"):
+                    self.piano_roll.set_bars(c.bars, steps)
+                    self.piano_roll.set_notes(getattr(c, "notes", []))
+                self._update_staff_canvas()
                 self._refresh_chords_list()
                 if self.composition.chords:
                     self._select_chord(0)

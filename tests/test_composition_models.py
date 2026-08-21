@@ -147,7 +147,7 @@ class TestCompositionModels(unittest.TestCase):
         sparse_data = {
             "id": "legacy_comp",
             "title": "Antiga Composição",
-            # Missing bpm, time_signature, bars, rhythm, chords, schema_version, etc.
+            # Missing bpm, time_signature, bars, rhythm, chords, notes, schema_version, etc.
         }
         comp = Composition.from_dict(sparse_data)
         self.assertEqual(comp.id, "legacy_comp")
@@ -156,8 +156,9 @@ class TestCompositionModels(unittest.TestCase):
         self.assertEqual(comp.time_signature, "4/4")
         self.assertEqual(comp.bars, 4)
         self.assertEqual(comp.chords, [])
+        self.assertEqual(comp.notes, [])
         self.assertEqual(comp.rhythm.steps_per_bar, 16)
-        self.assertEqual(comp.schema_version, 1)
+        self.assertEqual(comp.schema_version, 2)
 
 
 if __name__ == "__main__":

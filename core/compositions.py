@@ -24,8 +24,9 @@ def get_template_composition(pattern_id: str = "rock_basic") -> Composition:
         bars=4,
         rhythm=rhythm,
         chords=[],
+        notes=[],
         master_volume=0.8,
-        schema_version=1,
+        schema_version=2,
     )
 
 

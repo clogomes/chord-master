@@ -732,3 +732,17 @@ Implementação nativa de um sistema de i18n em duas vertentes:
   - Renderização em segundo plano via thread dedicada com feedback de estado («⏳ A exportar...») e mensagens de confirmação e erro sem bloquear a interface de utilizador.
 - **Suite de Testes Unitários (`tests/test_wav_export.py`)**:
   - Validação da integridade dos cabeçalhos WAV gerados, canais (2), resolução (16-bit), taxa de amostragem (44.1 kHz) e conformidade temporal. Total de **304/304 testes a passar**.
+
+### Fase 56 — Estúdio de Composição: Faixa Melódica & Piano Roll Interativo
+- **Modelo de Dados e Schema Version 2 (`core/composition.py`, `core/compositions.py`)**:
+  - Introdução do dataclass `NoteEvent(midi, start_beat, duration_beats, velocity, instrument)` e suporte a lista de notas `notes: List[NoteEvent]` em `Composition`.
+  - Atualização do `schema_version` para 2, preservando 100% de compatibilidade regressiva na leitura de composições legadas (v1).
+- **Componente Canvas Piano Roll (`gui/components/piano_roll.py`)**:
+  - Painel de dois canvas puros (régua vertical fixa de alturas MIDI à esquerda e grelha horizontal temporal à direita com scroll sincronizado) sem explosão de widgets.
+  - Interação direta por rato: clique em zona vazia insere nota, arrastar move posição temporal e altura, arrasto da borda direita redimensiona duração, e teclas `Delete`/`Backspace` ou botão de barra de ferramentas apagam a nota selecionada.
+- **Renderização Melódica com Cache (`audio/composition_renderer.py`)**:
+  - Síntese de notas melódicas individuais (piano aditivo harmónico e viola Karplus-Strong com ressonância de tampo) com cache de áudio e posicionamento temporal estéreo a nível de amostra.
+- **Espelhamento Pedagógico Triplo (`gui/screens/compose_studio.py`)**:
+  - A seleção de notas no Piano Roll destaca simultaneamente a nota no `PianoKeyboard`, no `GuitarFretboard` e espelha a partitura no `StaffCanvas`.
+- **Suite de Testes Unitários e Integração (`tests/test_piano_roll_and_melodic_notes.py`)**:
+  - Validação da serialização, carregamento regressivo, renderização de melodia e interações do Piano Roll. Total de **308/308 testes a passar**.
