@@ -14,6 +14,56 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Watcher com auto-invocação APROVADO ✅ — AVANÇA PARA A FASE 51
+- Commits revistos: `b6b5d8a`, `08080c9`
+- Testes: 265/265 OK
+- **Veredito: APROVADO**
+
+**Não me fiei no código — testei os travões a correr**, numa sandbox com um
+`opencode` falso que só regista quando é chamado:
+```
+A) .watch_disabled presente + mudança  → invocações = 0   ✓
+B) interruptor removido + mudança      → invocações = 1   ✓
+C) duas mudanças em 2 s                → invocações = 1   ✓ (cooldown travou a 2ª)
+```
+E o log confirma o comportamento em cada passo:
+```
+→ .watch_disabled presente — deteção registada mas SEM invocação.
+INVOCAR implementador (início 15:10:16) — entrada: «Revisão — Fase 50 APROVADA...»
+INVOCACAO terminou (fim 15:10:21, duração 5s, código de saída 0)
+→ Em cooldown (< 60s desde a última invocação) — a saltar.
+```
+O registo tem início, fim, duração e código de saída, como pedi.
+
+**Os 7 travões estão implementados**, e confirmei que o script **não faz
+`git commit`/`push`** — a única ocorrência de "git" é a linha do cabeçalho que
+diz que não o faz.
+
+**Documentaste bem**: o `AGENTS.md` ganhou uma secção "Watcher" que diz
+claramente que **há um agente autónomo ligado à máquina**, como se desliga, e
+quais os limites; e o `PROTOCOL.md` descreve-o na lista de ficheiros. Quem vier
+a seguir percebe o que está a correr.
+
+Boa ideia o `--mark`, que não estava na minha especificação: dá-te forma
+explícita de marcares uma mudança como tua e evitar a auto-invocação (travão 7),
+em vez de tentar adivinhar autoria a partir do git.
+
+### ⚠️ Passo manual necessário (aviso ao utilizador, não a ti)
+O watcher que está a correr agora tem a **versão antiga em memória**. Para a
+auto-invocação entrar em vigor é preciso reiniciá-lo:
+```
+kill "$(cat .agent-sync/.watch.pid)"
+nohup .agent-sync/watch_review.sh >/dev/null 2>&1 &
+```
+
+**Avança para a Fase 51** (progressão automática de dificuldade no treino
+auditivo) — a última desta série. Lembretes: subida em ≥85% num mínimo de ~15
+tentativas, descida abaixo de ~50%, interruptor "Dificuldade Automática" ligado
+por omissão **sem remover a escolha manual**, e o progresso visível ("12/15 ·
+87% — precisas de 85% em 15 para subir").
+
+---
+
 ## Revisão — Fase 50 APROVADA ✅ — a seguir: o WATCHER, depois a Fase 51
 - Commits revistos: `1e63836`, `630c91c`
 - Testes: 265/265 OK · `pyflakes`: limpo (F821)
