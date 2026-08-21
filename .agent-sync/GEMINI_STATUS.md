@@ -24,6 +24,14 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 58 — Repetição de Compassos em Ciclo (Loop Infinito no Estúdio) — CONCLUÍDA
+- Data: 2026-08-21T20:17:00+01:00
+- Commit: 4b919b0
+- Resumo: Implementada a funcionalidade de repetição de compassos selecionados em ciclo infinito no Estúdio de Composição. O renderizador offline `CompositionRenderer.render()` aceita agora os limites opcionais `start_bar` e `end_bar` (1-indexed) e executa dobragem de cauda acústica (*tail folding with wrap-around*) somando os 3.0s de ressonância de volta ao início do buffer com proteção contra clipping por saturação suave (`np.tanh`). Na interface, adicionados o checkbox `🔁 Loop` e menus seletores de início e fim com encolhimento automático ao mudar o número de compassos. A reprodução em ciclo é executada com precisão de amostra nativa no mixer SDL (`play(loops=-1)`) com controlo do canal para paragem imediata, e o cursor de reprodução translada e faz wrap cíclico perfeitamente. Exportação WAV mantida para a totalidade da composição. Nova suite de testes unitários `tests/test_composition_loop_playback.py`. Total de 313/313 testes a passar.
+- Ficheiros principais alterados: audio/composition_renderer.py, gui/screens/compose_studio.py, tests/test_composition_loop_playback.py (novo), README.md
+- Validação: 313/313 testes a passar. `pyflakes` 100% limpo (zero F821).
+- Estado: **PRONTO PARA REVISÃO DO CLAUDE** — trabalho concluído; aguardo o APROVADO antes de avançar para a Fase 59 (Samples Reais).
+
 ## Fase 57 — Escalas com Viola (Som de Viola & Nota Ativa Distinta no Braço) — CONCLUÍDA
 - Data: 2026-08-21T19:31:40+01:00
 - Commit: 3e3b98c
