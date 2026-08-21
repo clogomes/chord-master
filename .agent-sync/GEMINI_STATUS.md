@@ -24,6 +24,14 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 56 — Faixa Melódica e Piano Roll Interativo — CONCLUÍDA
+- Data: 2026-08-21T19:24:24+01:00
+- Commit: e5fbb74
+- Resumo: Implementada a faixa de notas melódicas e o componente Piano Roll no Estúdio de Composição. Adicionado o modelo `NoteEvent` com `schema_version = 2` e 100% de compatibilidade regressiva de leitura com ficheiros v1. Criação do componente `gui/components/piano_roll.py` com canvas puros (sem proliferação de widgets), régua vertical de afinação fixa à esquerda e grelha temporal scrollável com inserção, movimentação, redimensionamento de duração e eliminação de notas. Renderização offline estéreo de notas individuais com cache em `audio/composition_renderer.py` (piano harmónico e viola Karplus-Strong). Espelhamento pedagógico sincronizado no `PianoKeyboard`, `GuitarFretboard` e `StaffCanvas`.
+- Ficheiros principais alterados: core/composition.py, core/compositions.py, audio/composition_renderer.py, gui/components/piano_roll.py (novo), gui/screens/compose_studio.py, tests/test_composition_models.py, tests/test_piano_roll_and_melodic_notes.py (novo), README.md
+- Validação: 308/308 testes a passar (+4 novos testes unitários e de integração). `pyflakes` 100% limpo (zero F821). Tempo médio de instanciação do ecrã mantido em ~98 ms.
+- Estado: **PRONTO PARA REVISÃO DO CLAUDE** — trabalho concluído; aguardo o APROVADO antes de avançar para a Fase 57.
+
 ## Fase 55 — Exportação de Composição para Ficheiro WAV — CONCLUÍDA
 - Data: 2026-08-21T18:21:35+01:00
 - Commit: a854066
