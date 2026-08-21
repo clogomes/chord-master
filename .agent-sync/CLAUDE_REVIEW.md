@@ -14,6 +14,54 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Fase 53 APROVADA ✅ (commitada por mim) + mudança de Implementador
+- Commit: `ef2ce6a` — **commitado pelo Claude**, não pelo Implementador.
+- Testes: 302/302 OK · `pyflakes`: 0
+- **Veredito: APROVADO**
+
+### Contexto: o que aconteceu (para quem retomar)
+O utilizador voltou a mudar de Implementador: o **opencode** foi desligado e o
+papel voltou para o **Gemini**, que está a analisar o repositório para se
+inteirar do estado.
+
+O opencode deixou a **Fase 53 escrita mas por commitar** (3 ficheiros no
+diretório) quando a sessão dele terminou. A pedido do utilizador, validei-a e
+commitei-a em nome dele, para o Gemini encontrar o diretório limpo — é a mesma
+situação da Fase 18-19, quando o implementador anterior ficou sem quota a meio
+de uma correção e eu terminei o commit.
+
+### O que verifiquei antes de commitar
+```
+16 escalas → 5 dedilhações distintas (era 1 para todas)
+  7 graus (maior, menores)      1-2-3-1-2-3-4-5
+  pentatónicas                  1-2-3-1-2
+  blues / tons inteiros         1-2-3-1-2-3
+  cromática                     1-3-1-3-1-2-3-1-3-1-3-1-2  (polegar nas brancas)
+  bebop                         "dedilhação aproximada"    ← honestidade pedida
+ligada ao ecrã: practice_scales.py:435-436 (MD e ME)  ✓
+'left'/'esquerda' e 'right'/'direita' ambos aceites   ✓
+```
+A função deixou de ser código morto e passou a mostrar informação correta —
+eram as duas metades do pedido.
+
+### ⚠️ Estado da automação (importante para o Gemini)
+**O watcher automático foi CANCELADO** a pedido do utilizador. Razão: ele
+invocava `opencode run --continue`, e com o opencode desligado e o Gemini a
+trabalhar no mesmo diretório, arriscava pôr dois agentes a escrever em
+simultâneo.
+- Processo terminado; sem `cron` nem `launchd` a relançá-lo.
+- O script (`.agent-sync/watch_review.sh`) **continua no repositório**, intacto.
+- Para o reativar: `nohup .agent-sync/watch_review.sh >/dev/null 2>&1 &` —
+  mas **primeiro é preciso mudar a linha de invocação**, que está fixa no
+  `opencode`. Com o Gemini como Implementador, o mecanismo equivalente é o
+  cron que ele já usava.
+
+**Nota positiva de processo**: no commit `bb252b4` o Gemini usou `git add` de
+ficheiro específico e **não** apanhou os 3 ficheiros por commitar do opencode.
+A regra do `PROTOCOL.md` funcionou exatamente como pretendido.
+
+---
+
 ## Revisão — Fase 52 APROVADA ✅ — AVANÇA PARA A FASE 53
 - Commit revisto: `a9da7c2`
 - Testes: 297/297 OK
