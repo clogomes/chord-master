@@ -14,6 +14,150 @@ Cada entrada tem um veredito:
 
 ---
 
+## ▶ PRÓXIMA — TRABALHO PEDIDO — Fase 57: escalas com viola — som e nota destacada
+
+Pedido do utilizador: *"Na secção de prática de escalas quando a viola é
+selecionada o som deve ser de viola e seja destacada no braço da viola a nota
+que está a tocar."*
+
+**Isto são dois defeitos, não funcionalidade nova.** Diagnostiquei os dois:
+
+### 1. O som é sempre de piano, mesmo com a Viola escolhida
+
+`AudioPlayer.play_note` (`audio/player.py:73`) **já aceita**
+`instrument: str = "piano"` e já tem o caminho `generate_plucked_string` para
+`"guitar"`. O ecrã de escalas nunca lho passa:
+- `gui/screens/practice_scales.py:612` — `play_note(target_note, duration=0.45)`
+- `gui/screens/practice_scales.py:721` — `play_note(note, duration=note_dur_sec * 0.85)`
+
+Passa `instrument="guitar"` quando `self.instrument_mode == "guitar"`. No modo
+`"both"` mantém piano (é o instrumento visível em cima); não inventes tocar os
+dois em simultâneo.
+
+**`practice_song.py` tem o defeito idêntico** — tem `instrument_mode` e as suas 2
+chamadas a `play_note` também não passam `instrument`. São 2 linhas iguais;
+corrige-as na mesma fase. Varri os restantes ecrãs: só estes dois têm seletor de
+instrumento, portanto não há mais sítios.
+
+### 2. A nota que está a tocar não se distingue no braço
+
+O destaque **está implementado** (`_highlight_active_note`, linhas 484-490) mas é
+**invisível na prática**. Instanciei o ecrã e medi: com a nota activa no índice 3,
+cuja coordenada é `(3, 10)`, ficam **9 posições pintadas do mesmo verde**:
+`(0,8) (1,3) (1,15) (2,10) (3,5) (3,10) (4,1) (4,13) (5,8)`.
+
+A razão: `_highlight_active_note` chama `highlight_scale(self.scale_notes)`, e o
+`GuitarFretboard.highlight_scale` (`gui/components/guitar_fretboard.py:84`) pinta
+**todas as tónicas** com `"#10B981"` — que é exactamente o `theme.COLOR_SUCCESS`
+usado a seguir para a nota activa. O utilizador vê nove marcas verdes iguais e
+não consegue saber qual está a soar.
+
+Correcção: dá à nota activa um tratamento **visualmente distinto**, não só uma
+cor da paleta já em uso — por exemplo contorno branco grosso e/ou raio maior,
+mantendo o verde das tónicas como está. O critério de aceitação é directo:
+**com uma nota activa, exactamente uma marca no braço tem de ser distinguível de
+todas as outras**, seja qual for a escala.
+
+Não mudes o `highlight_scale` para deixar de marcar as tónicas — isso é
+informação pedagógica útil e a regra "nunca remover funcionalidade existente"
+aplica-se.
+
+Teste de regressão: percorrer as notas de uma escala e verificar que a marca
+distinta acompanha `guitar_coords[idx]` e que há **uma e uma só**.
+
+---
+
+## TRABALHO PEDIDO — Fase 58: repetir compassos em ciclo (loop)
+
+Pedido do utilizador: *"No estúdio de composição adiciona um tick para colocar
+em loop infinito os compassos selecionados."* Ele já escolheu a interface —
+**dois seletores**, não arrasto sobre a régua.
+
+**O ponto que sustenta tudo — já verifiquei:** o `pygame` faz o ciclo **dentro
+do mixer SDL**. Testei `play(loops=-1)` num som de 0.5 s e ao fim de 1.4 s
+continuava a tocar (`get_busy()` verdadeiro), e `channel.stop()` termina-o. Isto
+é ciclo ao nível da amostra: sem intervalo, sem salto, e **sem temporizador
+Python pelo meio**. Não implementes o loop re-disparando o som num `after()` —
+ouvir-se-ia uma falha a cada volta e acumularia desvio.
+
+1. **Interface**: um `ctk.CTkCheckBox` `🔁 Loop` na barra de transporte, com dois
+   `CTkOptionMenu` — `Compassos [X] a [Y]`. Por omissão cobrem a composição
+   toda. Ficam `disabled` enquanto o tick estiver desligado.
+2. **Renderizador**: `render()` passa a aceitar `start_bar` e `end_bar`
+   **opcionais**, com o comportamento atual como omissão. Os chamadores
+   existentes (reprodução e `export_to_wav_file` da Fase 55) não mudam uma linha.
+3. **A cauda dobra para o início.** O `render()` acrescenta `tail_duration = 3.0`
+   segundos depois do último compasso. Num ciclo, cortá-la faz o acorde morrer a
+   meio da ressonância. Soma a cauda de volta ao princípio do buffer — com
+   envolvimento (*wrap*) se for mais longa que a região — e **reaplica o
+   limitador `tanh` depois da soma**, senão a sobreposição pode passar de 1.0.
+   É o que se ouviria a tocar os compassos 3-4-3-4 seguidos.
+4. **Cursor**: `elapsed % duração_do_loop`, deslocado para o compasso inicial.
+   E **não agendes** o `after(duration_ms, self._on_playback_finished)` quando
+   está em ciclo — senão o botão repõe-se sozinho enquanto o som continua.
+   Guarda o `Channel` devolvido pelo `play()` para poderes chamar `stop()`.
+5. **Limites**: fim ≥ início; a gama encolhe sozinha se o número de compassos
+   for reduzido pelo menu existente (`values=["2","4","8","16"]`). O tick aplica-se
+   ao **próximo** Play — trocar a região a meio da reprodução exigiria uma emenda
+   sem falhas que este stack não faz.
+6. **A exportação WAV continua a exportar a composição inteira.** Não a ligues à
+   seleção do loop: daria um botão que exporta algo diferente do que se vê.
+
+Testes: que `render(comp, start_bar=2, end_bar=3)` devolve exatamente a duração
+de 2 compassos ao BPM dado (mais cauda), e que a região corresponde à fatia certa
+do render completo.
+
+---
+
+## APROVADO — Fase 56: Notas melódicas e piano roll (commit `e5fbb74`)
+
+**Veredito: APROVADO.** Suite completa **308/308** (3 skips), `pyflakes` sem
+nomes indefinidos, app arranca sem erro de runtime.
+
+Esta era a maior peça das três e ficou bem feita.
+
+### O que validei além dos testes
+
+**Modelo e persistência**
+- `schema_version: 2`, chave `notes` presente, ida-e-volta preserva os MIDI.
+- **Compatibilidade retroativa confirmada**: um dicionário sem `notes` e sem
+  `schema_version` (composição gravada antes desta fase) carrega com 0 notas em
+  vez de rebentar. Testei-o explicitamente, porque era o risco real da fase.
+
+**As notas são mesmo audíveis** — não bastava o modelo existir:
+- RMS do render sem notas = 0.00000; com 2 notas = 0.05935.
+- Primeiro som na amostra 7 (0.000 s) para uma nota no beat 0 — colocação
+  correcta no tempo.
+
+**Espelhamento pedagógico** — verifiquei que os três widgets *mudam mesmo*, em
+vez de me fiar num método que devolve sem erro (já me enganei assim no glossário):
+- Piano: 2 itens do canvas mudam de cor, a tecla passa a `#38BDF8`.
+- Braço da viola: itens 44 → 56 (C4) e 44 → 60 (E5).
+- Pauta: 9 → 13 itens.
+
+**Desempenho — bem dentro do alvo** (eu tinha pedido ~200 ms):
+- 128 notas: redesenho do piano roll em **2 ms**, com **3 widgets** e 433 itens
+  de canvas. Seguiste a regra de desenhar em canvas e não em widgets.
+- Render de 16 compassos com 128 notas: **133 ms a frio, 4 ms a quente**. A cache
+  de vozes está a fazer o trabalho, incluindo no Karplus-Strong.
+- Pico do mix com 128 notas: 0.574 — sem clipping.
+- Abertura do Estúdio: 1289/1475/1671 ms contra 1180/1423/1615 ms antes da
+  Fase 55. Dentro do mesmo ruído; não é regressão desta fase.
+
+### Reparo menor (não bloqueia)
+
+`pyflakes` acusa 8 importações por usar nos ficheiros que tocaste:
+`math`, `NOTE_NAMES`, `NOTE_NAMES_PT` (`piano_roll.py`); `Dict`,
+`delete_user_composition`, `GuitarChordShape` (`compose_studio.py`); `Optional`,
+`ChordEvent`, `RhythmTrack` (`composition_renderer.py`). Nenhuma causa erro — o
+teste que temos só falha com **nomes indefinidos**, e esses estão a zero. Limpa-as
+quando passares por lá; não faças um commit só para isto.
+
+**Ordem a seguir: Fase 57 (escalas com viola) → Fase 58 (loop) → Fase 59
+(samples).** A 57 primeiro por serem defeitos que o utilizador está a sentir agora.
+
+---
+
 ## APROVADO — Fase 55: Exportação para WAV (commit `a854066`)
 
 **Veredito: APROVADO. Avança para a Fase 56.**
@@ -76,7 +220,9 @@ quem precisar dela sem passar pelo disco.
 
 ---
 
-## TRABALHO PEDIDO — Fases 55 a 57: completar o Estúdio de Composição
+## TRABALHO PEDIDO — Fases 55, 56 e 59: completar o Estúdio de Composição
+> Nota (2026-08-21): as Fases 55 e 56 estão **feitas e aprovadas**. A antiga
+> Fase 57 (samples) passou a **Fase 59** — ver entradas mais recentes no topo.
 - Pedido do utilizador. É o que ficou **deliberadamente fora de âmbito** quando
   ele escolheu a "versão útil primeiro" nas Fases 40-43.
 - **Uma fase de cada vez**, com o meu APROVADO entre elas. Ordem por
@@ -144,7 +290,11 @@ uma melodia**. É a maior lacuna do estúdio.
    Mede `navigate_to("compose_studio")` antes e depois; hoje está em ~98 ms e
    não deve passar dos ~200 ms.
 
-### FASE 57 — Samples reais (bibliotecas externas)
+### FASE 59 — Samples reais (bibliotecas externas)
+> **Renumerada de 57 para 59** em 2026-08-21: o utilizador pediu entretanto
+> o loop de compassos (Fase 58) e a correção do som de viola nas escalas
+> (Fase 57), ambas mais pequenas e mais urgentes. O conteúdo desta fase
+> não muda.
 O utilizador decidiu explicitamente (ver `PROTOCOL.md`, regra de áudio revista)
 que quer **samples reais, maximizando realismo**, com o licenciamento à
 responsabilidade dele. A síntese atual **mantém-se como fallback**.
