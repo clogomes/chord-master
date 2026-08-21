@@ -344,3 +344,16 @@ class CompositionRenderer:
         # Stack into (N, 2) stereo float32 array
         stereo_mix = np.column_stack((mix_left, mix_right)).astype(np.float32)
         return stereo_mix
+
+    def render_to_wav_bytes(self, composition: Composition) -> bytes:
+        """Renders composition into a complete, standard 16-bit stereo WAV byte sequence."""
+        stereo_float32 = self.render(composition)
+        pcm_int16 = np.int16(np.clip(stereo_float32 * 32767.0, -32768, 32767))
+        pcm_bytes = pcm_int16.tobytes()
+        return Synthesizer._create_wav_header(pcm_bytes, self.sample_rate, num_channels=2)
+
+    def export_to_wav_file(self, composition: Composition, output_filepath: str):
+        """Renders composition and writes it directly to the specified WAV file."""
+        wav_bytes = self.render_to_wav_bytes(composition)
+        with open(output_filepath, "wb") as f:
+            f.write(wav_bytes)

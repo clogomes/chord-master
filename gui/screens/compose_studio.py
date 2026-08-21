@@ -1,7 +1,7 @@
 """Composition Studio Screen (Phase 43) with interactive step sequencer, chord track, and dual piano/guitar visualizers."""
 import threading
 import time
-from tkinter import messagebox
+from tkinter import filedialog, messagebox
 from typing import Callable, Dict, List, Optional
 import customtkinter as ctk
 import numpy as np
@@ -179,7 +179,7 @@ class ComposeStudioScreen(ctk.CTkFrame):
         self.bars_menu.set(str(self.composition.bars))
         self.bars_menu.pack(side="left", padx=(0, 14))
 
-        # Save Button
+        # Save & Export Buttons
         save_btn = ctk.CTkButton(
             t_row,
             text="💾 Guardar",
@@ -191,7 +191,21 @@ class ComposeStudioScreen(ctk.CTkFrame):
             corner_radius=theme.RADIUS_MD,
             command=self._save_composition,
         )
-        save_btn.pack(side="right")
+        save_btn.pack(side="right", padx=(8, 0))
+
+        self.export_wav_btn = ctk.CTkButton(
+            t_row,
+            text="📥 Exportar WAV",
+            font=theme.get_font(theme.FONT_BODY_BOLD),
+            fg_color=theme.COLOR_SURFACE_SECONDARY,
+            hover_color=theme.COLOR_SURFACE_HOVER,
+            text_color=theme.COLOR_TEXT_PRIMARY,
+            width=125,
+            height=34,
+            corner_radius=theme.RADIUS_MD,
+            command=self._export_wav,
+        )
+        self.export_wav_btn.pack(side="right")
 
         # 4. Preset Presets Row & Storage Bar
         presets_card = ctk.CTkFrame(
@@ -769,6 +783,50 @@ class ComposeStudioScreen(ctk.CTkFrame):
         save_user_composition(self.composition)
         self.saved_menu.configure(values=self._get_saved_titles())
         messagebox.showinfo("Guardado", f"Composição «{self.composition.title}» guardada com sucesso!")
+
+    def _export_wav(self):
+        """Exports the rendered composition to a user-selected WAV file asynchronously."""
+        self._on_title_changed()
+        self.composition.rhythm.grid = self.step_grid.get_grid()
+
+        # Sanitize default filename
+        safe_title = "".join(c for c in self.composition.title if c.isalnum() or c in (" ", "_", "-")).strip()
+        safe_title = safe_title.replace(" ", "_") or "composicao"
+        default_filename = f"{safe_title}.wav"
+
+        filepath = filedialog.asksaveasfilename(
+            title="Exportar Composição para Ficheiro WAV",
+            defaultextension=".wav",
+            initialfile=default_filename,
+            filetypes=[("Ficheiros de Áudio WAV (*.wav)", "*.wav"), ("Todos os Ficheiros", "*.*")],
+        )
+        if not filepath:
+            return
+
+        self.export_wav_btn.configure(text="⏳ A exportar...", state="disabled")
+
+        def _render_and_export():
+            try:
+                self.renderer.export_to_wav_file(self.composition, filepath)
+                self.after(0, lambda: self._on_export_success(filepath))
+            except Exception as e:
+                self.after(0, lambda err=e: self._on_export_error(err))
+
+        threading.Thread(target=_render_and_export, daemon=True).start()
+
+    def _on_export_success(self, filepath: str):
+        self.export_wav_btn.configure(text="📥 Exportar WAV", state="normal")
+        messagebox.showinfo(
+            "Exportação Concluída",
+            f"Composição exportada com sucesso em formato WAV estéreo de 16-bit!\n\nLocalização:\n{filepath}",
+        )
+
+    def _on_export_error(self, error: Exception):
+        self.export_wav_btn.configure(text="📥 Exportar WAV", state="normal")
+        messagebox.showerror(
+            "Erro na Exportação",
+            f"Não foi possível exportar a composição para WAV:\n{error}",
+        )
 
     def _toggle_playback(self):
         if self.is_playing:

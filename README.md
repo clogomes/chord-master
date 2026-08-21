@@ -722,3 +722,13 @@ Implementação nativa de um sistema de i18n em duas vertentes:
   - Adicionado o botão de navegação «⚡ Exercícios Técnicos» / «⚡ Technical Drills» (`nav_practice_technique`) à barra lateral principal, tornando o módulo imediatamente acessível a partir de qualquer ecrã com suporte bilingue PT/EN.
 - **Isolamento de I/O em Testes Unitários**:
   - Substituição da convenção `:memory:` por `tempfile.NamedTemporaryFile` com limpeza rigorosa em `tearDown` e `tearDownClass` em todos os testes (`test_compose_studio_chords.py`, `test_compose_studio_ui.py`, `test_practice_rhythm_screen.py`, `test_record_atomic_review_ui_integration.py`, `test_review_scheduler.py`). Zero ficheiros residuais deixados no disco durante a execução da suite de testes. Total de **302/302 testes a passar**.
+
+### Fase 55 — Estúdio de Composição: Exportação de Áudio para Ficheiro WAV
+- **Geração de Áudio WAV Estéreo 16-bit (`audio/composition_renderer.py`)**:
+  - Implementação dos métodos `render_to_wav_bytes(composition)` e `export_to_wav_file(composition, output_filepath)`, empacotando o buffer estéreo float32 processado (bateria + faixas de acorde com saturação `tanh` e cauda acústica) num cabeçalho canónico RIFF/WAVE a 44.1 kHz 16-bit estéreo via `Synthesizer._create_wav_header`.
+- **Interface e Exportação Assíncrona (`gui/screens/compose_studio.py`)**:
+  - Adicionado o botão «📥 Exportar WAV» na barra de cabeçalho do estúdio ao lado de «💾 Guardar».
+  - Diálogo nativo `filedialog.asksaveasfilename` com sanitização do título da composição como nome de ficheiro por omissão (`.wav`).
+  - Renderização em segundo plano via thread dedicada com feedback de estado («⏳ A exportar...») e mensagens de confirmação e erro sem bloquear a interface de utilizador.
+- **Suite de Testes Unitários (`tests/test_wav_export.py`)**:
+  - Validação da integridade dos cabeçalhos WAV gerados, canais (2), resolução (16-bit), taxa de amostragem (44.1 kHz) e conformidade temporal. Total de **304/304 testes a passar**.
