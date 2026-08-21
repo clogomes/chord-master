@@ -14,7 +14,67 @@ Cada entrada tem um veredito:
 
 ---
 
-## ▶ PRÓXIMA — TRABALHO PEDIDO — Fase 57: escalas com viola — som e nota destacada
+## APROVADO — Fase 57: escalas com viola — som e nota destacada (commit `3e3b98c`)
+
+**Veredito: APROVADO. Segue para a Fase 58 (loop de compassos).**
+
+Suite completa **310/310** (3 skips), `pyflakes` sem nomes indefinidos, app
+arranca. Os dois defeitos que diagnostiquei estão fechados.
+
+### 1. Som — encaminhamento verificado em execução
+
+Não me bastei por ver `instrument=inst` no código. Substituí o `play_note` por um
+apanhador e disparei o caminho real de reprodução nos três modos:
+
+| modo | instrumento usado |
+|---|---|
+| `piano` | `piano` |
+| `guitar` | **`guitar`** |
+| `both` | `piano` |
+
+O modo `both` mantém piano, como especifiquei — não inventaste tocar os dois em
+simultâneo. Confirmei também que os timbres são mesmo distintos
+(`generate_single_frequency` vs `generate_plucked_string` produzem bytes
+diferentes para a mesma nota).
+
+No `practice_song.py` verifiquei o que era o risco silencioso: `selected_instrument`
+só toma os valores `"piano"` e `"guitar"` (linhas 93, 752-837). Se contivesse
+`"Viola"`, o `play_note` cairia no ramo do piano **sem erro nenhum** e a correção
+não se notaria. Não é o caso.
+
+### 2. Destaque — critério de aceitação cumprido, varrido a fundo
+
+O critério que escrevi era: *com uma nota activa, exactamente uma marca no braço
+tem de ser distinguível de todas as outras, seja qual for a escala*. Varri
+**12 tónicas × 16 tipos de escala = 2880 posições**, e em todas:
+- há **exactamente uma** marca com `is_active`;
+- essa marca está na coordenada certa (`guitar_coords[idx]`).
+
+**Zero falhas em 2880.** Faço este varrimento porque a versão anterior *parecia*
+funcionar numa escala e falhava na prática — foi assim que apanhei as 9 marcas
+verdes iguais.
+
+A solução também está certa na abordagem: não trocaste apenas a cor por outra da
+paleta (que voltaria a colidir mais tarde), acrescentaste **forma** — anel exterior
+a `#38BDF8`, raio 12.5 em vez de 10.5, e contorno branco de 3 px contra 1.5. É
+distinguível mesmo entre tónicas verdes.
+
+### 3. Sem regressão nos outros usos do braço
+
+O `GuitarFretboard` é partilhado por vários ecrãs, por isso confirmei a
+compatibilidade: `highlight_scale` sozinho produz 23 marcas e **0 activas** (o
+`is_active` entra por `.get(..., False)`), o braço desenha na mesma, e o
+`clear_highlights` limpa tudo. Quem já usava o componente não muda de
+comportamento.
+
+Mantiveste a marcação das tónicas, como pedi — é informação pedagógica e não
+devia desaparecer para resolver o problema do destaque.
+
+**Nada a corrigir.**
+
+---
+
+## TRABALHO PEDIDO (CONCLUÍDA) — Fase 57: escalas com viola — som e nota destacada
 
 Pedido do utilizador: *"Na secção de prática de escalas quando a viola é
 selecionada o som deve ser de viola e seja destacada no braço da viola a nota
@@ -67,7 +127,7 @@ distinta acompanha `guitar_coords[idx]` e que há **uma e uma só**.
 
 ---
 
-## TRABALHO PEDIDO — Fase 58: repetir compassos em ciclo (loop)
+## ▶ PRÓXIMA — TRABALHO PEDIDO — Fase 58: repetir compassos em ciclo (loop)
 
 Pedido do utilizador: *"No estúdio de composição adiciona um tick para colocar
 em loop infinito os compassos selecionados."* Ele já escolheu a interface —
