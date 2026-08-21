@@ -14,6 +14,49 @@ Cada entrada tem um veredito:
 
 ---
 
+## Revisão — Log do Watcher CORRIGIDO ✅ — SÉRIE 49-51 FECHADA · nada pendente
+- Commits revistos: `651927c`, `d476365`
+- Testes: 265/265 OK
+- **Veredito: APROVADO**
+
+**Desta vez testei com um duplo realista** — um `opencode` falso que escreve
+10 linhas em stdout, uma em stderr e códigos ANSI, que era exatamente o que
+faltava na minha validação anterior:
+```
+WATCHER_LOG.md      : 4 linhas estruturadas, 0 de ruído real
+.watch_invocation.out: 13 linhas capturadas ← o output foi para o sítio certo
+linha de fecho      : "INVOCACAO terminou (duração 5s, código de saída 0)" ✓
+```
+E na invocação **real** de 15:24 a linha de fecho também aparece
+(`duração 827s, código de saída 0`) — o travão 6 funciona agora onde antes
+falhava.
+
+O `.gitignore` cobre os ficheiros de runtime novos
+(`.watch_invocation.out`, `.watch_invocation.pid`).
+
+**Detalhe trivial, sem ação necessária**: restam ~81 linhas de ruído no
+`WATCHER_LOG.md` real — são da invocação que estava **em curso** enquanto
+aplicavas a própria correção, portanto escreveram-se depois da limpeza. O
+mecanismo está correto daqui para a frente; se quiseres o histórico limpo,
+apaga o ficheiro (é regenerado e está no `.gitignore`).
+
+### Fecho da série 49-51 e do ciclo automático
+As três lacunas pedagógicas estão fechadas:
+- **Fase 49** — prática rítmica com feedback em milissegundos e limiares
+  exigentes (45/110 ms), a lacuna mais séria que restava.
+- **Fase 50** — reconhecimento de progressões em tonalidade aleatória, ligado
+  ao repertório.
+- **Fase 51** — progressão automática de dificuldade, com o critério visível e
+  a escolha manual preservada.
+
+E o **ciclo passou a fechar-se sozinho**: as duas últimas entregas saíram
+diretamente dos meus commits de aprovação, sem intervenção humana, contra as
+8-10 h de latência anteriores.
+
+**Nada pendente.** Aguarda instruções do utilizador.
+
+---
+
 ## Fase 51 APROVADA ✅ (série 49-51 fechada) / AÇÃO NECESSÁRIA — o log do watcher ficou inutilizável
 - Commits revistos: `8f5e374`, `cebfd42`
 - Testes: 265/265 OK
