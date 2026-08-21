@@ -14,6 +14,107 @@ Cada entrada tem um veredito:
 
 ---
 
+## AÇÃO NECESSÁRIA (2 itens pequenos) — Fase 59: samples reais (commit `ff24204`)
+
+**A implementação está bem feita e não precisa de ser reescrita.** Validei-a a
+fundo e passa em tudo o que especifiquei. Faltam duas coisas para a
+funcionalidade ser **utilizável** por quem instala o projeto — ambas pequenas.
+
+Suite **319/319** (3 skips), `pyflakes` sem nomes indefinidos, app arranca.
+
+### ❗ Item 1 — `soundfile` não está no `requirements.txt`
+
+O `HAS_SOUNDFILE` está lá com o padrão defensivo correcto, mas a dependência
+**nunca foi declarada**. Quem instalar com `pip install -r requirements.txt`
+fica sem ela e cai sempre no recurso ao módulo `wave`, que só lê **WAV PCM**.
+Bibliotecas de samples reais distribuem-se muito em **FLAC** — essas não
+carregam, em silêncio, sem erro nenhum que explique porquê.
+
+Acrescenta: `soundfile>=0.13.1,<0.14`
+
+O limite superior não é decorativo: a 0.14 parte o import. O `scipy>=1.11.0` já
+lá estava e está certo.
+
+### ❗ Item 2 — o formato do `instrument.json` não está documentado
+
+O README explica a ordem de procura das pastas (`CHORDMASTER_SAMPLES_DIR` →
+`data/local_settings.json` → `~/Documents/ChordMaster/Samples`) — bem, e mais do
+que eu tinha pedido. Mas **não diz como é o manifesto**, e sem isso o utilizador
+não consegue usar a funcionalidade sem ler o teu código-fonte.
+
+Documenta o esquema no README, com um exemplo mínimo a funcionar. Tive de o
+deduzir do código para te validar; é este:
+
+```json
+{
+  "name": "piano",
+  "samples": {
+    "60": {
+      "layers": [
+        {"min_velocity": 0.0, "files": ["60_soft_1.wav", "60_soft_2.wav"]},
+        {"min_velocity": 0.6, "files": ["60_loud_1.wav", "60_loud_2.wav"]}
+      ]
+    },
+    "63": {"file": "63.wav", "gain": 1.0}
+  }
+}
+```
+
+Menciona também as três formas aceites por nota (`file`, `files`, `layers`) e que
+a bateria usa nomes (`kick`, `snare`, …) em vez de números MIDI.
+
+---
+
+### O que validei — e passou tudo
+
+Construí uma biblioteca de samples verdadeira em disco (58 ficheiros WAV, piano
+de 3 em 3 semitons com 2 camadas de velocidade e 2 variantes cada, bateria, e um
+ficheiro corrompido de propósito) e exercitei o caminho completo. **Isto foi
+possível graças ao teu recurso ao módulo `wave`** — sem ele, nada disto seria
+testável nesta máquina, que não tem `soundfile` nem `scipy`.
+
+**Degradação graciosa — o requisito que eu tinha marcado como obrigatório**
+(*"silêncio é a pior degradação possível"*):
+
+| cenário | resultado |
+|---|---|
+| sem `soundfile` e sem `scipy` | RMS 0.14865 — som completo |
+| pasta de samples inexistente | RMS **0.09812**, idêntico à síntese pura |
+| ficheiro `.wav` corrompido | devolve `None`, não levanta exceção |
+
+O caso da pasta inexistente dá exactamente o mesmo RMS da síntese pura — não é
+"parecido", é o mesmo caminho. Nunca cai em silêncio.
+
+**Os samples são mesmo usados** (não é código morto): com a biblioteca activa, a
+diferença máxima face à síntese é 0.787 e o RMS sobe de 0.098 para 0.125, sem
+clipping (pico 0.741).
+
+**Transposição e limites:**
+- MIDI 61 a partir do sample de 60: 41 624 amostras contra 44 100 — a razão
+  bate certo com um semitom (`2^(1/12)`).
+- MIDI 200, sem nada perto: devolve `None`. O tecto de **±7 semitons** que
+  especifiquei está aplicado.
+
+**Camadas de velocidade** — comutação, não crossfade: velocidade 0.2 dá pico
+0.2991, velocidade 0.9 dá 0.6980. Camadas distintas.
+
+**Round-robin** — e aqui quase te reportei um defeito que não existe. O primeiro
+teste deu "não alterna", mas as minhas duas variantes tinham sido geradas com
+parâmetros idênticos, logo eram ficheiros iguais. Com variantes mesmo distintas:
+picos `[0.698, 0.4487, 0.698, 0.4487, 0.698, 0.4487]` — ciclo estrito, e duas
+instâncias independentes produzem a mesma sequência. **Determinístico**, como
+pedi.
+
+**Configuração e higiene do repositório:**
+- `data/local_settings.json` é lido correctamente e está coberto pelo
+  `.gitignore` (linha 32), tal como `samples/` e `audio/samples/`.
+- O `data/app_settings.json` versionado **não foi tocado** — era exactamente a
+  separação que eu tinha pedido para manter a decisão de licenciamento aberta.
+
+Depois destes dois itens, a série 55-59 fica fechada.
+
+---
+
 ## APROVADO — Fase 58: repetir compassos em ciclo (commit `4b919b0`)
 
 **Veredito: APROVADO. Falta só a Fase 59 (samples reais).**
@@ -430,7 +531,7 @@ uma melodia**. É a maior lacuna do estúdio.
    Mede `navigate_to("compose_studio")` antes e depois; hoje está em ~98 ms e
    não deve passar dos ~200 ms.
 
-### ▶ PRÓXIMA — FASE 59 — Samples reais (bibliotecas externas)
+### FASE 59 (IMPLEMENTADA) — Samples reais (bibliotecas externas)
 > **Renumerada de 57 para 59** em 2026-08-21: o utilizador pediu entretanto
 > o loop de compassos (Fase 58) e a correção do som de viola nas escalas
 > (Fase 57), ambas mais pequenas e mais urgentes. O conteúdo desta fase
