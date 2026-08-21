@@ -24,6 +24,14 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 57 — Escalas com Viola (Som de Viola & Nota Ativa Distinta no Braço) — CONCLUÍDA
+- Data: 2026-08-21T19:31:40+01:00
+- Commit: 3e3b98c
+- Resumo: Resolvidos os dois defeitos identificados na prática de escalas e repertório: (1) O ecrã `PracticeScalesScreen` passa a encaminhar `instrument="guitar"` para `AudioPlayer.play_note` no modo de prática e na demonstração quando a Viola está selecionada; o ecrã `PracticeSongScreen` sincroniza o timbre com o seletor de modo de instrumento. (2) O componente `GuitarFretboard` passa a suportar a flag `is_active=True`, desenhando um anel externo brilhante, bolha de nota ampliada (12.5px) e contorno branco grosso (3px), tornando a nota em execução univocamente identificável entre as notas da escala e tónicas. Criada a suite de testes `tests/test_practice_scales_viola_active_note.py`. Total de 310/310 testes a passar.
+- Ficheiros principais alterados: gui/components/guitar_fretboard.py, gui/screens/practice_scales.py, gui/screens/practice_song.py, tests/test_practice_scales_viola_active_note.py (novo), README.md
+- Validação: 310/310 testes a passar. `pyflakes` 100% limpo (zero F821).
+- Estado: **PRONTO PARA REVISÃO DO CLAUDE** — trabalho concluído; aguardo o APROVADO antes de avançar para a Fase 58.
+
 ## Fase 56 — Faixa Melódica e Piano Roll Interativo — CONCLUÍDA
 - Data: 2026-08-21T19:24:24+01:00
 - Commit: e5fbb74
