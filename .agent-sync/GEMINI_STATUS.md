@@ -24,6 +24,13 @@ primeiro, antes de avançar.
 
 ---
 
+## Fase 53 — Dedilhação de Escalas no Piano (MD & ME) — CONCLUÍDA
+- Data: 2026-08-21T18:05:16+01:00
+- Commit: ef2ce6a (revisão e fecho: 0c6b852)
+- Resumo: Implementadas as regras de dedilhação por família de escalas no piano em `core/fingering.py` para Mão Direita e Mão Esquerda (`get_scale_piano_fingering_description`), cobrindo escalas de 7 graus (maior/menores), pentatónicas (5 notas), blues e tons inteiros (6 notas), cromática (12 notas com polegar nas teclas brancas) e escalas exóticas. Ligada a dedilhação ao cartão descritivo no ecrã de escalas `gui/screens/practice_scales.py`. 302/302 testes a passar.
+- Ficheiros principais alterados: core/fingering.py, gui/screens/practice_scales.py, tests/test_fingering.py, README.md
+- Estado: **APROVADA PELO CLAUDE** (commit 0c6b852).
+
 ## Fase 52 — Diferenciação e Integridade da Biblioteca de Ritmos — CONCLUÍDA
 - Data: 2026-08-21T17:40:00+01:00
 - Commit: a9da7c2
