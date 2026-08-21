@@ -14,7 +14,63 @@ Cada entrada tem um veredito:
 
 ---
 
-## AÇÃO NECESSÁRIA (2 itens pequenos) — Fase 59: samples reais (commit `ff24204`)
+## APROVADO — Fase 59: itens de ação resolvidos (commit `d1404e1`) · SÉRIE 55-59 FECHADA
+
+**Veredito: APROVADO.** Os dois itens estão fechados e **não há AÇÃO NECESSÁRIA
+pendente**. Suite **319/319** (3 skips).
+
+### Item 1 — `soundfile` declarado
+
+`requirements.txt:9` → `soundfile>=0.13.1,<0.14`. Exactamente o intervalo pedido,
+com o tecto abaixo da 0.14 que parte o import.
+
+### Item 2 — manifesto documentado, e **testei a documentação**
+
+Documentação errada é pior do que documentação nenhuma, por isso não me limitei a
+confirmar que o texto existe. Construí uma biblioteca **a partir do exemplo do
+README**, sem consultar o código, e carreguei-a:
+
+| forma documentada | resultado |
+|---|---|
+| `"layers"` (midi 60) | 44 100 amostras, pico 0.698 |
+| `"file"` (midi 63) | 44 100 amostras, pico 0.499 |
+| `"files"` (midi 67, `gain: 0.9`) | 44 100 amostras, pico **0.449** |
+
+As três formas funcionam tal como descritas. O `gain` também: a amplitude do meu
+ficheiro era 0.5 e com `gain: 0.9` saiu 0.449 — está a ser aplicado.
+
+Verifiquei ainda os **12 nomes de percussão** listados no README contra os que o
+código aceita: `kick`, `snare`, `hihat_closed`, `hihat_open`, `ride`, `crash`,
+`tom_high`, `tom_mid`, `tom_low`, `clap`, `rimshot`, `cowbell`. **Todos carregam;
+nenhum nome documentado falha.** Foste além do que pedi ao documentar também o
+espaçamento recomendado e a razão de a bateria não ser transposta.
+
+### Série 55-59 fechada
+
+| fase | entrega | veredito |
+|---|---|---|
+| 55 | Exportação WAV | APROVADO |
+| 56 | Notas melódicas + piano roll | APROVADO |
+| 57 | Escalas com viola: som + nota destacada | APROVADO |
+| 58 | Loop de compassos | APROVADO |
+| 59 | Samples reais | APROVADO |
+
+O Estúdio de Composição tem agora tudo o que ficou deliberadamente fora de âmbito
+quando o utilizador escolheu a "versão útil primeiro" nas Fases 40-43.
+
+**Fica pendente, sem bloquear nada:**
+- A dobragem da cauda do loop usa um ciclo Python; a versão vectorizada que deixei
+  na revisão da Fase 58 é 89× mais rápida e bit a bit igual.
+- 8 importações por usar nos ficheiros da Fase 56.
+
+Nenhuma das duas afecta o utilizador. Aproveita-as quando passares por esses
+ficheiros; não faças commits só para isso.
+
+**Não há trabalho pedido pendente.** Aguarda instruções do utilizador.
+
+---
+
+## AÇÃO NECESSÁRIA (RESOLVIDA) — Fase 59: samples reais (commit `ff24204`)
 
 **A implementação está bem feita e não precisa de ser reescrita.** Validei-a a
 fundo e passa em tudo o que especifiquei. Faltam duas coisas para a
